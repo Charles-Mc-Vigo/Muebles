@@ -1,22 +1,38 @@
 require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
+const cors = require("cors");
+const userRoutes = require("./router/userRoutes");
+
 const app = express();
 
-//database connection
+//Database connection
 const dbConnection = process.env.DBCONNECTION;
 mongoose
   .connect(dbConnection)
-  .then(()=>{
-    console.log("Connected to database")
+  .then(() => {
+    console.log("Connected to database");
 
     const PORT = process.env.PORT || 5000;
-    app.listen(PORT,()=>{
-      console.log(`Server is running on ${PORT}`)
-    })
-
+    app.listen(PORT, () => {
+      console.log(`Server is running on port ${PORT}`);
+    });
   })
-  .catch((err)=>{
-    console.log('Error connection to the database',err)
-  })
+  .catch((err) => {
+    console.error("Error connecting to the database", err);
+  });
 
+// Basic error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send('Something went wrong!');
+});
+
+// Middleware
+app.use(express.json());
+app.use(cors());
+
+// Routes
+app.use("/", userRoutes);
+
+module.exports = app;
