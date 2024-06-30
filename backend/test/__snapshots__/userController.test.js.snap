@@ -1,14 +1,14 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`SignUp should return all users from the database 1`] = `
+exports[`Get all users should return all users from the database 1`] = `
 {
   "__v": 0,
-  "_id": "6681252cd61269e789f74090",
+  "_id": "668181d208796761cd9a7585",
   "email": "john.doe@example.com",
   "firstname": "John",
   "lastname": "Doe",
   "municipality": "Boac",
-  "password": "$2b$10$iG/1TxLRoCgW5Lr8VagGc.jxYBJxbHXO9FJS9.rYs3MkO8bEbWew.",
+  "password": "$2b$10$jplorvJaCdx/..ns7dwoSOTbeKIzlQcgZp89eUgPBHQOSPnsecPrm",
   "phoneNumber": "09123456789",
   "streetAddress": "123 Main St",
 }

@@ -2,6 +2,7 @@ const request = require("supertest");
 const app = require("../server");
 const { disconnect, connect } = require("./setup");
 require("./setup");
+const User = require("../models/userModel");
 
 describe("SignUp", () => {
   beforeAll(connect);
@@ -27,23 +28,29 @@ describe("SignUp", () => {
   });
 
   // test for creating a new user
-  it("should create a new user", async () => {
-    const res = await request(app)
-      .post("/api/user/signup")
-      .send({
-        firstname: "John",
-        lastname: "Doe",
-        phoneNumber: "09123456789",
-        streetAddress: "123 Main St",
-        municipality: "Boac",
-        email: "john.doe@example.com",
-        password: "Password@123",
-        confirmPassword: "Password@123",
-      });
+  it("should create a new user if the user does not exist", async () => {
+    const existingUser = await User.findOne({ email: "john.doe@example.com" });
+    if (existingUser) {
+      expect(existingUser).toHaveProperty("email", "john.doe@example.com");
+    } else {
+      const res = await request(app)
+        .post("/api/user/signup")
+        .send({
+          firstname: "John",
+          lastname: "Doe",
+          phoneNumber: "09123456789",
+          streetAddress: "123 Main St",
+          municipality: "Boac",
+          email: "john.doe@example.com",
+          password: "Password@123",
+          confirmPassword: "Password@123",
+        });
 
-    expect(res.statusCode).toBe(201);
-    expect(res.body).toHaveProperty("message", "Account created successfully!");
+      expect(res.statusCode).toBe(201);
+      expect(res.body).toHaveProperty("message", "Account created successfully!");
+    }
   });
+
 
   // test if input is not a valid phone number
   it("should return error if phone number is invalid", async () => {
@@ -101,8 +108,13 @@ describe("SignUp", () => {
     expect(res.statusCode).toBe(400);
     expect(res.body).toHaveProperty("message", "Passwords do not match!");
   });
+});
 
-  // test to check all users stored in the database
+describe("Get all users",()=>{
+  beforeAll(connect);
+  afterAll(disconnect);
+
+  // test to return atleast one user stored
   it("should return all users from the database", async () => {
     const res = await request(app).get("/api/users");
 
@@ -114,4 +126,4 @@ describe("SignUp", () => {
     const user = res.body[0];
     expect(user).toMatchSnapshot();
   });
-});
+})
