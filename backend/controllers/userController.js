@@ -42,7 +42,7 @@ exports.SignUp = async (req, res) => {
     const newUser = new User({ firstname, lastname, phoneNumber, streetAddress, municipality, email, password: hashedPassword });
     await newUser.save();
 
-    res.status(201).json(newUser);
+    res.status(201).json({message:"Account created successfully!",newUser:newUser});
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error" });
