@@ -7,20 +7,20 @@ const userRoutes = require("./router/userRoutes");
 const app = express();
 
 //Database connection
-const dbConnection = process.env.DBCONNECTION;
-mongoose
-  .connect(dbConnection)
-  .then(() => {
-    console.log("Connected to database");
+// const dbConnection = process.env.DBCONNECTION;
+// mongoose
+//   .connect(dbConnection)
+//   .then(() => {
+//     console.log("Connected to database");
 
-    const PORT = process.env.PORT || 5000;
-    app.listen(PORT, () => {
-      console.log(`Server is running on port ${PORT}`);
-    });
-  })
-  .catch((err) => {
-    console.error("Error connecting to the database", err);
-  });
+//     const PORT = process.env.PORT || 5000;
+//     app.listen(PORT, () => {
+//       console.log(`Server is running on port ${PORT}`);
+//     });
+//   })
+//   .catch((err) => {
+//     console.error("Error connecting to the database", err);
+//   });
 
 // Basic error handling middleware
 app.use((err, req, res, next) => {
