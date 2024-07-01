@@ -1,19 +1,7 @@
 require("dotenv").config();
 const mongoose = require("mongoose");
 const app = require("../server");
-// const { MongoMemoryServer } = require("mongodb-memory-server");
-// let mongodb;
 
-// exports.connect = async () => {
-//   mongodb = await MongoMemoryServer.create();
-//   const uri = mongodb.getUri();
-//   await mongoose.connect(uri);
-// };
-
-// exports.disconnect = async () => {
-//   await mongoose.disconnect();
-//   await mongodb.stop();
-// };
 let server;
 const TestDB = process.env.TEST_DB;
 

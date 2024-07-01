@@ -2,12 +2,7 @@ const express = require("express");
 const User = require("../models/userModel");
 const bcrypt = require("bcrypt");
 const validator = require("validator");
-
-// const phoneNumberRegex = /^(09|\+639)\d{9}$/;
-
-// const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-// const passwordRegex = /^(?=.*[!@#$%^&*(),.?":{}|<>])/;
+const {JoiSchemaValidator} = require("../middlewares/joiSchemaValidator");
 
 exports.SignUp = async (req, res) => {
   try {
@@ -30,8 +25,8 @@ exports.SignUp = async (req, res) => {
       return res.status(400).json({ message: "Invalid email account!" });
     }
 
-    if (!validator.isStrongPassword(password)) {
-      return res.status(400).json({ message: "Passwords is weak!" });
+    if (!validator.isStrongPassword(password, { minLength: 8, minLowercase: 1, minUppercase: 1, minNumbers: 1, minSymbols: 1 })) {
+      return res.status(400).json({ message: "Password is weak!" });
     }
 
     if (password !== confirmPassword) {
@@ -40,21 +35,15 @@ exports.SignUp = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    const { error } = JoiSchemaValidator.validate({firstname,lastname,streetAddress,municipality, password});
+    if (error) {
+      return res.status(400).json({ message: error.details[0].message });
+    }
+
     const newUser = new User({ firstname, lastname, phoneNumber, streetAddress, municipality, email, password: hashedPassword });
     await newUser.save();
 
     res.status(201).json({message:"Account created successfully!",newUser:newUser});
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Server error" });
-  }
-};
-
-
-exports.getAllUsers = async (req, res) => {
-  try {
-    const users = await User.find();
-    res.status(200).json(users);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error" });
@@ -90,6 +79,7 @@ exports.getAllUsers = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
 
 exports.getUserByID = async (req,res)=>{
   try {

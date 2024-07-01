@@ -3,12 +3,13 @@
 exports[`SignUp should return all users from the database 1`] = `
 {
   "__v": 0,
-  "_id": "66825c5aa6435725d14e6704",
+  "_id": "6682c2a8c730fc0ec04782c1",
+  "createdAt": "2024-07-01T14:52:24.944Z",
   "email": "john.doe@example.com",
   "firstname": "John",
   "lastname": "Doe",
   "municipality": "Boac",
-  "password": "$2b$10$XJFv7TRQylN693uKToU2Ie3wi4Dcxtr7FxxNB0PUb.wuvpryGJGw.",
+  "password": "$2b$10$CWJ02VpI68BnWO4vQ6u0qeOanFYpEIcLjdCLFfIa4MwM8qA6LPhrO",
   "phoneNumber": "09123456789",
   "streetAddress": "123 Main St",
 }
