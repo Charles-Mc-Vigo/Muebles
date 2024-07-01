@@ -17,6 +17,14 @@ const app = require("../server");
 let server;
 const TestDB = process.env.TEST_DB;
 
+const clearDatabase = async () => {
+  const collections = mongoose.connection.collections;
+  for (const key in collections) {
+    const collection = collections[key];
+    await collection.deleteMany({});
+  }
+};
+
 exports.connect = async () => {
   try {
     await mongoose.connect(TestDB);
@@ -36,6 +44,7 @@ exports.disconnect = async () => {
       console.log("Test port terminated.");
     })
   }
+    await clearDatabase();
     await mongoose.disconnect();
     console.log("Disconnected from the test database!");
   } catch (error) {

@@ -1,12 +1,13 @@
 const express = require("express");
 const User = require("../models/userModel");
 const bcrypt = require("bcrypt");
+const validator = require("validator");
 
-const phoneNumberRegex = /^(09|\+639)\d{9}$/;
+// const phoneNumberRegex = /^(09|\+639)\d{9}$/;
 
-const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+// const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-const passwordRegex = /^(?=.*[!@#$%^&*(),.?":{}|<>])/;
+// const passwordRegex = /^(?=.*[!@#$%^&*(),.?":{}|<>])/;
 
 exports.SignUp = async (req, res) => {
   try {
@@ -21,16 +22,16 @@ exports.SignUp = async (req, res) => {
       return res.status(400).json({ message: "Account or phone number is already existing" });
     }
 
-    if (!phoneNumberRegex.test(phoneNumber)) {
+    if (!validator.isMobilePhone(phoneNumber,"en-PH")) {
       return res.status(400).json({ message: "Invalid phone number!" });
     }
 
-    if (!emailRegex.test(email)) {
+    if (!validator.isEmail(email)) {
       return res.status(400).json({ message: "Invalid email account!" });
     }
 
-    if (!passwordRegex.test(password)) {
-      return res.status(400).json({ message: "Passwords should contain at least one special character!" });
+    if (!validator.isStrongPassword(password)) {
+      return res.status(400).json({ message: "Passwords is weak!" });
     }
 
     if (password !== confirmPassword) {
@@ -79,3 +80,29 @@ exports.LogIn = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+exports.getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find();
+    res.status(200).json(users);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+exports.getUserByID = async (req,res)=>{
+  try {
+    const {id} = req.params
+    const user = await User.findById(id);
+
+    if(!user){
+      return res.status(404).json({message:"User not found!"})
+    }
+
+    res.status(200).json(user)
+  } catch (error) {
+    res.status(400).json({message: err.message});
+    console.log(error)
+  }
+}

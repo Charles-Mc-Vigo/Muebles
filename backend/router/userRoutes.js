@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { SignUp, getAllUsers, LogIn } = require("../controllers/userController");
+const { SignUp, getAllUsers, LogIn, getUserByID} = require("../controllers/userController");
 
 // Sign up
 // @route POST /api/user/signup
@@ -13,5 +13,7 @@ router.get("/api/users", getAllUsers);
 // Login
 // @route POST /api/user/login
 router.post("/api/user/login", LogIn);
+
+router.get("/api/user/:id", getUserByID);
 
 module.exports = router;

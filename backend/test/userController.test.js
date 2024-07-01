@@ -51,6 +51,18 @@ describe("SignUp", () => {
     }
   });
 
+    // test to return atleast one user stored
+    it("should return all users from the database", async () => {
+      const res = await request(app).get("/api/users");
+  
+      expect(res.statusCode).toBe(200);
+      expect(Array.isArray(res.body)).toBe(true);
+      expect(res.body.length).toBeGreaterThan(0);
+  
+      // use snapshot for the first user in the response
+      const user = res.body[0];
+      expect(user).toMatchSnapshot();
+    });
 
   // test if input is not a valid phone number
   it("should return error if phone number is invalid", async () => {
@@ -109,21 +121,3 @@ describe("SignUp", () => {
     expect(res.body).toHaveProperty("message", "Passwords do not match!");
   });
 });
-
-describe("Get all users",()=>{
-  beforeAll(connect);
-  afterAll(disconnect);
-
-  // test to return atleast one user stored
-  it("should return all users from the database", async () => {
-    const res = await request(app).get("/api/users");
-
-    expect(res.statusCode).toBe(200);
-    expect(Array.isArray(res.body)).toBe(true);
-    expect(res.body.length).toBeGreaterThan(0);
-
-    // use snapshot for the first user in the response
-    const user = res.body[0];
-    expect(user).toMatchSnapshot();
-  });
-})
