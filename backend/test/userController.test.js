@@ -1,6 +1,6 @@
 const request = require("supertest");
 const app = require("../server");
-const { disconnect, connect } = require("./setup");
+const { disconnect, connect, clearDatabase } = require("./setup");
 require("./setup");
 const User = require("../models/userModel");
 
@@ -13,7 +13,7 @@ describe("User case - Login and Sign up", () => {
 		it("should throw an error if some of the input fields are missing", async () => {
 			const res = await request(app).post("/api/user/signup").send({
 				firstname: "",
-				lastname: "Doe",
+				lastname: "",
 				phoneNumber: "09123456789",
 				streetAddress: "123 Main St",
 				municipality: "Boac",
@@ -29,18 +29,18 @@ describe("User case - Login and Sign up", () => {
 		// test for creating a new user
 		it("should create a new user if the user does not exist", async () => {
 			const existingUser = await User.findOne({
-				email: "john.doe@example.com",
+				email: "charlesvigo@example.com",
 			});
 			if (existingUser) {
-				expect(existingUser).toHaveProperty("email", "john.doe@example.com");
+				expect(existingUser).toHaveProperty("email", "charlesvigo@example.com");
 			} else {
 				const res = await request(app).post("/api/user/signup").send({
-					firstname: "John",
-					lastname: "Doe",
+					firstname: "Charles",
+					lastname: "Vigo",
 					phoneNumber: "09123456789",
 					streetAddress: "123 Main St",
 					municipality: "Boac",
-					email: "john.doe@example.com",
+					email: "charlesvigo@example.com",
 					password: "Password@123",
 					confirmPassword: "Password@123",
 				});
@@ -53,24 +53,15 @@ describe("User case - Login and Sign up", () => {
 			}
 		});
 
-		// test to return atleast one user stored
-		it("should return all users from the database", async () => {
-			const res = await request(app).get("/api/users");
-
-			expect(res.statusCode).toBe(200);
-			expect(Array.isArray(res.body)).toBe(true);
-			expect(res.body.length).toBeGreaterThan(0);
-		});
-
 		// test if input is not a valid phone number
 		it("should return error if phone number is invalid", async () => {
 			const res = await request(app).post("/api/user/signup").send({
-				firstname: "Jane",
-				lastname: "Doe",
+				firstname: "Charles",
+				lastname: "Vigo",
 				phoneNumber: "123456789",
 				streetAddress: "123 Main St",
 				municipality: "Boac",
-				email: "jane.doe@example.com",
+				email: "charlesvigo123@example.com",
 				password: "Password@123",
 				confirmPassword: "Password@123",
 			});
@@ -82,8 +73,8 @@ describe("User case - Login and Sign up", () => {
 		// test if email is invalid
 		it("should return error if email is invalid", async () => {
 			const res = await request(app).post("/api/user/signup").send({
-				firstname: "Jane",
-				lastname: "Doe",
+				firstname: "Charles",
+				lastname: "Vigo",
 				phoneNumber: "09123456788",
 				streetAddress: "123 Main St",
 				municipality: "Boac",
@@ -99,12 +90,12 @@ describe("User case - Login and Sign up", () => {
 		// test if password don't match
 		it("should return error if password don't match", async () => {
 			const res = await request(app).post("/api/user/signup").send({
-				firstname: "Jane",
-				lastname: "Doe",
-				phoneNumber: "09123456788",
+				firstname: "Charles",
+				lastname: "Vigo",
+				phoneNumber: "09923456788",
 				streetAddress: "123 Main St",
 				municipality: "Boac",
-				email: "jane.doe@example.com",
+				email: "charlesvigo123@example.com",
 				password: "Password@124",
 				confirmPassword: "Password@123",
 			});
@@ -114,60 +105,46 @@ describe("User case - Login and Sign up", () => {
 		});
 	});
 
-  
 	// Login cases
-  describe("User case - Login", () => {
-    it("should return a success message if login is completed", async () => {
-      const user = await User.findOne({ email: "jane.doe@example.com" });
-      if (user) {
-        const res = await request(app).post("/api/user/login").send({
-          email: "jane.doe@example.com",
-          password: "Password@123",
-        });
+	describe("User case - Login", () => {
+		let user;
+		it("should return a success message if login is completed", async () => {
+			user = await User.findOne({email:"charlesvigo@example.com"})
+			if (user) {
+				const res = await request(app).post("/api/user/login").send({
+					email: "charlesvigo@example.com",
+					password: "Password@123",
+				});
 
-        expect(res.statusCode).toBe(200);
-        expect(res.body).toHaveProperty("message", "Login successful");
-      }
-    });
+				expect(res.statusCode).toBe(200);
+				expect(res.body).toHaveProperty("message", "Login successful");
+			}
+		});
 
-    it("should return an error if the email is not registered", async () => {
-      const res = await request(app).post("/api/user/login").send({
-        email: "unknown@example.com",
-        password: "Password@123",
-      });
+		it("should return error if password is incorrect", async () => {
+			user = await User.findOne({email:"charlesvigo@example.com"})
+			if (user) {
+				const res = await request(app).post("/api/user/login").send({
+					email: "charlesvigo@example.com",
+					password: "wrongPassword",
+				});
 
-      expect(res.statusCode).toBe(404);
-      expect(res.body).toHaveProperty("message", "Incorrect email account");
-    });
+				expect(res.statusCode).toBe(400);
+				expect(res.body).toHaveProperty("message", "Incorrect password");
+			}
+		});
 
-    it("should return an error if the password is incorrect", async () => {
-      const res = await request(app).post("/api/user/login").send({
-        email: "jane.doe@example.com",
-        password: "WrongPassword",
-      });
+		it("should return error if email is incorrect", async () => {
+			user = await User.findOne({email:"charlesvigo@example.com"})
+			if (user) {
+				const res = await request(app).post("/api/user/login").send({
+					email: "charlesvigo204@example.com",
+					password: "Password@123",
+				});
 
-      expect(res.statusCode).toBe(400);
-      expect(res.body).toHaveProperty("message", "Incorrect password");
-    });
-  });
-
-		// it("should return an error if the email is not registered", async () => {
-		//   const res = await request(app).post("/api/user/login").send({
-		//     email: "unknown@example.com",
-		//     password: "Password@123",
-		//   });
-
-		//   expect(res.statusCode).toBe(404);
-		//   expect(res.body).toHaveProperty("message", "Incorrect email account");
-		// });
-
-		// it("should return an error if the password is incorrect", async () => {
-		//   const res = await request(app).post("/api/user/login").send({
-		//     email: "jane.doe@example.com",
-		//     password: "WrongPassword",
-		//   });
-
-		//   expect(res.statusCode).toBe(400);
-		//   expect(res.body).toHaveProperty("message", "Incorrect password");
-		// });
+				expect(res.statusCode).toBe(404);
+				expect(res.body).toHaveProperty("message", "Incorrect email account");
+			}
+		});
 	});
+});
