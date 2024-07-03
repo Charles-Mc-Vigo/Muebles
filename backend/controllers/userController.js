@@ -56,7 +56,7 @@ exports.LogIn = async (req, res) => {
     const user = await User.findOne({email});
 
     if(!user){
-      return res.status(404).json({message:"Unrecognized account"});
+      return res.status(404).json({message:"Incorrect email account"});
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
