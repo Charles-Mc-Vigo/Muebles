@@ -4,6 +4,7 @@ const bcrypt = require("bcrypt");
 const validator = require("validator");
 const {JoiSchemaValidator} = require("../middlewares/joiSchemaValidator");
 
+//POST - /api/user/signup
 exports.SignUp = async (req, res) => {
   try {
     const { firstname, lastname, phoneNumber, streetAddress, municipality, email, password, confirmPassword } = req.body;
@@ -50,6 +51,8 @@ exports.SignUp = async (req, res) => {
   }
 };
 
+
+//POST - /api/user/login
 exports.LogIn = async (req, res) => {
   try {
     const {email, password} = req.body;
@@ -70,6 +73,7 @@ exports.LogIn = async (req, res) => {
   }
 };
 
+//GET - /api/users
 exports.getAllUsers = async (req, res) => {
   try {
     const users = await User.find();
@@ -80,7 +84,7 @@ exports.getAllUsers = async (req, res) => {
   }
 };
 
-
+//GET - /api/user/:id
 exports.getUserByID = async (req,res)=>{
   try {
     const {id} = req.params
@@ -96,3 +100,71 @@ exports.getUserByID = async (req,res)=>{
     console.log(error)
   }
 }
+
+//PUT - /api/user/:id
+exports.editUserInfo = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { firstname, lastname, phoneNumber, streetAddress, municipality, email } = req.body;
+
+    const existingUser = await User.findById(id);
+    if (!existingUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (email && !validator.isEmail(email)) {
+      return res.status(400).json({ message: "Invalid email address!" });
+    }
+
+    if (phoneNumber && !validator.isMobilePhone(phoneNumber, "en-PH")) {
+      return res.status(400).json({ message: "Invalid phone number!" });
+    }
+
+    if (firstname) existingUser.firstname = firstname;
+    if (lastname) existingUser.lastname = lastname;
+    if (phoneNumber) existingUser.phoneNumber = phoneNumber;
+    if (streetAddress) existingUser.streetAddress = streetAddress;
+    if (municipality) existingUser.municipality = municipality;
+    if (email) existingUser.email = email;
+
+    existingUser.updatedAt = new Date();
+
+    const { error } = JoiSchemaValidator.validate({
+      firstname: existingUser.firstname,
+      lastname: existingUser.lastname,
+      streetAddress: existingUser.streetAddress,
+      municipality: existingUser.municipality,
+      password: existingUser.password
+    });
+    if (error) {
+      return res.status(400).json({ message: error.details[0].message });
+    }
+
+    const modifiedUser = await existingUser.save();
+
+    res.status(200).json({ message: "User information updated successfully!", user: modifiedUser });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+//delete request
+//DELETE - /api/user/:id
+exports.deleteUserbyID = async (req,res) => {
+  try {
+    const {id} = req.params;
+
+    const existingUser = await User.findById(id);
+    if (!existingUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    await existingUser.deleteOne();
+    res.status(200).json({message:"User has been deleted",existingUser})
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+}
+
