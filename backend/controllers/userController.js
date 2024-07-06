@@ -1,8 +1,7 @@
-const express = require("express");
 const User = require("../models/userModel");
 const bcrypt = require("bcrypt");
 const validator = require("validator");
-const {JoiSchemaValidator} = require("../middlewares/joiSchemaValidator");
+const {UserSchemaValidator} = require("../middlewares/UserSchemaValidator");
 
 //POST - /api/user/signup
 exports.SignUp = async (req, res) => {
@@ -36,7 +35,7 @@ exports.SignUp = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const { error } = JoiSchemaValidator.validate({firstname,lastname,streetAddress,municipality, password});
+    const { error } = UserSchemaValidator.validate({firstname,lastname,streetAddress,municipality, password});
     if (error) {
       return res.status(400).json({ message: error.details[0].message });
     }

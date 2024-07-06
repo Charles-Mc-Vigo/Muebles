@@ -3,6 +3,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const userRoutes = require("./router/userRoutes");
+const furnitureRoutes = require("./router/furnitureRoutes")
 
 const app = express();
 
@@ -33,6 +34,8 @@ app.use(express.json());
 app.use(cors());
 
 // Routes
-app.use("/", userRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/furnitures", furnitureRoutes);
+
 
 module.exports = app;

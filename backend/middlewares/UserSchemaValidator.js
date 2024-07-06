@@ -1,6 +1,6 @@
 const joi = require("joi");
 
-const JoiSchemaValidator = joi.object({
+const UserSchemaValidator = joi.object({
   firstname: joi.string().required().min(3).max(30),
   lastname: joi.string().required().min(3).max(30),
   streetAddress: joi.string().required(),
@@ -9,4 +9,4 @@ const JoiSchemaValidator = joi.object({
 });
 
 
-module.exports = {JoiSchemaValidator};
+module.exports = {UserSchemaValidator};
