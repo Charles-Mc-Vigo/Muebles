@@ -81,17 +81,26 @@ exports.getFurnitureById = async (req, res) => {
 
 //get furniture by category
 exports.getFurnitureByCategory = async (req, res) => {
-	try {
-		const { category } = req.params;
-		//check if specific furniture is existing
-		const furniture = await Furniture.find(category);
-
-		res.status(200).json(furniture);
-	} catch (error) {
-		console.log(error);
-		res.status(500).json({ message: "Server error!" });
-	}
+  try {
+    const { category } = req.params;
+    
+    if (!["Door", "Bed frame", "Cabinet", "Chair", "Table", "Sala set"].includes(category)) {
+      return res.status(400).json({ message: "Invalid category!" });
+    }
+    
+    const furniture = await Furniture.find({ category });
+    
+    if (!furniture.length) {
+      return res.status(404).json({ message: "No furniture found for this category!" });
+    }
+    
+    res.status(200).json(furniture);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error!" });
+  }
 };
+
 //edit furniture by id
 exports.editFurnitureById = async (req, res) => {
 	try {

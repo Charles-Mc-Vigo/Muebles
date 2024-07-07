@@ -10,6 +10,7 @@
   - @ GET - /api/users/:id
   - @ PUT - /api/users/:id 
   - @ DELETE - /api/users/:id
+  
   ### Furniture
   - @ POST - /api/furnitures/create
   - @ GET - /api/furnitures 
@@ -17,6 +18,10 @@
   - @ PUT - /api/furnitures/:id
   - @ DELETE - /api/furnitures/:id
   - @ GET - /api/furnitures/:category
+  
+  ### Order
+  - @GET - /api/orders
+  - @POST - /api/orders/create
 # Frontend
   - Vite
   - React
