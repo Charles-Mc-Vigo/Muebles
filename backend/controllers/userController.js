@@ -14,7 +14,7 @@ exports.SignUp = async (req, res) => {
 
     const existingUser = await User.findOne({ $or: [{ email }, { phoneNumber }] });
     if (existingUser) {
-      return res.status(400).json({ message: "Account or phone number is already existing" });
+      return res.status(400).json({ message: "Account or phone number is already existing!" });
     }
 
     if (!validator.isMobilePhone(phoneNumber,"en-PH")) {
@@ -46,7 +46,7 @@ exports.SignUp = async (req, res) => {
     res.status(201).json({message:"Account created successfully!",newUser:newUser});
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: "Server error!" });
   }
 };
 
@@ -58,17 +58,17 @@ exports.LogIn = async (req, res) => {
     const user = await User.findOne({email});
 
     if(!user){
-      return res.status(404).json({message:"Incorrect email account"});
+      return res.status(404).json({message:"Incorrect email account!"});
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(400).json({ message: "Incorrect password" });
+      return res.status(400).json({ message: "Incorrect password!" });
     }
 
-    res.status(200).json({message:"Login successful"})
+    res.status(200).json({message:"Login successful!"})
   } catch (error) {
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: "Server error!" });
   }
 };
 
@@ -79,7 +79,7 @@ exports.getAllUsers = async (req, res) => {
     res.status(200).json(users);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: "Server error!" });
   }
 };
 
@@ -108,7 +108,7 @@ exports.editUserInfo = async (req, res) => {
 
     const existingUser = await User.findById(id);
     if (!existingUser) {
-      return res.status(404).json({ message: "User not found" });
+      return res.status(404).json({ message: "User not found!" });
     }
 
     if (email && !validator.isEmail(email)) {
@@ -128,7 +128,7 @@ exports.editUserInfo = async (req, res) => {
 
     existingUser.updatedAt = new Date();
 
-    const { error } = JoiSchemaValidator.validate({
+    const { error } = UserSchemaValidator.validate({
       firstname: existingUser.firstname,
       lastname: existingUser.lastname,
       streetAddress: existingUser.streetAddress,
@@ -144,7 +144,7 @@ exports.editUserInfo = async (req, res) => {
     res.status(200).json({ message: "User information updated successfully!", user: modifiedUser });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: "Server error!" });
   }
 };
 
@@ -156,14 +156,14 @@ exports.deleteUserbyID = async (req,res) => {
 
     const existingUser = await User.findById(id);
     if (!existingUser) {
-      return res.status(404).json({ message: "User not found" });
+      return res.status(404).json({ message: "User not found!" });
     }
 
-    await existingUser.deleteOne();
-    res.status(200).json({message:"User has been deleted",existingUser})
+    const user = await existingUser.deleteOne();
+    res.status(200).json({message:"User has been deleted!",user})
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: "Server error!" });
   }
 }
 

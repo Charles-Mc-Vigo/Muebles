@@ -5,29 +5,29 @@ const { SignUp, getAllUsers, LogIn, getUserByID, editUserInfo, deleteUserbyID} =
 // Sign up
 // @route POST /api/user/signup
 //create a user
-router.post("/api/user/signup", SignUp);
+router.post("/signup", SignUp);
 
 // Get all users
 // @route GET /api/users
 //get all users
-router.get("/api/users", getAllUsers);
+router.get("/", getAllUsers);
 
 // Login
 // @route POST /api/user/login
 //login user
-router.post("/api/user/login", LogIn);
+router.post("/login", LogIn);
 
 //get user by id
 // @route GET /api/user/:id
-router.get("/api/user/:id", getUserByID);
+router.get("/:id", getUserByID);
 
 
 //edit user information
 // @route PUT /api/user/:id
-router.put("/api/user/:id", editUserInfo);
+router.put("/:id", editUserInfo);
 
 //edit user information
 // @route PUT /api/user/:id
-router.delete("/api/user/:id", deleteUserbyID);
+router.delete("/:id", deleteUserbyID);
 
 module.exports = router;

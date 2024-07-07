@@ -7,17 +7,16 @@
   - @ POST - /api/users/signup
   - @ POST - /api/users/login 
   - @ GET - /api/users 
-  - @ GET - /api/user/:id
-  - @ GET - /api/user/:id 
-  - @ PUT - /api/user/:id 
-  - @ DELETE - /api/user/:id
+  - @ GET - /api/users/:id
+  - @ PUT - /api/users/:id 
+  - @ DELETE - /api/users/:id
   ### Furniture
-  - @ POST - /api/furniture/create
+  - @ POST - /api/furnitures/create
   - @ GET - /api/furnitures 
+  - @ GET - /api/furnitures/:id
+  - @ PUT - /api/furnitures/:id
+  - @ DELETE - /api/furnitures/:id
   - @ GET - /api/furnitures/:category
-  - @ GET - /api/furniture/:category/:id
-  - @ PUT - /api/furniture/:category/:id
-  - @ DELETE - /api/furniture/:category/:id
 # Frontend
   - Vite
   - React
