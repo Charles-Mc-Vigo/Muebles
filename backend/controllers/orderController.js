@@ -1,40 +1,65 @@
 const Order = require("../models/orderModel");
+const User = require("../models/userModel");
+const Furniture = require("../models/furnitureModel");
 
-exports.getAllOrders = async (req,res) => {
+exports.getAllOrders = async (req, res) => {
   try {
-    const orders = await Order.find({});
-    
-    //check if there are orders
-    if(!orders.length){
-      return res.status(404).json({message: "No order found!"})
+    const orders = await Order.find({}).populate('userId').populate('furnituresId');
+
+    if (!orders.length) {
+      return res.status(404).json({ message: "No order found!" });
     }
 
     res.status(200).json(orders);
   } catch (error) {
     console.log(error);
-    res.status(500).json({message: "Server error!"})
+    res.status(500).json({ message: "Server error!" });
   }
 }
 
-exports.createOrders = async (req,res) => {
+exports.createOrders = async (req, res) => {
   try {
-    const {user, orderFurniture, quantity} = req.body;
+    const { userId, furnituresId, quantity } = req.body;
 
-    //check if user is existing
-    if(!user || !orderFurniture || !quantity){
-      return res.status(400).json({message:"All fields are required!"})
+    if (!userId || !furnituresId || !quantity) {
+      return res.status(400).json({ message: "All fields are required!" });
+    }
+
+    const existingUser = await User.findById(userId);
+    if (!existingUser) {
+      return res.status(404).json({ message: "User not found!" });
+    }
+
+    const existingFurnitures = await Furniture.find({ '_id': { $in: furnituresId } });
+    if (existingFurnitures.length !== furnituresId.length) {
+      return res.status(404).json({ message: "One or more furniture items not found!" });
     }
 
     const newOrder = new Order({
-      user,
-      orderFurniture,
+      userId,
+      furnituresId,
       quantity
-    })
+    });
 
     const order = await newOrder.save();
-    res.status(201).json({message:"Order created successfully!",order})
+
+    const orderedFurniture = existingFurnitures.map(furniture => ({
+      furnitureId: furniture._id,
+      furnitureCategory: furniture.category,
+      orderFurniture: furniture.furnitureType
+    }));
+
+    res.status(201).json({
+      message: "Order created successfully!",
+      order,
+      user: {
+        id: existingUser._id,
+        email: existingUser.email
+      },
+      orderedFurniture
+    });
   } catch (error) {
     console.log(error);
-    res.status(500).json({message: "Server error!"})
+    res.status(500).json({ message: "Server error!" });
   }
 }

@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const furnitureSchema = mongoose.Schema({
+const furnitureSchema = new mongoose.Schema({
   category:{
     type:String,
     enum:["Door","Bed frame","Cabinet","Chair", "Table","Sala set"],
