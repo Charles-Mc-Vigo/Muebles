@@ -132,4 +132,6 @@ exports.getOrderById = async (req,res) =>{
   }
 }
 
+//up next!
 //delete request for specific order
+//joi validation for ordering

@@ -22,6 +22,9 @@
   ### Order
   - @GET - /api/orders
   - @POST - /api/orders/create
+  - @GET - /api/orders/:id
+  - @PUT - /api/orders/:id
+  - 
 # Frontend
   - Vite
   - React
