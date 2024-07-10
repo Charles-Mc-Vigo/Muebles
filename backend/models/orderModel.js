@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-
+const Furniture = require("../models/furnitureModel");
 const orderSchema = new mongoose.Schema({
   userId:{
     type: mongoose.Schema.ObjectId,
@@ -13,7 +13,11 @@ const orderSchema = new mongoose.Schema({
   }],
   quantity:{
     type:Number,
-    required:true
+    default:0
+  },
+  totalAmount:{
+    type:Number,
+    default:0
   },
   orderDate:{
     type: Date,
@@ -27,6 +31,29 @@ const orderSchema = new mongoose.Schema({
 },{
   timestamps:true
 })
+
+//calculate the quantity automatically base on furniture order
+orderSchema.pre("save", function (next) {
+  this.quantity = this.furnituresId.length;
+  next();
+});
+
+//calculate the total amount of the order
+orderSchema.pre("save",async function(next){
+  try {
+    const furnitures = await Furniture.find({"_id":{$in: this.furnituresId}});
+
+    let total = 0;
+  
+    furnitures.forEach((furniture)=>{
+      total+=furniture.price;
+      next();
+    })
+    this.totalAmount = total;
+  } catch (error) {
+    next(error);
+  }
+});
 
 const Order = mongoose.model("Order",orderSchema);
 module.exports = Order;
