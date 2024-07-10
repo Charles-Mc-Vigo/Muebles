@@ -4,27 +4,28 @@
   - Mongodb
   ## Routes
   ### User
-  - @ POST - /api/users/signup
-  - @ POST - /api/users/login 
-  - @ GET - /api/users 
-  - @ GET - /api/users/:id
-  - @ PUT - /api/users/:id 
-  - @ DELETE - /api/users/:id
+  - [x] @ POST - /api/users/signup
+  - [x] @ POST - /api/users/login 
+  - [x] @ GET - /api/users 
+  - [x] @ GET - /api/users/:id
+  - [x] @ PUT - /api/users/:id 
+  - [x] @ DELETE - /api/users/:id
   
   ### Furniture
-  - @ POST - /api/furnitures/create
-  - @ GET - /api/furnitures 
-  - @ GET - /api/furnitures/:id
-  - @ PUT - /api/furnitures/:id
-  - @ DELETE - /api/furnitures/:id
-  - @ GET - /api/furnitures/:category
+  - [x] @ POST - /api/furnitures/create
+  - [x] @ GET - /api/furnitures 
+  - [x] @ GET - /api/furnitures/:id
+  - [x] @ PUT - /api/furnitures/:id
+  - [x] @ DELETE - /api/furnitures/:id
+  - [x] @ GET - /api/furnitures/:category
   
   ### Order
-  - @GET - /api/orders
-  - @POST - /api/orders/create
-  - @GET - /api/orders/:id
-  - @PUT - /api/orders/:id
-  - 
+  - [x] @GET - /api/orders
+  - [x] @POST - /api/orders/create
+  - [x] @GET - /api/orders/:id
+  - [x] @PUT - /api/orders/:id
+  - [x] @DELETE - /api/orders/:id
+  - [ ] @GET - /api/orders/:orderStatus
 # Frontend
   - Vite
   - React

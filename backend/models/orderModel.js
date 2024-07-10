@@ -42,7 +42,6 @@ orderSchema.pre("save", function (next) {
 orderSchema.pre("save",async function(next){
   try {
     const furnitures = await Furniture.find({"_id":{$in: this.furnituresId}});
-
     let total = 0;
   
     furnitures.forEach((furniture)=>{

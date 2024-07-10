@@ -1,18 +1,26 @@
 const Order = require("../models/orderModel");
 const User = require("../models/userModel");
 const Furniture = require("../models/furnitureModel");
+const {OrderSchemaValidator} = require("../middlewares/OrderSchemaValidator");
 
 //getting all the orders
 exports.getAllOrders = async (req, res) => {
   try {
     
-    const orders = await Order.find({}).populate('userId').populate('furnituresId');
-
+    const orders = await Order.find({})
+      .populate({
+        path: 'userId',
+        select: '-createdAt -updatedAt -__v'
+      })
+      .populate({
+        path: 'furnituresId',
+        select: '-createdAt -updatedAt -__v'
+      });
     if (!orders.length) {
       return res.status(404).json({ message: "No order found!" });
     }
 
-    res.status(200).json(orders);
+    res.status(200).json({Orders:orders});
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Server error!" });
@@ -73,13 +81,11 @@ exports.editOrder = async (req, res) => {
     const { id } = req.params;
     const { userId, furnituresId, orderStatus } = req.body;
 
-    //check existence of the order
     const existingOrder = await Order.findById(id);
     if (!existingOrder) {
       return res.status(404).json({ message: "Order not found!" });
     }
 
-    //also the user
     if (userId) {
       const existingUser = await User.findById(userId);
       if (!existingUser) {
@@ -88,7 +94,6 @@ exports.editOrder = async (req, res) => {
       existingOrder.userId = userId;
     }
 
-    //also the ordered furnitures
     if (furnituresId) {
       const existingFurnitures = await Furniture.find({ '_id': { $in: furnituresId } });
       if (existingFurnitures.length !== furnituresId.length) {
@@ -97,12 +102,12 @@ exports.editOrder = async (req, res) => {
       existingOrder.furnituresId = furnituresId;
     }
 
-    //edit order status
-    if (orderStatus) {
-      existingOrder.orderStatus = orderStatus;
+    const {error} = OrderSchemaValidator.validate({orderStatus})
+    if (error) {
+      return res.status(400).json({ message: error.details[0].message });
     }
 
-    // save the updated order
+
     const updatedOrder = await existingOrder.save();
 
     res.status(200).json({
@@ -119,19 +124,57 @@ exports.editOrder = async (req, res) => {
 exports.getOrderById = async (req,res) =>{
   try {
     const {id} = req.params;
-    const existingOrder = await Order.findById(id).populate('furnituresId');
+    const order = await Order.findById(id)
+      .populate({
+        path: 'userId',
+        select: '-createdAt -updatedAt -__v'
+      })
+      .populate({
+        path: 'furnituresId',
+        select: '-createdAt -updatedAt -__v'
+      });
 
-    if (!existingOrder) {
+    if (!order) {
       return res.status(404).json({ message: "Order not found!" });
     }
 
-    res.status(200).json({message: "Order details",orderDetails:existingOrder});
+    res.status(200).json({message: "Order details",orderDetails:order});
   } catch (error) {
     console.log(error);
     res.status(500).json({message: "Server error!"})
   }
 }
 
-//up next!
+
 //delete request for specific order
-//joi validation for ordering
+exports.deleteOrderById = async (req,res) =>{
+  try {
+    const {id} = req.params;
+    const order = await Order.findById(id);
+
+    if(!order){
+      return res.status(404).json({message:"Order not found!"});
+    }
+
+    await order.deleteOne();
+    res.status(200).json({message:"Order deleted successfully!",deletedOrder:order});
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({message:"Server error!"});
+  }
+}
+
+//get orders by orderStatus
+exports.getOrdersByStatus = async (req, res) => {
+  try {
+    const { orderStatus } = req.params;
+
+    // Fetch orders from the database filtered by orderStatus
+    const orders = await Order.find({ orderStatus });
+
+    res.status(200).json(orders);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error!" });
+  }
+}
