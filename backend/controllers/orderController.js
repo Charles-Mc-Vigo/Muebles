@@ -52,6 +52,8 @@ exports.createOrders = async (req, res) => {
     });
 
     const order = await newOrder.save();
+    existingUser.orders.push(order._id);
+    await existingUser.save();
 
     const orderedFurniture = existingFurnitures.map(furniture => ({
       furnitureId: furniture._id,
@@ -174,7 +176,7 @@ exports.getOrdersByStatus = async (req, res) => {
 
     res.status(200).json(orders);
   } catch (error) {
-    console.error(error);
+    console.log(error);
     res.status(500).json({ message: "Server error!" });
   }
 }
