@@ -166,17 +166,26 @@ exports.deleteOrderById = async (req,res) =>{
   }
 }
 
-//get orders by orderStatus
+// orderController.js
+// get orders by orderStatus
+// find all the orders based on its status
+// for example. Pending orders must be all shown
 exports.getOrdersByStatus = async (req, res) => {
   try {
     const { orderStatus } = req.params;
 
-    // Fetch orders from the database filtered by orderStatus
+    if (!["Pending", "Delivered", "Shipped", "Cancelled"].includes(orderStatus)) {
+      return res.status(400).json({ message: "Invalid order status!" });
+    }
+
     const orders = await Order.find({ orderStatus });
+    if(!orders.orderStatus){
+      return res.status(404).json({message:`No orders found on ${orderStatus} status`})
+    }
 
     res.status(200).json(orders);
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Server error!" });
   }
-}
+};

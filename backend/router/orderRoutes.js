@@ -18,6 +18,6 @@ router.put("/:id",editOrder)
 router.delete("/:id",deleteOrderById)
 
 //get orders by status
-router.get("/:orderStatus",getOrdersByStatus);
+router.get("/status/:orderStatus",getOrdersByStatus);
 
 module.exports = router;
