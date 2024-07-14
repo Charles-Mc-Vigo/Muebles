@@ -6,9 +6,9 @@ const {UserSchemaValidator} = require("../middlewares/UserSchemaValidator");
 //POST - /api/user/signup
 exports.SignUp = async (req, res) => {
   try {
-    const { firstname, lastname, phoneNumber, streetAddress, municipality, email, password, confirmPassword } = req.body;
+    const { firstname, lastname, gender, phoneNumber, streetAddress, municipality, email, password, confirmPassword } = req.body;
 
-    if (!firstname || !lastname || !phoneNumber || !streetAddress || !municipality || !email || !password || !confirmPassword) {
+    if (!firstname || !lastname || !gender || !phoneNumber || !streetAddress || !municipality || !email || !password || !confirmPassword) {
       return res.status(400).json({ message: "All fields are required!" });
     }
 
@@ -35,12 +35,12 @@ exports.SignUp = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const { error } = UserSchemaValidator.validate({firstname,lastname,streetAddress,municipality, password});
+    const { error } = UserSchemaValidator.validate({firstname,lastname,gender,streetAddress,municipality, password});
     if (error) {
       return res.status(400).json({ message: error.details[0].message });
     }
 
-    const newUser = new User({ firstname, lastname, phoneNumber, streetAddress, municipality, email, password: hashedPassword });
+    const newUser = new User({ firstname, lastname, gender, phoneNumber, streetAddress, municipality, email, password: hashedPassword });
     await newUser.save();
 
     res.status(201).json({message:"Account created successfully!",newUser:newUser});
