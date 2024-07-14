@@ -12,13 +12,22 @@ export default function SignUp() {
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 		try {
-			const response = await axios.post("http://localhost:3000/api/users/signup",formData)
+			const response = await axios.post("/api/user/signup", {
+				firstname: formData.firstname,
+				lastname: formData.lastname,
+				gender:formData.gender,
+				phoneNumber: formData.phoneNumber,
+				streetAddress: formData.streetAddress,
+				municipality: formData.municipality,
+				email: formData.email,
+				password: formData.password,
+				confirmPassword: formData.confirmPassword
+			});
 			console.log(response.data);
-
 		} catch (error) {
-			console.error("Sign up error",error.response.data)
+			console.error("Sign up error", error.response?.data || error.message);
 		}
-	}
+	};
 	return (
 		<div className="p-3 max-w-lg mx-auto">
 			<h1 className="text-center font-semibold my-7 text-3xl">
@@ -49,7 +58,6 @@ export default function SignUp() {
 							id="male"
 							name="gender"
 							value="male"
-							required
 							onChange={handleChange}
 						/>
 						<label htmlFor="male">Male</label>
@@ -58,7 +66,6 @@ export default function SignUp() {
 							id="female"
 							name="gender"
 							value="female"
-							required
 							onChange={handleChange}
 						/>
 						<label htmlFor="female">Female</label>
@@ -89,6 +96,14 @@ export default function SignUp() {
 					<option value="Buenavista">Buenavista</option>
 					<option value="Torrijos">Torrijos</option>
 				</select>
+				<input
+					type="text"
+					placeholder="Street Address"
+					id="streetAddress"
+					required
+					className="bg-slate-100 p-3 rounded-lg"
+					onChange={handleChange}
+				/>
 				<input
 					type="email"
 					placeholder="Email"
