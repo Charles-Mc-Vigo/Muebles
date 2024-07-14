@@ -1,34 +1,52 @@
 require("dotenv").config();
 const express = require("express");
-const mongoose = require("mongoose");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const userRoutes = require("./router/userRoutes");
 const furnitureRoutes = require("./router/furnitureRoutes");
 const orderRoutes = require("./router/orderRoutes");
+const connectDB = require("./database/db");
+const testDB = require("./database/testdb");
 
 const app = express();
 
+const prodServer = async () => {
+	try {
+		await connectDB();
+		app.listen(process.env.PORT || 5000, () => {
+			console.log("Server is running...");
+		});
+	} catch (error) {
+		console.error("Error starting the server!", error.message);
+	}
+};
+
+const testServer = async () => {
+	try {
+		await testDB();
+		app.listen(process.env.TEST_PORT || 5000, () => {
+			console.log("Server is running on test port...");
+		});
+	} catch (error) {
+		next(error);
+	}
+};
+
 //Database connection
-const dbConnection = process.env.DBCONNECTION;
-mongoose
-  .connect(dbConnection)
-  .then(() => {
-    console.log("Connected to database");
+if (process.env.NODE_ENV === "production") {
+	prodServer();
+} else {
+	testServer();
+}
 
-    const PORT = process.env.PORT || 5000;
-    app.listen(PORT, () => {
-      console.log(`Server is running on port ${PORT}`);
-    });
-  })
-  .catch((err) => {
-    console.error("Error connecting to the database", err);
-  });
-
-// Basic error handling middleware
+//error handling
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).send('Something went wrong!');
+	res.status(err.status || 500);
+	res.json({
+		error: {
+			message: err.message,
+		},
+	});
 });
 
 // Middleware
@@ -37,12 +55,9 @@ app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-
 // Routes
 app.use("/api/users", userRoutes);
 app.use("/api/furnitures", furnitureRoutes);
-app.use("/api/orders",orderRoutes);
-
-
+app.use("/api/orders", orderRoutes);
 
 module.exports = app;

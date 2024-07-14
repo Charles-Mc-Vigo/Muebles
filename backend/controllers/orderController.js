@@ -1,7 +1,7 @@
 const Order = require("../models/orderModel");
 const User = require("../models/userModel");
 const Furniture = require("../models/furnitureModel");
-const {OrderSchemaValidator} = require("../middlewares/OrderSchemaValidator");
+const OrderSchemaValidator = require("../middlewares/OrderSchemaValidator");
 
 //getting all the orders
 exports.getAllOrders = async (req, res) => {
@@ -108,6 +108,7 @@ exports.editOrder = async (req, res) => {
     if (error) {
       return res.status(400).json({ message: error.details[0].message });
     }
+    existingOrder.orderStatus = orderStatus;
 
 
     const updatedOrder = await existingOrder.save();
@@ -166,10 +167,7 @@ exports.deleteOrderById = async (req,res) =>{
   }
 }
 
-// orderController.js
 // get orders by orderStatus
-// find all the orders based on its status
-// for example. Pending orders must be all shown
 exports.getOrdersByStatus = async (req, res) => {
   try {
     const { orderStatus } = req.params;

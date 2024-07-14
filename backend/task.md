@@ -25,7 +25,7 @@
   - [x] @GET - /api/orders/:id
   - [x] @PUT - /api/orders/:id
   - [x] @DELETE - /api/orders/:id
-  - [ ] @GET - /api/orders/:orderStatus
+  - [x] @GET - /api/orders/status/:orderStatus
 # Frontend
   - Vite
   - React

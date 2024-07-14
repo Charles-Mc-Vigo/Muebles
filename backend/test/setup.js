@@ -13,7 +13,7 @@ exports.connect = async () => {
       console.log("Server is running on test port!")
     })
   } catch (error) {
-    console.error("Error connecting to the test database:", error);
+    console.error("Error connecting to the test database:", error.message);
   }
 };
 

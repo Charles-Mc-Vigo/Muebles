@@ -1,4 +1,3 @@
-const mongoose = require("mongoose");
 const Furniture = require("../models/furnitureModel");
 const {
 	FurnitureSchemaValidator,
@@ -141,7 +140,7 @@ exports.editFurnitureById = async (req, res) => {
 				message: `Changes has been saved!`,
 			});
 
-		res.status(200).json(existingFurniture);
+		res.status(200).json(modifiedFurniture);
 	} catch (error) {
 		console.log(error);
 		res.status(500).json({ message: "Server error!" });
