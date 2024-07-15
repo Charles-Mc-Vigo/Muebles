@@ -1,8 +1,11 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+
+
 export default function SignUp() {
 	const [formData, setFormData] = useState({});
+	const navigate = useNavigate();
 
 	const handleChange = (e) => {
 		setFormData({ ...formData, [e.target.id]: e.target.value });
@@ -12,7 +15,7 @@ export default function SignUp() {
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 		try {
-			const response = await axios.post("/api/user/signup", {
+			const response = await axios.post("http://localhost:3000/api/users/signup", {
 				firstname: formData.firstname,
 				lastname: formData.lastname,
 				gender:formData.gender,
@@ -24,8 +27,11 @@ export default function SignUp() {
 				confirmPassword: formData.confirmPassword
 			});
 			console.log(response.data);
+			alert("Sign up successfully!");
+			navigate("/login");
 		} catch (error) {
 			console.error("Sign up error", error.response?.data || error.message);
+      alert(error.response?.data?.message || error.message || "Sign up failed");
 		}
 	};
 	return (
