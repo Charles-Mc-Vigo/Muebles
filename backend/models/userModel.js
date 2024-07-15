@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
 
+
+
 const userSchema = new mongoose.Schema({
 	firstname: { type: String, required: true },
 	lastname: { type: String, required: true },
@@ -13,6 +15,20 @@ const userSchema = new mongoose.Schema({
     type: String, 
     enum:["Boac","Gasan","Torrijos","Buenavista", "Mogpog","Santa Cruz"],
     required: true
+  },
+  zipCode: {
+    type: Number,
+    default: function() {
+      const zipCodes = {
+        "Boac": 4900,
+        "Gasan": 4905,
+        "Torrijos": 4903,
+        "Buenavista": 4904,
+        "Mogpog": 4901,
+        "Santa Cruz": 4902
+      };
+      return zipCodes[this.municipality] || 0;
+    }
   },
   email: { 
     type: String, 
