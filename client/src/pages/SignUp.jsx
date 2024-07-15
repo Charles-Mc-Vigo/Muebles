@@ -5,10 +5,31 @@ import axios from "axios";
 
 export default function SignUp() {
 	const [formData, setFormData] = useState({});
+	const [zipCode,setZipcode] = useState("");
 	const navigate = useNavigate();
 
+
+	const municipalityZipcodes = {
+		Boac: '4900',
+		Mogpog: '4901',
+		SantaCruz: '4902',
+		Gasan: '4903',
+		Buenavista: '4904',
+		Torrijos: '4905'
+	};
+
 	const handleChange = (e) => {
-		setFormData({ ...formData, [e.target.id]: e.target.value });
+		const { id, value } = e.target;
+		setFormData({ ...formData, [id]: value });
+
+		if (id === "municipality") {
+			const selectedZipcode = municipalityZipcodes[value] || '';
+			setZipcode(selectedZipcode);
+			setFormData({ ...formData, [id]: value, zipcode: selectedZipcode });
+		} else {
+			setFormData({ ...formData, [id]: value });
+		}
+
 		console.log(formData);
 	};
 
@@ -102,6 +123,14 @@ export default function SignUp() {
 					<option value="Buenavista">Buenavista</option>
 					<option value="Torrijos">Torrijos</option>
 				</select>
+				<input
+					type="text"
+					placeholder="Zipcode"
+					id="zipcode"
+					value={zipCode}
+					disabled
+					className="bg-slate-100 p-3 rounded-lg"
+				/>
 				<input
 					type="text"
 					placeholder="Street Address"
