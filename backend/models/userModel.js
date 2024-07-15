@@ -21,11 +21,11 @@ const userSchema = new mongoose.Schema({
     default: function() {
       const zipCodes = {
         "Boac": 4900,
-        "Gasan": 4903,
-        "Torrijos": 4904,
-        "Buenavista": 4901,
-        "Mogpog": 4902,
-        "Santa Cruz": 4905
+        "Gasan": 4905,
+        "Torrijos": 4903,
+        "Buenavista": 4904,
+        "Mogpog": 4901,
+        "Santa Cruz": 4902
       };
       return zipCodes[this.municipality] || 0;
     }
