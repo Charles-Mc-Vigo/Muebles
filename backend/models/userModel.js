@@ -19,6 +19,10 @@ const userSchema = new mongoose.Schema({
     enum:["Boac","Gasan","Torrijos","Buenavista", "Mogpog","Santa Cruz"],
     required: true
   },
+  zipCode : {
+    type:Number,
+    default:0
+  },
   email: { 
     type: String, 
     required: true, 
