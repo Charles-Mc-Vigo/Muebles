@@ -2,36 +2,46 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 
-
 export default function SignUp() {
 	const [formData, setFormData] = useState({});
+	const [zipCode, setZipcode] = useState("");
 	const navigate = useNavigate();
 
 	const handleChange = (e) => {
-		setFormData({ ...formData, [e.target.id]: e.target.value });
+		const { id, value } = e.target;
+		setFormData({ ...formData, [id]: value });
 		console.log(formData);
+
+		if (id === "municipality") {
+			setZipcode(zipCodes[value] || "");
+		}
+	};
+
+	const zipCodes = {
+		Boac: 4900,
+		Mogpog: 4901,
+		SantaCruz: 4902,
+		Gasan: 4905,
+		Buenavista: 4904,
+		Torrijos: 4903,
 	};
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 		try {
-			const response = await axios.post("http://localhost:3000/api/users/signup", {
-				firstname: formData.firstname,
-				lastname: formData.lastname,
-				gender:formData.gender,
-				phoneNumber: formData.phoneNumber,
-				streetAddress: formData.streetAddress,
-				municipality: formData.municipality,
-				email: formData.email,
-				password: formData.password,
-				confirmPassword: formData.confirmPassword
-			});
+			const response = await axios.post(
+				"http://localhost:3000/api/users/signup",
+				{
+					...formData,
+					zipCode
+				}
+			);
 			console.log(response.data);
 			alert("Sign up successfully!");
 			navigate("/login");
 		} catch (error) {
 			console.error("Sign up error", error.response?.data || error.message);
-      alert(error.response?.data?.message || error.message || "Sign up failed");
+			alert(error.response?.data?.message || error.message || "Sign up failed");
 		}
 	};
 	return (
@@ -90,7 +100,7 @@ export default function SignUp() {
 					id="municipality"
 					required
 					onChange={handleChange}
-					defaultValue=""
+					defaultValue={formData.municipality || ""}
 				>
 					<option value="" disabled hidden>
 						Select Municipality
@@ -102,6 +112,15 @@ export default function SignUp() {
 					<option value="Buenavista">Buenavista</option>
 					<option value="Torrijos">Torrijos</option>
 				</select>
+				{formData.municipality && (
+					<input
+						type="text"
+						value={zipCode}
+						readOnly
+						className="bg-slate-100 p-3 rounded-lg"
+						placeholder="Zip Code"
+					/>
+				)}
 				<input
 					type="text"
 					placeholder="Street Address"
