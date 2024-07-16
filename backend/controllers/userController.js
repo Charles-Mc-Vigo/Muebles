@@ -1,14 +1,19 @@
 const User = require("../models/userModel");
 const bcrypt = require("bcrypt");
 const validator = require("validator");
-const {UserSchemaValidator} = require("../middlewares/UserSchemaValidator");
+const {UserSchemaValidator} = require("../middlewares/JoiSchemaValidation");
+const jwt = require("jsonwebtoken");
+
+const createToken = (_id,firstname,lastname,email) =>{
+  return jwt.sign({_id,firstname,lastname,email},process.env.SECRET,{expiresIn:"1d"});
+}
 
 //POST - /api/user/signup
 exports.SignUp = async (req, res) => {
   try {
-    const { firstname, lastname, phoneNumber, streetAddress, municipality, email, password, confirmPassword } = req.body;
+    const { firstname, lastname, gender, phoneNumber, streetAddress, municipality, email, password, confirmPassword } = req.body;
 
-    if (!firstname || !lastname || !phoneNumber || !streetAddress || !municipality || !email || !password || !confirmPassword) {
+    if (!firstname || !lastname || !gender || !phoneNumber || !streetAddress || !municipality || !email || !password || !confirmPassword) {
       return res.status(400).json({ message: "All fields are required!" });
     }
 
@@ -35,15 +40,15 @@ exports.SignUp = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const { error } = UserSchemaValidator.validate({firstname,lastname,streetAddress,municipality, password});
+    const { error } = UserSchemaValidator.validate({firstname,lastname,gender, streetAddress,municipality, password});
     if (error) {
       return res.status(400).json({ message: error.details[0].message });
     }
 
-    const newUser = new User({ firstname, lastname, phoneNumber, streetAddress, municipality, email, password: hashedPassword });
+    const newUser = new User({ firstname, lastname, gender, phoneNumber, streetAddress, municipality, email, password: hashedPassword });
     await newUser.save();
-
-    res.status(201).json({message:"Account created successfully!",newUser:newUser});
+    const token = createToken(newUser._id);
+    res.status(201).json({message:"Account created successfully!",token});
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error!" });
@@ -66,7 +71,9 @@ exports.LogIn = async (req, res) => {
       return res.status(400).json({ message: "Incorrect password!" });
     }
 
-    res.status(200).json({message:"Login successful!"})
+    const token = createToken(user._id, user.firstname, user.lastname, user.email);
+
+    res.status(200).json({message:"Login successful!",token})
   } catch (error) {
     res.status(500).json({ message: "Server error!" });
   }

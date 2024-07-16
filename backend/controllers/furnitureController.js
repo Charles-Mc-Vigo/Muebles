@@ -1,7 +1,5 @@
 const Furniture = require("../models/furnitureModel");
-const {
-	FurnitureSchemaValidator,
-} = require("../middlewares/FurnitureSchemaValidator");
+const {FurnitureSchemaValidator} = require("../middlewares/JoiSchemaValidation");
 
 //get all furnitures
 exports.getAllFurnitures = async (req, res) => {
@@ -29,7 +27,7 @@ exports.createFurniture = async (req, res) => {
 
 		if (existingFurniture) {
 			return res.status(400).json({
-				message: "Furniture is already existing!"
+				message: "Furniture is already existing!",
 			});
 		}
 
@@ -53,7 +51,7 @@ exports.createFurniture = async (req, res) => {
 
 		await newFurniture.save();
 
-		res.status(200).json({ message: "New furniture is added successfully!"});
+		res.status(200).json({ message: "New furniture is added successfully!" });
 	} catch (error) {
 		console.log(error);
 		res.status(500).json({ message: "Server error!" });
@@ -80,24 +78,30 @@ exports.getFurnitureById = async (req, res) => {
 
 //get furniture by category
 exports.getFurnitureByCategory = async (req, res) => {
-  try {
-    const { category } = req.params;
-    
-    if (!["Door", "Bed frame", "Cabinet", "Chair", "Table", "Sala set"].includes(category)) {
-      return res.status(400).json({ message: "Invalid category!" });
-    }
-    
-    const furniture = await Furniture.find({ category });
-    
-    if (!furniture.length) {
-      return res.status(404).json({ message: "No furniture found for this category!" });
-    }
-    
-    res.status(200).json(furniture);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Server error!" });
-  }
+	try {
+		const { category } = req.params;
+
+		if (
+			!["Door", "Bed frame", "Cabinet", "Chair", "Table", "Sala set"].includes(
+				category
+			)
+		) {
+			return res.status(400).json({ message: "Invalid category!" });
+		}
+
+		const furniture = await Furniture.find({ category });
+
+		if (!furniture.length) {
+			return res
+				.status(404)
+				.json({ message: "No furniture found for this category!" });
+		}
+
+		res.status(200).json(furniture);
+	} catch (error) {
+		console.error(error);
+		res.status(500).json({ message: "Server error!" });
+	}
 };
 
 //edit furniture by id
@@ -112,7 +116,6 @@ exports.editFurnitureById = async (req, res) => {
 		if (!existingFurniture) {
 			return res.status(404).json({ message: "Furniture not found!" });
 		}
-
 
 		if (category) existingFurniture.category = category;
 		if (furnitureType) existingFurniture.furnitureType = furnitureType;
@@ -134,11 +137,9 @@ exports.editFurnitureById = async (req, res) => {
 
 		const modifiedFurniture = await existingFurniture.save();
 
-		res
-			.status(200)
-			.json({
-				message: `Changes has been saved!`,
-			});
+		res.status(200).json({
+			message: `Changes has been saved!`,
+		});
 
 		res.status(200).json(modifiedFurniture);
 	} catch (error) {
@@ -148,21 +149,21 @@ exports.editFurnitureById = async (req, res) => {
 };
 
 //delete furniture by id
-exports.deleteFurnitureById = async (req,res) => {
-  try {
-    const {id} = req.params;
+exports.deleteFurnitureById = async (req, res) => {
+	try {
+		const { id } = req.params;
 
-    //check existance
-    const existingFurniture = await Furniture.findById(id);
+		//check existance
+		const existingFurniture = await Furniture.findById(id);
 
-    if(!existingFurniture){
-      return res.status(404).json({message:"Furniture not found!"})
-    }
+		if (!existingFurniture) {
+			return res.status(404).json({ message: "Furniture not found!" });
+		}
 
-    await existingFurniture.deleteOne();
-    res.status(200).json({message:"Furniture deleted successfully!"})
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json({message:"Server error!"})
-  }
-}
+		await existingFurniture.deleteOne();
+		res.status(200).json({ message: "Furniture deleted successfully!" });
+	} catch (error) {
+		console.log(error);
+		return res.status(500).json({ message: "Server error!" });
+	}
+};

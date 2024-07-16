@@ -3,6 +3,10 @@
   - Express
   - Mongodb
   ## Routes
+  -  [ ] Secure the routes
+  -  [x] Token
+  -  [ ] verify the user using the token
+  -  [ ] Authentication and authorization
   ### User
   - [x] @ POST - /api/users/signup
   - [x] @ POST - /api/users/login 

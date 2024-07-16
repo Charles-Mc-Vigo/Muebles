@@ -1,26 +1,28 @@
 const express = require("express");
 const router = express.Router();
 const { SignUp, getAllUsers, LogIn, getUserByID, editUserInfo, deleteUserbyID} = require("../controllers/userController");
+const authRoutes = require("../middlewares/authRoutes");
+
 
 // Sign up
 // @route POST /api/user/signup
 //create a user
 router.post("/signup", SignUp);
 
-// Get all users
-// @route GET /api/users
-//get all users
-router.get("/", getAllUsers);
-
 // Login
 // @route POST /api/user/login
 //login user
 router.post("/login", LogIn);
 
+// Get all users
+// @route GET /api/users
+//get all users
+router.use(authRoutes)
+router.get("/", getAllUsers);
+
 //get user by id
 // @route GET /api/user/:id
 router.get("/:id", getUserByID);
-
 
 //edit user information
 // @route PUT /api/user/:id
