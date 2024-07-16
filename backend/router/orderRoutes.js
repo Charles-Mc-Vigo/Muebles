@@ -1,6 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const {getAllOrders, createOrders, editOrder, getOrderById, deleteOrderById, getOrdersByStatus} = require("../controllers/orderController");
+const authRoutes = require("../middlewares/authRoutes");
+
+
+router.use(authRoutes)
 
 //get all orders
 router.get("/",getAllOrders);

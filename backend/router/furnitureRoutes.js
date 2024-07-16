@@ -1,7 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const {createFurniture,getAllFurnitures, getFurnitureById, editFurnitureById, deleteFurnitureById, getFurnitureByCategory} = require("../controllers/furnitureController")
+const authRoutes = require("../middlewares/authRoutes");
 
+
+router.use(authRoutes)
 //create new furniture
 //POST - /api/furnitures/create
 router.post("/create",createFurniture);

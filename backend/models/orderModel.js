@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const Furniture = require("../models/furnitureModel");
+
 const orderSchema = new mongoose.Schema({
   userId:{
     type: mongoose.Schema.ObjectId,
@@ -18,6 +19,11 @@ const orderSchema = new mongoose.Schema({
   totalAmount:{
     type:Number,
     default:0
+  },
+  currency:{
+    type:String,
+    enum:["PHP"],
+    default:"PHP"
   },
   orderDate:{
     type: Date,
@@ -48,7 +54,7 @@ orderSchema.pre("save",async function(next){
       total+=furniture.price;
       next();
     })
-    this.totalAmount = total;
+    this.totalAmount = `${this.currency}`,total;
   } catch (error) {
     next(error);
   }

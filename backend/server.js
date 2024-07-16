@@ -8,8 +8,8 @@ const orderRoutes = require("./router/orderRoutes");
 const connectDB = require("./database/db");
 const testDB = require("./database/testdb");
 
-const app = express();
 
+const app = express();
 const prodServer = async () => {
 	try {
 		await connectDB();

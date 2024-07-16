@@ -19,11 +19,6 @@ const furnitureSchema = new mongoose.Schema({
     required:true,
     default:0
   },
-  currency:{
-    type:String,
-    enum:["PHP"],
-    default:"PHP"
-  },
   createdAt:{
     type:Date,
     default:Date.now
