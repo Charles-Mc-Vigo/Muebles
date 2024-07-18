@@ -4,7 +4,7 @@ export default function LandinPage() {
 	return (
 		<>
 			<Nav />
-      <h1 className="text-center">Landing Page</h1>
+			<img src="/testlandingpage.png" alt="" />
 		</>
 	);
 }
