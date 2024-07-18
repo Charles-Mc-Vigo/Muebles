@@ -1,20 +1,16 @@
 import React from "react";
 
-export default function content() {
-	return (
-		<div className="flex">
-			<div>
-				<h1 className="text-4xl sm:text-6xl lg:text-7xl">
-					Discover the Beauty of Handcrafted Wood Furniture!
-				</h1>
-			</div>
-			<div className="">
-				<img
-					src="/furniture.jpg"
-					alt="furniture"
-					style={{ width: "100%", maxWidth: "800px", height: "auto" }}
-				/>
-			</div>
-		</div>
-	);
+export default function Content() {
+  return (
+    <div className="flex flex-col lg:flex-row max-w-7xl m-auto mt-10">
+      <h1 className="text-4xl lg:text-7xl mb-4 lg:mb-0 lg:mr-4">
+        Discover the Beauty of Handcrafted Wood Furniture!
+      </h1>
+      <img
+        className="w-1/2 max-w-full lg:max-w-800px h-auto"
+        src="/furniture.jpg"
+        alt="furniture"
+      />
+    </div>
+  );
 }
