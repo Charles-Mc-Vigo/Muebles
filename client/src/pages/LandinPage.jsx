@@ -5,9 +5,7 @@ export default function LandinPage() {
 	return (
 		<>
 			<Nav />
-			<div className="max-w-7xl mx-auto pt-10 bg-slate-600">
-				<Content />
-			</div>
+			<Content />
 		</>
 	);
 }
