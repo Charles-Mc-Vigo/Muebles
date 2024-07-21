@@ -1,11 +1,12 @@
 import React from "react";
-import Nav from "../components/nav";
-import Content from "../components/content";
+import Header from "../components/Header";
+import Hero from "../components/Hero";
+
 export default function LandinPage() {
 	return (
 		<>
-			<Nav />
-			<Content />
+			<Header showLogin={true}/>
+			<Hero />
 		</>
 	);
 }
