@@ -5,7 +5,7 @@ const {UserSchemaValidator} = require("../middlewares/JoiSchemaValidation");
 const jwt = require("jsonwebtoken");
 
 const createToken = (_id,firstname,lastname,email) =>{
-  return jwt.sign({_id,firstname,lastname,email},process.env.SECRET,{expiresIn:"1d"});
+  return jwt.sign({_id,firstname,lastname,email},process.env.SECRET,{expiresIn:"3d"});
 }
 
 //POST - /api/user/signup
@@ -40,7 +40,7 @@ exports.SignUp = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const { error } = UserSchemaValidator.validate({firstname,lastname,gender, streetAddress,municipality, password});
+    const { error } = UserSchemaValidator.validate({firstname,lastname, gender, streetAddress,municipality, password});
     if (error) {
       return res.status(400).json({ message: error.details[0].message });
     }
@@ -102,16 +102,33 @@ exports.getUserByID = async (req,res)=>{
 
     res.status(200).json(user)
   } catch (error) {
-    res.status(400).json({message: err.message});
+    res.status(400).json({message: error.message});
     console.log(error)
   }
 }
+
+//GET - /api/user/roles
+exports.getUserRoles = async (req, res) => {
+  try {
+    
+    const users = await User.find({}, 'firstname lastname email isAdmin');
+
+    if (!users.length) {
+      return res.status(404).json({ message: "No users found!" });
+    }
+    res.status(200).json(users);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+    console.log(error);
+  }
+};
+
 
 //PUT - /api/user/:id
 exports.editUserInfo = async (req, res) => {
   try {
     const { id } = req.params;
-    const { firstname, lastname, phoneNumber, streetAddress, municipality, email } = req.body;
+    const { firstname, lastname, gender, phoneNumber, streetAddress, municipality, email, isAdmin } = req.body;
 
     const existingUser = await User.findById(id);
     if (!existingUser) {
@@ -128,16 +145,20 @@ exports.editUserInfo = async (req, res) => {
 
     if (firstname) existingUser.firstname = firstname;
     if (lastname) existingUser.lastname = lastname;
+    if (gender) existingUser.gender = gender;
     if (phoneNumber) existingUser.phoneNumber = phoneNumber;
     if (streetAddress) existingUser.streetAddress = streetAddress;
     if (municipality) existingUser.municipality = municipality;
     if (email) existingUser.email = email;
+    if (isAdmin) existingUser.isAdmin = isAdmin;
+
 
     existingUser.updatedAt = new Date();
 
     const { error } = UserSchemaValidator.validate({
       firstname: existingUser.firstname,
       lastname: existingUser.lastname,
+      gender: existingUser.gender,
       streetAddress: existingUser.streetAddress,
       municipality: existingUser.municipality,
       password: existingUser.password

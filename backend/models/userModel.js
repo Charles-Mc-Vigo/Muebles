@@ -42,14 +42,14 @@ const userSchema = new mongoose.Schema({
     type: String, 
     required: true
   },
+  isAdmin:{
+    type:Boolean,
+    default: false
+  },
   orders:[{
     type:mongoose.Schema.ObjectId,
     ref:"Order"
-  }],
-  createdAt:{
-    type:Date,
-    default: Date.now
-  }
+  }]
 },{
   timestamps:true
 });

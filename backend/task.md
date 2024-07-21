@@ -3,10 +3,10 @@
   - Express
   - Mongodb
   ## Routes
-  -  [ ] Secure the routes
+  -  [x] Secure the routes
   -  [x] Token
-  -  [ ] verify the user using the token
-  -  [ ] Authentication and authorization
+  -  [x] verify the user using the token
+  -  [x] Authentication and authorization
   ### User
   - [x] @ POST - /api/users/signup
   - [x] @ POST - /api/users/login 
@@ -14,6 +14,7 @@
   - [x] @ GET - /api/users/:id
   - [x] @ PUT - /api/users/:id 
   - [x] @ DELETE - /api/users/:id
+  - [x] @ GET - /api/users/manageRoles/roles
   
   ### Furniture
   - [x] @ POST - /api/furnitures/create
