@@ -4,9 +4,10 @@ const validator = require("validator");
 const {UserSchemaValidator} = require("../middlewares/JoiSchemaValidation");
 const jwt = require("jsonwebtoken");
 
-const createToken = (_id,firstname,lastname,email) =>{
-  return jwt.sign({_id,firstname,lastname,email},process.env.SECRET,{expiresIn:"3d"});
-}
+const createToken = (_id, firstname, lastname, email, isAdmin) => {
+  return jwt.sign({ _id, firstname, lastname, email, isAdmin }, process.env.SECRET, { expiresIn: "3d" });
+};
+
 
 //POST - /api/user/signup
 exports.SignUp = async (req, res) => {
@@ -56,14 +57,13 @@ exports.SignUp = async (req, res) => {
 };
 
 
-//POST - /api/user/login
 exports.LogIn = async (req, res) => {
   try {
-    const {email, password} = req.body;
-    const user = await User.findOne({email});
+    const { email, password } = req.body;
+    const user = await User.findOne({ email });
 
-    if(!user){
-      return res.status(404).json({message:"Incorrect email account!"});
+    if (!user) {
+      return res.status(404).json({ message: "Incorrect email account!" });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
@@ -71,13 +71,14 @@ exports.LogIn = async (req, res) => {
       return res.status(400).json({ message: "Incorrect password!" });
     }
 
-    const token = createToken(user._id, user.firstname, user.lastname, user.email);
+    const token = createToken(user._id, user.firstname, user.lastname, user.email, user.isAdmin);
 
-    res.status(200).json({message:"Login successful!",token})
+    res.status(200).json({ message: "Login successful!", token, isAdmin: user.isAdmin });
   } catch (error) {
     res.status(500).json({ message: "Server error!" });
   }
 };
+
 
 //GET - /api/users
 exports.getAllUsers = async (req, res) => {

@@ -4,6 +4,8 @@ import LandinPage from "./pages/LandinPage";
 import SignUp from "./pages/SignUp";
 import Login from "./pages/Login";
 import Home from "./pages/Home";
+import Dashboard from "./pages/Dashboard";
+import AdminLogin from "./pages/AdminLogin";
 import ProtectedRoute from "./components/protectedRoutes";
 
 export default function App() {
@@ -13,6 +15,7 @@ export default function App() {
         <Route path="/" element={<LandinPage />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/admin" element={<AdminLogin />} />
         <Route
           path="/home"
           element={
@@ -21,6 +24,14 @@ export default function App() {
             </ProtectedRoute>
           }
         />
+        <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute admin={true}>
+            <Dashboard/>
+          </ProtectedRoute>
+        }>
+        </Route>
       </Routes>
     </BrowserRouter>
   );
