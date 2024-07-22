@@ -6,7 +6,6 @@ const userRoutes = require("./router/userRoutes");
 const furnitureRoutes = require("./router/furnitureRoutes");
 const orderRoutes = require("./router/orderRoutes");
 const connectDB = require("./database/db");
-const testDB = require("./database/testdb");
 
 
 const app = express();
@@ -21,22 +20,9 @@ const prodServer = async () => {
 	}
 };
 
-const testServer = async () => {
-	try {
-		await testDB();
-		app.listen(process.env.TEST_PORT || 5000, () => {
-			console.log("Server is running on test port...");
-		});
-	} catch (error) {
-		next(error);
-	}
-};
-
 //Database connection
 if (process.env.NODE_ENV === "production") {
 	prodServer();
-} else {
-	testServer();
 }
 
 //error handling
