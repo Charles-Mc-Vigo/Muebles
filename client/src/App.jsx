@@ -7,6 +7,7 @@ import Home from "./pages/Home";
 import Dashboard from "./pages/adminPages/Dashboard";
 import AdminLogin from "./pages/adminPages/AdminLogin";
 import Cart from "./pages/Cart";
+import Furnitures from "./pages/adminPages/Furnitures";
 
 export default function App() {
   return (
@@ -19,6 +20,7 @@ export default function App() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/home" element={<Home />} />
         <Route path="/cart" element={<Cart/>}/>
+        <Route path="/furnitures" element={<Furnitures/>}/>
       </Routes>
     </BrowserRouter>
   );

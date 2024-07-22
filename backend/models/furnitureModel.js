@@ -1,6 +1,10 @@
 const mongoose = require("mongoose");
 
 const furnitureSchema = new mongoose.Schema({
+  image:{
+    type:String,
+    required:true
+  },
   category:{
     type:String,
     enum:["Door","Bed frame","Cabinet","Chair", "Table","Sala set"],
