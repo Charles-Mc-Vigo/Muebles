@@ -4,9 +4,9 @@ import LandinPage from "./pages/LandinPage";
 import SignUp from "./pages/SignUp";
 import Login from "./pages/Login";
 import Home from "./pages/Home";
-import Dashboard from "./pages/Dashboard";
-import AdminLogin from "./pages/AdminLogin";
-import ProtectedRoute from "./components/protectedRoutes";
+import Dashboard from "./pages/adminPages/Dashboard";
+import AdminLogin from "./pages/adminPages/AdminLogin";
+import Cart from "./pages/Cart";
 
 export default function App() {
   return (
@@ -16,22 +16,9 @@ export default function App() {
         <Route path="/signup" element={<SignUp />} />
         <Route path="/login" element={<Login />} />
         <Route path="/admin" element={<AdminLogin />} />
-        <Route
-          path="/home"
-          element={
-            <ProtectedRoute>
-              <Home />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-        path="/dashboard"
-        element={
-          <ProtectedRoute admin={true}>
-            <Dashboard/>
-          </ProtectedRoute>
-        }>
-        </Route>
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/home" element={<Home />} />
+        <Route path="/cart" element={<Cart/>}/>
       </Routes>
     </BrowserRouter>
   );

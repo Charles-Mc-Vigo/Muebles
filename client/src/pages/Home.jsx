@@ -5,7 +5,7 @@ export default function Home() {
 	return (
 		<>
 			<Header showLogin={false} category={true} />
-			<div className="lg:max-w-7xl bg-slate-400 mx-auto">
+			<div className="lg:max-w-7xl bg-slate-400 mx-auto h-screen flex justify-center items-center">
         <h1 className="text-center text-5xl">This is a home page</h1>
       </div>
 		</>
