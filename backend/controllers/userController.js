@@ -109,7 +109,7 @@ exports.getUserByID = async (req,res)=>{
 }
 
 //GET - /api/user/roles
-exports.getUserRoles = async (req, res) => {
+exports.showAdmins = async (req, res) => {
   try {
     
     const users = await User.find({}, 'firstname lastname email isAdmin');
