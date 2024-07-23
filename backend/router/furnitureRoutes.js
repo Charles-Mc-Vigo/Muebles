@@ -15,7 +15,7 @@ router.get("/",getAllFurnitures);
 
 //get furnitures by category
 //GET - /api/furnitures/:category
-router.get("/:category",getFurnitureByCategory)
+router.get("/category/:category",getFurnitureByCategory)
 
 //get furniture by id
 //GET - /api/furnitures/:id
