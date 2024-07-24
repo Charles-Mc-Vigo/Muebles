@@ -14,7 +14,7 @@
   - [x] @ GET - /api/users/:id
   - [x] @ PUT - /api/users/:id 
   - [x] @ DELETE - /api/users/:id
-  - [x] @ GET - /api/users/manageRoles/roles
+  - [x] @ GET - /api/users/showRoles/admin
   
   ### Furniture
   - [x] @ POST - /api/furnitures/create

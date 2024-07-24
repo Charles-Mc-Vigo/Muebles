@@ -3,11 +3,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import LandinPage from "./pages/LandinPage";
 import SignUp from "./pages/SignUp";
 import Login from "./pages/Login";
-import Home from "./pages/Home";
-import Dashboard from "./pages/adminPages/Dashboard";
-import AdminLogin from "./pages/adminPages/AdminLogin";
-import Cart from "./pages/Cart";
-import Furnitures from "./pages/adminPages/Furnitures";
+import Furniture from "./pages/Furniture";
 
 export default function App() {
   return (
@@ -16,11 +12,8 @@ export default function App() {
         <Route path="/" element={<LandinPage />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/admin" element={<AdminLogin />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/home" element={<Home />} />
-        <Route path="/cart" element={<Cart/>}/>
-        <Route path="/furnitures" element={<Furnitures/>}/>
+        <Route path="/furniture/create" element={<Furniture />} />
+
       </Routes>
     </BrowserRouter>
   );
