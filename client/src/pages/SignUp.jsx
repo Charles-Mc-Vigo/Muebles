@@ -47,7 +47,7 @@ export default function SignUp() {
 	return (
 		<div className="p-3 max-w-lg mx-auto">
 			<h1 className="text-center font-semibold my-7 text-3xl">
-			Welcome to JCKAME Furniture Shop!
+				Welcome to Muebles!
 			</h1>
 			<form className="flex flex-col gap-4" onSubmit={handleSubmit}>
 				<input
