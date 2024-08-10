@@ -3,12 +3,24 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 export default function SignUp() {
-	const [formData, setFormData] = useState({});
+	const [formData, setFormData] = useState({
+		firstname: "",
+		lastname: "",
+		gender: "",
+		phoneNumber: "",
+		streetAddress: "",
+		municipality: "",
+		email: "",
+		password: "",
+		confirmPassword: "",
+	});
+
 	const [zipCode, setZipcode] = useState("");
 	const navigate = useNavigate();
 
 	const handleChange = (e) => {
 		const { id, value } = e.target;
+
 		setFormData({ ...formData, [id]: value });
 		console.log(formData);
 
@@ -28,14 +40,18 @@ export default function SignUp() {
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
+
+		console.log("Form data to be submitted:", { ...formData, zipCode });
 		try {
 			const response = await axios.post(
 				"http://localhost:3000/api/users/signup",
 				{
 					...formData,
-					zipCode
+					zipCode,
 				}
 			);
+
+			//store token to local storage
 			console.log(response.data);
 			alert("Sign up successfully!");
 			navigate("/login");
@@ -66,27 +82,19 @@ export default function SignUp() {
 					className="bg-slate-100 p-3 rounded-lg"
 					onChange={handleChange}
 				/>
-				<div className="flex justify-between mx-4">
-					<label htmlFor="Gender">Gender</label>
-					<div name="Gender" className="flex gap-4">
-						<input
-							type="radio"
-							id="male"
-							name="gender"
-							value="male"
-							onChange={handleChange}
-						/>
-						<label htmlFor="male">Male</label>
-						<input
-							type="radio"
-							id="female"
-							name="gender"
-							value="female"
-							onChange={handleChange}
-						/>
-						<label htmlFor="female">Female</label>
-					</div>
-				</div>
+				<select
+					id="gender"
+					value={formData.gender}
+					onChange={handleChange}
+					required
+					className="bg-slate-100 p-3 rounded-lg"
+				>
+					<option value="" disabled hidden>
+					Gender
+					</option>
+					<option value="Male">Male</option>
+					<option value="Female">Female</option>
+				</select>
 				<input
 					type="tel"
 					placeholder="+639XXXXXXXXX"
