@@ -71,7 +71,7 @@ exports.LogIn = async (req, res) => {
       return res.status(400).json({ message: "Incorrect password!" });
     }
 
-    const token = createToken(user._id, user.firstname, user.lastname, user.email, user.isAdmin);
+    const token = createToken(user._id);
 
     res.status(200).json({ message: "Login successful!", token, isAdmin: user.isAdmin });
   } catch (error) {

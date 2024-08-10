@@ -51,7 +51,6 @@ export default function SignUp() {
 				}
 			);
 
-			//store token to local storage
 			console.log(response.data);
 			alert("Sign up successfully!");
 			navigate("/login");

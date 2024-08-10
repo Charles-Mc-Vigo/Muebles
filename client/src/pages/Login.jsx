@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 
@@ -8,7 +8,7 @@ export default function Login() {
 		email:'',
 		password:''
 	});
-
+	const navigate = useNavigate();
 const handleChange = (e) => {
 	const {id,value} = e.target;
 	setFormData({...formData,[id]:value});
@@ -25,7 +25,14 @@ const handleSubmit = async (e) => {
 		})
 		console.log(response);
 		//store token to local storage
-		response ? alert('Logged in successful') : alert('Logged in unsuccessful');
+		if(response){
+			localStorage.setItem('authToken', response.data.token);
+			alert('Logged in successful')
+			navigate('/home')
+		}else{
+			alert('Logged in unsuccessful')
+		}
+
 	} catch (error) {
 		console.error("Log in error", error.response?.data || error.message);
 		alert(error.response?.data?.message || error.message || "Log in failed");
