@@ -1,14 +1,14 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
-const Home = () => {
-  return (
-    <>
-    <nav>
-      <h1>JCKAME</h1>
-      <Link to='/logout'>Logout</Link>
-    </nav>
-    </>
-  )
-}
+import React from "react";
+import Nav from "../components/Nav";
+import ItemList from "../components/ItemList";
 
-export default Home
+const Home = () => {
+	return (
+		<>
+			<Nav />
+      <ItemList/>
+		</>
+	);
+};
+
+export default Home;

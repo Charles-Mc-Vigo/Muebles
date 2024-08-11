@@ -24,7 +24,6 @@ const handleSubmit = async (e) => {
 			...formData
 		})
 		console.log(response);
-		//store token to local storage
 		if(response){
 			localStorage.setItem('authToken', response.data.token);
 			alert('Logged in successful')

@@ -37,9 +37,7 @@ app.use((err, req, res, next) => {
 
 // Middleware
 app.use(express.json());
-app.use(cors({
-  origin: 'http://localhost:5173'
-}));
+app.use(cors());
 app.use(bodyParser.json({limit: '100mb'}));
 app.use(bodyParser.urlencoded({limit: '100mb', extended: true}));
 app.use(bodyParser.json());
