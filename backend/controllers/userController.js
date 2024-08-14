@@ -4,8 +4,8 @@ const validator = require("validator");
 const {UserSchemaValidator} = require("../middlewares/JoiSchemaValidation");
 const jwt = require("jsonwebtoken");
 
-const createToken = (_id, firstname, lastname, email, isAdmin) => {
-  return jwt.sign({ _id, firstname, lastname, email, isAdmin }, process.env.SECRET, { expiresIn: "3d" });
+const createToken = (_id) => {
+  return jwt.sign({ _id }, process.env.SECRET, { expiresIn: "3d" });
 };
 
 
@@ -49,6 +49,13 @@ exports.SignUp = async (req, res) => {
     const newUser = new User({ firstname, lastname, gender, phoneNumber, streetAddress, municipality, email, password: hashedPassword });
     await newUser.save();
     const token = createToken(newUser._id);
+
+    res.cookie('authToken', token, {
+      httpOnly: true, // Cookie is not accessible via JavaScript
+      secure: process.env.NODE_ENV === 'production', // Use HTTPS in production
+      maxAge: 3 * 24 * 60 * 60 * 1000 // 3 days
+    });
+
     res.status(201).json({message:"Account created successfully!",token});
   } catch (err) {
     console.error(err);
@@ -72,6 +79,12 @@ exports.LogIn = async (req, res) => {
     }
 
     const token = createToken(user._id);
+
+    res.cookie('authToken', token, {
+      httpOnly: true, // Cookie is not accessible via JavaScript
+      secure: process.env.NODE_ENV === 'production', // Use HTTPS in production
+      maxAge: 3 * 24 * 60 * 60 * 1000 // 3 days
+    });
 
     res.status(200).json({ message: "Login successful!", token, isAdmin: user.isAdmin });
   } catch (error) {

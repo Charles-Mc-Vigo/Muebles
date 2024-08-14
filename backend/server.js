@@ -6,6 +6,7 @@ const userRoutes = require("./router/userRoutes");
 const furnitureRoutes = require("./router/furnitureRoutes");
 const orderRoutes = require("./router/orderRoutes");
 const connectDB = require("./database/db");
+const cookieParser = require('cookie-parser')
 
 
 const app = express();
@@ -38,6 +39,7 @@ app.use((err, req, res, next) => {
 // Middleware
 app.use(express.json());
 app.use(cors());
+app.use(cookieParser())
 app.use(bodyParser.json({limit: '100mb'}));
 app.use(bodyParser.urlencoded({limit: '100mb', extended: true}));
 app.use(bodyParser.json());
