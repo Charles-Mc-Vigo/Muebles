@@ -81,12 +81,13 @@ exports.LogIn = async (req, res) => {
     const token = createToken(user._id);
 
     res.cookie('authToken', token, {
-      httpOnly: true, // Cookie is not accessible via JavaScript
-      secure: process.env.NODE_ENV === 'production', // Use HTTPS in production
-      maxAge: 3 * 24 * 60 * 60 * 1000 // 3 days
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 3 * 24 * 60 * 60 * 1000
     });
 
-    res.status(200).json({ message: "Login successful!", token, isAdmin: user.isAdmin });
+
+    res.status(200).json({ message: "Login successful!", token });
   } catch (error) {
     res.status(500).json({ message: "Server error!" });
   }

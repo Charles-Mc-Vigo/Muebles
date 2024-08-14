@@ -1,7 +1,8 @@
 const jwt = require("jsonwebtoken");
+const User = require("../models/userModel");
 
 const authRoutes = async (req, res, next) => {
-
+  
   const token = req.cookies.authToken;
 
   if (!token) {
@@ -9,8 +10,8 @@ const authRoutes = async (req, res, next) => {
   }
 
   try {
-    req.user = jwt.verify(token, process.env.SECRET);
-    console.log(req.user)//debugging
+    const { _id } = jwt.verify(token, process.env.SECRET);
+    req.user = await User.findOne({ _id }).select('_id');
     next();
   } catch (error) {
     console.log(error);

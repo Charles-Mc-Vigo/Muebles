@@ -4,7 +4,7 @@
   - Mongodb
   ## Routes
   -  [x] Secure the routes
-  -  [x] Token
+  -  [x] Token store in cookie
   -  [x] verify the user using the token
   -  [x] Authentication and authorization
   ### User
@@ -26,7 +26,7 @@
   
   ### Order
   - [x] @GET - /api/orders
-  - [x] @POST - /api/orders/create
+  - [x] @POST - /api/orders/createOrder
   - [x] @GET - /api/orders/:id
   - [x] @PUT - /api/orders/:id
   - [x] @DELETE - /api/orders/:id
