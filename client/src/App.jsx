@@ -9,7 +9,7 @@ import AdminOnlyRoutes from "./components/AdminOnlyRoutes";
 import Logout from "./components/Logout";
 import Cart from "./pages/Cart";
 import AdminLogin from "./pages/AdminLogin";
-import Dashboard from "./pages/Dashboard";
+import DashBoard from "./pages/DashBoard";
 
 export default function App() {
 	return (
@@ -20,7 +20,7 @@ export default function App() {
 				<Route path="/login" element={<Login />} />
 				<Route path="/admin" element={<AdminLogin />}/>
 				<Route path="/home" element={<ProtectedRoute element={<Home />} />} />
-				<Route path="/dashboard" element={<AdminOnlyRoutes element={<Dashboard />} />} />
+				<Route path="/dashboard" element={<AdminOnlyRoutes element={<DashBoard />} />} />
 
 				<Route
 					path="/logout"
