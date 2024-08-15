@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { SignUp, getAllUsers, LogIn, getUserByID, editUserInfo, deleteUserbyID, showAdmins} = require("../controllers/userController");
+const { SignUp, getAllUsers, LogIn, getUserByID, editUserInfo, deleteUserbyID, showAdmins, Logout} = require("../controllers/userController");
 const authRoutes = require("../middlewares/authRoutes");
 
 
@@ -36,5 +36,7 @@ router.put("/:id", editUserInfo);
 //edit user information
 // @route PUT /api/users/:id
 router.delete("/:id", deleteUserbyID);
+
+router.post("/logout",Logout)
 
 module.exports = router;

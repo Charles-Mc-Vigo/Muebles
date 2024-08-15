@@ -93,6 +93,15 @@ exports.LogIn = async (req, res) => {
   }
 };
 
+exports.Logout = (req, res) => {
+  res.clearCookie('authToken', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+  });
+
+  res.status(200).json({ message: "Logout successful!" });
+};
+
 
 //GET - /api/users
 exports.getAllUsers = async (req, res) => {
