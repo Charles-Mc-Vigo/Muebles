@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-
+import Cookies from 'js-cookie';
 const AdminLogin = () => {
   const [formData, setFormData] = useState({
     email: "",
@@ -24,10 +24,16 @@ const AdminLogin = () => {
         password: formData.password
       });
 
+      console.log('check if user is admin',response.data.isAdmin) //debugging
+      console.log('check if user has token',response.data.token) //debugging
       // Check if the user is an admin
-      if (response.data.isAdmin) {
+      if (response.data.token && response.data.isAdmin) {
         // Store the token and navigate to the admin dashboard
-        localStorage.setItem('adminToken', response.data.token);
+        Cookies.set('adminToken', response.data.token, {
+          expires: 3, // Token expiration in days
+          secure: process.env.NODE_ENV === 'production' // Use HTTPS in production
+        });
+
         alert('Admin Logged in successfully');
         navigate('/dashboard');
       } else {

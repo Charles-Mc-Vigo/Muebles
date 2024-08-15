@@ -9,7 +9,6 @@ const createToken = (_id) => {
 };
 
 
-//POST - /api/user/signup
 exports.SignUp = async (req, res) => {
   try {
     const { firstname, lastname, gender, phoneNumber, streetAddress, municipality, email, password, confirmPassword } = req.body;
@@ -51,9 +50,9 @@ exports.SignUp = async (req, res) => {
     const token = createToken(newUser._id);
 
     res.cookie('authToken', token, {
-      httpOnly: true, // Cookie is not accessible via JavaScript
-      secure: process.env.NODE_ENV === 'production', // Use HTTPS in production
-      maxAge: 3 * 24 * 60 * 60 * 1000 // 3 days
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 3 * 24 * 60 * 60 * 1000
     });
 
     res.status(201).json({message:"Account created successfully!",token});
@@ -84,10 +83,11 @@ exports.LogIn = async (req, res) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       maxAge: 3 * 24 * 60 * 60 * 1000
+      // maxAge: 1000 //debugging
     });
 
 
-    res.status(200).json({ message: "Login successful!", token });
+    res.status(200).json({ message: "Login successful!", token , isAdmin: user.isAdmin});
   } catch (error) {
     res.status(500).json({ message: "Server error!" });
   }
@@ -103,7 +103,6 @@ exports.Logout = (req, res) => {
 };
 
 
-//GET - /api/users
 exports.getAllUsers = async (req, res) => {
   try {
     const users = await User.find();
@@ -114,7 +113,6 @@ exports.getAllUsers = async (req, res) => {
   }
 };
 
-//GET - /api/user/:id
 exports.getUserByID = async (req,res)=>{
   try {
     const {id} = req.params
@@ -131,7 +129,6 @@ exports.getUserByID = async (req,res)=>{
   }
 }
 
-//GET - /api/user/roles
 exports.showAdmins = async (req, res) => {
   try {
     
@@ -148,7 +145,6 @@ exports.showAdmins = async (req, res) => {
 };
 
 
-//PUT - /api/user/:id
 exports.editUserInfo = async (req, res) => {
   try {
     const { id } = req.params;
@@ -200,8 +196,7 @@ exports.editUserInfo = async (req, res) => {
   }
 };
 
-//delete request
-//DELETE - /api/user/:id
+
 exports.deleteUserbyID = async (req,res) => {
   try {
     const {id} = req.params;
