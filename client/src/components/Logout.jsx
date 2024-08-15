@@ -1,14 +1,19 @@
-import React, { useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import Cookies from 'js-cookie';
 
 const Logout = () => {
   const navigate = useNavigate();
 
-  useEffect(()=>{
-    localStorage.removeItem('authToken');
-    navigate('/login')
-  },[navigate])
-  return null
+  useEffect(() => {
+    // Remove the token from cookies
+    Cookies.remove('authToken');
+    
+    // Redirect the user to the login page
+    navigate('/login');
+  }, [navigate]);
+
+  return null;
 }
 
-export default Logout
+export default Logout;
