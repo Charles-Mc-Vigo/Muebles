@@ -10,6 +10,10 @@ import Logout from "./components/Logout";
 import Cart from "./pages/Cart";
 import AdminLogin from "./pages/AdminLogin";
 import DashBoard from "./pages/DashBoard";
+import UserManagement from "./pages/UserManagement";
+import OrderManagement from "./pages/OrderManagement";
+import ProductManagement from "./pages/ProductManagement";
+import ProductCustomization from "./pages/ProductCustomization";
 
 export default function App() {
 	return (
@@ -21,6 +25,10 @@ export default function App() {
 				<Route path="/admin" element={<AdminLogin />}/>
 				<Route path="/home" element={<ProtectedRoute element={<Home />} />} />
 				<Route path="/dashboard" element={<AdminOnlyRoutes element={<DashBoard />} />} />
+				<Route path="/user-management" element={<AdminOnlyRoutes element={<UserManagement />} />} />
+				<Route path="/order-management" element={<AdminOnlyRoutes element={<OrderManagement />} />} />
+				<Route path="/product-management" element={<AdminOnlyRoutes element={<ProductManagement />} />} />
+				<Route path="/product-customization" element={<AdminOnlyRoutes element={<ProductCustomization />} />} />
 
 				<Route
 					path="/logout"

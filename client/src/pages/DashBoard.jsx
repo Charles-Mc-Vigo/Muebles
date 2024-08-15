@@ -1,36 +1,53 @@
 import React from 'react';
-import Cookies from 'js-cookie'
+import Cookies from 'js-cookie';
 import { useNavigate } from 'react-router-dom';
 
-
 const DashBoard = () => {
-
   const navigate = useNavigate();
 
   const handleLogout = () => {
     Cookies.remove('adminToken');
-    navigate('/admin')
+    navigate('/admin');
     console.log('Logging out...');
+  };
+
+  const navigateToSection = (section) => {
+    navigate(`/${section}`);
   };
 
   return (
     <div className="flex min-h-screen bg-gray-100">
       {/* Sidebar */}
-      <nav className="w-64 bg-gray-800 text-white flex flex-col">
-        <div className="p-4 text-xl font-bold">Admin Dashboard</div>
+      <nav className="w-64 bg-gray-800 text-white flex flex-col justify-center text-center">
+        <div className="p-4 text-xl font-bold text-center">Admin Dashboard</div>
         <ul className="flex-1">
-          <li className="p-4 hover:bg-gray-700">
-            <a href="#user-management">User Management</a>
+          <li
+            className="p-4 hover:bg-gray-700 cursor-pointer"
+            onClick={() => navigateToSection('user-management')}
+          >
+            User Management
           </li>
-          <li className="p-4 hover:bg-gray-700">
-            <a href="#order-management">Order Management</a>
+          <li
+            className="p-4 hover:bg-gray-700 cursor-pointer"
+            onClick={() => navigateToSection('order-management')}
+          >
+            Order Management
           </li>
-          <li className="p-4 hover:bg-gray-700">
-            <a href="#product-management">Furniture Product Management</a>
+          <li
+            className="p-4 hover:bg-gray-700 cursor-pointer"
+            onClick={() => navigateToSection('product-management')}
+          >
+            Furniture Product Management
+          </li>
+          <li
+            className="p-4 hover:bg-gray-700 cursor-pointer"
+            onClick={() => navigateToSection('product-customization')}
+          >
+            Product Customization
           </li>
         </ul>
-        <button 
-          onClick={handleLogout} 
+        <button
+          onClick={handleLogout}
           className="bg-red-600 text-white p-4 mt-auto hover:bg-red-700 w-full"
         >
           Logout
@@ -39,32 +56,51 @@ const DashBoard = () => {
 
       {/* Main Content */}
       <div className="flex-1 p-6 overflow-auto">
-        {/* User Management Section */}
-        <section id="user-management" className="mb-6">
-          <h2 className="text-2xl font-semibold mb-4">User Management</h2>
-          <div className="bg-white p-4 rounded shadow">
-            {/* User management content */}
-            <p>Manage users here.</p>
+        <h1 className="text-2xl font-bold mb-6 text-center">Admin Dashboard Overview</h1>
+        {/* Order Statistics Section */}
+        <div className="grid grid-cols-4 gap-6 mb-6">
+          <div className="bg-white p-4 rounded-lg shadow text-center">
+            <h2 className="text-lg font-semibold">Today's Orders</h2>
+            <p className="text-2xl font-bold">0</p>
           </div>
-        </section>
+          <div className="bg-cyan-200 p-4 rounded-lg shadow text-center">
+            <h2 className="text-lg font-semibold">Total Orders</h2>
+            <p className="text-2xl font-bold">0</p>
+          </div>
+          <div className="bg-yellow-200 p-4 rounded-lg shadow text-center">
+            <h2 className="text-lg font-semibold">Pending Orders</h2>
+            <p className="text-2xl font-bold">0</p>
+          </div>
+          <div className="bg-red-200 p-4 rounded-lg shadow text-center">
+            <h2 className="text-lg font-semibold">Cancelled Orders</h2>
+            <p className="text-2xl font-bold">0</p>
+          </div>
+        </div>
 
-        {/* Order Management Section */}
-        <section id="order-management" className="mb-6">
-          <h2 className="text-2xl font-semibold mb-4">Order Management</h2>
-          <div className="bg-white p-4 rounded shadow">
-            {/* Order management content */}
-            <p>Manage orders here.</p>
-          </div>
-        </section>
-
-        {/* Product Management Section */}
-        <section id="product-management">
-          <h2 className="text-2xl font-semibold mb-4">Furniture Product Management</h2>
-          <div className="bg-white p-4 rounded shadow">
-            {/* Product management content */}
-            <p>Manage products here.</p>
-          </div>
-        </section>
+        {/* Orders Table */}
+        <div className="bg-white p-4 rounded-lg shadow">
+          <h2 className="text-lg font-semibold mb-4">Orders</h2>
+          <table className="w-full table-auto border-collapse">
+            <thead>
+              <tr className="bg-gray-200 text-left">
+                <th className="p-3 border-b">Order ID</th>
+                <th className="p-3 border-b">Customer</th>
+                <th className="p-3 border-b">Status</th>
+                <th className="p-3 border-b">Total</th>
+                <th className="p-3 border-b">Date</th>
+                <th className="p-3 border-b">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {/* Empty state for now */}
+              <tr>
+                <td className="p-3 text-center" colSpan="6">
+                  No orders available.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
