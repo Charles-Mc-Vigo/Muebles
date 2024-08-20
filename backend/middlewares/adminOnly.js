@@ -1,8 +1,8 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/userModel");
 
-const authRoutes = async (req, res, next) => {
-  const token = req.cookies.authToken;
+const adminOnly = async (req, res, next) => {
+  const token = req.cookies.adminToken || req.cookies.authToken;
 
   if (!token) {
     return res.status(401).json({ message: "Authorization required!" });
@@ -10,7 +10,13 @@ const authRoutes = async (req, res, next) => {
 
   try {
     const { _id } = jwt.verify(token, process.env.SECRET);
-    req.user = await User.findOne({ _id }).select('_id');
+    const user = await User.findOne({ _id }).select('isAdmin');
+
+    if (user.isAdmin !== true) {
+      return res.status(403).json({ message: "Access denied. Admins only." });
+    }
+
+    req.user = user;
     next();
   } catch (error) {
     console.log(error);
@@ -18,4 +24,4 @@ const authRoutes = async (req, res, next) => {
   }
 };
 
-module.exports = authRoutes;
+module.exports = adminOnly;
