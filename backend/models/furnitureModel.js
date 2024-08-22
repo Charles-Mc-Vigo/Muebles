@@ -1,8 +1,8 @@
 const mongoose = require("mongoose");
 
 const furnitureSchema = new mongoose.Schema({
-  image:{
-    type:String,
+  image: {
+    type: String,
     required:true
   },
   category:{

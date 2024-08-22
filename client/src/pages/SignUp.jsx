@@ -48,6 +48,9 @@ export default function SignUp() {
 				{
 					...formData,
 					zipCode,
+					headers: {
+						'Content-Type': 'multipart/form-data',
+					},
 				}
 			);
 

@@ -10,6 +10,7 @@ const cookieParser = require('cookie-parser')
 
 
 const app = express();
+
 const prodServer = async () => {
 	try {
 		await connectDB();
@@ -45,6 +46,11 @@ app.use(bodyParser.urlencoded({limit: '100mb', extended: true}));
 app.use(bodyParser.json());
 
 // Routes
+// app.use("/",(req,res)=>{
+// 	console.log('Welcome to Muebles!');
+// 	res.json({message:"Welcome to Muebles!"})
+// })
+
 app.use("/api/users", userRoutes);
 app.use("/api/furnitures", furnitureRoutes);
 app.use("/api/orders", orderRoutes);

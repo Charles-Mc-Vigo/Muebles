@@ -1,116 +1,152 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+
 const ProductManagement = () => {
-  const [product, setProduct] = useState({
+  const [products, setProducts] = useState([]);
+  const [newProduct, setNewProduct] = useState({
     image: null,
     category: '',
     furnitureType: '',
     description: '',
-    price: '',
+    price: ''
   });
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setProduct({ ...product, [name]: value });
+  const fetchProducts = async () => {
+    try {
+      const response = await axios.get('http://localhost:3000/api/furnitures');
+      setProducts(response.data);
+    } catch (error) {
+      console.error("Error fetching products:", error);
+      alert("Failed to fetch products. Please try again.");
+    }
   };
 
-  const handleImageUpload = (e) => {
-    setProduct({ ...product, image: e.target.files[0] });
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  const handleInputChange = (e) => {
+    const { name, value, files } = e.target;
+    setNewProduct((prevData) => ({
+      ...prevData,
+      [name]: files ? files[0] : value,
+    }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-		try {
-			const response = await axios.post(
-				"http://localhost:3000/api/furnitures/create",
-				{
-					...product
-				}
-			);
-
+    const form = new FormData();
+    form.append('image', newProduct.image);
+    form.append('category', newProduct.category);
+    form.append('furnitureType', newProduct.furnitureType);
+    form.append('description', newProduct.description);
+    form.append('price', newProduct.price);
+  
+    try {
+      const response = await axios.post('http://localhost:3000/api/furnitures/add-furniture', form, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        }
+      });
+  
       console.log(response);
-      alert("Furniture added successfully!");
-		} catch (error) {
-			console.error("Error adding new furniture", error.response?.data || error.message);
-			alert(error.response?.data?.message || error.message || "Adding Furniture failed");
-		}
+      fetchProducts(); // Refetch products after adding a new one
+      setNewProduct({ image: null, category: '', furnitureType: '', description: '', price: '' });
+    } catch (error) {
+      console.error("Error creating furniture!", error.response?.data || error.message);
+      alert(error.response?.data?.message || error.message || "Can not add furniture!");
+    }
   };
 
   return (
-    <div className="p-6 bg-gray-100 min-h-screen">
-      <h2 className="text-2xl font-semibold mb-6">Product Management</h2>
-      <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-lg">
-        {/* Image Upload */}
-        <div className="mb-4">
-          <label className="block text-sm font-medium mb-2">Upload Furniture Image</label>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleImageUpload}
-            className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none"
-          />
+    <div className="container mx-auto p-4">
+      <h1 className="text-2xl font-bold mb-4">Product Management</h1>
+      <div className="flex flex-col md:flex-row gap-4">
+        {/* Product Form */}
+        <div className="w-full md:w-1/3 bg-white p-4 rounded shadow">
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <input
+              type='file'
+              name='image'
+              id='image'
+              onChange={handleInputChange}
+              />,
+
+            <input
+              type="text"
+              name="category"
+              placeholder="Category"
+              value={newProduct.category}
+              onChange={handleInputChange}
+              className="w-full p-2 border rounded"
+            />
+            <input
+              type="text"
+              name="furnitureType"
+              placeholder="Type"
+              value={newProduct.furnitureType}
+              onChange={handleInputChange}
+              className="w-full p-2 border rounded"
+            />
+            <textarea
+              name="description"
+              placeholder="Description"
+              value={newProduct.description}
+              onChange={handleInputChange}
+              className="w-full p-2 border rounded"
+              rows="3"
+            />
+            <input
+              type="number"
+              name="price"
+              placeholder="Price"
+              value={newProduct.price}
+              onChange={handleInputChange}
+              className="w-full p-2 border rounded"
+            />
+            <button type="submit" className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600">
+              Submit
+            </button>
+          </form>
         </div>
 
-        {/* Category Input */}
-        <div className="mb-4">
-          <label className="block text-sm font-medium mb-2">Category</label>
-          <input
-            type="text"
-            name="category"
-            value={product.category}
-            onChange={handleInputChange}
-            placeholder="e.g., Living Room"
-            className="block w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
-          />
+        {/* Product Table */}
+        <div className="w-full md:w-2/3">
+          <div className="overflow-x-auto">
+            <table className="w-full bg-white shadow rounded">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="p-2 text-left">Image</th>
+                  <th className="p-2 text-left">Category</th>
+                  <th className="p-2 text-left">Type</th>
+                  <th className="p-2 text-left">Description</th>
+                  <th className="p-2 text-left">Price</th>
+                  <th className="p-2 text-left">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+  {products.map((product, index) => (
+    <tr key={product._id} className="border-t">
+      <td className="p-2">
+        {product.image && (
+          <img src={`data:image/jpeg;base64,${product.image}`} alt={product.furnitureType} className="w-20 h-20 object-cover" />
+        )}
+      </td>
+      <td className="p-2">{product.category}</td>
+      <td className="p-2">{product.furnitureType}</td>
+      <td className="p-2">{product.description}</td>
+      <td className="p-2"><strong>PHP</strong><span className="px-2"></span> {product.price}</td>
+      <td className="p-2">
+        <button className="bg-yellow-500 text-white px-2 py-1 rounded mr-2 hover:bg-yellow-600">Edit</button>
+        <button className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600">Delete</button>
+      </td>
+    </tr>
+  ))}
+</tbody>
+            </table>
+          </div>
         </div>
-
-        {/* Furniture Type Input */}
-        <div className="mb-4">
-          <label className="block text-sm font-medium mb-2">Furniture Type</label>
-          <input
-            type="text"
-            name="type"
-            value={product.furnitureType}
-            onChange={handleInputChange}
-            placeholder="e.g., Sofa"
-            className="block w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
-          />
-        </div>
-
-        {/* Description Input */}
-        <div className="mb-4">
-          <label className="block text-sm font-medium mb-2">Description</label>
-          <textarea
-            name="description"
-            value={product.description}
-            onChange={handleInputChange}
-            placeholder="Enter a detailed description..."
-            className="block w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
-            rows="4"
-          />
-        </div>
-
-        {/* Price Input */}
-        <div className="mb-4">
-          <label className="block text-sm font-medium mb-2">Price ($)</label>
-          <input
-            type="number"
-            name="price"
-            value={product.price}
-            onChange={handleInputChange}
-            placeholder="e.g., 299.99"
-            className="block w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
-          />
-        </div>
-
-        {/* Submit Button */}
-        <button
-          type="submit"
-          className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition"
-        >
-          Add Product
-        </button>
-      </form>
+      </div>
     </div>
   );
 };

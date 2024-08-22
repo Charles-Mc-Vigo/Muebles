@@ -14,7 +14,7 @@ export default function Login() {
 const handleChange = (e) => {
 	const {id,value} = e.target;
 	setFormData({...formData,[id]:value});
-	console.log(formData);
+	// console.log(formData);
 }
 
 const handleSubmit = async (e) => {
@@ -22,9 +22,12 @@ const handleSubmit = async (e) => {
 
 	try {
 		const response = await axios.post('http://localhost:3000/api/users/login',{
-			...formData
+			...formData,
+			headers: {
+				'Content-Type': 'multipart/form-data',
+			}
 		})
-		console.log(response);
+		// console.log(response);
 
     if (response.data.token) {
       // Store the token in a cookie

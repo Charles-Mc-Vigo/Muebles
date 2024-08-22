@@ -1,16 +1,16 @@
 const express = require("express");
 const router = express.Router();
 const {getAllOrders, createOrders, editOrder, getOrderById, deleteOrderById, getOrdersByStatus} = require("../controllers/orderController");
-const authRoutes = require("../middlewares/authRoutes");
+// const authRoutes = require("../middlewares/authRoutes");
 
 
-router.use(authRoutes)
+// router.use(authRoutes)
 
 //get all orders
 router.get("/",getAllOrders);
 
 //create orders
-router.post("/createOrders",createOrders);
+router.post("/create-orders",createOrders);
 
 //get specific order by id
 router.get("/:id",getOrderById);
