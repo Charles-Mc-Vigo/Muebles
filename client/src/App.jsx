@@ -10,7 +10,7 @@ import Logout from "./components/Logout";
 import Cart from "./pages/Cart";
 import AdminLogin from "./pages/AdminLogin";
 import DashBoard from "./pages/DashBoard";
-
+import FurnitureList from "./components/FurnitureList";
 export default function App() {
 	return (
 		<BrowserRouter>
@@ -21,7 +21,6 @@ export default function App() {
 				<Route path="/admin" element={<AdminLogin />}/>
 				<Route path="/home" element={<ProtectedRoute element={<Home />} />} />
 				<Route path="/dashboard" element={<AdminOnlyRoutes element={<DashBoard />} />} />
-
 				<Route
 					path="/logout"
 					element={<ProtectedRoute element={<Logout />} />}
