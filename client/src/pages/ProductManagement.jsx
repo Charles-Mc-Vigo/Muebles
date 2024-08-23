@@ -31,10 +31,11 @@ const ProductManagement = () => {
 			...prevData,
 			[name]: files ? files[0] : value,
 		}));
+		// console.log(newProduct)
 	};
 
 	const handleDelete = async (id) => {
-		console.log("Deleting product with ID:", id); //for debugging
+		// console.log("Deleting product with ID:", id); //for debugging
 		try {
 			await axios.delete(
 				`http://localhost:3000/api/furnitures/furniture/${id}`
@@ -76,6 +77,8 @@ const ProductManagement = () => {
 				description: "",
 				price: "",
 			});
+			document.getElementById("image").value = "";
+
 		} catch (error) {
 			console.error(
 				"Error creating furniture!",
@@ -103,14 +106,30 @@ const ProductManagement = () => {
 							onChange={handleInputChange}
 						/>
 						,
-						<input
+						{/* <input
 							type="text"
 							name="category"
 							placeholder="Category"
 							value={newProduct.category}
 							onChange={handleInputChange}
 							className="w-full p-2 border rounded"
-						/>
+						/> */}
+						<select 
+								id="category"
+								name="category"
+								required
+								onChange={handleInputChange}
+								value={newProduct.category}
+								className="bg-slate-100 p-3 rounded-lg w-full">
+
+							<option>Category</option>
+							<option value="Door">Door</option>
+							<option value="Bed frame">Bed frame</option>
+							<option value="Cabinet">Cabinet</option>
+							<option value="Chair">Chair</option>
+							<option value="Table">Table</option>
+							<option value="Sala set">Sala set</option>
+						</select>
 						<input
 							type="text"
 							name="furnitureType"

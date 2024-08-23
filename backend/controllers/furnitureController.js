@@ -20,8 +20,8 @@ exports.getAllFurnitures = async (req, res) => {
 // Create furniture
 exports.createFurniture = [upload.single('image'), async (req, res) => {
 	try {
-		console.log('Received request body:', req.body);
-    console.log('Received file:', req.file);
+		// console.log('Received request body:', req.body); //for debugging
+    // console.log('Received file:', req.file);//for debugging
     
     if (!req.file) {
       return res.status(400).json({ message: 'No file uploaded!' });
