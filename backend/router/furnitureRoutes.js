@@ -27,6 +27,6 @@ router.put("/furniture/:id",editFurnitureById);
 
 //delete furniture by id
 //DELETE - /api/furnitures/:id
-router.delete("furniture/:id",deleteFurnitureById);
+router.delete("/furniture/:id",deleteFurnitureById);
 
 module.exports = router;

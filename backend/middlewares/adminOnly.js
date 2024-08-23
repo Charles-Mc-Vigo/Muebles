@@ -2,10 +2,10 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/userModel");
 
 const adminOnly = async (req, res, next) => {
-  const token = req.cookies.adminToken || req.cookies.authToken;
+  const token = req.cookies.adminToken;
 
   if (!token) {
-    return res.status(401).json({ message: "Authorization required!" });
+    return res.status(401).json({ message: "No access token!" });
   }
 
   try {
