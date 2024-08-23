@@ -86,6 +86,8 @@ exports.LogIn = async (req, res) => {
       // maxAge: 1000 //debugging
     });
 
+    
+
 
     res.status(200).json({ message: "Login successful!", token , isAdmin: user.isAdmin});
   } catch (error) {
@@ -93,14 +95,78 @@ exports.LogIn = async (req, res) => {
   }
 };
 
-exports.Logout = (req, res) => {
-  res.clearCookie('authToken', {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-  });
+exports.AdminLogin = async (req, res) => {
+  try {
+    const { email, password } = req.body;
 
-  res.status(200).json({ message: "Logout successful!" });
+    // Find the user by email first
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({ message: "Incorrect email account!" });
+    }
+
+    // Check if the user is an admin
+    if (!user.isAdmin) {
+      return res.status(403).json({ message: "Access denied: Admins only!" });
+    }
+
+    // Verify the password
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (!isMatch) {
+      return res.status(400).json({ message: "Incorrect password!" });
+    }
+
+    // Generate and send the token
+    const token = createToken(user._id);
+
+    res.cookie('adminToken', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 3 * 24 * 60 * 60 * 1000 // 3 days
+    });
+
+    res.status(200).json({ message: "Successfully logged in as an Admin!", token });
+  } catch (error) {
+    res.status(500).json({ message: "Server error!" });
+    console.error(error);
+  }
 };
+
+exports.Logout = async (req, res) => {
+  try {
+    // Assuming the user ID is stored in req.user._id (typically after verifying a JWT)
+    const userId = req.user._id;
+
+    // Find the user by ID
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found!" });
+    }
+
+    // Check if the user is an admin
+    if (user.isAdmin) {
+      res.clearCookie('adminToken', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+      });
+    } else {
+      res.clearCookie('authToken', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+      });
+    }
+
+    res.status(200).json({ message: "Logout successful!" });
+    console.log("Logout successful!");
+  } catch (error) {
+    res.status(500).json({ message: "Server error!" });
+    console.error(error);
+  }
+};
+
 
 
 exports.getAllUsers = async (req, res) => {

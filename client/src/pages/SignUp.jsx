@@ -41,17 +41,20 @@ export default function SignUp() {
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 
-		console.log("Form data to be submitted:", { ...formData, zipCode });
+		// console.log("Form data to be submitted:", { ...formData, zipCode }); //for debugging
 		try {
 			const response = await axios.post(
 				"http://localhost:3000/api/users/signup",
 				{
 					...formData,
 					zipCode,
+					headers: {
+						'Content-Type': 'multipart/form-data',
+					},
 				}
 			);
 
-			console.log(response.data);
+			// console.log(response.data); //for debugging
 			alert("Sign up successfully!");
 			navigate("/login");
 		} catch (error) {
