@@ -14,6 +14,7 @@ import UserManagement from "./pages/UserManagement";
 import OrderManagement from "./pages/OrderManagement";
 import ProductManagement from "./pages/ProductManagement";
 import ProductCustomization from "./pages/ProductCustomization";
+import FurnitureList from './components/FurnitureList'
 
 export default function App() {
 	return (
@@ -24,6 +25,7 @@ export default function App() {
 				<Route path="/login" element={<Login />} />
 				<Route path="/admin" element={<AdminLogin />}/>
 				<Route path="/home" element={<ProtectedRoute element={<Home />} />} />
+				<Route path="/furniture-list" element={<ProtectedRoute element={<FurnitureList />} />} />
 				<Route path="/dashboard" element={<AdminOnlyRoutes element={<DashBoard />} />} />
 				<Route path="/user-management" element={<AdminOnlyRoutes element={<UserManagement />} />} />
 				<Route path="/order-management" element={<AdminOnlyRoutes element={<OrderManagement />} />} />
