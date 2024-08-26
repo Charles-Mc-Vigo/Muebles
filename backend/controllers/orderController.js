@@ -1,7 +1,8 @@
 const Order = require("../models/orderModel");
 const User = require("../models/userModel");
 const Furniture = require("../models/furnitureModel");
-const OrderSchemaValidator = require("../middlewares/JoiSchemaValidation");
+const OrderSchemaValidator = require("../middlewares/JoiSchemaValidation")
+
 
 //getting all the orders
 exports.getAllOrders = async (req, res) => {
@@ -26,6 +27,8 @@ exports.getAllOrders = async (req, res) => {
     res.status(500).json({ message: "Server error!" });
   }
 }
+
+
 
 //creating an order
 exports.createOrders = async (req, res) => {
