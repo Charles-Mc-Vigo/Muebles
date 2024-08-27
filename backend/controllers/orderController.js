@@ -4,29 +4,22 @@ const Furniture = require("../models/furnitureModel");
 const OrderSchemaValidator = require("../middlewares/JoiSchemaValidation")
 
 
-//getting all the orders
+// Getting all the orders
 exports.getAllOrders = async (req, res) => {
   try {
-    
     const orders = await Order.find({})
-      .populate({
-        path: 'userId',
-        select: '-createdAt -updatedAt -__v'
-      })
-      .populate({
-        path: 'furnituresId',
-        select: '-createdAt -updatedAt -__v'
-      });
-    if (!orders.length) {
-      return res.status(404).json({ message: "No order found!" });
+
+    if (orders.length === 0) {
+      return res.status(404).json({ message: "No orders found!" });
     }
 
-    res.status(200).json({Orders:orders});
+    res.status(200).json({ orders });
   } catch (error) {
-    console.log(error);
+    console.error("Error fetching orders:", error);
     res.status(500).json({ message: "Server error!" });
   }
-}
+};
+
 
 
 
