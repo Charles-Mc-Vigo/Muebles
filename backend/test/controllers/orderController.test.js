@@ -114,65 +114,201 @@ describe("Order Controller", () => {
 	describe("Edit Order", () => {
 		it("should return 404 if order is not found", async () => {
 			Order.findById.mockResolvedValueOnce(null);
-			const response = await request(app).put("/api/orders/1234567890");
-
+			const response = await request(app).put("/api/orders/1234567890").send({
+				userId: "existingUser",
+				furnituresId: ["furnitureOne"],
+				orderStatus: "Shipped",
+			});
+	
 			expect(response.status).toBe(404);
 			expect(response.body.message).toBe("Order not found!");
 		});
-	});
-
-	it("return 404 when user not found", async () => {
-		Order.findById.mockResolvedValueOnce(true);
-		User.findById.mockResolvedValueOnce(null);
-		const response = await request(app)
-			.put("/api/orders/1234567890")
-			.send({
-				userId: "notExistingUser",
+	
+		it("should return 404 when user not found", async () => {
+			Order.findById.mockResolvedValueOnce({
+				_id: "1234567890",
+				userId: "oldUser",
+				furnituresId: ["oldFurniture"],
+				orderStatus: "Pending",
+			});
+			User.findById.mockResolvedValueOnce(null);
+			const response = await request(app).put("/api/orders/1234567890").send({
+				userId: "nonExistingUser",
 				furnituresId: ["updatedFurnitureId"],
 				orderStatus: "Shipped",
 			});
-
-		expect(response.status).toBe(404);
-		expect(response.body.message).toBe("User not found!");
-	});
-
-	it("should return 404 if one or more furniture items are not found", async () => {
-		const mockExistingOrder = {
-			_id: "1234567890",
-			userId: "existingUser",
-			furnituresId: ["oldFurniture1", "oldFurniture2"],
-			orderStatus: "Pending",
-			save: jest.fn().mockResolvedValue(true),
-		};
-
-		Order.findById.mockResolvedValueOnce(mockExistingOrder);
-		User.findById.mockResolvedValueOnce({ _id: "existingUser" });
-		Furniture.find.mockResolvedValueOnce([
-			{ _id: "furnitureOne", category: "Chair", furnitureType: "Wooden Chair" },
-			{ _id: "furnitureTwo", category: "Table", furnitureType: "Wooden Table" },
-		]);
-
-		OrderSchemaValidator.validate.mockReturnValueOnce({ error: null });
-
-		const response = await request(app)
-			.put("/api/orders/1234567890")
-			.send({
+	
+			expect(response.status).toBe(404);
+			expect(response.body.message).toBe("User not found!");
+		});
+	
+		it("should return 404 if one or more furniture items are not found", async () => {
+			Order.findById.mockResolvedValueOnce({
+				_id: "1234567890",
 				userId: "existingUser",
-				furnituresId: [
-					"furnitureOne",
-					"furnitureTwo",
-					"notExistingFurnitureThree",
-				],
+				furnituresId: ["oldFurniture1", "oldFurniture2"],
+				orderStatus: "Pending",
+				save: jest.fn().mockResolvedValue(true),
+			});
+			User.findById.mockResolvedValueOnce({ _id: "existingUser" });
+			Furniture.find.mockResolvedValueOnce([
+				{ _id: "furnitureOne" },
+				{ _id: "furnitureTwo" },
+			]);
+	
+			const response = await request(app).put("/api/orders/1234567890").send({
+				userId: "existingUser",
+				furnituresId: ["furnitureOne", "furnitureTwo", "nonExistingFurniture"],
 				orderStatus: "Shipped",
 			});
-
-		expect(response.status).toBe(404);
-		expect(response.body.message).toBe(
-			"One or more furniture items not found!"
-		);
+	
+			expect(response.status).toBe(404);
+			expect(response.body.message).toBe("One or more furniture items not found!");
+		});
+	
+		it("should return 400 if orderStatus is invalid", async () => {
+			Order.findById.mockResolvedValueOnce({
+				_id: "1234567890",
+				userId: "existingUser",
+				furnituresId: ["furniture1", "furniture2"],
+				orderStatus: "Pending",
+				save: jest.fn().mockResolvedValue(true),
+			});
+			User.findById.mockResolvedValueOnce({ _id: "existingUser" });
+			Furniture.find.mockResolvedValueOnce([
+				{ _id: "furniture1" },
+				{ _id: "furniture2" },
+			]);
+	
+			OrderSchemaValidator.validate.mockReturnValueOnce({
+				error: { details: [{ message: "Invalid order status" }] },
+			});
+	
+			const response = await request(app).put("/api/orders/1234567890").send({
+				userId: "existingUser",
+				furnituresId: ["furniture1", "furniture2"],
+				orderStatus: "InvalidStatus",
+			});
+	
+			expect(response.status).toBe(400);
+			expect(response.body.message).toBe("Invalid order status");
+		});
+	
+		it("should successfully update the order and return 200", async () => {
+			const mockExistingOrder = {
+				_id: "1234567890",
+				userId: "existingUser",
+				furnituresId: ["oldFurniture1", "oldFurniture2"],
+				orderStatus: "Pending",
+				save: jest.fn().mockResolvedValue({
+					_id: "1234567890",
+					userId: "newUser",
+					furnituresId: ["newFurniture1", "newFurniture2"],
+					orderStatus: "Shipped",
+				}),
+			};
+	
+			Order.findById.mockResolvedValueOnce(mockExistingOrder);
+			User.findById.mockResolvedValueOnce({ _id: "newUser" });
+			Furniture.find.mockResolvedValueOnce([
+				{ _id: "newFurniture1" },
+				{ _id: "newFurniture2" },
+			]);
+	
+			OrderSchemaValidator.validate.mockReturnValueOnce({ error: null });
+	
+			const response = await request(app).put("/api/orders/1234567890").send({
+				userId: "newUser",
+				furnituresId: ["newFurniture1", "newFurniture2"],
+				orderStatus: "Shipped",
+			});
+	
+			expect(response.status).toBe(200);
+			expect(response.body.message).toBe("Order updated successfully!");
+			expect(response.body.updatedOrder).toEqual({
+				_id: "1234567890",
+				userId: "newUser",
+				furnituresId: ["newFurniture1", "newFurniture2"],
+				orderStatus: "Shipped",
+			});
+		});
 	});
 
-  it('should return 200 if order is successfully created', async ()=>{
-    //to be continued.....
-  })
+	describe('Get Order by Id', () => {
+		it('should return 404 if order not found', async () => {
+			Order.findById.mockResolvedValueOnce(null)
+	
+			const response = await request(app).get('/api/orders/23456');
+	
+			expect(response.status).toBe(404);
+			expect(response.body.message).toBe("Order not found!");
+		});
+
+		it('should return 200 if order is found', async()=>{
+			Order.findById.mockResolvedValueOnce({_id:"23456"})
+			const response = await request(app).get('/api/orders/23456')
+
+			expect(response.status).toBe(200);
+			expect(response.body.message).toBe("Order details");
+		})
+	});
+
+	describe('Delete Order by Id',()=>{
+		it('should return 404 order is not found', async()=>{
+			Order.findById.mockResolvedValueOnce(null)
+			const response = await request(app).delete('/api/orders/23456')
+
+			expect(response.status).toBe(404)
+			expect(response.body.message).toBe("Order not found!")
+		})
+
+		it('should return 200 if order is delete successfully',async()=>{
+			Order.findById.mockResolvedValueOnce({_id:"2468"})
+			Order.deleteOne.mockResolvedValueOnce({_id:"2468"})
+			const response = await request(app).delete('/api/orders/2468')
+
+			expect(response.status).toBe(200)
+			expect(response.body.message).toBe("Order deleted successfully!")
+		})
+	})
+
+	describe('Get Orders by Status',()=>{
+		it('should return 400 if order status is invalid', async () => {
+			const response = await request(app).get('/api/orders/status/InvalidStatus');
+			
+			expect(response.status).toBe(400);
+			expect(response.body.message).toBe("Invalid order status!");
+		});
+	
+		it('should return 404 if no orders are found for the given status', async () => {
+			Order.find.mockResolvedValueOnce([]);
+	
+			const response = await request(app).get('/api/orders/status/Pending');
+			
+			expect(response.status).toBe(404);
+			expect(response.body.message).toBe("No orders found on Pending status");
+		});
+	
+		it('should return 200 and the list of orders for a valid status', async () => {
+			const mockOrders = [
+				{ _id: "1234", orderStatus: "Pending", items: [] },
+				{ _id: "5678", orderStatus: "Pending", items: [] }
+			];
+			Order.find.mockResolvedValueOnce(mockOrders);
+	
+			const response = await request(app).get('/api/orders/status/Pending');
+			
+			expect(response.status).toBe(200);
+			expect(response.body).toStrictEqual(mockOrders); 
+		});
+	
+		it('should return 500 if there is a server error', async () => {
+			Order.find.mockRejectedValueOnce(new Error('Server error!'));
+	
+			const response = await request(app).get('/api/orders/status/Pending');
+			
+			expect(response.status).toBe(500);
+			expect(response.body.message).toBe("Server error!");
+		});
+	})
 });

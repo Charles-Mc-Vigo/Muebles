@@ -45,16 +45,17 @@ orderSchema.pre("save", function (next) {
 });
 
 //calculate the total amount of the order
-orderSchema.pre("save",async function(next){
+orderSchema.pre("save", async function (next) {
   try {
-    const furnitures = await Furniture.find({"_id":{$in: this.furnituresId}});
+    const furnitures = await Furniture.find({ "_id": { $in: this.furnituresId } });
     let total = 0;
-  
-    furnitures.forEach((furniture)=>{
-      total+=furniture.price;
-      next();
-    })
-    this.totalAmount = `${this.currency}`,total;
+
+    furnitures.forEach((furniture) => {
+      total += furniture.price;
+    });
+
+    this.totalAmount = total;
+    next();
   } catch (error) {
     next(error);
   }
