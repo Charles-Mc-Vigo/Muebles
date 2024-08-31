@@ -234,7 +234,7 @@ describe("Order Controller", () => {
 		});
 	});
 
-	describe('Get order by Id', () => {
+	describe('Get Order by Id', () => {
 		it('should return 404 if order not found', async () => {
 			Order.findById.mockResolvedValueOnce(null)
 	
@@ -253,5 +253,62 @@ describe("Order Controller", () => {
 		})
 	});
 
+	describe('Delete Order by Id',()=>{
+		it('should return 404 order is not found', async()=>{
+			Order.findById.mockResolvedValueOnce(null)
+			const response = await request(app).delete('/api/orders/23456')
+
+			expect(response.status).toBe(404)
+			expect(response.body.message).toBe("Order not found!")
+		})
+
+		it('should return 200 if order is delete successfully',async()=>{
+			Order.findById.mockResolvedValueOnce({_id:"2468"})
+			Order.deleteOne.mockResolvedValueOnce({_id:"2468"})
+			const response = await request(app).delete('/api/orders/2468')
+
+			expect(response.status).toBe(200)
+			expect(response.body.message).toBe("Order deleted successfully!")
+		})
+	})
+
+	describe('Get Orders by Status',()=>{
+		it('should return 400 if order status is invalid', async () => {
+			const response = await request(app).get('/api/orders/status/InvalidStatus');
+			
+			expect(response.status).toBe(400);
+			expect(response.body.message).toBe("Invalid order status!");
+		});
 	
+		it('should return 404 if no orders are found for the given status', async () => {
+			Order.find.mockResolvedValueOnce([]);
+	
+			const response = await request(app).get('/api/orders/status/Pending');
+			
+			expect(response.status).toBe(404);
+			expect(response.body.message).toBe("No orders found on Pending status");
+		});
+	
+		it('should return 200 and the list of orders for a valid status', async () => {
+			const mockOrders = [
+				{ _id: "1234", orderStatus: "Pending", items: [] },
+				{ _id: "5678", orderStatus: "Pending", items: [] }
+			];
+			Order.find.mockResolvedValueOnce(mockOrders);
+	
+			const response = await request(app).get('/api/orders/status/Pending');
+			
+			expect(response.status).toBe(200);
+			expect(response.body).toStrictEqual(mockOrders); 
+		});
+	
+		it('should return 500 if there is a server error', async () => {
+			Order.find.mockRejectedValueOnce(new Error('Server error!'));
+	
+			const response = await request(app).get('/api/orders/status/Pending');
+			
+			expect(response.status).toBe(500);
+			expect(response.body.message).toBe("Server error!");
+		});
+	})
 });
