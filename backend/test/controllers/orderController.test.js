@@ -233,4 +233,25 @@ describe("Order Controller", () => {
 			});
 		});
 	});
+
+	describe('Get order by Id', () => {
+		it('should return 404 if order not found', async () => {
+			Order.findById.mockResolvedValueOnce(null)
+	
+			const response = await request(app).get('/api/orders/23456');
+	
+			expect(response.status).toBe(404);
+			expect(response.body.message).toBe("Order not found!");
+		});
+
+		it('should return 200 if order is found', async()=>{
+			Order.findById.mockResolvedValueOnce({_id:"23456"})
+			const response = await request(app).get('/api/orders/23456')
+
+			expect(response.status).toBe(200);
+			expect(response.body.message).toBe("Order details");
+		})
+	});
+
+	
 });

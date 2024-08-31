@@ -124,14 +124,6 @@ exports.getOrderById = async (req,res) =>{
   try {
     const {id} = req.params;
     const order = await Order.findById(id)
-      .populate({
-        path: 'userId',
-        select: '-createdAt -updatedAt -__v'
-      })
-      .populate({
-        path: 'furnituresId',
-        select: '-createdAt -updatedAt -__v'
-      });
 
     if (!order) {
       return res.status(404).json({ message: "Order not found!" });
