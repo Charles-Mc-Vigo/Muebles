@@ -1,16 +1,5 @@
 const Joi = require("joi");
 
-//furniture schema validation using joi
-const FurnitureSchemaValidator = Joi.object({
-  image:Joi.string().required(),
-  category: Joi.string().required().valid("Door","Bed frame","Cabinet","Chair", "Table","Sala set"),
-  furnitureType: Joi.string().required().min(3).max(20),
-  description: Joi.string().required().min(0).max(30),
-  price: Joi.number().required().default(0),
-  currency: Joi.string().valid("PHP")
-})
-
-
 //order schema validation using Joi
 const OrderSchemaValidator = Joi.object({
   orderStatus: Joi.string().valid("Pending", "Shipped", "Delivered", "Cancelled")
@@ -28,4 +17,4 @@ const UserSchemaValidator = Joi.object({
 });
 
 
-module.exports = {UserSchemaValidator, OrderSchemaValidator, FurnitureSchemaValidator};
+module.exports = {UserSchemaValidator, OrderSchemaValidator};
