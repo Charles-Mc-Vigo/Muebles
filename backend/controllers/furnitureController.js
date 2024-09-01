@@ -10,6 +10,9 @@ const upload = multer({ storage: multer.memoryStorage() });
 exports.getAllFurnitures = async (req, res) => {
 	try {
 		const furnitures = await Furniture.find();
+		if(furnitures.length === 0){
+			return res.status(404).json({message:"No furniture found!"})
+		}
 		res.status(200).json(furnitures);
 	} catch (error) {
 		console.error(error);
@@ -20,31 +23,33 @@ exports.getAllFurnitures = async (req, res) => {
 // Create furniture
 exports.createFurniture = [upload.single('image'), async (req, res) => {
 	try {
-		// console.log('Received request body:', req.body); //for debugging
-    // console.log('Received file:', req.file);//for debugging
-    
-    if (!req.file) {
-      return res.status(400).json({ message: 'No file uploaded!' });
+    let image;
+
+    if (req.file) {
+      image = req.file.buffer.toString('base64');
+
+    } else if (req.body.image) {
+      image = req.body.image;
+    } else {
+
+      return res.status(400).json({ message: 'No image provided!' });
     }
 
 			const { category, furnitureType, description, price } = req.body;
-			const image = req.file.buffer.toString('base64');
 
+			let missingFields = [];
 
-			// Validate the input data using Joi
-			const { error } = FurnitureSchemaValidator.validate({
-				image,
-				category,
-				furnitureType,
-				description,
-				price,
-			});
+			if (!category) missingFields.push("category");
+			if (!furnitureType) missingFields.push("furnitureType");
+			if (!description) missingFields.push("description");
+			if (!price) missingFields.push("price");
 
-			if (error) {
-				return res.status(400).json({ message: error.details[0].message });
+			if (missingFields.length > 0) {
+				return res.status(400).json({
+					message: `The following fields are required: ${missingFields.join(", ")}`
+				});
 			}
 
-			// Create new furniture entry
 			const newFurniture = new Furniture({
 				image,
 				category,

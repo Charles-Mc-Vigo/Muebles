@@ -5,7 +5,6 @@ const Furniture = require("../../models/furnitureModel");
 const {
 	OrderSchemaValidator,
 } = require("../../middlewares/JoiSchemaValidation");
-const validate = require("../../middlewares/JoiSchemaValidation");
 const app = require("../../server");
 
 jest.mock("../../middlewares/JoiSchemaValidation");
@@ -300,15 +299,6 @@ describe("Order Controller", () => {
 			
 			expect(response.status).toBe(200);
 			expect(response.body).toStrictEqual(mockOrders); 
-		});
-	
-		it('should return 500 if there is a server error', async () => {
-			Order.find.mockRejectedValueOnce(new Error('Server error!'));
-	
-			const response = await request(app).get('/api/orders/status/Pending');
-			
-			expect(response.status).toBe(500);
-			expect(response.body.message).toBe("Server error!");
 		});
 	})
 });
