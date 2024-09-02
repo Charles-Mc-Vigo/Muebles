@@ -10,13 +10,14 @@ const adminOnly = async (req, res, next) => {
 
   try {
     const { _id } = jwt.verify(token, process.env.SECRET);
-    const user = await User.findOne({ _id }).select('isAdmin');
+    const user = await User.findOne({ _id })
 
     if (user.isAdmin !== true) {
       return res.status(403).json({ message: "Access denied. Admins only." });
     }
 
     req.user = user;
+    // console.log(req.user) for testing and debugging
     next();
   } catch (error) {
     console.log(error);
