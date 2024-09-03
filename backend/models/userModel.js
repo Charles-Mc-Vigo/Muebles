@@ -35,6 +35,16 @@ const userSchema = new mongoose.Schema({
     type:Boolean,
     default: false
   },
+  isVerified:{
+    type:Boolean,
+    default:false
+  },
+  verificationCode: {
+    type: String
+  },
+  verificationCodeExpires: {
+    type: Date
+  },
   orders:[{
     type:mongoose.Schema.ObjectId,
     ref:"Order"

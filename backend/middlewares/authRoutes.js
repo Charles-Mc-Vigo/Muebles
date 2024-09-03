@@ -10,19 +10,19 @@ const authRoutes = async (req, res, next) => {
 
   try {
     const { _id } = jwt.verify(token, process.env.SECRET);
-    console.log("Token verification successful, _id:", _id);
+    // console.log("Token verification successful, _id:", _id);
     
     const user = await User.findOne({ _id });
 
     if (!user) {
-      console.log("User not found");
+      // console.log("User not found");
       return res.status(401).json({ message: "User not found!" });
     }
 
     req.user = user;
     next();
   } catch (error) {
-    console.log("Error in authRoutes middleware:", error);
+    // console.log("Error in authRoutes middleware:", error);
     res.status(401).json({ message: "Unauthorized request denied!" });
   }
 };

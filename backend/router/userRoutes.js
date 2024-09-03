@@ -9,7 +9,8 @@ const {
   deleteUserbyID,
   showAdmins,
   Logout,
-  AdminLogin
+  AdminLogin,
+  verifyEmail
 } = require("../controllers/userController");
 
 // const authRoutes = require("../middlewares/authRoutes");
@@ -17,6 +18,7 @@ const {
 
 // Public Routes
 router.post("/signup", SignUp);  // Sign up
+router.post('/verify-email', verifyEmail);
 router.post("/login", LogIn);    // Log in
 router.post("/admin/login", AdminLogin);    // Admin Log in
 
