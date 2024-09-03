@@ -3,11 +3,11 @@ const bcrypt = require("bcrypt");
 const validator = require("validator");
 const {UserSchemaValidator} = require("../middlewares/JoiSchemaValidation");
 const jwt = require("jsonwebtoken");
+const {sendVerificationEmail, generateVerificationCode} = require('../utils/EmailVerification');
 
 const createToken = (_id) => {
   return jwt.sign({ _id }, process.env.SECRET, { expiresIn: "3d" });
 };
-
 
 exports.SignUp = async (req, res) => {
   try {
@@ -44,8 +44,24 @@ exports.SignUp = async (req, res) => {
     if (error) {
       return res.status(400).json({ message: error.details[0].message });
     }
+    const verificationCode = generateVerificationCode();
+    const verificationCodeExpires = Date.now() + 15 * 60 * 1000;
 
-    const newUser = new User({ firstname, lastname, gender, phoneNumber, streetAddress, municipality, email, password: hashedPassword });
+    await sendVerificationEmail(email,verificationCode)
+
+    const newUser = new User({ 
+      firstname, 
+      lastname, 
+      gender, 
+      phoneNumber, 
+      streetAddress, 
+      municipality, 
+      email, 
+      password: hashedPassword,
+      verificationCode,
+      verificationCodeExpires
+    });
+
     await newUser.save();
     const token = createToken(newUser._id);
 
@@ -61,6 +77,37 @@ exports.SignUp = async (req, res) => {
     res.status(500).json({ message: "Server error!" });
   }
 };
+
+exports.verifyEmail = async (req, res) => {
+  try {
+    const { email, code } = req.body;
+
+    if (!email || !code) {
+      return res.status(400).json({ message: "Email and verification code are required!" });
+    }
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(400).json({ message: "User not found!" });
+    }
+
+    if (user.verificationCode !== code || user.verificationCodeExpires < Date.now()) {
+      return res.status(400).json({ message: "Invalid or expired verification code!" });
+    }
+
+    user.isVerified = true;
+    user.verificationCode = undefined;
+    user.verificationCodeExpires = undefined;
+    await user.save();
+
+    res.status(200).json({ message: "Email verified successfully!" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error!" });
+  }
+};
+
 
 
 exports.LogIn = async (req, res) => {
@@ -99,26 +146,22 @@ exports.AdminLogin = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Find the user by email first
     const user = await User.findOne({ email });
 
     if (!user) {
       return res.status(404).json({ message: "Incorrect email account!" });
     }
 
-    // Check if the user is an admin
     if (!user.isAdmin) {
       return res.status(403).json({ message: "Access denied: Admins only!" });
     }
 
-    // Verify the password
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
       return res.status(400).json({ message: "Incorrect password!" });
     }
 
-    // Generate and send the token
     const token = createToken(user._id);
 
     res.cookie('adminToken', token, {
@@ -136,17 +179,14 @@ exports.AdminLogin = async (req, res) => {
 
 exports.Logout = async (req, res) => {
   try {
-    // Assuming the user ID is stored in req.user._id (typically after verifying a JWT)
     const userId = req.user._id;
 
-    // Find the user by ID
     const user = await User.findById(userId);
 
     if (!user) {
       return res.status(404).json({ message: "User not found!" });
     }
 
-    // Check if the user is an admin
     if (user.isAdmin) {
       res.clearCookie('adminToken', {
         httpOnly: true,
