@@ -56,7 +56,7 @@ export default function SignUp() {
 
 			// console.log(response.data); //for debugging
 			alert("Sign up successfully!");
-			navigate("/login");
+			navigate('/verify-email');
 		} catch (error) {
 			console.error("Sign up error", error.response?.data || error.message);
 			alert(error.response?.data?.message || error.message || "Sign up failed");
