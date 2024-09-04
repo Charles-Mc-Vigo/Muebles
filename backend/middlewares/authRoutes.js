@@ -19,6 +19,11 @@ const authRoutes = async (req, res, next) => {
       return res.status(401).json({ message: "User not found!" });
     }
 
+    if (!user.isVerified !== true) {
+      // console.log("User not found");
+      return res.status(401).json({ message: "Please verify your account first!" });
+    }
+
     req.user = user;
     next();
   } catch (error) {
