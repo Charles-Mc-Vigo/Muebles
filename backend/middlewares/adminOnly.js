@@ -16,6 +16,10 @@ const adminOnly = async (req, res, next) => {
       return res.status(403).json({ message: "Access denied. Admins only." });
     }
 
+    if (user.isVerified !== true) {
+      return res.status(403).json({ message: "Please verify your account first!" });
+    }
+
     req.user = user;
     // console.log(req.user) for testing and debugging
     next();
