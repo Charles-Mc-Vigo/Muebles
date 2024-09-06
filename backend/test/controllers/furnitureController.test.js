@@ -22,6 +22,9 @@ describe('Furniture Controller',()=>{
       Furniture.find.mockResolvedValueOnce(mockFurnitures)
       const response = await request(app).get('/api/furnitures')
 
+      // console.log(response.status)
+      // console.log(response.body)
+
       expect(response.status).toBe(200)
       expect(response.body).toStrictEqual(mockFurnitures)
     })

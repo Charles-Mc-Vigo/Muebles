@@ -46,6 +46,7 @@ exports.SignUp = async (req, res) => {
     }
     const verificationCode = generateVerificationCode();
     const verificationCodeExpires = Date.now() + 15 * 60 * 1000;
+    
 
     await sendVerificationEmail(email,verificationCode)
 
@@ -63,15 +64,16 @@ exports.SignUp = async (req, res) => {
     });
 
     await newUser.save();
-    const token = createToken(newUser._id);
+    // const token = createToken(newUser._id);
 
-    res.cookie('authToken', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: 3 * 24 * 60 * 60 * 1000
-    });
+    // res.cookie('authToken', token, {
+    //   httpOnly: true,
+    //   secure: process.env.NODE_ENV === 'production',
+    //   maxAge: 3 * 24 * 60 * 60 * 1000,
+    //   sameSite: 'strict'
+    // });
 
-    res.status(201).json({message:"Account created successfully!",token});
+    res.status(201).json({message:"Account created successfully!"});
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error!" });
@@ -92,16 +94,27 @@ exports.verifyEmail = async (req, res) => {
       return res.status(400).json({ message: "User not found!" });
     }
 
-    if (user.verificationCode !== code || user.verificationCodeExpires < Date.now()) {
+    if (user.verificationCode !== code || new Date(user.verificationCodeExpires) < new Date()) {
       return res.status(400).json({ message: "Invalid or expired verification code!" });
     }
+    
 
     user.isVerified = true;
     user.verificationCode = undefined;
     user.verificationCodeExpires = undefined;
+
     await user.save();
 
-    res.status(200).json({ message: "Email verified successfully!" });
+    const token = createToken(user._id);
+
+    res.cookie('authToken', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 3 * 24 * 60 * 60 * 1000,
+    });
+    console.log(token)
+
+    res.status(200).json({ message: "Email verified successfully!" ,token});
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error!" });
@@ -129,13 +142,10 @@ exports.LogIn = async (req, res) => {
     res.cookie('authToken', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      maxAge: 3 * 24 * 60 * 60 * 1000
-      // maxAge: 1000 //debugging
+      maxAge: 3 * 24 * 60 * 60 * 1000,
+      sameSite: 'strict'
     });
-
     
-
-
     res.status(200).json({ message: "Login successful!", token , isAdmin: user.isAdmin});
   } catch (error) {
     res.status(500).json({ message: "Server error!" });
@@ -167,7 +177,8 @@ exports.AdminLogin = async (req, res) => {
     res.cookie('adminToken', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      maxAge: 3 * 24 * 60 * 60 * 1000 // 3 days
+      maxAge: 3 * 24 * 60 * 60 * 1000,
+      sameSite: 'strict'
     });
 
     res.status(200).json({ message: "Successfully logged in as an Admin!", token });
@@ -206,7 +217,6 @@ exports.Logout = async (req, res) => {
     console.error(error);
   }
 };
-
 
 
 exports.getAllUsers = async (req, res) => {

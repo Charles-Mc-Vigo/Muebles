@@ -24,7 +24,7 @@ const handleSubmit = async (e) => {
 		const response = await axios.post('http://localhost:3000/api/users/login',{
 			...formData,
 			headers: {
-				'Content-Type': 'multipart/form-data',
+				'Content-Type': 'application/json',
 			}
 		})
 		// console.log(response);
