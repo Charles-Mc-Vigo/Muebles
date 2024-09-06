@@ -121,8 +121,6 @@ exports.verifyEmail = async (req, res) => {
   }
 };
 
-
-
 exports.LogIn = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -329,4 +327,3 @@ exports.deleteUserbyID = async (req,res) => {
     res.status(500).json({ message: "Server error!" });
   }
 }
-

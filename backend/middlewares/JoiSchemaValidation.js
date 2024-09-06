@@ -12,7 +12,7 @@ const UserSchemaValidator = Joi.object({
   lastname: Joi.string().required().min(3).max(30),
   gender:Joi.string().required().valid("Male","Female"),
   streetAddress: Joi.string().required(),
-  municipality: Joi.string().required().valid("Boac", "Gasan", "Torrijos", "Buenavista", "Mogpog", "Santa Cruz"),
+  municipality: Joi.string().required().valid("Boac", "Gasan", "Torrijos", "Buenavista", "Mogpog", "Santa_Cruz"),
   password: Joi.string().required(),
 });
 

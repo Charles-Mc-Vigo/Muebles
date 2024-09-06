@@ -32,7 +32,7 @@ export default function SignUp() {
 	const zipCodes = {
 		Boac: 4900,
 		Mogpog: 4901,
-		SantaCruz: 4902,
+		Santa_Cruz: 4902,
 		Gasan: 4905,
 		Buenavista: 4904,
 		Torrijos: 4903,
@@ -55,7 +55,6 @@ export default function SignUp() {
 			);
 
 			// console.log(response.data); //for debugging
-			alert("Sign up successfully!");
 			navigate('/verify-email');
 		} catch (error) {
 			console.error("Sign up error", error.response?.data || error.message);
@@ -117,7 +116,7 @@ export default function SignUp() {
 					</option>
 					<option value="Boac">Boac</option>
 					<option value="Mogpog">Mogpog</option>
-					<option value="SantaCruz">Santa Cruz</option>
+					<option value="Santa_Cruz">Santa Cruz</option>
 					<option value="Gasan">Gasan</option>
 					<option value="Buenavista">Buenavista</option>
 					<option value="Torrijos">Torrijos</option>
