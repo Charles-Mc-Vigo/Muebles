@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-
+import Cookies from 'js-cookie'
+  
 const EmailVerification = () => {
   const [email, setEmail] = useState(''); // Initialize with an empty string
   const [code, setCode] = useState('');
@@ -23,25 +24,36 @@ const EmailVerification = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      // Logic for submitting the email and verification code
       const response = await axios.post(
         "http://localhost:3000/api/users/verify-email",
         {
           email,
-          code,
+          code
         },
         {
           headers: {
-            'Content-Type': 'application/json',
+            'Content-Type': 'application/json', // Change this to 'application/json'
           },
         }
       );
       console.log('Response:', response.data);
-      navigate('/home'); // Navigate to home page after successful verification
+  
+      if (response.data.token) {
+        Cookies.set('authToken', response.data.token, {
+          expires: 3, // Token expiration in days
+          secure: process.env.NODE_ENV === 'production' // Use HTTPS in production
+        });
+  
+        alert('Account verified successfully!');
+        navigate('/home');
+      } else {
+        alert('Account verification unsuccessful!');
+      }
     } catch (error) {
       console.error('Error verifying email:', error);
     }
   };
+  
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">

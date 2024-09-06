@@ -24,7 +24,7 @@ const adminOnly = async (req, res, next) => {
     // console.log(req.user) for testing and debugging
     next();
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     res.status(401).json({ message: "Unauthorized request denied!" });
   }
 };

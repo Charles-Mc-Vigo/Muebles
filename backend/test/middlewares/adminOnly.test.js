@@ -55,15 +55,41 @@ describe('adminOnly Middleware', () => {
     expect(next).not.toHaveBeenCalled();
   });
 
-  it('should call next if the user is an admin', async () => {
+  it('should return 403 is it is not an admin', async () => {
     req.cookies.adminToken = 'validToken';
     jwt.verify.mockReturnValue({ _id: 'mockUserId' });
-    User.findOne.mockResolvedValueOnce({ _id: 'mockUserId', isAdmin: true });
+    User.findOne.mockResolvedValueOnce({ _id: 'mockUserId', isAdmin: false });
 
     await adminOnly(req, res, next);
     
+
+    expect(res.status).toHaveBeenCalledWith(403);
+    expect(res.json).toHaveBeenCalledWith({ message: "Access denied. Admins only." });
+    expect(next).not.toHaveBeenCalled();
+  });
+
+  it('should return 403 the admin is not verified', async () => {
+    req.cookies.adminToken = 'validToken';
+    jwt.verify.mockReturnValue({ _id: 'mockUserId' });
+    User.findOne.mockResolvedValueOnce({ _id: 'mockUserId', isAdmin: true, isVerified: false });
+
+    await adminOnly(req, res, next);
+    
+
+    expect(res.status).toHaveBeenCalledWith(403);
+    expect(res.json).toHaveBeenCalledWith({ message: "Please verify your account first!" });
+    expect(next).not.toHaveBeenCalled();
+  });
+
+  it('should call next if admin is verified', async()=>{
+    req.cookies.adminToken = 'validToken';
+    jwt.verify.mockReturnValue({ _id: 'mockUserId' });
+    User.findOne.mockResolvedValueOnce({ _id: 'mockUserId', isAdmin: true , isVerified: true});
+
+    await adminOnly(req, res, next);
+
     expect(next).toHaveBeenCalled();
     expect(res.status).not.toHaveBeenCalled();
     expect(res.json).not.toHaveBeenCalled();
-  });
+  })
 });
