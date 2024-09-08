@@ -10,7 +10,7 @@ import Carousel from './Carousel';
 export default function Hero() {
   const images = [
     '/landingimage/coverphoto.svg',
-    '/landingimage/ads1.svg',
+    '/landingimage/ads1.png',
     'https://via.placeholder.com/800x400?text=Slide+3',
     'https://via.placeholder.com/800x400?text=Slide+4',
     'https://via.placeholder.com/800x400?text=Slide+5',
@@ -57,23 +57,8 @@ export default function Hero() {
           <div className="md:w-1/2 mt-10"><FAQAccordion /></div>
         </div>
 
-        <div className="text-center lg:col-span-2 flex justify-center items-center space-x-72 mt-20">
-          <div className="w-32 h-32 rounded-full overflow-hidden border-2 border-green-400">
-            <img className="w-full h-full object-cover" src="/landingimage/family.PNG" alt="family" />
-          </div>
-          <div className="w-32 h-32 rounded-full overflow-hidden border-2 border-green-400">
-            <img className="w-full h-full object-cover" src="landingimage/custom.PNG" alt="custom" />
-          </div>
-          <div className="w-32 h-32 rounded-full overflow-hidden border-2 border-green-400">
-            <img className="w-full h-full object-cover" src="landingimage/deliver.png" alt="deliver" />
-          </div>
-        </div>
+        
 
-        <div className="text-center lg:col-span-2 flex justify-center items-center space-x-10">
-          <p>Craftsmanship at its Finest Our skilled artisans meticulously handcraft each piece of furniture to perfection.</p>
-          <p>Custom Designs for your Space Create furniture that reflects your unique style and perfectly fits your space.</p>
-          <p>Sustainable Materials We prioritize using eco-friendly materials that minimize our impact on the environment.</p>
-        </div>
       </div>
 
       <Footer /> 

@@ -1,88 +1,85 @@
-import React, { useState } from 'react'
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import Cookies from 'js-cookie'
+import Cookies from 'js-cookie';
+import { FaFingerprint } from 'react-icons/fa'; // Import an icon for the top
 
 export default function Login() {
-
 	const [formData, setFormData] = useState({
-		email:'',
-		password:''
+		email: '',
+		password: ''
 	});
 	const navigate = useNavigate();
 
-const handleChange = (e) => {
-	const {id,value} = e.target;
-	setFormData({...formData,[id]:value});
-	// console.log(formData);
-}
+	const handleChange = (e) => {
+		const { id, value } = e.target;
+		setFormData({ ...formData, [id]: value });
+	};
 
-const handleSubmit = async (e) => {
-	e.preventDefault();
-
-	try {
-		const response = await axios.post('http://localhost:3000/api/users/login',{
-			...formData,
-			headers: {
-				'Content-Type': 'application/json',
+	const handleSubmit = async (e) => {
+		e.preventDefault();
+		try {
+			const response = await axios.post('http://localhost:3000/api/users/login', {
+				...formData,
+				headers: { 'Content-Type': 'application/json' }
+			});
+			if (response.data.token) {
+				Cookies.set('authToken', response.data.token, {
+					expires: 3,
+					secure: process.env.NODE_ENV === 'production'
+				});
+				alert('Logged in successfully');
+				navigate('/home');
+			} else {
+				alert('Login unsuccessful');
 			}
-		})
-		// console.log(response);
-
-    if (response.data.token) {
-      // Store the token in a cookie
-      Cookies.set('authToken', response.data.token, {
-        expires: 3, // Token expiration in days
-        secure: process.env.NODE_ENV === 'production' // Use HTTPS in production
-      });
-
-      alert('Logged in successfully');
-      navigate('/home');
-    } else {
-      alert('Login unsuccessful');
-    }
-
-	} catch (error) {
-		console.error("Log in error", error.response?.data || error.message);
-		alert(error.response?.data?.message || error.message || "Log in failed");
-	}
-}
+		} catch (error) {
+			console.error("Log in error", error.response?.data || error.message);
+			alert(error.response?.data?.message || error.message || "Log in failed");
+		}
+	};
 
 	return (
-		<div className="p-3 max-w-lg mx-auto">
-			<h1 className="text-center font-semibold my-7 text-3xl">Welcome to Muebles!</h1>
-			<form onSubmit={handleSubmit} className="flex flex-col gap-4">
-				<input
-					type="email"
-					placeholder="Email"
-					id="email"
-					required
-					onChange={handleChange}
-					className="bg-slate-100 p-3 rounded-lg"
-				/>
-				<input
-					type="password"
-					placeholder="Password"
-					id="password"
-					required
-					onChange={handleChange}
-					className="bg-slate-100 p-3 rounded-lg"
-				/>
-				<button
-					type="submit"
-					className="p-3 bg-slate-500 rounded-lg text-slate-50 font-bold uppercase hover:opacity-80 disabled:opacity-70"
-				>
-					Log In
-				</button>
-				<div>
-					<p>
-						Don't have an account?{" "}
-						<Link to="/signup">
-							<span className="text-blue-500">Sign Up</span>
-						</Link>
-					</p>
+		<div className="min-h-screen bg-fill flex justify-center items-center"
+			 style={{ backgroundImage: 'url(/landingimage/jckamecover.jpg)', backgroundSize: 'cover', backgroundPosition: 'center' }}>
+			<div className="bg-teal-800 bg-opacity-90 p-6 md:p-10 rounded-lg max-w-md w-full">
+				<div className="flex justify-center mb-6">
+					<FaFingerprint className="text-white text-4xl" />
 				</div>
-			</form>
+				<h1 className="text-center text-white text-2xl font-semibold mb-6">Log In</h1>
+				<form onSubmit={handleSubmit} className="space-y-4">
+					<input
+						type="email"
+						id="email"
+						placeholder="E-mail address"
+						required
+						onChange={handleChange}
+						className="w-full px-4 py-2 text-white bg-transparent border-b-2 border-gray-300 placeholder-gray-300 focus:outline-none focus:border-white"
+					/>
+					<input
+						type="password"
+						id="password"
+						placeholder="Password"
+						required
+						onChange={handleChange}
+						className="w-full px-4 py-2 text-white bg-transparent border-b-2 border-gray-300 placeholder-gray-300 focus:outline-none focus:border-white"
+					/>
+					<button
+						type="submit"
+						className="w-full py-3 mt-6 bg-white text-teal-800 font-bold rounded-full hover:bg-gray-100 transition-colors"
+					>
+						Log In
+					</button>
+				</form>
+				<p className="text-white text-sm text-center mt-4">
+					Don't have an account?{" "}
+					<Link to="/SignUp" className="underline">Sign up Now</Link>.
+				</p>
+				<p className="text-white text-sm text-center mt-2">
+					Forgot password?{" "}
+					<Link to="/login" className="underline">Click here</Link>.
+				</p>
+			</div>
 		</div>
 	);
 }
