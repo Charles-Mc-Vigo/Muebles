@@ -7,9 +7,7 @@ const {
   getUserByID,
   editUserInfo,
   deleteUserbyID,
-  showAdmins,
   Logout,
-  AdminLogin,
   verifyEmail
 } = require("../controllers/userController");
 
@@ -20,7 +18,6 @@ const adminOnly = require("../middlewares/adminOnly");
 router.post("/signup", SignUp);  // Sign up
 router.post('/verify-email', verifyEmail);
 router.post("/login", LogIn);    // Log in
-router.post("/admin/login", AdminLogin);    // Admin Log in
 
 
 // Routes accessible to all authenticated users
@@ -34,7 +31,6 @@ router.post("/profile/logout", Logout);           // Log out
 router.use(adminOnly);
 
 router.get("/", getAllUsers);                  // Get all users (Admin only)
-router.get("/show-roles", showAdmins);    // Get all admin users
 router.delete("/delete-user/:id", deleteUserbyID);         // Delete a user by ID (Admin only)
 router.post("/logout", Logout);         // Logout Admin
 

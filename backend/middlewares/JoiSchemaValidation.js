@@ -16,5 +16,12 @@ const UserSchemaValidator = Joi.object({
   password: Joi.string().required(),
 });
 
+const AdminSchemaValidator = Joi.object({
+  firstname: Joi.string().required().min(3).max(30),
+  lastname: Joi.string().required().min(3).max(30),
+  gender:Joi.string().required().valid("Male","Female"),
+  password: Joi.string().required(),
+});
 
-module.exports = {UserSchemaValidator, OrderSchemaValidator};
+
+module.exports = {UserSchemaValidator, OrderSchemaValidator, AdminSchemaValidator};

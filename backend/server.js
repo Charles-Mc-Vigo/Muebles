@@ -4,7 +4,7 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const userRoutes = require("./router/userRoutes");
 const furnitureRoutes = require("./router/furnitureRoutes");
-// const adminRoutes = require('./router/adminRoutes')
+const adminRoutes = require('./router/adminRoutes')
 const orderRoutes = require("./router/orderRoutes");
 const connectDB = require("./database/db");
 const cookieParser = require('cookie-parser')
@@ -53,7 +53,7 @@ app.use(bodyParser.json());
 // })
 
 app.use("/api/users", userRoutes);
-// app.use("/api/admins", adminRoutes);
+app.use("/api/admins", adminRoutes);
 app.use("/api/furnitures", furnitureRoutes);
 app.use("/api/orders", orderRoutes);
 

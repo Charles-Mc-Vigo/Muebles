@@ -25,12 +25,22 @@ const adminSchema = new mongoose.Schema({
     unique:true
   },
   password:{
-    type:Boolean,
+    type:String,
     required:true
   },
   role:{
     type: String,
     default:"Admin"
+  },
+  isVerified:{
+    type:Boolean,
+    default:false
+  },
+  verificationCode: {
+    type: String
+  },
+  verificationCodeExpires: {
+    type: Date
   }
 },
 {

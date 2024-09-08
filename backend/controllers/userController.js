@@ -105,15 +105,6 @@ exports.SignUp = async (req, res) => {
 		});
 
 		await newUser.save();
-		// const token = createToken(newUser._id);
-
-		// res.cookie('authToken', token, {
-		//   httpOnly: true,
-		//   secure: process.env.NODE_ENV === 'production',
-		//   maxAge: 3 * 24 * 60 * 60 * 1000,
-		//   sameSite: 'strict'
-		// });
-
 		res.status(201).json({ message: "Account created successfully!" });
 	} catch (err) {
 		console.error(err);
@@ -199,45 +190,6 @@ exports.LogIn = async (req, res) => {
 	}
 };
 
-//Admin Sign up here
-
-exports.AdminLogin = async (req, res) => {
-	try {
-		const { email, password } = req.body;
-
-		const user = await User.findOne({ email });
-
-		if (!user) {
-			return res.status(404).json({ message: "Incorrect email account!" });
-		}
-
-		if (user.role !== "Admin") {
-			return res.status(403).json({ message: "Access denied: Admins only!" });
-		}
-
-		const isMatch = await bcrypt.compare(password, user.password);
-
-		if (!isMatch) {
-			return res.status(400).json({ message: "Incorrect password!" });
-		}
-
-		const token = createToken(user._id);
-
-		res.cookie("adminToken", token, {
-			httpOnly: true,
-			secure: process.env.NODE_ENV === "production",
-			maxAge: 3 * 24 * 60 * 60 * 1000,
-			sameSite: "strict",
-		});
-
-		res
-			.status(200)
-			.json({ message: "Successfully logged in as an Admin!", token });
-	} catch (error) {
-		res.status(500).json({ message: "Server error!" });
-		console.error(error);
-	}
-};
 
 exports.Logout = async (req, res) => {
 	try {
@@ -272,6 +224,9 @@ exports.Logout = async (req, res) => {
 exports.getAllUsers = async (req, res) => {
 	try {
 		const users = await User.find();
+		if(users.length === 0){
+			return res.status(404).json({message:"No users found!"})
+		}
 		res.status(200).json(users);
 	} catch (err) {
 		console.error(err);
