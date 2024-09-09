@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
 const AdminLogin = () => {
-  const [formData, setFormData] = useState({
+  const [admin, setAdmin] = useState({
     email: "",
     password: ""
   });
@@ -11,23 +11,23 @@ const AdminLogin = () => {
 
   const handleChange = (e) => {
     const { id, value } = e.target;
-    setFormData({ ...formData, [id]: value });
-    console.log(formData);
+    setAdmin({ ...admin, [id]: value });
+    console.log(admin); //for debugging
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      const response = await axios.post('http://localhost:3000/api/users/login', {
-        email: formData.email,
-        password: formData.password
+      const response = await axios.post('http://localhost:3000/api/admins/login', {
+        email: admin.email,
+        password: admin.password
       });
 
-      console.log('check if user is admin',response.data.isAdmin) //debugging
-      console.log('check if user has token',response.data.token) //debugging
+      // console.log('check if user has token',response.data.token) //debugging
+
       // Check if the user is an admin
-      if (response.data.token && response.data.isAdmin) {
+      if (response.data.token) {
         // Store the token and navigate to the admin dashboard
         Cookies.set('adminToken', response.data.token, {
           expires: 3, // Token expiration in days
@@ -43,6 +43,7 @@ const AdminLogin = () => {
       console.error("Admin Login error", error.response?.data || error.message);
       alert(error.response?.data?.message || error.message || "Admin Login failed");
     }
+    console.log(admin)
   };
 
   return (

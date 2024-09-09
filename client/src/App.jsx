@@ -18,6 +18,7 @@ import ProductCustomization from "./pages/ProductCustomization";
 import FurnitureList from './components/FurnitureList'
 import EmailVerification from "./pages/EmailVerification";
 import AdminSignUp from "./pages/AdminSignUp";
+import AdminVerify from "./pages/AdminVerify"
 
 function RedirectToHome() {
   const navigate = useNavigate();
@@ -44,6 +45,7 @@ export default function App() {
 				<Route path="/login" element={<Login />} />
 				<Route path="/admin-login" element={<AdminLogin />}/>
 				<Route path="/admin-signup" element={<AdminSignUp />}/>
+				<Route path="/admin-verify" element={<AdminVerify />}/>
 
 				<Route path="/home" element={<ProtectedRoute element={<Home />} />} />
 				<Route path="/furniture-list" element={<ProtectedRoute element={<FurnitureList />} />} />
