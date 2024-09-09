@@ -9,7 +9,7 @@ const AdminOnlyRoutes = ({ element: Component, ...rest }) => {
   return isAuthenticated ? (
 		Component
   ) : (
-      <Navigate to="/admin" replace />
+      <Navigate to="/admin-login" replace />
   );
 }
 
