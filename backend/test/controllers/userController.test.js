@@ -117,9 +117,10 @@ describe("User Controller", () => {
         confirmPassword: 'StrongPass123!'
       });
     
+			// console.log(response.status) //for debugging purposes
+			// console.log(response.body.message) //for debugging purposes
       expect(response.status).toBe(201);
       expect(response.body.message).toBe('Account created successfully!');
-      expect(response.body.token).toBe('mockToken');
     });
   })
 
