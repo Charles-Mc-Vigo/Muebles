@@ -16,7 +16,7 @@ const userSchema = new mongoose.Schema({
   streetAddress: { type: String, required: true },
 	municipality: { 
     type: String, 
-    enum:["Boac","Gasan","Torrijos","Buenavista", "Mogpog","Santa Cruz"],
+    enum:["Boac","Gasan","Torrijos","Buenavista", "Mogpog","Santa_Cruz"],
     required: true
   },
   zipCode: {
@@ -31,9 +31,9 @@ const userSchema = new mongoose.Schema({
     type: String, 
     required: true
   },
-  isAdmin:{
-    type:Boolean,
-    default: false
+  role:{
+    type:String,
+    default:"User"
   },
   isVerified:{
     type:Boolean,
