@@ -1,5 +1,6 @@
-import React from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import React, { useEffect } from "react";
+import Cookies from "js-cookie"
+import { BrowserRouter, Routes, Route , useNavigate} from "react-router-dom";
 import LandinPage from "./pages/LandinPage";
 import SignUp from "./pages/SignUp";
 import Login from "./pages/Login";
@@ -18,9 +19,24 @@ import FurnitureList from './components/FurnitureList'
 import EmailVerification from "./pages/EmailVerification";
 import AdminSignUp from "./pages/AdminSignUp";
 
+function RedirectToHome() {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = Cookies.get("authToken");
+
+    if (token) {
+      navigate("/home");
+    }
+  }, [navigate]);
+
+  return null; // This component doesn't render anything
+}
+
 export default function App() {
 	return (
 		<BrowserRouter>
+		<RedirectToHome />
 			<Routes>
 				<Route path="/" element={<LandinPage />} />
 				<Route path="/signup" element={<SignUp />} />

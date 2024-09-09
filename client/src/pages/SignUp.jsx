@@ -132,7 +132,7 @@ export default function SignUp() {
 							</option>
 							<option value="Boac">Boac</option>
 							<option value="Mogpog">Mogpog</option>
-							<option value="SantaCruz">Santa Cruz</option>
+							<option value="Santa_Cruz">Santa Cruz</option>
 							<option value="Gasan">Gasan</option>
 							<option value="Buenavista">Buenavista</option>
 							<option value="Torrijos">Torrijos</option>
