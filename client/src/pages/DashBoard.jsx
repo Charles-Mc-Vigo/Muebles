@@ -16,7 +16,7 @@ const DashBoard = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-black">
+    <div className="flex min-h-screen bg-white">
       {/* Sidebar */}
       <nav className="w-64 bg-green-900 text-white flex flex-col justify-center">
         <div className="p-6 text-xl font-bold text-center bg-green-800">
@@ -57,7 +57,7 @@ const DashBoard = () => {
       </nav>
 
       {/* Main Content */}
-      <div className="flex-1 p-8 bg-black text-white overflow-auto">
+      <div className="flex-1 p-8 bg-white text-white overflow-auto">
         <h1 className="text-3xl font-bold mb-8 text-center text-green-500">
           Admin Dashboard Overview
         </h1>

@@ -16,6 +16,7 @@ import ProductManagement from "./pages/ProductManagement";
 import ProductCustomization from "./pages/ProductCustomization";
 import FurnitureList from './components/FurnitureList'
 import EmailVerification from "./pages/EmailVerification";
+import About from "./pages/About"
 
 export default function App() {
 	return (
@@ -25,14 +26,16 @@ export default function App() {
 				<Route path="/signup" element={<SignUp />} />
 				<Route path="/verify-email" element={<EmailVerification />} />
 				<Route path="/login" element={<Login />} />
+				<Route path="/about" element={<About />} />
 				<Route path="/admin" element={<AdminLogin />}/>
 				<Route path="/home" element={<ProtectedRoute element={<Home />} />} />
 				<Route path="/furniture-list" element={<ProtectedRoute element={<FurnitureList />} />} />
-				<Route path="/dashboard" element={<AdminOnlyRoutes element={<DashBoard />} />} />
+				<Route path="/dashboard" element={<DashBoard />}  />
 				<Route path="/user-management" element={<AdminOnlyRoutes element={<UserManagement />} />} />
 				<Route path="/order-management" element={<AdminOnlyRoutes element={<OrderManagement />} />} />
 				<Route path="/product-management" element={<AdminOnlyRoutes element={<ProductManagement />} />} />
 				<Route path="/product-customization" element={<AdminOnlyRoutes element={<ProductCustomization />} />} />
+				
 
 				<Route
 					path="/logout"
