@@ -7,7 +7,7 @@ const DashBoard = () => {
 
   const handleLogout = () => {
     Cookies.remove('adminToken');
-    navigate('/admin');
+    navigate('/admin-login');
     console.log('Logging out...');
   };
 

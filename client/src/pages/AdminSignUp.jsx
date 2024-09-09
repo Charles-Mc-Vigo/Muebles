@@ -3,6 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 export default function AdminSignUp() {
+
+	const navigate = useNavigate();
 	const [admin, setAdmin] = useState({
 		firstname: "",
 		lastname: "",
@@ -23,24 +25,23 @@ export default function AdminSignUp() {
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 
-		// // console.log("Form data to be submitted:", { ...admin, zipCode }); //for debugging
-		// try {
-		// 	const response = await axios.post(
-		// 		"http://localhost:3000/api/users/signup",
-		// 		{
-		// 			...admin,
-		// 			headers: {
-		// 				'Content-Type': 'application/json',
-		// 			},
-		// 		}
-		// 	);
+		try {
+			const response = await axios.post(
+				"http://localhost:3000/api/admins/signup",
+				{
+					...admin,
+					headers: {
+						'Content-Type': 'application/json',
+					},
+				}
+			);
 
-		// 	// console.log(response.data); //for debugging
-		// 	navigate('/verify-email');
-		// } catch (error) {
-		// 	console.error("Sign up error", error.response?.data || error.message);
-		// 	alert(error.response?.data?.message || error.message || "Sign up failed");
-		// }
+			// console.log(response.data); //for debugging
+			navigate('/admin-verify');
+		} catch (error) {
+			console.error("Sign up error", error.response?.data || error.message);
+			alert(error.response?.data?.message || error.message || "Sign up failed");
+		}
 	};
 	return (
 		<div className="p-3 max-w-lg mx-auto">
