@@ -80,7 +80,8 @@ exports.AdminSignup = async (req,res) =>{
 		});
 
 		await newAdmin.save();
-		res.status(201).json({ message: "Admin account is created successfully!" });
+		res.status(201).json({ message: "We’ve sent a verification email to your inbox. Please check your email to verify your admin account." 
+		});
 
 	} catch (error) {
 		console.log(error);
@@ -180,7 +181,7 @@ exports.verifyEmail = async (req, res) => {
 		});
 		// console.log(token);
 
-		res.status(200).json({ message: "Email verified successfully!", token });
+		res.status(200).json({ message: "Admin account was verified successfully!", token });
 	} catch (err) {
 		console.error(err);
 		res.status(500).json({ message: "Server error!" });

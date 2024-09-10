@@ -2,30 +2,35 @@ const mongoose = require("mongoose");
 const Furniture = require("../models/furnitureModel");
 
 const orderSchema = new mongoose.Schema({
-  userId:{
+  userId: {
     type: mongoose.Schema.ObjectId,
-    ref:"User",
+    ref: "User",
     required: true
   },
-  furnituresId:[{
-    type:mongoose.Schema.ObjectId,
-    ref:"Furniture",
-    required:true
-  }],
-  quantity:{
-    type:Number,
-    default:0
+  items: [
+    {
+      furniture: {
+        type: mongoose.Schema.ObjectId,
+        ref: "Furniture",
+        required: true
+      },
+      quantity: {
+        type: Number,
+        required: true,
+        default: 1 // Default quantity kung hindi specified
+      }
+    }
+  ],
+  totalAmount: {
+    type: Number,
+    default: 0
   },
-  totalAmount:{
-    type:Number,
-    default:0
+  currency: {
+    type: String,
+    enum: ["PHP"],
+    default: "PHP"
   },
-  currency:{
-    type:String,
-    enum:["PHP"],
-    default:"PHP"
-  },
-  orderDate:{
+  orderDate: {
     type: Date,
     default: Date.now
   },
@@ -34,24 +39,22 @@ const orderSchema = new mongoose.Schema({
     enum: ["Pending", "Shipped", "Delivered", "Cancelled"],
     default: "Pending"
   }
-},{
-  timestamps:true
-})
-
-//calculate the quantity automatically base on furniture order
-orderSchema.pre("save", function (next) {
-  this.quantity = this.furnituresId.length;
-  next();
+}, {
+  timestamps: true
 });
 
-//calculate the total amount of the order
+// Calculate the total amount of the order based on furniture price and quantity
 orderSchema.pre("save", async function (next) {
   try {
-    const furnitures = await Furniture.find({ "_id": { $in: this.furnituresId } });
+    const furnitures = await Furniture.find({ "_id": { $in: this.items.map(item => item.furniture) } });
     let total = 0;
 
-    furnitures.forEach((furniture) => {
-      total += furniture.price;
+    // Calculate total price based on quantity per item
+    this.items.forEach((item) => {
+      const furniture = furnitures.find(f => f._id.equals(item.furniture));
+      if (furniture) {
+        total += furniture.price * item.quantity; // Multiply price by quantity
+      }
     });
 
     this.totalAmount = total;
@@ -61,5 +64,5 @@ orderSchema.pre("save", async function (next) {
   }
 });
 
-const Order = mongoose.model("Order",orderSchema);
+const Order = mongoose.model("Order", orderSchema);
 module.exports = Order;
