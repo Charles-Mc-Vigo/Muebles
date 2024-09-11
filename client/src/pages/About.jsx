@@ -1,11 +1,11 @@
 import React from 'react';
 import Header from '../components/Header';
-import Footer from '../components/Footer';
+import Footer from '../components/Footer'
 
 const About = () => {
   return (
     <div className="bg-gray-50 font-poppins">
-      <Header />
+      <Header/>
 
       {/* About Section */}
       <section className="bg-white rounded-lg shadow-md p-8 w-full h-auto flex flex-col justify-center items-center">
@@ -133,7 +133,7 @@ const About = () => {
         </div>
       </section>
 
-      <Footer />
+    <Footer/>
     </div>
   );
 };
