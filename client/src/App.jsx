@@ -17,6 +17,9 @@ import ProductManagement from "./pages/ProductManagement";
 import ProductCustomization from "./pages/ProductCustomization";
 import FurnitureList from './components/FurnitureList'
 import EmailVerification from "./pages/EmailVerification";
+<<<<<<< HEAD
+import About from "./pages/About"
+=======
 import AdminSignUp from "./pages/AdminSignUp";
 import AdminVerify from "./pages/AdminVerify"
 
@@ -33,6 +36,7 @@ function RedirectToHome() {
 
   return null; // This component doesn't render anything
 }
+>>>>>>> 96f885e3eb8d59fc4b48e45d1aa7f26635e0ade9
 
 export default function App() {
 	return (
@@ -43,17 +47,23 @@ export default function App() {
 				<Route path="/signup" element={<SignUp />} />
 				<Route path="/verify-email" element={<EmailVerification />} />
 				<Route path="/login" element={<Login />} />
+<<<<<<< HEAD
+				<Route path="/about" element={<About />} />
+				<Route path="/admin" element={<AdminLogin />}/>
+=======
 				<Route path="/admin-login" element={<AdminLogin />}/>
 				<Route path="/admin-signup" element={<AdminSignUp />}/>
 				<Route path="/admin-verify" element={<AdminVerify />}/>
 
+>>>>>>> 96f885e3eb8d59fc4b48e45d1aa7f26635e0ade9
 				<Route path="/home" element={<ProtectedRoute element={<Home />} />} />
 				<Route path="/furniture-list" element={<ProtectedRoute element={<FurnitureList />} />} />
-				<Route path="/dashboard" element={<AdminOnlyRoutes element={<DashBoard />} />} />
+				<Route path="/dashboard" element={<DashBoard />}  />
 				<Route path="/user-management" element={<AdminOnlyRoutes element={<UserManagement />} />} />
 				<Route path="/order-management" element={<AdminOnlyRoutes element={<OrderManagement />} />} />
 				<Route path="/product-management" element={<AdminOnlyRoutes element={<ProductManagement />} />} />
 				<Route path="/product-customization" element={<AdminOnlyRoutes element={<ProductCustomization />} />} />
+				
 
 				<Route
 					path="/logout"

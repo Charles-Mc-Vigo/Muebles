@@ -57,8 +57,6 @@ export default function Hero() {
           <div className="md:w-1/2 mt-10"><FAQAccordion /></div>
         </div>
 
-        
-
       </div>
 
       <Footer /> 
