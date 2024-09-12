@@ -69,7 +69,7 @@ export default function Header({ showLogin = false }) {
                 </ul>
               )}
             </li>
-            <Link to="/aboutus" className="hover:text-gray-400">About Us</Link>
+            <Link to="/about" className="hover:text-gray-400">About Us</Link>
             <Link to="/featured" className="hover:text-gray-400">Featured</Link>
             <Link to="/services" className="hover:text-gray-400">Services</Link>
           </ul>
@@ -120,7 +120,7 @@ export default function Header({ showLogin = false }) {
                 </ul>
               )}
             </li>
-            <Link to="/aboutus" className="hover:text-gray-400 ml-2">About Us</Link>
+            <Link to="/about" className="hover:text-gray-400 ml-2">About Us</Link>
             <Link to="/featured" className="hover:text-gray-400 ml-2">Featured</Link>
             <Link to="/services" className="hover:text-gray-400 ml-2">Services</Link>
             <Link to="/customer-service" className="hover:text-gray-400 flex items-center">

@@ -1,7 +1,7 @@
 import React from "react";
 import { FaShoppingCart } from "react-icons/fa";
 import { Link } from "react-router-dom";
-import Footer from "./footer";
+import Footer from './Footer';
 import Collection from "./Collection";
 import FAQAccordion from "./FAQAccordion";
 import FAQPage from "./FAQpage";
@@ -56,8 +56,6 @@ export default function Hero() {
           <div className="md:w-1/2 justify-center mt-0"><FAQPage /></div>
           <div className="md:w-1/2 mt-10"><FAQAccordion /></div>
         </div>
-
-        
 
       </div>
 

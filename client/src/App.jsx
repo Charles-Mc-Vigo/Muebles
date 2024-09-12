@@ -19,6 +19,7 @@ import FurnitureList from './components/FurnitureList'
 import EmailVerification from "./pages/EmailVerification";
 import AdminSignUp from "./pages/AdminSignUp";
 import AdminVerify from "./pages/AdminVerify"
+import About from './pages/About'
 
 function RedirectToHome() {
   const navigate = useNavigate();
@@ -29,6 +30,7 @@ function RedirectToHome() {
     if (token) {
       navigate("/home");
     }
+		
   }, [navigate]);
 
   return null; // This component doesn't render anything
@@ -40,6 +42,7 @@ export default function App() {
 		<RedirectToHome />
 			<Routes>
 				<Route path="/" element={<LandinPage />} />
+				<Route path="/about" element={<About />} />
 				<Route path="/signup" element={<SignUp />} />
 				<Route path="/verify-email" element={<EmailVerification />} />
 				<Route path="/login" element={<Login />} />
@@ -54,6 +57,7 @@ export default function App() {
 				<Route path="/order-management" element={<AdminOnlyRoutes element={<OrderManagement />} />} />
 				<Route path="/product-management" element={<AdminOnlyRoutes element={<ProductManagement />} />} />
 				<Route path="/product-customization" element={<AdminOnlyRoutes element={<ProductCustomization />} />} />
+				
 
 				<Route
 					path="/logout"
