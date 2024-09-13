@@ -15,6 +15,7 @@ const ProductManagement = () => {
 		try {
 			const response = await axios.get("http://localhost:3000/api/furnitures");
 			setProducts(response.data);
+			//if no furnitures data found, display "No furnitures found. create one" in a paragrap tag
 		} catch (error) {
 			console.error("Error fetching products:", error);
 			alert("Failed to fetch products. Please try again.");
@@ -67,6 +68,8 @@ const ProductManagement = () => {
 					},
 				}
 			);
+
+			alert(`${response.data.furniture.furnitureType} has been added successfully! `)
 
 			// console.log(response);
 			fetchProducts(); // Refetch products after adding a new one
@@ -123,12 +126,12 @@ const ProductManagement = () => {
 								className="bg-slate-100 p-3 rounded-lg w-full">
 
 							<option>Category</option>
-							<option value="Door">Door</option>
-							<option value="Bed frame">Bed frame</option>
-							<option value="Cabinet">Cabinet</option>
-							<option value="Chair">Chair</option>
-							<option value="Table">Table</option>
-							<option value="Sala set">Sala set</option>
+							<option value="door">Door</option>
+							<option value="bed_frame">Bed frame</option>
+							<option value="cabinet">Cabinet</option>
+							<option value="chair">Chair</option>
+							<option value="table">Table</option>
+							<option value="sala_set">Sala set</option>
 						</select>
 						<input
 							type="text"

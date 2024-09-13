@@ -7,7 +7,7 @@ const furnitureSchema = new mongoose.Schema({
   },
   category:{
     type:String,
-    enum:["Door","Bed frame","Cabinet","Chair", "Table","Sala set"],
+    enum:["door","bed_frame","cabinet","chair", "table","sala_set"],
     required:true
   },
   furnitureType:{

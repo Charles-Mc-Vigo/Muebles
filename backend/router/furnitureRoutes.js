@@ -13,14 +13,6 @@ router.post("/add-furniture",createFurniture);
 //GET - /api/furnitures 
 router.get("/",getAllFurnitures);
 
-//get furnitures by category
-//GET - /api/furnitures/:category
-router.get("/:category",getFurnitureByCategory)
-
-//get furniture by id
-//GET - /api/furnitures/:id
-router.get("/furniture/:id",getFurnitureById);
-
 //edit furniture
 //PUT - /api/furnitures/:id
 router.put("/furniture/:id",editFurnitureById);

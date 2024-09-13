@@ -6,19 +6,35 @@ const multer = require('multer');
 const upload = multer({ storage: multer.memoryStorage() });
 
 
-// Get all furnitures
+// Get all furnitures or furniture by ID
 exports.getAllFurnitures = async (req, res) => {
 	try {
-		const furnitures = await Furniture.find();
-		if(furnitures.length === 0){
-			return res.status(404).json({message:"No furniture found!"})
+		const { id } = req.query;
+
+		// Check if 'id' is provided in the query to fetch a specific furniture
+		if (id) {
+			const existingFurniture = await Furniture.findById(id);
+			
+			if (!existingFurniture) {
+				return res.status(404).json({ message: "Furniture not found!" });
+			}
+
+			return res.status(200).json(existingFurniture);
 		}
+
+		// If no 'id', fetch all furnitures
+		const furnitures = await Furniture.find(req.query);
+		if (furnitures.length === 0) {
+			return res.status(404).json({ message: "No furniture found!" });
+		}
+		
 		res.status(200).json(furnitures);
 	} catch (error) {
 		console.error(error);
 		res.status(500).json({ message: "Server error!" });
 	}
 };
+
 
 // Create furniture
 exports.createFurniture = [upload.single('image'), async (req, res) => {
@@ -70,58 +86,14 @@ exports.createFurniture = [upload.single('image'), async (req, res) => {
 	},
 ];
 
-// Get furniture by ID
-exports.getFurnitureById = async (req, res) => {
-	try {
-		const { id } = req.params;
-		const existingFurniture = await Furniture.findById(id);
-
-		if (!existingFurniture) {
-			return res.status(404).json({ message: "Furniture not found!" });
-		}
-
-		res.status(200).json(existingFurniture);
-	} catch (error) {
-		console.error(error);
-		res.status(500).json({ message: "Server error!" });
-	}
-};
-
-// Get furniture by category
-exports.getFurnitureByCategory = async (req, res) => {
-	try {
-		const { category } = req.params;
-
-		if (
-			!["door", "bed frame", "cabinet", "chair", "table", "sala set"].includes(
-				category
-			)
-		) {
-			return res.status(400).json({ message: "Invalid category!" });
-		}
-
-		const furniture = await Furniture.find({ category });
-
-		if (!furniture.length) {
-			return res
-				.status(404)
-				.json({ message: "No furniture found for this category!" });
-		}
-
-		res.status(200).json(furniture);
-	} catch (error) {
-		console.error(error);
-		res.status(500).json({ message: "Server error!" });
-	}
-};
 
 // Edit furniture by ID
 exports.editFurnitureById = async (req, res) => {
 	try {
-		const { id } = req.params;
+		const { id } = req.query;
 		const { image, category, furnitureType, description, price } = req.body;
 
-		const existingFurniture = await Furniture.findById(id);
+		const existingFurniture = await Furniture.findById(req.query);
 
 		if (!existingFurniture) {
 			return res.status(404).json({ message: "Furniture not found!" });
@@ -159,21 +131,21 @@ exports.editFurnitureById = async (req, res) => {
 	}
 };
 
-// Delete furniture by ID
+// Delete furniture by ID using params
 exports.deleteFurnitureById = async (req, res) => {
 	try {
-		const { id } = req.params;
+		const { id } = req.params;  // Use req.params instead of req.query
 
-		const existingFurniture = await Furniture.findById(id);
+		const existingFurniture = await Furniture.findByIdAndDelete(id);
 
 		if (!existingFurniture) {
 			return res.status(404).json({ message: "Furniture not found!" });
 		}
 
-		await existingFurniture.deleteOne();
 		res.status(200).json({ message: "Furniture deleted successfully!" });
 	} catch (error) {
 		console.error(error);
 		res.status(500).json({ message: "Server error!" });
 	}
 };
+
