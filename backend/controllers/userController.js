@@ -1,4 +1,6 @@
 const User = require("../models/userModel");
+const Furniture = require("../models/furnitureModel");
+const Cart = require('../models/cartModel');
 const bcrypt = require("bcrypt");
 const validator = require("validator");
 const { UserSchemaValidator } = require("../middlewares/JoiSchemaValidation");
@@ -8,10 +10,15 @@ const {
 	generateVerificationCode,
 } = require("../utils/EmailVerification");
 
+//task
+//user could,login, signup, request account deletion, request password reset, view products, add to cart, make payment, direct order, view order or purchase, view purchase history
+
+//token for creation of user and logging in their account
 const createToken = (_id) => {
 	return jwt.sign({ _id }, process.env.SECRET, { expiresIn: "3d" });
 };
 
+//sign up and some validation
 exports.SignUp = async (req, res) => {
 	try {
 		const {
@@ -105,13 +112,15 @@ exports.SignUp = async (req, res) => {
 		});
 
 		await newUser.save();
-		res.status(201).json({ message: "Account created successfully!" });
-	} catch (err) {
+		res.status(201).json({ message: "We’ve sent a verification email to your inbox. Please check your email to verify your account." 
+		});
+		} catch (err) {
 		console.error(err);
 		res.status(500).json({ message: "Server error!" });
 	}
 };
 
+//for verifying user account
 exports.verifyEmail = async (req, res) => {
 	try {
 		const { email, code } = req.body;
@@ -148,6 +157,7 @@ exports.verifyEmail = async (req, res) => {
 		res.cookie("authToken", token, {
 			httpOnly: true,
 			secure: process.env.NODE_ENV === "production",
+			sameSite: "strict",
 			maxAge: 3 * 24 * 60 * 60 * 1000,
 		});
 		// console.log(token);
@@ -159,6 +169,7 @@ exports.verifyEmail = async (req, res) => {
 	}
 };
 
+//login
 exports.LogIn = async (req, res) => {
 	try {
 		const { email, password } = req.body;
@@ -190,7 +201,24 @@ exports.LogIn = async (req, res) => {
 	}
 };
 
+//view all furnitures
+exports.viewFurnitures = async (req,res) => {
+	try {
 
+		const furnitures = await Furniture.find(req.query);
+
+		if(furnitures.length === 0){
+			return res.status(404).json({message:"No furniture found!"})
+		}
+		res.status(200).json(furnitures)
+	} catch (error) {
+		console.log("Failed to view products:",error);
+		res.status(500).json({message:"Server error!"})
+	}
+}
+
+
+//logout
 exports.Logout = async (req, res) => {
 	try {
 		const userId = req.user._id;
@@ -201,146 +229,200 @@ exports.Logout = async (req, res) => {
 			return res.status(404).json({ message: "User not found!" });
 		}
 
-		if (user.role === "Admin") {
-			res.clearCookie("adminToken", {
-				httpOnly: true,
-				secure: process.env.NODE_ENV === "production",
-			});
-		} else {
-			res.clearCookie("authToken", {
-				httpOnly: true,
-				secure: process.env.NODE_ENV === "production",
-			});
-		}
+		res.clearCookie("authToken", {
+			httpOnly: true,
+			secure: process.env.NODE_ENV === "production",
+			sameSite: "strict"
+		});
 
 		res.status(200).json({ message: "Logout successful!" });
 		console.log("Logout successful!");
 	} catch (error) {
 		res.status(500).json({ message: "Server error!" });
-		console.error(error);
+		console.error("Failed to log out:",error);
 	}
 };
 
-exports.getAllUsers = async (req, res) => {
+//view cart
+exports.viewCart = async (req,res) => {
 	try {
-		const users = await User.find();
-		if(users.length === 0){
-			return res.status(404).json({message:"No users found!"})
-		}
-		res.status(200).json(users);
-	} catch (err) {
-		console.error(err);
-		res.status(500).json({ message: "Server error!" });
-	}
-};
-
-exports.getUserByID = async (req, res) => {
-	try {
-		const { id } = req.params;
-		const user = await User.findById(id);
-
-		if (!user) {
-			return res.status(404).json({ message: "User not found!" });
-		}
-
-		res.status(200).json(user);
+		const userId = req.user._id;
+		const userCart = await Cart.findOne({ user: userId });
+		res.status(200).json(userCart);
 	} catch (error) {
-		res.status(400).json({ message: error.message });
-		console.log(error);
+		console.log("Failed to view cart",error);
+		res.status(500).json({message:"Server error!"})
 	}
+}
+
+exports.addToCart = async (req, res) => {
+  try {
+    const { furnituresId } = req.body;
+
+    // Ensure the user is authenticated
+    if (!req.user) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    // Find the furniture items to be added to the cart
+    const existingFurnitures = await Furniture.find({ '_id': { $in: furnituresId } });
+    if (existingFurnitures.length !== furnituresId.length) {
+      return res.status(404).json({ message: "One or more furniture items not found!" });
+    }
+
+    // Get the userId from the request
+    const userId = req.user._id;
+
+    // Find or create a cart for the user
+    let cart = await Cart.findOne({ userId });
+
+    if (!cart) {
+      // Create a new cart if one does not exist
+      cart = new Cart({ userId, items: [] });
+    }
+
+    // Update cart items
+    furnituresId.forEach(id => {
+      const itemIndex = cart.items.findIndex(item => item.furnitureId.toString() === id.toString());
+
+      if (itemIndex !== -1) {
+        // If item exists, update quantity
+        cart.items[itemIndex].quantity += 1;
+      } else {
+        // Add new item to cart
+        cart.items.push({ furnitureId: id, quantity: 1 });
+      }
+    });
+
+    // Save the cart
+    await cart.save();
+
+    // Update user's cart reference if needed
+    const user = await User.findById(userId);
+    if (user) {
+      if (!user.cart.includes(cart._id)) {
+        user.cart.push(cart._id);
+        await user.save();
+      }
+    }
+
+    res.status(200).json({
+      message: "Item added to cart successfully!",
+      cart
+    });
+  } catch (error) {
+    console.log("Failed to addToCart function: ", error);
+    res.status(500).json({ message: "Server error!" });
+  }
 };
 
-exports.showAdmins = async (req, res) => {
-	try {
-		const users = await User.find({}, "firstname lastname email isAdmin");
 
-		if (!users.length) {
-			return res.status(404).json({ message: "No users found!" });
-		}
-		res.status(200).json(users);
-	} catch (error) {
-		res.status(400).json({ message: error.message });
-		console.log(error);
-	}
-};
 
-exports.editUserInfo = async (req, res) => {
-	try {
-		const { id } = req.params;
-		const {
-			firstname,
-			lastname,
-			gender,
-			phoneNumber,
-			streetAddress,
-			municipality,
-			email,
-			role,
-		} = req.body;
+// exports.getUserByID = async (req, res) => {
+// 	try {
+// 		const { id } = req.params;
+// 		const user = await User.findById(id);
 
-		const existingUser = await User.findById(id);
-		if (!existingUser) {
-			return res.status(404).json({ message: "User not found!" });
-		}
+// 		if (!user) {
+// 			return res.status(404).json({ message: "User not found!" });
+// 		}
 
-		if (email && !validator.isEmail(email)) {
-			return res.status(400).json({ message: "Invalid email address!" });
-		}
+// 		res.status(200).json(user);
+// 	} catch (error) {
+// 		res.status(400).json({ message: error.message });
+// 		console.log(error);
+// 	}
+// };
 
-		if (phoneNumber && !validator.isMobilePhone(phoneNumber, "en-PH")) {
-			return res.status(400).json({ message: "Invalid phone number!" });
-		}
+// exports.showAdmins = async (req, res) => {
+// 	try {
+// 		const users = await User.find({}, "firstname lastname email isAdmin");
 
-		if (firstname) existingUser.firstname = firstname;
-		if (lastname) existingUser.lastname = lastname;
-		if (gender) existingUser.gender = gender;
-		if (phoneNumber) existingUser.phoneNumber = phoneNumber;
-		if (streetAddress) existingUser.streetAddress = streetAddress;
-		if (municipality) existingUser.municipality = municipality;
-		if (email) existingUser.email = email;
-		if (role) existingUser.role = role;
+// 		if (!users.length) {
+// 			return res.status(404).json({ message: "No users found!" });
+// 		}
+// 		res.status(200).json(users);
+// 	} catch (error) {
+// 		res.status(400).json({ message: error.message });
+// 		console.log(error);
+// 	}
+// };
 
-		existingUser.updatedAt = new Date();
+// exports.editUserInfo = async (req, res) => {
+// 	try {
+// 		const { id } = req.params;
+// 		const {
+// 			firstname,
+// 			lastname,
+// 			gender,
+// 			phoneNumber,
+// 			streetAddress,
+// 			municipality,
+// 			email,
+// 			role,
+// 		} = req.body;
 
-		const { error } = UserSchemaValidator.validate({
-			firstname: existingUser.firstname,
-			lastname: existingUser.lastname,
-			gender: existingUser.gender,
-			streetAddress: existingUser.streetAddress,
-			municipality: existingUser.municipality,
-			password: existingUser.password,
-		});
-		if (error) {
-			return res.status(400).json({ message: error.details[0].message });
-		}
+// 		const existingUser = await User.findById(id);
+// 		if (!existingUser) {
+// 			return res.status(404).json({ message: "User not found!" });
+// 		}
 
-		const modifiedUser = await existingUser.save();
+// 		if (email && !validator.isEmail(email)) {
+// 			return res.status(400).json({ message: "Invalid email address!" });
+// 		}
 
-		res
-			.status(200)
-			.json({
-				message: "User information updated successfully!",
-				user: modifiedUser,
-			});
-	} catch (error) {
-		console.error(error);
-		res.status(500).json({ message: "Server error!" });
-	}
-};
+// 		if (phoneNumber && !validator.isMobilePhone(phoneNumber, "en-PH")) {
+// 			return res.status(400).json({ message: "Invalid phone number!" });
+// 		}
 
-exports.deleteUserbyID = async (req, res) => {
-	try {
-		const { id } = req.params;
+// 		if (firstname) existingUser.firstname = firstname;
+// 		if (lastname) existingUser.lastname = lastname;
+// 		if (gender) existingUser.gender = gender;
+// 		if (phoneNumber) existingUser.phoneNumber = phoneNumber;
+// 		if (streetAddress) existingUser.streetAddress = streetAddress;
+// 		if (municipality) existingUser.municipality = municipality;
+// 		if (email) existingUser.email = email;
+// 		if (role) existingUser.role = role;
 
-		const existingUser = await User.findById(id);
-		if (!existingUser) {
-			return res.status(404).json({ message: "User not found!" });
-		}
+// 		existingUser.updatedAt = new Date();
 
-		const user = await existingUser.deleteOne();
-		res.status(200).json({ message: "User has been deleted!", user });
-	} catch (error) {
-		console.error(error);
-		res.status(500).json({ message: "Server error!" });
-	}
-};
+// 		const { error } = UserSchemaValidator.validate({
+// 			firstname: existingUser.firstname,
+// 			lastname: existingUser.lastname,
+// 			gender: existingUser.gender,
+// 			streetAddress: existingUser.streetAddress,
+// 			municipality: existingUser.municipality,
+// 			password: existingUser.password,
+// 		});
+// 		if (error) {
+// 			return res.status(400).json({ message: error.details[0].message });
+// 		}
+
+// 		const modifiedUser = await existingUser.save();
+
+// 		res
+// 			.status(200)
+// 			.json({
+// 				message: "User information updated successfully!",
+// 				user: modifiedUser,
+// 			});
+// 	} catch (error) {
+// 		console.error(error);
+// 		res.status(500).json({ message: "Server error!" });
+// 	}
+// };
+
+// exports.deleteUserbyID = async (req, res) => {
+// 	try {
+// 		const {id} = req.params
+// 		const user = await User.findByIdAndDelete(id);
+// 		if (!user) {
+// 			return res.status(404).json({ message: "User not found!" });
+// 		}
+
+// 		res.status(200).json({ message: "User has been deleted!", user });
+// 	} catch (error) {
+// 		console.error("Failed to delete the user:",error);
+// 		res.status(500).json({ message: "Server error!" });
+// 	}
+// };

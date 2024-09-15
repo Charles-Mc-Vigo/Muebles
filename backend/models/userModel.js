@@ -48,6 +48,10 @@ const userSchema = new mongoose.Schema({
   orders:[{
     type:mongoose.Schema.ObjectId,
     ref:"Order"
+  }],
+  cart:[{
+    type:mongoose.Schema.ObjectId,
+    ref:"Cart"
   }]
 },{
   timestamps:true

@@ -53,7 +53,7 @@ app.use(bodyParser.json());
 // })
 
 app.use("/api/users", userRoutes);
-app.use("/api/admins", adminRoutes);
+app.use("/api/admin", adminRoutes);
 app.use("/api/furnitures", furnitureRoutes);
 app.use("/api/orders", orderRoutes);
 

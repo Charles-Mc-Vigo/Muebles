@@ -1,31 +1,39 @@
 const jwt = require("jsonwebtoken");
-const User = require("../models/userModel");
+const Admin = require('../models/adminModel')
 
+//admin onyly middleware
+//it authenticate the admin before accessing any api endpoints
 const adminOnly = async (req, res, next) => {
-  const token = req.cookies.adminToken;
-
-  if (!token) {
+  const adminToken = req.cookies.adminToken;
+  
+  if (!adminToken) {
     return res.status(401).json({ message: "No access token!" });
   }
 
   try {
-    const { _id } = jwt.verify(token, process.env.SECRET);
-    const user = await User.findOne({ _id })
+    const decoded = jwt.verify(adminToken, process.env.SECRET);
+    const admin = await Admin.findOne({ _id: decoded._id });
 
-    if (user.role !== "Admin") {
+    if (!admin) {
+      return res.status(401).json({ message: "Admin not found" });
+    }
+
+    if (admin.role !== "Admin") {
       return res.status(403).json({ message: "Access denied. Admins only." });
     }
 
-    if (user.isVerified !== true) {
+    if (!admin.isVerified) {
       return res.status(403).json({ message: "Please verify your account first!" });
     }
 
-    req.user = user;
-    // console.log(req.user) for testing and debugging
+    req.user = admin;
     next();
   } catch (error) {
-    // console.log(error);
-    res.status(401).json({ message: "Unauthorized request denied!" });
+    console.error('Token verification error:', error);
+    if (error instanceof jwt.JsonWebTokenError) {
+      return res.status(401).json({ message: "Invalid token" });
+    }
+    res.status(500).json({ message: "Internal server error" });
   }
 };
 
