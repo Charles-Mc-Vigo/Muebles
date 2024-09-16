@@ -21,8 +21,8 @@ router.post("/login", LogIn);    // Log in
 router.use(authRoutes);
 
 router.get("/view-furnitures",viewFurnitures)
-router.get("/view-cart",viewCart)
-router.post("/add-to-cart",addToCart)
+router.get("/cart/view-cart",viewCart)
+router.post("/cart/add-to-cart",addToCart)
 router.post("/logout", Logout);           // Log out
 
 // // Admin-Only Routes

@@ -2,6 +2,7 @@ const User = require("../models/userModel");
 const Furniture = require("../models/furnitureModel");
 const Cart = require('../models/cartModel');
 const bcrypt = require("bcrypt");
+const mongoose = require('mongoose');
 const validator = require("validator");
 const { UserSchemaValidator } = require("../middlewares/JoiSchemaValidation");
 const jwt = require("jsonwebtoken");
@@ -256,65 +257,10 @@ exports.viewCart = async (req,res) => {
 }
 
 exports.addToCart = async (req, res) => {
-  try {
-    const { furnituresId } = req.body;
+	//task here
+}
 
-    // Ensure the user is authenticated
-    if (!req.user) {
-      return res.status(401).json({ message: "Unauthorized" });
-    }
 
-    // Find the furniture items to be added to the cart
-    const existingFurnitures = await Furniture.find({ '_id': { $in: furnituresId } });
-    if (existingFurnitures.length !== furnituresId.length) {
-      return res.status(404).json({ message: "One or more furniture items not found!" });
-    }
-
-    // Get the userId from the request
-    const userId = req.user._id;
-
-    // Find or create a cart for the user
-    let cart = await Cart.findOne({ userId });
-
-    if (!cart) {
-      // Create a new cart if one does not exist
-      cart = new Cart({ userId, items: [] });
-    }
-
-    // Update cart items
-    furnituresId.forEach(id => {
-      const itemIndex = cart.items.findIndex(item => item.furnitureId.toString() === id.toString());
-
-      if (itemIndex !== -1) {
-        // If item exists, update quantity
-        cart.items[itemIndex].quantity += 1;
-      } else {
-        // Add new item to cart
-        cart.items.push({ furnitureId: id, quantity: 1 });
-      }
-    });
-
-    // Save the cart
-    await cart.save();
-
-    // Update user's cart reference if needed
-    const user = await User.findById(userId);
-    if (user) {
-      if (!user.cart.includes(cart._id)) {
-        user.cart.push(cart._id);
-        await user.save();
-      }
-    }
-
-    res.status(200).json({
-      message: "Item added to cart successfully!",
-      cart
-    });
-  } catch (error) {
-    console.log("Failed to addToCart function: ", error);
-    res.status(500).json({ message: "Server error!" });
-  }
-};
 
 
 
