@@ -1,4 +1,5 @@
 const Admin = require('../models/adminModel');
+const User = require('../models/userModel');
 const {AdminSchemaValidator} = require('../middlewares/JoiSchemaValidation');
 const bcrypt = require("bcrypt");
 const validator = require("validator");
@@ -8,7 +9,7 @@ const {
 	generateVerificationCode,
 } = require("../utils/EmailVerification");
 
-
+//create token with the combination of id and secrets followed by the expiration date
 const createToken = (_id) => {
 	return jwt.sign({ _id }, process.env.SECRET, { expiresIn: "3d" });
 };
@@ -89,6 +90,7 @@ exports.AdminSignup = async (req,res) =>{
 	}
 }
 
+//admin login
 exports.AdminLogin = async (req, res) => {
 	try {
 		const { email, password } = req.body;
@@ -127,20 +129,7 @@ exports.AdminLogin = async (req, res) => {
 	}
 };
 
-//get all admins
-exports.AllAdmins = async(req,res)=>{
-	try {
-		const admins = await Admin.find();
-		if(admins.length === 0){
-			return res.status(404).json({message:"No admins found!"})
-		}
-		res.status(200).json(admins)
-	} catch (error) {
-		console.log(error);
-		res.status(500).json({message:"Server error!"})
-	}
-}
-
+//admin account verification
 exports.verifyEmail = async (req, res) => {
 	try {
 		const { email, code } = req.body;
@@ -174,7 +163,7 @@ exports.verifyEmail = async (req, res) => {
 
 		const token = createToken(admin._id);
 
-		res.cookie("authToken", token, {
+		res.cookie("adminToken", token, {
 			httpOnly: true,
 			secure: process.env.NODE_ENV === "production",
 			maxAge: 3 * 24 * 60 * 60 * 1000,
@@ -183,7 +172,83 @@ exports.verifyEmail = async (req, res) => {
 
 		res.status(200).json({ message: "Admin account was verified successfully!", token });
 	} catch (err) {
-		console.error(err);
+		console.error("Email verification error:",err);
 		res.status(500).json({ message: "Server error!" });
+	}
+};
+
+//get all admins
+exports.AllAdmins = async(req,res)=>{
+	try {
+		//get admin by id query
+		const {id} = req.query;
+		if(id){
+			const admin = await Admin.findById(id);
+			if(!admin){
+				return res.status(404).json({message:"Admin not found!"})
+			}
+			return res.status(200).json(admin)
+		}
+
+		//get All admin
+		const admins = await Admin.find();
+		if(admins.length === 0){
+			return res.status(404).json({message:"No admins found!"})
+		}
+		res.status(200).json(admins)
+	} catch (error) {
+		console.log(error);
+		res.status(500).json({message:"Server error!"})
+	}
+}
+
+//get all user
+//get users by id using quiery
+exports.getUsers = async (req, res) => {
+	try {
+		//get specific user by id
+		const {id} = req.query;
+
+		if(id){
+			const user = await User.findById(id);
+
+			if(!user){
+				return res.status(404).json({message:"User not found!"})
+			}
+		}
+		//get all users
+		const users = await User.find();
+		if(users.length === 0){
+			return res.status(404).json({message:"No users found!"})
+		}
+		res.status(200).json(users);
+	} catch (err) {
+		console.error("Failed to fetch user data:",err);
+		res.status(500).json({ message: "Server error!" });
+	}
+};
+
+
+exports.adminLogout = async (req, res) => {
+	try {
+		const adminId = req.user._id;
+
+		const admin = await Admin.findById(adminId);
+
+		if (!admin) {
+			return res.status(404).json({ message: "Admin not found!" });
+		}
+
+		res.clearCookie("adminToken", {
+			httpOnly: true,
+			secure: process.env.NODE_ENV === "production",
+			sameSite: "strict"
+		});
+
+		res.status(200).json({ message: "Admin: Logout successful!" });
+		console.log("Admin: Logout successful!");
+	} catch (error) {
+		res.status(500).json({ message: "Server error!" });
+		console.error("Failed to Admin: log out:",error);
 	}
 };

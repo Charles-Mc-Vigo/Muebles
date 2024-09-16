@@ -19,7 +19,7 @@ const AdminLogin = () => {
     e.preventDefault();
 
     try {
-      const response = await axios.post('http://localhost:3000/api/admins/login', {
+      const response = await axios.post('http://localhost:3000/api/admin/login', {
         email: admin.email,
         password: admin.password
       });
