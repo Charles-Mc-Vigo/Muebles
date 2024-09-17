@@ -84,12 +84,12 @@ export default function Header({ showLogin = true, showLogout = false }) {
             <FaShoppingCart className="text-2xl cursor-pointer hover:underline" />
           </Link>
           {showLogout ? (
-            <button className="rounded-md py-2 px-4 bg-transparent text-black text-lg font-semibold hover:bg-green-300">
+            <button className="rounded-md py-2 px-4 bg-transparent text-black text-lg font-semibold hover:underline">
               Log Out
             </button>
           ) : showLogin ? (
             <Link to="/login">
-              <button className="rounded-md py-2 px-4 bg-transparent text-black text-lg font-semibold hover:bg-green-300">
+              <button className="rounded-md py-2 px-4 bg-transparent text-black text-lg font-semibold hover:underline ">
                 Log In
               </button>
             </Link>

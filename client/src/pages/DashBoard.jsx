@@ -61,7 +61,7 @@ const DashBoard = () => {
               </div>
               {productDropdownOpen && (
                 <ul className="">
-                  <li className="p-3 border-b-2 border-green-700 border-oliveGreen cursor-pointer" onClick={() => navigateToSection('product-management')}>Add Product</li>
+                  <li className="p-3 border-b-2 border-green-700 hover:bg-green-300 cursor-pointer" onClick={() => navigateToSection('product-management')}>Add Product</li>
                   <li className="p-3 border-b-2 border-green-700 hover:bg-green-300 cursor-pointer" onClick={() => navigateToSection('remove-product')}>Remove Product</li>
                   <li className="p-3 border-b-2 border-green-700 hover:bg-green-300 cursor-pointer" onClick={() => navigateToSection('view-product-list')}>View Product List</li>
                 </ul>
