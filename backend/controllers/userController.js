@@ -29,6 +29,7 @@ exports.SignUp = async (req, res) => {
 			phoneNumber,
 			streetAddress,
 			municipality,
+			barangay,
 			email,
 			password,
 			confirmPassword,
@@ -41,6 +42,7 @@ exports.SignUp = async (req, res) => {
 			!phoneNumber ||
 			!streetAddress ||
 			!municipality ||
+			!barangay ||
 			!email ||
 			!password ||
 			!confirmPassword
@@ -106,6 +108,7 @@ exports.SignUp = async (req, res) => {
 			phoneNumber,
 			streetAddress,
 			municipality,
+			barangay,
 			email,
 			password: hashedPassword,
 			verificationCode,
