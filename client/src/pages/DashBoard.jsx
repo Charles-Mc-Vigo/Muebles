@@ -44,15 +44,15 @@ const DashBoard = () => {
   return (
     <div className="flex min-h-screen bg-white">
       {/* Sidebar */}
-      <nav className="w-64 bg-white text-black flex flex-col justify-between border-r-2 border-green-300 h-screen">
+      <nav className="w-64 bg-white text-black flex flex-col justify-between border-r-2 border-oliveGreen h-screen">
         <div>
-          <div className="p-6 text-xl font-bold text-center border-b-2 border-green-300">
+          <div className="p-6 text-xl font-bold text-center border-b-2 border-oliveGreen">
             Admin Dashboard
           </div>
           <ul>
             {/* Product Management with Dropdown */}
-            <li className="flex flex-col cursor-pointer transition-colors border-green-300">
-              <div className="flex items-center justify-between hover:bg-green-300 border-b-2 border-green-300 p-3" onClick={toggleProductDropdown}>
+            <li className="flex flex-col cursor-pointer transition-colors border-oliveGreen">
+              <div className="flex items-center justify-between hover:bg-green-800 border-b-2 border-green-700 p-3" onClick={toggleProductDropdown}>
                 <div className="flex items-center">
                   <FontAwesomeIcon icon={faBox} className="w-6 h-6 ml-2 mt-2" />
                   <span className="ml-3">Product Management</span>
@@ -61,9 +61,9 @@ const DashBoard = () => {
               </div>
               {productDropdownOpen && (
                 <ul className="">
-                  <li className="p-3 border-b-2 border-green-300 hover:bg-green-300 cursor-pointer" onClick={() => navigateToSection('product-management')}>Add Product</li>
-                  <li className="p-3 border-b-2 border-green-300 hover:bg-green-300 cursor-pointer" onClick={() => navigateToSection('remove-product')}>Remove Product</li>
-                  <li className="p-3 border-b-2 border-green-300 hover:bg-green-300 cursor-pointer" onClick={() => navigateToSection('view-product-list')}>View Product List</li>
+                  <li className="p-3 border-b-2 border-green-700 border-oliveGreen cursor-pointer" onClick={() => navigateToSection('product-management')}>Add Product</li>
+                  <li className="p-3 border-b-2 border-green-700 hover:bg-green-300 cursor-pointer" onClick={() => navigateToSection('remove-product')}>Remove Product</li>
+                  <li className="p-3 border-b-2 border-green-700 hover:bg-green-300 cursor-pointer" onClick={() => navigateToSection('view-product-list')}>View Product List</li>
                 </ul>
               )}
             </li>
@@ -71,7 +71,7 @@ const DashBoard = () => {
 
             {/* Order Management */}
             <li
-              className="p-4 flex items-center hover:bg-green-300 cursor-pointer transition-colors border-b-2 border-green-300"
+              className="p-4 flex items-center hover:bg-green-700 cursor-pointer transition-colors border-b-2 border-green-700"
               onClick={() => navigateToSection('order-management')}
             >
               <FontAwesomeIcon icon={faListUl} className="w-6 h-6 mr-3" />
@@ -80,7 +80,7 @@ const DashBoard = () => {
 
             {/* Customers */}
             <li
-              className="p-4 flex items-center hover:bg-green-300 cursor-pointer transition-colors border-b-2 border-green-300"
+              className="p-4 flex items-center hover:bg-green-700 cursor-pointer transition-colors border-b-2 border-green-700"
               onClick={() => navigateToSection('user-management')}
             >
               <FontAwesomeIcon icon={faUser} className="w-6 h-6 mr-3" />
@@ -88,8 +88,8 @@ const DashBoard = () => {
             </li>
 
             {/* Transactions with Dropdown */}
-            <li className="flex flex-col cursor-pointer transition-colors border-green-300">
-              <div className="flex items-center justify-between hover:bg-green-300 p-3 border-b-2 border-green-300" onClick={toggleTransactionDropdown}>
+            <li className="flex flex-col cursor-pointer transition-colors border-green-700">
+              <div className="flex items-center justify-between hover:bg-green-700 p-3 border-b-2 border-green-700" onClick={toggleTransactionDropdown}>
                 <div className="flex items-center">
                   <FontAwesomeIcon icon={faHandshake} className="w-6 h-6 mr-3" />
                   Transactions

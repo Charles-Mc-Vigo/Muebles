@@ -7,6 +7,7 @@ import FAQAccordion from "./FAQAccordion";
 import FAQPage from "./FAQpage";
 import Carousel from './Carousel';
 
+
 export default function Hero() {
   const images = [
     '/landingimage/coverphoto.svg',
