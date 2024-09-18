@@ -1,6 +1,5 @@
-import React, { useEffect } from "react";
-import Cookies from "js-cookie"
-import { BrowserRouter, Routes, Route , useNavigate} from "react-router-dom";
+import React from "react";
+import { BrowserRouter, Routes, Route} from "react-router-dom";
 import LandinPage from "./pages/LandinPage";
 import SignUp from "./pages/SignUp";
 import Login from "./pages/Login";
