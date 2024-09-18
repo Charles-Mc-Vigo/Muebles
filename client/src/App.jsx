@@ -21,25 +21,9 @@ import AdminSignUp from "./pages/AdminSignUp";
 import AdminVerify from "./pages/AdminVerify"
 import About from './pages/About'
 
-function RedirectToHome() {
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const token = Cookies.get("authToken");
-
-    if (token) {
-      navigate("/home");
-    }
-		
-  }, [navigate]);
-
-  return null; // This component doesn't render anything
-}
-
 export default function App() {
 	return (
 		<BrowserRouter>
-		<RedirectToHome />
 			<Routes>
 				<Route path="/" element={<LandinPage />} />
 				<Route path="/about" element={<About />} />
