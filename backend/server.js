@@ -6,8 +6,9 @@ const userRoutes = require("./router/userRoutes");
 const furnitureRoutes = require("./router/furnitureRoutes");
 const adminRoutes = require('./router/adminRoutes')
 const orderRoutes = require("./router/orderRoutes");
+const cartRoutes = require('./router/cartRoutes');
 const connectDB = require("./database/db");
-const cookieParser = require('cookie-parser')
+const cookieParser = require('cookie-parser');
 
 
 const app = express();
@@ -53,6 +54,7 @@ app.use(bodyParser.json());
 // })
 
 app.use("/api/users", userRoutes);
+app.use('/api/carts', cartRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/furnitures", furnitureRoutes);
 app.use("/api/orders", orderRoutes);
