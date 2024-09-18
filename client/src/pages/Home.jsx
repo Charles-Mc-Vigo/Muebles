@@ -1,137 +1,211 @@
-import React, { useState } from "react";
-import Header from "../components/Header";
-import Footer from "../components/Footer";
+import React, { useEffect, useState } from 'react';
+import axios from 'axios'; 
+import Header from '../components/Header';
+import Footer from '../components/Footer';
 
-const Home = () => {
-  const furnitureItems = [
-    {
-      category: "Living Room",
-      items: [
-        { name: "Sofa", image: "https://via.placeholder.com/150x150?text=Sofa" },
-        { name: "Armchair", image: "https://via.placeholder.com/150x150?text=Armchair" },
-        { name: "Coffee Table", image: "https://via.placeholder.com/150x150?text=Coffee+Table" },
-        { name: "TV Stand", image: "https://via.placeholder.com/150x150?text=TV+Stand" },
-        { name: "Bookshelf", image: "https://via.placeholder.com/150x150?text=Bookshelf" },
-        { name: "Ottoman", image: "https://via.placeholder.com/150x150?text=Ottoman" },
-        { name: "Side Table", image: "https://via.placeholder.com/150x150?text=Side+Table" },
-        { name: "Recliner", image: "https://via.placeholder.com/150x150?text=Recliner" },
-      ],
-    },
-    {
-      category: "Dining Room",
-      items: [
-        { name: "Dining Table", image: "https://via.placeholder.com/150x150?text=Dining+Table" },
-        { name: "Dining Chairs", image: "https://via.placeholder.com/150x150?text=Dining+Chairs" },
-        { name: "Buffet", image: "https://via.placeholder.com/150x150?text=Buffet" },
-        { name: "Bar Cart", image: "https://via.placeholder.com/150x150?text=Bar+Cart" },
-        { name: "Bench", image: "https://via.placeholder.com/150x150?text=Bench" },
-      ],
-    },
-    {
-      category: "Bedroom",
-      items: [
-        { name: "Bed Frame", image: "https://via.placeholder.com/150x150?text=Bed+Frame" },
-        { name: "Nightstand", image: "https://via.placeholder.com/150x150?text=Nightstand" },
-        { name: "Dresser", image: "https://via.placeholder.com/150x150?text=Dresser" },
-        { name: "Wardrobe", image: "https://via.placeholder.com/150x150?text=Wardrobe" },
-        { name: "Vanity", image: "https://via.placeholder.com/150x150?text=Vanity" },
-      ],
-    },
-    {
-      category: "Office",
-      items: [
-        { name: "Desk", image: "https://via.placeholder.com/150x150?text=Desk" },
-        { name: "Office Chair", image: "https://via.placeholder.com/150x150?text=Office+Chair" },
-        { name: "Bookshelf", image: "https://via.placeholder.com/150x150?text=Bookshelf" },
-        { name: "Filing Cabinet", image: "https://via.placeholder.com/150x150?text=Filing+Cabinet" },
-      ],
-    },
-  ];
+const ItemList = () => {
+  const [furnitureList, setFurnitureList] = useState([]);
 
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategories, setSelectedCategories] = useState([]);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get('http://localhost:3000/api/furnitures');
+        setFurnitureList(response.data);
+      } catch (error) {
+        console.error('Error fetching furniture:', error);
+      }
+    };
 
-  const handleSearch = (e) => {
-    setSearchTerm(e.target.value.toLowerCase());
-  };
-
-  const handleCategoryChange = (category) => {
-    if (selectedCategories.includes(category)) {
-      setSelectedCategories(selectedCategories.filter((cat) => cat !== category));
-    } else {
-      setSelectedCategories([...selectedCategories, category]);
-    }
-  };
-
-  const filteredItems = furnitureItems
-    .filter(
-      (category) =>
-        selectedCategories.length === 0 || selectedCategories.includes(category.category)
-    )
-    .map((category) => ({
-      ...category,
-      items: category.items.filter((item) => item.name.toLowerCase().includes(searchTerm)),
-    }));
+    fetchData();
+  }, []);
 
   return (
-    <>
+    <div className="flex flex-col min-h-screen bg-gray-100">
       <Header />
 
-      <div className="flex flex-col md:flex-row h-auto md:h-screen m-5 md:m-10">
+      <div className="flex flex-1 overflow-hidden mt-5 mx-2 mb-2">
         {/* Left Section - Filter */}
-        <div className="w-full md:w-1/5 border-2 border-oliveGreen p-4 flex flex-col mb-5 md:mb-0 md:mr-5 rounded-lg">
-          <div className="font-mono font-normal text-xl">
-            <p className="mb-5">Filter by:</p>
-            <p className="mb-3">Category</p>
-
-            {/* Filter Options */}
-            <div className="flex flex-col space-y-2">
-              {["Living Room", "Dining Room", "Bedroom"].map((category) => (
-                <label key={category} className="flex items-center">
-                  <input
-                    type="checkbox"
-                    className="mr-2"
-                    onChange={() => handleCategoryChange(category)}
-                    checked={selectedCategories.includes(category)}
-                  />
-                  {category}
-                </label>
-              ))}
+        <div className="w-full md:w-1/5 p-4 border-2 border-oliveGreen rounded-lg overflow-y-auto mr-5" style={{ maxHeight: 'calc(100vh - 4rem)' }}>
+          <h2 className="text-xl font-semibold mb-4 text-gray-800">Filter by Category</h2>
+          <div className="space-y-6">
+            <div>
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">Living Room</h3>
+              <ul className="space-y-2">
+                <li>
+                  <label className="flex items-center">
+                    <input type="checkbox" className="mr-2" />
+                    Coffee Tables
+                  </label>
+                </li>
+                <li>
+                  <label className="flex items-center">
+                    <input type="checkbox" className="mr-2" />
+                    TV Console
+                  </label>
+                </li>
+                <li>
+                  <label className="flex items-center">
+                    <input type="checkbox" className="mr-2" />
+                    Cabinets
+                  </label>
+                </li>
+                <li>
+                  <label className="flex items-center">
+                    <input type="checkbox" className="mr-2" />
+                    Mini Shelves
+                  </label>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">Bedroom</h3>
+              <ul className="space-y-2">
+                <li>
+                  <label className="flex items-center">
+                    <input type="checkbox" className="mr-2" />
+                    Single Bedframes
+                  </label>
+                </li>
+                <li>
+                  <label className="flex items-center">
+                    <input type="checkbox" className="mr-2" />
+                    Double Bedframes
+                  </label>
+                </li>
+                <li>
+                  <label className="flex items-center">
+                    <input type="checkbox" className="mr-2" />
+                    Queen Bedframes
+                  </label>
+                </li>
+                <li>
+                  <label className="flex items-center">
+                    <input type="checkbox" className="mr-2" />
+                    King Bedframes
+                  </label>
+                </li>
+                <li>
+                  <label className="flex items-center">
+                    <input type="checkbox" className="mr-2" />
+                    Dresser
+                  </label>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">Dining Room</h3>
+              <ul className="space-y-2">
+                <li>
+                  <label className="flex items-center">
+                    <input type="checkbox" className="mr-2" />
+                    Dining Table
+                  </label>
+                </li>
+                <li>
+                  <label className="flex items-center">
+                    <input type="checkbox" className="mr-2" />
+                    Dining Chair
+                  </label>
+                </li>
+                <li>
+                  <label className="flex items-center">
+                    <input type="checkbox" className="mr-2" />
+                    Dining Set
+                  </label>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">Chair/Sofa</h3>
+              <ul className="space-y-2">
+                <li>
+                  <label className="flex items-center">
+                    <input type="checkbox" className="mr-2" />
+                    Wooden Stools
+                  </label>
+                </li>
+                <li>
+                  <label className="flex items-center">
+                    <input type="checkbox" className="mr-2" />
+                    Rocking Chair
+                  </label>
+                </li>
+                <li>
+                  <label className="flex items-center">
+                    <input type="checkbox" className="mr-2" />
+                    High Wooden Chairs
+                  </label>
+                </li>
+                <li>
+                  <label className="flex items-center">
+                    <input type="checkbox" className="mr-2" />
+                    Wooden Bench Chair
+                  </label>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">Door</h3>
+              <ul className="space-y-2">
+                <li>
+                  <label className="flex items-center">
+                    <input type="checkbox" className="mr-2" />
+                    Main Door
+                  </label>
+                </li>
+                <li>
+                  <label className="flex items-center">
+                    <input type="checkbox" className="mr-2" />
+                    Flush Door
+                  </label>
+                </li>
+                <li>
+                  <label className="flex items-center">
+                    <input type="checkbox" className="mr-2" />
+                    Panel Door
+                  </label>
+                </li>
+                <li>
+                  <label className="flex items-center">
+                    <input type="checkbox" className="mr-2" />
+                    Door Jamb
+                  </label>
+                </li>
+              </ul>
             </div>
           </div>
         </div>
 
         {/* Right Section - Main Content */}
-        <div className="w-full md:w-4/5 p-4 border-2 border-oliveGreen overflow-y-auto rounded-lg">
-          <input
-            type="text"
-            placeholder="Search items..."
-            className="mb-4 p-2 border rounded w-full"
-            onChange={handleSearch}
-            value={searchTerm}
-          />
-
-          {/* Display filtered items */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-            {filteredItems.map((category) =>
-              category.items.map((item) => (
-                <div key={item.name} className="border p-2 rounded-lg">
+        <div className="flex-1 w-full md:w-3/4 p-4 border-2 border-oliveGreen overflow-y-auto rounded-lg mb-5" style={{ maxHeight: 'calc(100vh - 4rem)' }}>
+          <h2 className="text-2xl font-semibold mb-6 text-center text-gray-800">Browse Items</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {furnitureList.length > 0 ? (
+              furnitureList.map((item) => (
+                <div key={item._id} className="border bg-white shadow-lg p-4 rounded-lg hover:shadow-xl transition-shadow duration-300">
                   <img
-                    src={item.image}
+                    src={`data:image/jpeg;base64,${item.image}`}
                     alt={item.name}
-                    className="mb-2 w-full h-auto max-w-[150px] mx-auto"
+                    className="w-full h-32 object-cover mb-3 rounded-lg"
                   />
-                  <p className="text-center text-sm">{item.name}</p>
+                  <h1 className="text-lg font-medium text-gray-700 mt-2">{item.furnitureType}</h1>
+                  <p className="font-mono text-sm text-gray-600 my-2">{item.description}</p>
+                  <p className="text-lg text-gray-800 my-2">PHP {item.price}</p>
+                  <button className="mt-4 bg-blue-500 hover:bg-blue-600 text-white px-5 py-2 rounded-full w-full transition-colors duration-200">
+                    Add to Cart
+                  </button>
                 </div>
               ))
+            ) : (
+              <p className="col-span-full text-center text-gray-600">Loading items...</p>
             )}
           </div>
         </div>
       </div>
 
       <Footer />
-    </>
+    </div>
   );
 };
 
-export default Home;
+export default ItemList;
