@@ -1,11 +1,12 @@
 import React from "react";
 import { FaShoppingCart } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Footer from './Footer';
 import Collection from "./Collection";
 import FAQAccordion from "./FAQAccordion";
 import FAQPage from "./FAQpage";
 import Carousel from './Carousel';
+import Cookies from 'js-cookie'; 
 
 export default function Hero() {
   const images = [
@@ -15,6 +16,17 @@ export default function Hero() {
     'https://via.placeholder.com/800x400?text=Slide+4',
     'https://via.placeholder.com/800x400?text=Slide+5',
   ];
+
+  const navigate = useNavigate();
+
+  const toHomePage = () => {
+    const token = Cookies.get('authToken');
+    if (token) {
+      navigate('/home');
+    } else {
+      navigate('/login');
+    }
+  };
 
   return (
     <div>
@@ -31,12 +43,13 @@ export default function Hero() {
             Experience the timeless elegance and natural warmth of our exquisite wood furniture collection
           </p>
           <div className="flex flex-col items-center lg:items-start">
-            <Link to="/login">
-              <button className="flex flex-row items-center gap-3 rounded-md py-3 px-6 mt-6 bg-slate-700 text-white hover:opacity-60">
-                Shop now!
-                <FaShoppingCart />
-              </button>
-            </Link>
+            <button 
+              className="flex flex-row items-center gap-3 rounded-md py-3 px-6 mt-6 bg-slate-700 text-white hover:opacity-60"
+              onClick={toHomePage}
+            >
+              Shop now!
+              <FaShoppingCart />
+            </button>
           </div>
         </div>
 
@@ -56,7 +69,6 @@ export default function Hero() {
           <div className="md:w-1/2 justify-center mt-0"><FAQPage /></div>
           <div className="md:w-1/2 mt-10"><FAQAccordion /></div>
         </div>
-
       </div>
 
       <Footer /> 
