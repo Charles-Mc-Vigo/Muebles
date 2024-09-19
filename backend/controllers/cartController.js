@@ -1,5 +1,6 @@
 const Cart = require('../models/cartModel');
 const Furniture = require('../models/furnitureModel');
+const User = require('../models/userModel');
 
 // Get Cart by userId
 exports.getCart = async (req, res) => {
@@ -14,39 +15,55 @@ exports.getCart = async (req, res) => {
   }
 };
 
-// Add Item to Cart
-exports.addItemToCart = async (req, res) => {
+exports.addItemsToCart = async (req, res) => {
   const { userId } = req.params;
-  const { furnitureId, quantity } = req.body;
+  const { items } = req.body; // Array of { furnitureId, quantity }
 
   try {
     let cart = await Cart.findOne({ userId });
 
-    // Check if the furniture exists
-    const furniture = await Furniture.findById(furnitureId);
-    if (!furniture) return res.status(404).json({ message: 'Furniture not found' });
-
-    // If cart doesn't exist, create a new one
-    if (!cart) {
-      cart = new Cart({ userId, items: [{ furnitureId, quantity }] });
-    } else {
-      // Check if the item is already in the cart
-      const itemIndex = cart.items.findIndex(item => item.furnitureId.equals(furnitureId));
-      if (itemIndex > -1) {
-        // If the item exists, update the quantity
-        cart.items[itemIndex].quantity += quantity;
-      } else {
-        // If the item doesn't exist, add it to the cart
-        cart.items.push({ furnitureId, quantity });
+    // Validate that all furniture items exist
+    for (const item of items) {
+      const furniture = await Furniture.findById(item.furnitureId);
+      if (!furniture) {
+        return res.status(404).json({ message: `Furniture with ID ${item.furnitureId} not found` });
       }
     }
 
-    await cart.save();
+    // If cart doesn't exist, create a new one
+    if (!cart) {
+      cart = new Cart({ userId, items });
+      
+      // Save the new cart
+      await cart.save();
+
+      // Update the user's cart reference
+      await User.findByIdAndUpdate(userId, { cart: cart._id });
+    } else {
+      // Loop through the new items and add them to the cart
+      for (const newItem of items) {
+        const itemIndex = cart.items.findIndex(item => item.furnitureId.equals(newItem.furnitureId));
+
+        if (itemIndex > -1) {
+          // If the item exists, update the quantity
+          cart.items[itemIndex].quantity += newItem.quantity;
+        } else {
+          // If the item doesn't exist, add it to the cart
+          cart.items.push(newItem);
+        }
+      }
+
+      // Save the updated cart
+      await cart.save();
+    }
+
     res.status(200).json(cart);
   } catch (err) {
     res.status(500).json({ message: 'Server error', error: err.message });
   }
 };
+
+
 
 // Remove Item from Cart
 exports.removeItemFromCart = async (req, res) => {

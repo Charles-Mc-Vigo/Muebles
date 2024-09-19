@@ -11,25 +11,16 @@ const {
 } = require("../controllers/userController");
 
 const authRoutes = require("../middlewares/authRoutes");
-// Public Routes
-router.post("/signup", SignUp);  // Sign up
+router.post("/signup", SignUp);
 router.post('/verify-email', verifyEmail);
-router.post("/login", LogIn);    // Log in
+router.post("/login", LogIn);
 
 
-// Routes accessible to all authenticated users
 router.use(authRoutes);
 
 router.get("/view-furnitures",viewFurnitures)
 router.get("/cart/view-cart",viewCart)
 router.post("/cart/add-to-cart",addToCart)
-router.post("/logout", Logout);           // Log out
-
-// // Admin-Only Routes
-// router.use(adminOnly);
-
-// router.delete("/delete-user/:id", deleteUserbyID);         // Delete a user by ID (Admin only)
-// router.post("/logout", Logout);         // Logout Admin
-
+router.post("/logout", Logout);
 
 module.exports = router;
