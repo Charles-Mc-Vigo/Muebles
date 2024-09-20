@@ -1,6 +1,8 @@
-const Furniture = require("../models/furnitureModel");
-const { FurnitureSchemaValidator } = require("../middlewares/JoiSchemaValidation");
+const Furniture = require("../../models/Furniture/furnitureModel");
+const Category = require('../../models/Furniture/categoryModel');
+const { FurnitureSchemaValidator } = require("../../middlewares/JoiSchemaValidation");
 const multer = require('multer');
+const FurnitureType = require("../../models/Furniture/furnitureTypeModel");
 
 // Multer setup for handling image uploads in memory
 const upload = multer({ storage: multer.memoryStorage() });
@@ -66,10 +68,23 @@ exports.createFurniture = [upload.single('image'), async (req, res) => {
 				});
 			}
 
+			// Find the category by name to get its ObjectId
+			const existingCategory = await Category.findOne({ name: category });
+			if (!existingCategory) {
+					return res.status(400).json({ message: "Invalid category!" });
+			}
+
+			// Find the category by name to get its ObjectId
+			const existingFurnitureType = await FurnitureType.findOne({ name: furnitureType });
+			if (!existingFurnitureType) {
+					return res.status(400).json({ message: "Invalid furniture type!" });
+			}
+
+
 			const newFurniture = new Furniture({
 				image,
-				category,
-				furnitureType,
+				category:existingCategory.name,
+				furnitureType:existingFurnitureType.name,
 				description,
 				price,
 			});

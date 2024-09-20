@@ -1,5 +1,5 @@
 const Cart = require('../models/cartModel');
-const Furniture = require('../models/furnitureModel');
+const Furniture = require('../models/Furniture/furnitureModel');
 const User = require('../models/userModel');
 
 // Get Cart by userId

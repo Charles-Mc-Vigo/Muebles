@@ -5,11 +5,10 @@ const furnitureSchema = new mongoose.Schema({
     type: String,
     required:true
   },
-  category:{
+  category: {
     type:String,
-    enum:["door","bed_frame","cabinet","chair", "table","sala_set"],
-    required:true
-  },
+    require:true
+  }, // Change this to String
   furnitureType:{
     type:String,
     required:true

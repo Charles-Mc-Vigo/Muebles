@@ -3,6 +3,7 @@ import axios from "axios";
 
 const ProductManagement = () => {
 	const [products, setProducts] = useState([]);
+	const [categories, setCategories] = useState([]); // State to hold fetched categories
 	const [newProduct, setNewProduct] = useState({
 		image: null,
 		category: "",
@@ -11,11 +12,22 @@ const ProductManagement = () => {
 		price: "",
 	});
 
+	// Fetch categories from the backend
+	const fetchCategories = async () => {
+		try {
+			const response = await axios.get("http://localhost:3000/api/category");
+			setCategories(response.data); // Assume response data contains array of categories
+		} catch (error) {
+			console.error("Error fetching categories:", error);
+			alert("Failed to fetch categories. Please try again.");
+		}
+	};
+
+	// Fetch furniture products from the backend
 	const fetchProducts = async () => {
 		try {
 			const response = await axios.get("http://localhost:3000/api/furnitures");
 			setProducts(response.data);
-			//if no furnitures data found, display "No furnitures found. create one" in a paragrap tag
 		} catch (error) {
 			console.error("Error fetching products:", error);
 			alert("Failed to fetch products. Please try again.");
@@ -23,7 +35,8 @@ const ProductManagement = () => {
 	};
 
 	useEffect(() => {
-		fetchProducts();
+		fetchCategories(); // Fetch categories when the component loads
+		fetchProducts(); // Fetch products when the component loads
 	}, []);
 
 	const handleInputChange = (e) => {
@@ -32,15 +45,11 @@ const ProductManagement = () => {
 			...prevData,
 			[name]: files ? files[0] : value,
 		}));
-		// console.log(newProduct)
 	};
 
 	const handleDelete = async (id) => {
-		// console.log("Deleting product with ID:", id); //for debugging
 		try {
-			await axios.delete(
-				`http://localhost:3000/api/furnitures/furniture/${id}`
-			);
+			await axios.delete(`http://localhost:3000/api/furnitures/furniture/${id}`);
 			setProducts(products.filter((product) => product._id !== id));
 			alert("Product deleted successfully.");
 		} catch (error) {
@@ -68,10 +77,7 @@ const ProductManagement = () => {
 					},
 				}
 			);
-
-			alert(`${response.data.furniture.furnitureType} has been added successfully! `)
-
-			// console.log(response);
+			alert(`${response.data.furniture.furnitureType} has been added successfully!`);
 			fetchProducts(); // Refetch products after adding a new one
 			setNewProduct({
 				image: null,
@@ -81,16 +87,13 @@ const ProductManagement = () => {
 				price: "",
 			});
 			document.getElementById("image").value = "";
-
 		} catch (error) {
 			console.error(
 				"Error creating furniture!",
 				error.response?.data || error.message
 			);
 			alert(
-				error.response?.data?.message ||
-					error.message ||
-					"Can not add furniture!"
+				error.response?.data?.message || error.message || "Cannot add furniture!"
 			);
 		}
 	};
@@ -108,30 +111,20 @@ const ProductManagement = () => {
 							id="image"
 							onChange={handleInputChange}
 						/>
-						,
-						{/* <input
-							type="text"
+						<select
+							id="category"
 							name="category"
-							placeholder="Category"
-							value={newProduct.category}
+							required
 							onChange={handleInputChange}
-							className="w-full p-2 border rounded"
-						/> */}
-						<select 
-								id="category"
-								name="category"
-								required
-								onChange={handleInputChange}
-								value={newProduct.category}
-								className="bg-slate-100 p-3 rounded-lg w-full">
-
-							<option>Category</option>
-							<option value="door">Door</option>
-							<option value="bed_frame">Bed frame</option>
-							<option value="cabinet">Cabinet</option>
-							<option value="chair">Chair</option>
-							<option value="table">Table</option>
-							<option value="sala_set">Sala set</option>
+							value={newProduct.category}
+							className="bg-slate-100 p-3 rounded-lg w-full"
+						>
+							<option value="">Select a category</option>
+							{categories.map((category) => (
+								<option key={category._id} value={category.name}>
+									{category.name}
+								</option>
+							))}
 						</select>
 						<input
 							type="text"
@@ -181,37 +174,45 @@ const ProductManagement = () => {
 								</tr>
 							</thead>
 							<tbody>
-								{products.map((product, index) => (
-									<tr key={product._id} className="border-t">
-										<td className="p-2">
-											{product.image && (
-												<img
-													src={`data:image/jpeg;base64,${product.image}`}
-													alt={product.furnitureType}
-													className="w-20 h-20 object-cover"
-												/>
-											)}
-										</td>
-										<td className="p-2">{product.category}</td>
-										<td className="p-2">{product.furnitureType}</td>
-										<td className="p-2">{product.description}</td>
-										<td className="p-2">
-											<strong>PHP</strong>
-											<span className="px-2"></span> {product.price}
-										</td>
-										<td className="p-2">
-											<button className="bg-yellow-500 text-white px-2 py-1 rounded mr-2 hover:bg-yellow-600">
-												Edit
-											</button>
-											<button
-												onClick={() => handleDelete(product._id)}
-												className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
-											>
-												Delete
-											</button>
+								{products.length === 0 ? (
+									<tr>
+										<td colSpan="6" className="text-center">
+											No furnitures found. Create one.
 										</td>
 									</tr>
-								))}
+								) : (
+									products.map((product) => (
+										<tr key={product._id} className="border-t">
+											<td className="p-2">
+												{product.image && (
+													<img
+														src={`data:image/jpeg;base64,${product.image}`}
+														alt={product.furnitureType}
+														className="w-20 h-20 object-cover"
+													/>
+												)}
+											</td>
+											<td className="p-2">{product.category}</td>
+											<td className="p-2">{product.furnitureType}</td>
+											<td className="p-2">{product.description}</td>
+											<td className="p-2">
+												<strong>PHP</strong>
+												<span className="px-2"></span> {product.price}
+											</td>
+											<td className="p-2">
+												<button className="bg-yellow-500 text-white px-2 py-1 rounded mr-2 hover:bg-yellow-600">
+													Edit
+												</button>
+												<button
+													onClick={() => handleDelete(product._id)}
+													className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
+												>
+													Delete
+												</button>
+											</td>
+										</tr>
+									))
+								)}
 							</tbody>
 						</table>
 					</div>

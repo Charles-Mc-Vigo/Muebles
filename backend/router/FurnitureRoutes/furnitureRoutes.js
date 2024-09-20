@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const {createFurniture,getAllFurnitures, editFurnitureById} = require("../controllers/furnitureController");
+const {createFurniture,getAllFurnitures, editFurnitureById} = require("../../controllers/FurnitureControllers/furnitureController");
 // const adminOnly = require("../middlewares/adminOnly");
 
 //get all furnitures
