@@ -1,5 +1,5 @@
 const User = require("../models/userModel");
-const Furniture = require("../models/furnitureModel");
+const Furniture = require("../models/Furniture/furnitureModel");
 const Cart = require('../models/cartModel');
 const bcrypt = require("bcrypt");
 const mongoose = require('mongoose');

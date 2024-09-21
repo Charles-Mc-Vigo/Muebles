@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const Furniture = require("../models/furnitureModel");
+const Furniture = require("./Furniture/furnitureModel");
 
 const orderSchema = new mongoose.Schema({
   userId: {

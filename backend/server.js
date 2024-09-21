@@ -3,11 +3,19 @@ const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const userRoutes = require("./router/userRoutes");
-const furnitureRoutes = require("./router/furnitureRoutes");
+
+//furnitures
+const furnitureRoutes = require("./router/FurnitureRoutes/furnitureRoutes");
+const categoryRoutes = require("../backend/router/FurnitureRoutes/categoryRoutes")
+const furnitureTypeRoutes = require('../backend/router/FurnitureRoutes/furnitureTypeRoutes')
+const materialsRoutes = require('./router/FurnitureRoutes/materialsRoutes')
+const colorRoutes = require('../backend/router/FurnitureRoutes/colorRoutes');
+
 const adminRoutes = require('./router/adminRoutes')
 const orderRoutes = require("./router/orderRoutes");
+const cartRoutes = require('./router/cartRoutes');
 const connectDB = require("./database/db");
-const cookieParser = require('cookie-parser')
+const cookieParser = require('cookie-parser');
 
 
 const app = express();
@@ -53,8 +61,17 @@ app.use(bodyParser.json());
 // })
 
 app.use("/api/users", userRoutes);
-app.use("/api/admin", adminRoutes);
+
+//Furnitures maintainance
 app.use("/api/furnitures", furnitureRoutes);
+app.use("/api/categories", categoryRoutes);
+app.use("/api/furniture-types", furnitureTypeRoutes);
+app.use("/api/materials",materialsRoutes)
+app.use("/api/colors",colorRoutes)
+
+app.use('/api/carts', cartRoutes);
+app.use("/api/admin", adminRoutes);
+
 app.use("/api/orders", orderRoutes);
 
 module.exports = app;
