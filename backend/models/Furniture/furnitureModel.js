@@ -33,6 +33,11 @@ const furnitureSchema = new mongoose.Schema({
     ref:"Colors",
     required:true
   },
+  stocks:{
+    type:Number,
+    require:true,
+    default:0
+  },
   price:{
     type:Number,
     required:true,

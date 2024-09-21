@@ -103,7 +103,7 @@ exports.createFurniture = [
 				return res.status(400).json({ message: "No image provided!" });
 			}
 
-			const { category, furnitureType,name,color, description, material, price } =
+			const { category, furnitureType,name,color, description, stocks, material, price } =
 				req.body;
 
 			let missingFields = [];
@@ -113,6 +113,7 @@ exports.createFurniture = [
 			if (!description) missingFields.push("description");
 			if (!name) missingFields.push("name");
 			if (!color) missingFields.push("color");
+			if (!stocks) missingFields.push("stocks");
 			if (!material) missingFields.push("material");
 			if (!price) missingFields.push("price");
 
@@ -156,6 +157,7 @@ exports.createFurniture = [
 				name,
 				color: exisitingColor._id,
 				description,
+				stocks,
 				material: existingMaterials._id,
 				price,
 			});
