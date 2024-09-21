@@ -3,6 +3,7 @@ const Category = require('../../models/Furniture/categoryModel');
 const { FurnitureSchemaValidator } = require("../../middlewares/JoiSchemaValidation");
 const multer = require('multer');
 const FurnitureType = require("../../models/Furniture/furnitureTypeModel");
+const Material = require("../../models/Furniture/materialsModel");
 
 // Multer setup for handling image uploads in memory
 const upload = multer({ storage: multer.memoryStorage() });
@@ -53,13 +54,14 @@ exports.createFurniture = [upload.single('image'), async (req, res) => {
       return res.status(400).json({ message: 'No image provided!' });
     }
 
-			const { category, furnitureType, description, price } = req.body;
+			const { category, furnitureType, description, material, price } = req.body;
 
 			let missingFields = [];
 
 			if (!category) missingFields.push("category");
 			if (!furnitureType) missingFields.push("furnitureType");
 			if (!description) missingFields.push("description");
+			if (!material) missingFields.push("material");
 			if (!price) missingFields.push("price");
 
 			if (missingFields.length > 0) {
@@ -80,12 +82,19 @@ exports.createFurniture = [upload.single('image'), async (req, res) => {
 					return res.status(400).json({ message: "Invalid furniture type!" });
 			}
 
+						// Find the category by name to get its ObjectId
+			const existingMaterials = await Material.findOne({ name: material });
+			if (!existingMaterials) {
+					return res.status(400).json({ message: "Invalid material type!" });
+			}
+
 
 			const newFurniture = new Furniture({
 				image,
 				category:existingCategory.name,
 				furnitureType:existingFurnitureType.name,
 				description,
+				material,
 				price,
 			});
 

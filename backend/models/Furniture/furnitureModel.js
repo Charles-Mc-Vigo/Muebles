@@ -8,15 +8,27 @@ const furnitureSchema = new mongoose.Schema({
   category: {
     type:String,
     require:true
-  }, // Change this to String
+  },
   furnitureType:{
     type:String,
     required:true
   },
+  // furnitureName:{
+  //   type:String,
+  //   required:true
+  // },
   description:{
     type:String,
     required:true
   },
+  material:{
+    type:String,
+    required:true
+  },
+  // color:{
+  //   type:String,
+  //   required:true
+  // },
   price:{
     type:Number,
     required:true,
