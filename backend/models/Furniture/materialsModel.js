@@ -8,5 +8,5 @@ const materialSchema = new mongoose.Schema({
   }
 })
 
-const Material = mongoose.model("Materials",materialSchema);
-module.exports = Material;
+const Materials = mongoose.model("Materials",materialSchema);
+module.exports = Materials;

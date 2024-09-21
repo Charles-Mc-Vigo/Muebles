@@ -4,10 +4,6 @@ exports.AddFurnitureType = async(req,res)=>{
   try {
     const {name} = req.body;
 
-    if(!name){
-      return null
-    }
-
     const newFurnitureType = new FurnitureType({name});
     await newFurnitureType.save();
 
@@ -24,6 +20,8 @@ exports.GetFurnitureType = async(req,res)=>{
     if(furnitureType.length===0){
       res.status(404).json({message:"No furniture type found!"})
     }
+
+    res.status(200).json(furnitureType)
   } catch (error) {
     console.log('Error fetching furniture type:',error);
     res.status(500).json({message:"Server error!"})

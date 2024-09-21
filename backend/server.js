@@ -9,6 +9,7 @@ const furnitureRoutes = require("./router/FurnitureRoutes/furnitureRoutes");
 const categoryRoutes = require("../backend/router/FurnitureRoutes/categoryRoutes")
 const furnitureTypeRoutes = require('../backend/router/FurnitureRoutes/furnitureTypeRoutes')
 const materialsRoutes = require('./router/FurnitureRoutes/materialsRoutes')
+const colorRoutes = require('../backend/router/FurnitureRoutes/colorRoutes');
 
 const adminRoutes = require('./router/adminRoutes')
 const orderRoutes = require("./router/orderRoutes");
@@ -66,6 +67,7 @@ app.use("/api/furnitures", furnitureRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/furniture-types", furnitureTypeRoutes);
 app.use("/api/materials",materialsRoutes)
+app.use("/api/colors",colorRoutes)
 
 app.use('/api/carts', cartRoutes);
 app.use("/api/admin", adminRoutes);
