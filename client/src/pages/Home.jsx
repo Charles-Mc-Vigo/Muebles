@@ -3,7 +3,8 @@ import axios from 'axios';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 
-const ItemList = () => {
+
+const Home = () => {
   const [furnitureList, setFurnitureList] = useState([]);
 
   useEffect(() => {
@@ -208,4 +209,4 @@ const ItemList = () => {
   );
 };
 
-export default ItemList;
+export default Home;

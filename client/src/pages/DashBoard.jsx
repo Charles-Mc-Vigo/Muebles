@@ -1,33 +1,22 @@
 import React, { useState } from 'react';
 import Cookies from 'js-cookie';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBox, faListUl, faUser, faBell, faHandshake } from '@fortawesome/free-solid-svg-icons'; 
-import { useNavigate } from 'react-router-dom';
-import { faTruck } from '@fortawesome/free-solid-svg-icons';
-import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
-
-
+import { faBox, faListUl,  faTruck, faChevronDown, faChevronUp, faHandshake, faWrench } from '@fortawesome/free-solid-svg-icons'; 
+import ProductManagement from './ProductManagement'; 
+import ItemList from '../components/ItemList';
+import Maintenance from '../components/Maintenance';
+import Inventory from '../components/Inventory';
 
 const DashBoard = () => {
-  const navigate = useNavigate();
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-
   const [productDropdownOpen, setProductDropdownOpen] = useState(false);
   const [transactionDropdownOpen, setTransactionDropdownOpen] = useState(false);
-  const [DeliveryDropdownOpen, setDeliveryDropdownOpen] = useState(false);
+  const [deliveryDropdownOpen, setDeliveryDropdownOpen] = useState(false);
+  const [maintenanceDropdownOpen, setMaintenanceDropdownOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState('dashboard'); 
 
   const handleLogout = () => {
     Cookies.remove('adminToken');
-    navigate('/admin-login');
     console.log('Logging out...');
-  };
-
-  const navigateToSection = (section) => {
-    navigate(`/${section}`);
-  };
-
-  const handleImageClick = () => {
-    setDropdownOpen(!dropdownOpen);
   };
 
   const toggleProductDropdown = () => {
@@ -37,188 +26,200 @@ const DashBoard = () => {
   const toggleTransactionDropdown = () => {
     setTransactionDropdownOpen(!transactionDropdownOpen);
   };
-  const toggleDeliveryDropdown =() => {
-    setDeliveryDropdownOpen(!DeliveryDropdownOpen);
+
+  const toggleDeliveryDropdown = () => {
+    setDeliveryDropdownOpen(!deliveryDropdownOpen);
+  };
+
+  const toggleMaintenanceDropdown = () => {
+    setMaintenanceDropdownOpen(!maintenanceDropdownOpen);
   };
 
   return (
-    <div className="flex min-h-screen bg-white">
+    <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}
-      <nav className="w-64 bg-white text-black flex flex-col justify-between border-r-2 border-oliveGreen h-screen">
-        <div>
-          <div className="p-6 text-xl font-bold text-center border-b-2 border-oliveGreen">
-            Admin Dashboard
-          </div>
-          <ul>
-            {/* Product Management with Dropdown */}
-            <li className="flex flex-col cursor-pointer transition-colors border-oliveGreen">
-              <div className="flex items-center justify-between hover:bg-green-800 border-b-2 border-green-700 p-3" onClick={toggleProductDropdown}>
-                <div className="flex items-center">
-                  <FontAwesomeIcon icon={faBox} className="w-6 h-6 ml-2 mt-2" />
-                  <span className="ml-3">Product Management</span>
-                </div>
-                <FontAwesomeIcon icon={productDropdownOpen ? faChevronUp : faChevronDown} className="w-4 h-4" />
-              </div>
-              {productDropdownOpen && (
-                <ul className="">
-                  <li className="p-3 border-b-2 border-green-700 hover:bg-green-300 cursor-pointer" onClick={() => navigateToSection('product-management')}>Add Product</li>
-                  <li className="p-3 border-b-2 border-green-700 hover:bg-green-300 cursor-pointer" onClick={() => navigateToSection('remove-product')}>Remove Product</li>
-                  <li className="p-3 border-b-2 border-green-700 hover:bg-green-300 cursor-pointer" onClick={() => navigateToSection('view-product-list')}>View Product List</li>
-                </ul>
-              )}
+      <aside className="w-64 bg-oliveGreen text-white flex flex-col items-center py-5 rounded-l-3xl ml-1 h-50 mt-2 mb-2">
+        <h1 className="text-2xl font-bold mb-6">JCKAME</h1>
+        <nav className="w-full">
+          <ul className="space-y-4">
+            {/* Dashboard */}
+            <h1 
+              className={`px-4 py-2 flex items-center text-black text-xl cursor-pointer ${activeSection === 'dashboard' ? 'bg-white rounded-l-3xl' : ''}`}
+              onClick={() => setActiveSection('dashboard')}
+            >
+              <FontAwesomeIcon icon={faBox} className="mr-2" /> Dashboard
+            </h1>
+            
+            {/* Product Management */}
+            <li 
+              className={`px-4 py-2 flex items-center justify-between text-black cursor-pointer ${activeSection.startsWith('product') ? 'bg-white rounded-l-3xl' : ''}`}
+              onClick={toggleProductDropdown}
+            >
+              <span className="flex items-center">
+                <FontAwesomeIcon icon={faBox} className="mr-2" /> Product Management
+              </span>
+              <FontAwesomeIcon icon={productDropdownOpen ? faChevronUp : faChevronDown} />
             </li>
-
-
+            {productDropdownOpen && (
+              <ul className="ml-8 space-y-2">
+                <li 
+                  className={`px-4 py-2 text-black cursor-pointer ${activeSection === 'view-products' ? 'bg-white rounded-l-3xl' : 'hover:bg-white rounded-l-3xl'}`}
+                  onClick={() => setActiveSection('view-products')}
+                >
+                  View Products
+                </li>
+                <li 
+                  className={`px-4 py-2 text-black cursor-pointer ${activeSection === 'modify-product' ? 'bg-white rounded-l-3xl' : 'hover:bg-white rounded-l-3xl'}`}
+                  onClick={() => setActiveSection('modify-product')}
+                >
+                  Modify Product
+                </li>
+              </ul>
+            )}
+            
             {/* Order Management */}
-            <li
-              className="p-4 flex items-center hover:bg-green-700 cursor-pointer transition-colors border-b-2 border-green-700"
-              onClick={() => navigateToSection('order-management')}
+            <li 
+              className={`px-4 py-2 flex items-center text-black cursor-pointer ${activeSection === 'order-management' ? 'bg-white rounded-l-3xl' : 'hover:bg-white rounded-l-3xl'}`}
+              onClick={() => setActiveSection('order-management')}
             >
-              <FontAwesomeIcon icon={faListUl} className="w-6 h-6 mr-3" />
-              Order Management
+              <FontAwesomeIcon icon={faListUl} className="mr-2" /> Order Management
             </li>
-
-            {/* Customers */}
-            <li
-              className="p-4 flex items-center hover:bg-green-700 cursor-pointer transition-colors border-b-2 border-green-700"
-              onClick={() => navigateToSection('user-management')}
+            
+            {/* Inventory */}
+            <li 
+              className={`px-4 py-2 flex items-center text-black cursor-pointer ${activeSection === 'inventory' ? 'bg-white rounded-l-3xl' : 'hover:bg-white rounded-l-3xl'}`}
+              onClick={() => setActiveSection('inventory')}
             >
-              <FontAwesomeIcon icon={faUser} className="w-6 h-6 mr-3" />
-              Customers
+              <FontAwesomeIcon icon={faBox} className="mr-2" /> Inventory
             </li>
-
-            {/* Transactions with Dropdown */}
-            <li className="flex flex-col cursor-pointer transition-colors border-green-700">
-              <div className="flex items-center justify-between hover:bg-green-700 p-3 border-b-2 border-green-700" onClick={toggleTransactionDropdown}>
-                <div className="flex items-center">
-                  <FontAwesomeIcon icon={faHandshake} className="w-6 h-6 mr-3" />
-                  Transactions
-                </div>
-                <FontAwesomeIcon icon={transactionDropdownOpen ? faChevronUp : faChevronDown} className="w-4 h-4" />
-              </div>
-              {transactionDropdownOpen && (
-                <ul className="">
-                  <li className="p-3 border-b-2 border-green-300 hover:bg-green-300 cursor-pointer" onClick={() => navigateToSection('customer-payment')}>Customer Payment</li>
-                  <li className="p-3 border-b-2 border-green-300 hover:bg-green-300 cursor-pointer" onClick={() => navigateToSection('completed-transactions')}>Completed Transactions</li>
+            
+            {/* Transaction */}
+            <li 
+              className={`px-4 py-2 flex items-center justify-between text-black cursor-pointer ${activeSection.startsWith('transaction') ? 'bg-white rounded-l-3xl' : ''}`}
+              onClick={toggleTransactionDropdown}
+            >
+              <span className="flex items-center">
+                <FontAwesomeIcon icon={faHandshake} className="mr-2" /> Transaction
+              </span>
+              <FontAwesomeIcon icon={transactionDropdownOpen ? faChevronUp : faChevronDown} />
+            </li>
+            {transactionDropdownOpen && (
+              <ul className="ml-8 space-y-2">
+                <li 
+                  className={`px-4 py-2 text-black cursor-pointer ${activeSection === 'view-transactions' ? 'bg-white rounded-l-3xl' : 'hover:bg-white rounded-l-3xl'}`}
+                  onClick={() => setActiveSection('view-transactions')}
+                >
+                  View Transactions
+                </li>
+                <li 
+                  className={`px-4 py-2 text-black cursor-pointer ${activeSection === 'refund-transactions' ? 'bg-white rounded-l-3xl' : 'hover:bg-white rounded-l-3xl'}`}
+                  onClick={() => setActiveSection('refund-transactions')}
+                >
+                  Refund Transactions
+                </li>
+              </ul>
+            )}
+            
+            {/* Delivery */}
+            <li 
+              className={`px-4 py-2 flex items-center justify-between text-black cursor-pointer ${activeSection.startsWith('delivery') ? 'bg-white rounded-l-3xl' : ''}`}
+              onClick={toggleDeliveryDropdown}
+            >
+              <span className="flex items-center">
+                <FontAwesomeIcon icon={faTruck} className="mr-2" /> Delivery
+              </span>
+              <FontAwesomeIcon icon={deliveryDropdownOpen ? faChevronUp : faChevronDown} />
+            </li>
+            {deliveryDropdownOpen && (
+              <ul className="ml-8 space-y-2">
+                <li 
+                  className={`px-4 py-2 text-black cursor-pointer ${activeSection === 'track-delivery' ? 'bg-white rounded-l-3xl' : 'hover:bg-white rounded-l-3xl'}`}
+                  onClick={() => setActiveSection('track-delivery')}
+                >
+                  Track Delivery
+                </li>
+                <li 
+                  className={`px-4 py-2 text-black cursor-pointer ${activeSection === 'manage-delivery' ? 'bg-white rounded-l-3xl ' : 'hover:bg-white rounded-l-3xl'}`}
+                  onClick={() => setActiveSection('manage-delivery')}
+                >
+                  Manage Delivery
+                </li>
+              </ul>
+            )}
+            
+           {/* Maintenance */}
+              <li 
+                className={`px-4 py-2 flex items-center justify-between text-black cursor-pointer ${activeSection.startsWith('maintenance') ? 'bg-white rounded-l-3xl' : ''}`}
+                onClick={toggleMaintenanceDropdown}
+              >
+                <span className="flex items-center">
+                  <FontAwesomeIcon icon={faWrench} className="mr-2" /> Maintenance
+                </span>
+                <FontAwesomeIcon icon={maintenanceDropdownOpen ? faChevronUp : faChevronDown} />
+              </li>
+              {maintenanceDropdownOpen && (
+                <ul className="ml-8 space-y-2">
+                  <li 
+                    className={`px-4 py-2 text-black cursor-pointer ${activeSection === 'Category' ? 'bg-white rounded-l-3xl' : 'hover:bg-white rounded-l-3xl'}`}
+                    onClick={() => setActiveSection('Category')}
+                  >
+                    Product 
+                  </li>
+                  <li 
+                    className={`px-4 py-2 text-black cursor-pointer ${activeSection === 'Type' ? 'bg-white rounded-l-3xl' : 'hover:bg-white rounded-l-3xl'}`}
+                    onClick={() => setActiveSection('Type')}
+                  >
+                    Type
+                  </li>
+                  <li 
+                    className={`px-4 py-2 text-black cursor-pointer ${activeSection === 'Services' ? 'bg-white rounded-l-3xl' : 'hover:bg-white rounded-l-3xl'}`}
+                    onClick={() => setActiveSection('Services')}
+                  >
+                    Services 
+                  </li>
                 </ul>
               )}
-            </li>
-
-
-            {/* Delivery */}
-              <li className="flex flex-col cursor-pointer transition-colors border-green-300">
-                <div className="flex items-center justify-between hover:bg-green-300 p-3 border-b-2 border-green-300" onClick={toggleDeliveryDropdown}>
-                  <div className="flex items-center">
-                    <FontAwesomeIcon icon={faTruck} className="w-6 h-6 mr-3" />
-                    Delivery Status
-                  </div>
-                  <FontAwesomeIcon icon={DeliveryDropdownOpen ? faChevronUp : faChevronDown} className="w-4 h-4" />
-                </div>
-                {DeliveryDropdownOpen && (
-                  <ul className="">
-                    <li className="p-3 border-b-2 border-green-300 hover:bg-green-300 cursor-pointer" onClick={() => navigateToSection('customer-payment')}>Processing</li>
-                    <li className="p-3 border-b-2 border-green-300 hover:bg-green-300 cursor-pointer" onClick={() => navigateToSection('completed-transactions')}>Shipped</li>
-                    <li className="p-3 border-b-2 border-green-300 hover:bg-green-300 cursor-pointer" onClick={() => navigateToSection('completed-transactions')}>Delivered</li>
-                  </ul>
-                )}
-              </li>
 
           </ul>
-        </div>
-
-        <button
-          onClick={handleLogout}
-          className="bg-white text-black p-4 hover:bg-green-300 w-full transition-colors border-t-2 border-green-300"
-        >
-          Logout
-        </button>
-      </nav>
+        </nav>
+      </aside>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col">
-        {/* Admin profile and notification */}
-        <section className="flex items-center justify-between bg-white border-b-2 border-green-300 mb-10" style={{ height: '8.5vh' }}>
-          <div className='flex-1 flex items-center justify-center'>
-            <h1 className='text-4xl font-sans gap-5 font-bold'>JCKAME</h1>
-          </div>
-          <button className="relative p-2 text-gray-600 hover:text-gray-900 m-20">
-            <FontAwesomeIcon icon={faBell} className="w-6 h-6" />
-            {/* Notification badge */}
-            <span className="absolute top-0 right-0 inline-flex items-center justify-center w-4 h-4 text-xs font-bold text-white bg-red-500 rounded-full">3</span>
-          </button>
+      <main className="flex-1 p-6 overflow-y-auto">
+        <div className="h-100 max-h-[calc(50vh-50px)]"> 
+          {activeSection === 'dashboard' && <h2 className="text-2xl font-semibold">Dashboard Content</h2>}
 
-          <div className="relative flex items-center">
-            <img
-              className="h-16 w-16 border-2 object-contain cursor-pointer ml-5 mr-10 rounded-full"
-              src="/landingimage/LOGO.jpg"
-              alt="adminprofile"
-              onClick={handleImageClick}
-            />
-            {/* Dropdown menu */}
-            {dropdownOpen && (
-              <div className="absolute top-full right-0 mt-2 mr-2 w-48 bg-white border border-gray-300 shadow-lg rounded-lg">
-                <ul className="py-2">
-                  <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Admin 1</li>
-                  <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Admin 2</li>
-                  <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Admin 3</li>
-                  <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer" onClick={handleLogout}>Logout</li>
-                </ul>
-              </div>
-            )}
-          </div>
-        </section>
-
-        {/* Dashboard Overview */}
-        <section className="flex-1 flex items-center justify-center">
-          <div className="bg-gray-100 p-8 rounded-lg shadow-md h-full w-full mr-10 ml-10 mb-10 text-center">
-            <h1 className="text-3xl font-bold mb-8 text-center">Dashboard Overview</h1>
-            <div>
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-                <div className="bg-white border-2 border-green-300 p-6 rounded-lg shadow hover:shadow-lg transition-shadow">
-                  <h2 className="text-2xl font-semibold mb-2 text-black">Today's Orders</h2>
-                  <p className="text-3xl font-bold text-black">0</p>
-                </div>
-                <div className="bg-white border-2 border-green-300  p-6 rounded-lg shadow hover:shadow-lg transition-shadow">
-                  <h2 className="text-2xl font-semibold mb-2  text-black">Total Orders</h2>
-                  <p className="text-3xl font-bold text-black">0</p>
-                </div>
-                <div className="bg-white border-2 border-green-300 p-6 rounded-lg shadow hover:shadow-lg transition-shadow">
-                  <h2 className="text-2xl font-semibold mb-2  text-black">Pending Orders</h2>
-                  <p className="text-3xl font-bold text-black">0</p>
-                </div>
-                <div className="bg-white border-2 border-green-300  p-6 rounded-lg shadow hover:shadow-lg transition-shadow">
-                  <h2 className="text-2xl font-semibold mb-2  text-black">Cancelled Orders</h2>
-                  <p className="text-3xl font-bold text-black">0</p>
-                </div>
-              </div>
+          {activeSection === 'view-products' && (
+            <div className='h-full overflow-y-auto'>
+              <ItemList/>
             </div>
+          )}
 
-            <div className="bg-white rounded-lg border-green-300 border-2 shadow-lg p-1">
-              <h2 className="text-xl font-bold mb-3 text-black mt-3">Recent Orders</h2>
-              <table className="w-full table-auto border-collapse text-left ">
-                <thead>
-                  <tr className="bg-green-500 text-black ">
-                    <th className="p-3 border-b border-green-700">Order ID</th>
-                    <th className="p-3 border-b border-green-700">Customer</th>
-                    <th className="p-3 border-b border-green-700">Status</th>
-                    <th className="p-3 border-b border-green-700">Total</th>
-                    <th className="p-3 border-b border-green-700">Date</th>
-                    <th className="p-3 border-b border-green-700">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {/* Empty state for now */}
-                  <tr>
-                    <td className="p-3 text-center text-black" colSpan="6">
-                      No orders available.
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+          
+          {activeSection === 'modify-product' && (
+            <div className="h-full overflow-y-auto"> 
+              <ProductManagement />
             </div>
-          </div>
-        </section>
-      </div>
+          )}
+          {activeSection === 'inventory' &&
+          (<div>
+            <Inventory/>
+          </div>) }
+
+
+          {activeSection === 'order-management' && <h2 className="text-2xl font-semibold">Order Management Content</h2>}
+          {activeSection === 'track-delivery' && <h2 className="text-2xl font-semibold">Track Delivery Content</h2>}
+          {activeSection === 'manage-delivery' && <h2 className="text-2xl font-semibold">Manage Delivery Content</h2>}
+
+          {activeSection === 'Category' && (
+            <div className="h-full overflow-y-auto">
+              <Maintenance/>
+            </div>
+          )}
+          
+          {activeSection === 'repair-hardware' && <h2 className="text-2xl font-semibold">Repair Hardware Content</h2>}
+        </div>
+      </main>
     </div>
   );
 };
