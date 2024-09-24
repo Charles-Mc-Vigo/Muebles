@@ -14,6 +14,13 @@ const ProductManagement = () => {
 	const [currentPage, setCurrentPage] = useState(1);
 	const [productsPerPage] = useState(5);
 
+	// State for filtering
+	const [filterCategory, setFilterCategory] = useState("");
+	const [filterType, setFilterType] = useState("");
+
+	// State for sorting by date
+	const [sortOrder, setSortOrder] = useState("newest");
+
 	const fetchProducts = async () => {
 		try {
 			const response = await axios.get("http://localhost:3000/api/furnitures");
@@ -86,14 +93,69 @@ const ProductManagement = () => {
 		}
 	};
 
+	// Filtering logic based on category and type
+	const filteredProducts = products.filter((product) => {
+		return (
+			(!filterCategory || product.category === filterCategory) &&
+			(!filterType || product.furnitureType === filterType)
+		);
+	});
+
+	// Sorting logic based on the created date
+	const sortedProducts = filteredProducts.sort((a, b) =>
+		sortOrder === "newest"
+			? new Date(b.createdAt) - new Date(a.createdAt)
+			: new Date(a.createdAt) - new Date(b.createdAt)
+	);
+
 	const indexOfLastProduct = currentPage * productsPerPage;
 	const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
-	const currentProducts = products.slice(indexOfFirstProduct, indexOfLastProduct);
-	const totalPages = Math.ceil(products.length / productsPerPage);
+	const currentProducts = sortedProducts.slice(indexOfFirstProduct, indexOfLastProduct);
+	const totalPages = Math.ceil(sortedProducts.length / productsPerPage);
 
 	return (
 		<div className="container mx-auto p-4">
-			<h1 className="text-3xl font-bold mb-6 text-center">Product Management</h1>
+			<h1 className="text-3xl font-bold mb-2 text-center">Product Management</h1>
+
+			{/* Filter and Sort Section */}
+			<div className="mb-2 flex gap-4 justify-end">
+				<select
+					name="filterCategory"
+					onChange={(e) => setFilterCategory(e.target.value)}
+					value={filterCategory}
+					className="bg-gray-100 p-2 rounded-lg border border-gray-300"
+				>
+					<option value="">All Categories</option>
+					<option value="livingroom">LivingRoom</option>
+					<option value="bedroom">Bedroom</option>
+					<option value="diningroom">DiningRoom</option>
+				</select>
+
+				<select
+					name="filterType"
+					onChange={(e) => setFilterType(e.target.value)}
+					value={filterType}
+					className="bg-gray-100 p-2 rounded-lg border border-gray-300"
+				>
+					<option value="">All Types</option>
+					<option value="sala-set">Sala Set</option>
+					<option value="dining-set">Dining Set</option>
+					<option value="bedroom-set">Bedroom Set</option>
+					<option value="contemporary">Contemporary</option>
+				</select>
+
+				{/* Sort by Date Dropdown */}
+				<select
+					name="sortOrder"
+					onChange={(e) => setSortOrder(e.target.value)}
+					value={sortOrder}
+					className="bg-gray-100 p-3 rounded-lg border border-gray-300"
+				>
+					<option value="newest">Newest</option>
+					<option value="oldest">Oldest</option>
+				</select>
+			</div>
+
 			<div className="flex gap-6">
 				{/* Product Form Section */}
 				<div className="w-full md:w-1/3 bg-white p-6 rounded-lg shadow-lg flex flex-col h-full">
@@ -107,12 +169,9 @@ const ProductManagement = () => {
 							required
 						>
 							<option value="">Select Category</option>
-							<option value="door">Door</option>
-							<option value="bed_frame">Bed frame</option>
-							<option value="cabinet">Cabinet</option>
-							<option value="chair">Chair</option>
-							<option value="table">Table</option>
-							<option value="sala_set">Sala set</option>
+							<option value="livingroom">LivingRoom</option>
+							<option value="bedroom">Bedroom</option>
+							<option value="diningroom">DiningRoom</option>
 						</select>
 
 						{/* Furniture Type Dropdown */}
@@ -124,9 +183,9 @@ const ProductManagement = () => {
 							required
 						>
 							<option value="">Select Furniture Type</option>
-							<option value="modern">Modern</option>
-							<option value="classic">Classic</option>
-							<option value="rustic">Rustic</option>
+							<option value="sala-set">Sala Set</option>
+							<option value="dining-set">Dining Set</option>
+							<option value="bedroom-set">Bedroom Set</option>
 							<option value="contemporary">Contemporary</option>
 						</select>
 
@@ -188,43 +247,40 @@ const ProductManagement = () => {
 				</div>
 
 				{/* Product Table Section */}
-				<div className="w-full md:w-2/3 rounded-lg shadow-lg flex flex-col h-full">
-					<table className="w-full bg-white shadow-lg rounded-lg flex-grow">
-						<thead className="bg-gray-50">
+				<div className="w-full md:w-2/3">
+					<h2 className="text-2xl font-bold mb-2">Products</h2>
+
+					<table className="table-auto w-full">
+						<thead>
 							<tr>
-								<th className="p-4 text-left">Image</th>
-								<th className="p-4 text-left">Category</th>
-								<th className="p-4 text-left">Type</th>
-								<th className="p-4 text-left">Product Name</th>
-								<th className="p-4 text-left">Description</th>
-								<th className="p-4 text-left">Price</th>
-								<th className="p-4 text-left">Actions</th>
+								<th className="px-4 py-2">Image</th>
+								<th className="px-4 py-2">Category</th>
+								<th className="px-4 py-2">Type</th>
+								<th className="px-4 py-2">Name</th>
+								<th className="px-4 py-2">Description</th>
+								<th className="px-4 py-2">Price</th>
+								<th className="px-4 py-2">Actions</th>
 							</tr>
 						</thead>
 						<tbody>
 							{currentProducts.map((product) => (
-								<tr key={product._id} className="border-t">
-									<td className="p-4">
-										{product.image && (
-											<img
-												src={`data:image/jpeg;base64,${product.image}`}
-												alt={product.productName}
-												className="w-20 h-20 object-cover"
-											/>
-										)}
+								<tr key={product._id}>
+									<td className="border px-4 py-2">
+										<img
+											src={`http://localhost:3000/${product.imageUrl}`}
+											alt={product.productName}
+											className="w-16 h-16 object-cover"
+										/>
 									</td>
-									<td className="p-4">{product.category}</td>
-									<td className="p-4">{product.furnitureType}</td>
-									<td className="p-4">{product.productName}</td>
-									<td className="p-4">{product.description}</td>
-									<td className="p-4">PHP {product.price}</td>
-									<td className="p-4 flex space-x-2">
-										<button className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600">
-											Edit
-										</button>
+									<td className="border px-4 py-2">{product.category}</td>
+									<td className="border px-4 py-2">{product.furnitureType}</td>
+									<td className="border px-4 py-2">{product.productName}</td>
+									<td className="border px-4 py-2">{product.description}</td>
+									<td className="border px-4 py-2">{product.price}</td>
+									<td className="border px-4 py-2">
 										<button
+											className="bg-red-500 text-white px-4 py-2 rounded-lg"
 											onClick={() => handleDelete(product._id)}
-											className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
 										>
 											Delete
 										</button>
@@ -234,25 +290,21 @@ const ProductManagement = () => {
 						</tbody>
 					</table>
 
-					{/* Pagination Controls */}
-					<div className="flex justify-between items-center mt-4">
-						<button
-							onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-							className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 disabled:opacity-50"
-							disabled={currentPage === 1}
-						>
-							Previous
-						</button>
-						<span>
-							Page {currentPage} of {totalPages}
-						</span>
-						<button
-							onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-							className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 disabled:opacity-50"
-							disabled={currentPage === totalPages}
-						>
-							Next
-						</button>
+					{/* Pagination */}
+					<div className="flex justify-center mt-4">
+						{Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+							<button
+								key={page}
+								onClick={() => setCurrentPage(page)}
+								className={`px-3 py-1 mx-1 rounded-lg ${
+									currentPage === page
+										? "bg-blue-500 text-white"
+										: "bg-gray-300 text-black"
+								}`}
+							>
+								{page}
+							</button>
+						))}
 					</div>
 				</div>
 			</div>

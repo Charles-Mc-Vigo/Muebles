@@ -19,6 +19,7 @@ import EmailVerification from "./pages/EmailVerification";
 import AdminSignUp from "./pages/AdminSignUp";
 import AdminVerify from "./pages/AdminVerify"
 import About from './pages/About'
+import ServicePage from "./pages/ServicePage";
 
 export default function App() {
 	return (
@@ -32,10 +33,15 @@ export default function App() {
 				<Route path="/admin-login" element={<AdminLogin />}/>
 				<Route path="/admin-signup" element={<AdminSignUp />}/>
 				<Route path="/admin-verify" element={<AdminVerify />}/>
+				<Route path="/dashboard" element={<DashBoard />} />
+				<Route path="/home" element={<Home />} />
+				<Route path="/service-page" element={<ServicePage />} />
 
-				<Route path="/home" element={<ProtectedRoute element={<Home />} />} />
+
+
+				{/* <Route path="/home" element={<ProtectedRoute element={<Home />} />} /> */}
 				<Route path="/furniture-list" element={<ProtectedRoute element={<FurnitureList />} />} />
-				<Route path="/dashboard" element={<AdminOnlyRoutes element={<DashBoard />} />} />
+				{/* <Route path="/dashboard" element={<AdminOnlyRoutes element={<DashBoard />} />} /> */}
 				<Route path="/user-management" element={<AdminOnlyRoutes element={<UserManagement />} />} />
 				<Route path="/order-management" element={<AdminOnlyRoutes element={<OrderManagement />} />} />
 				<Route path="/product-management" element={<AdminOnlyRoutes element={<ProductManagement />} />} />

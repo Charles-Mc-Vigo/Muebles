@@ -6,6 +6,7 @@ import ProductManagement from './ProductManagement';
 import ItemList from '../components/ItemList';
 import Maintenance from '../components/Maintenance';
 import Inventory from '../components/Inventory';
+import ServiceSection from '../components/Services';
 
 const DashBoard = () => {
   const [productDropdownOpen, setProductDropdownOpen] = useState(false);
@@ -214,6 +215,12 @@ const DashBoard = () => {
           {activeSection === 'Category' && (
             <div className="h-full overflow-y-auto">
               <Maintenance/>
+            </div>
+          )}
+
+          {activeSection === 'Services' && (
+            <div className="h-full overflow-y-auto">
+              <ServiceSection/>
             </div>
           )}
           

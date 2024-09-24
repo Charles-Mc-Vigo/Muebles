@@ -70,7 +70,7 @@ export default function Header({ showLogin = true, showLogout = false }) {
             </li>
             <Link to="/about" className="hover:underline">About Us</Link>
             <Link to="/featured" className="hover:underline">Featured</Link>
-            <Link to="/services" className="hover:underline">Services</Link>
+            <Link to="/service-page" className="hover:underline">Services</Link>
           </ul>
         </div>
 
@@ -127,7 +127,7 @@ export default function Header({ showLogin = true, showLogout = false }) {
             </li>
             <Link to="/about" className="hover:text-gray-400 ml-2">About Us</Link>
             <Link to="/featured" className="hover:text-gray-400 ml-2">Featured</Link>
-            <Link to="/services" className="hover:text-gray-400 ml-2">Services</Link>
+            <Link to="/ServicePage" className="hover:text-gray-400 ml-2">Services</Link>
             <Link to="/customer-service" className="hover:text-gray-400 flex items-center">
               <RiCustomerServiceFill className="mr-2 ml-2" />
               Customer Service

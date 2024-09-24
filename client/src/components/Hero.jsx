@@ -11,11 +11,12 @@ import Cookies from 'js-cookie';
 
 export default function Hero() {
   const images = [
-    '/landingimage/coverphoto.svg',
-    '/landingimage/ads1.png',
-    'https://via.placeholder.com/800x400?text=Slide+3',
-    'https://via.placeholder.com/800x400?text=Slide+4',
-    'https://via.placeholder.com/800x400?text=Slide+5',
+    '/Advertisement/carouselimages/1.png',
+    '/Advertisement/carouselimages/2.png',
+    '/Advertisement/carouselimages/3.png',
+    '/Advertisement/carouselimages/4.png',
+    '/Advertisement/carouselimages/5.png',
+    '/Advertisement/carouselimages/6.png',
   ];
 
   const navigate = useNavigate();
