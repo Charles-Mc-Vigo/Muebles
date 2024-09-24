@@ -4,7 +4,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBox, faListUl,  faTruck, faChevronDown, faChevronUp, faHandshake, faWrench } from '@fortawesome/free-solid-svg-icons'; 
 import ProductManagement from './ProductManagement'; 
 import ItemList from '../components/ItemList';
-import Maintenance from '../components/Maintenance';
 import Inventory from '../components/Inventory';
 import ServiceSection from '../components/Services';
 
@@ -164,7 +163,7 @@ const DashBoard = () => {
                     className={`px-4 py-2 text-black cursor-pointer ${activeSection === 'Category' ? 'bg-white rounded-l-3xl' : 'hover:bg-white rounded-l-3xl'}`}
                     onClick={() => setActiveSection('Category')}
                   >
-                    Product 
+                    Category 
                   </li>
                   <li 
                     className={`px-4 py-2 text-black cursor-pointer ${activeSection === 'Type' ? 'bg-white rounded-l-3xl' : 'hover:bg-white rounded-l-3xl'}`}
@@ -192,7 +191,7 @@ const DashBoard = () => {
 
           {activeSection === 'view-products' && (
             <div className='h-full overflow-y-auto'>
-              <ItemList/>
+              
             </div>
           )}
 
@@ -214,7 +213,6 @@ const DashBoard = () => {
 
           {activeSection === 'Category' && (
             <div className="h-full overflow-y-auto">
-              <Maintenance/>
             </div>
           )}
 
