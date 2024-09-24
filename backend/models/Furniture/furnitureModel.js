@@ -5,18 +5,38 @@ const furnitureSchema = new mongoose.Schema({
     type: String,
     required:true
   },
-  category:{
-    type:String,
-    enum:["door","bed_frame","cabinet","chair", "table","sala_set"],
-    required:true
+  category: {
+    type:mongoose.Schema.ObjectId,
+    ref:"Category",
+    require:true
   },
   furnitureType:{
+    type:mongoose.Schema.ObjectId,
+    ref:"FurnitureType",
+    required:true
+  },
+  name:{
     type:String,
     required:true
   },
   description:{
     type:String,
     required:true
+  },
+  material:{
+    type:mongoose.Schema.ObjectId,
+    ref:"Materials",
+    required:true
+  },
+  color:{
+    type:mongoose.Schema.ObjectId,
+    ref:"Colors",
+    required:true
+  },
+  stocks:{
+    type:Number,
+    require:true,
+    default:0
   },
   price:{
     type:Number,

@@ -33,7 +33,8 @@ const ProductManagement = () => {
 	};
 
 	useEffect(() => {
-		fetchProducts();
+		fetchCategories(); // Fetch categories when the component loads
+		fetchProducts(); // Fetch products when the component loads
 	}, []);
 
 	const handleInputChange = (e) => {
@@ -46,6 +47,7 @@ const ProductManagement = () => {
 
 	const handleDelete = async (id) => {
 		try {
+			await axios.delete(`http://localhost:3000/api/furnitures/furniture/${id}`);
 			await axios.delete(`http://localhost:3000/api/furnitures/furniture/${id}`);
 			setProducts(products.filter((product) => product._id !== id));
 			alert("Product deleted successfully.");

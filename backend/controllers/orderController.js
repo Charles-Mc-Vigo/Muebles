@@ -1,6 +1,6 @@
 const Order = require("../models/orderModel");
 const User = require("../models/userModel");
-const Furniture = require("../models/furnitureModel");
+const Furniture = require("../models/Furniture/furnitureModel");
 const {OrderSchemaValidator} = require("../middlewares/JoiSchemaValidation")
 
 
