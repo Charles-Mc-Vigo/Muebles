@@ -9,8 +9,7 @@ const Materials = require("../../models/Furniture/materialsModel");
 const Colors = require("../../models/Furniture/colorModel");
 
 // Multer setup for handling image uploads in memory
-const upload = multer({ storage: multer.memoryStorage() });
-
+const upload = multer({ storage: multer.memoryStorage() }).array("images", 10); // Accept up to 10 images
 // Get all furnitures or furniture by ID
 exports.getAllFurnitures = async (req, res) => {
 	try {
@@ -90,87 +89,68 @@ exports.getFurnitreById = async (req, res) => {
 
 // Create furniture
 exports.createFurniture = [
-	upload.single("image"),
+	upload, // Use the updated multer configuration
 	async (req, res) => {
-		try {
-			let image;
+			try {
+					let images = [];
+					if (req.files && req.files.length > 0) {
+							images = req.files.map(file => file.buffer.toString("base64")); // Convert each image to base64
+					} else if (req.body.images) {
+							images = JSON.parse(req.body.images); // Assuming images are sent as a JSON array
+					} else {
+							return res.status(400).json({ message: "No images provided!" });
+					}
 
-			if (req.file) {
-				image = req.file.buffer.toString("base64");
-			} else if (req.body.image) {
-				image = req.body.image;
-			} else {
-				return res.status(400).json({ message: "No image provided!" });
+					const { category, furnitureType, name, color, description, stocks, material, price } = req.body;
+					let missingFields = [];
+					if (!category) missingFields.push("category");
+					if (!furnitureType) missingFields.push("furnitureType");
+					if (!description) missingFields.push("description");
+					if (!name) missingFields.push("name");
+					if (!color) missingFields.push("color");
+					if (!stocks) missingFields.push("stocks");
+					if (!material) missingFields.push("material");
+					if (!price) missingFields.push("price");
+					if (missingFields.length > 0) {
+							return res.status(400).json({
+									message: `The following fields are required: ${missingFields.join(", ")}`,
+							});
+					}
+
+					// Find the category, furniture type, material, and color
+					const existingCategory = await Category.findOne({ name: category });
+					const existingFurnitureType = await FurnitureType.findOne({ name: furnitureType });
+					const existingMaterials = await Materials.findOne({ name: material });
+					const existingColor = await Colors.findOne({ name: color });
+
+					// Check for valid references
+					if (!existingCategory) return res.status(400).json({ message: "Invalid category!" });
+					if (!existingFurnitureType) return res.status(400).json({ message: "Invalid furniture type!" });
+					if (!existingMaterials) return res.status(400).json({ message: "Invalid material type!" });
+					if (!existingColor) return res.status(400).json({ message: "Invalid color!" });
+
+					// Create a new furniture item
+					const newFurniture = new Furniture({
+							images, // Store the array of images
+							category: existingCategory._id,
+							furnitureType: existingFurnitureType._id,
+							name,
+							color: existingColor._id,
+							description,
+							stocks,
+							material: existingMaterials._id,
+							price,
+					});
+					await newFurniture.save();
+
+					res.status(201).json({
+							message: "New furniture is added successfully!",
+							furniture: newFurniture,
+					});
+			} catch (error) {
+					console.error(error);
+					res.status(500).json({ message: "Server error!", error: error.message });
 			}
-
-			const { category, furnitureType,name,color, description, stocks, material, price } =
-				req.body;
-
-			let missingFields = [];
-
-			if (!category) missingFields.push("category");
-			if (!furnitureType) missingFields.push("furnitureType");
-			if (!description) missingFields.push("description");
-			if (!name) missingFields.push("name");
-			if (!color) missingFields.push("color");
-			if (!stocks) missingFields.push("stocks");
-			if (!material) missingFields.push("material");
-			if (!price) missingFields.push("price");
-
-			if (missingFields.length > 0) {
-				return res.status(400).json({
-					message: `The following fields are required: ${missingFields.join(
-						", "
-					)}`,
-				});
-			}
-
-			// Find the category by name to get its ObjectId
-			const existingCategory = await Category.findOne({ name: category });
-			if (!existingCategory) {
-				return res.status(400).json({ message: "Invalid category!" });
-			}
-
-			// Find the category by name to get its ObjectId
-			const existingFurnitureType = await FurnitureType.findOne({
-				name: furnitureType,
-			});
-			if (!existingFurnitureType) {
-				return res.status(400).json({ message: "Invalid furniture type!" });
-			}
-
-			// Find the category by name to get its ObjectId
-			const existingMaterials = await Materials.findOne({ name: material });
-			if (!existingMaterials) {
-				return res.status(400).json({ message: "Invalid material type!" });
-			}
-
-			const exisitingColor = await Colors.findOne({ name: color });
-			if (!exisitingColor) {
-				return res.status(400).json({ message: "Invalid color!" });
-			}
-
-			const newFurniture = new Furniture({
-				image,
-				category: existingCategory._id,
-				furnitureType: existingFurnitureType._id,
-				name,
-				color: exisitingColor._id,
-				description,
-				stocks,
-				material: existingMaterials._id,
-				price,
-			});
-
-			await newFurniture.save();
-			res.status(201).json({
-				message: "New furniture is added successfully!",
-				furniture: newFurniture,
-			});
-		} catch (error) {
-			console.error(error);
-			res.status(500).json({ message: "Server error!", error: error.message });
-		}
 	},
 ];
 

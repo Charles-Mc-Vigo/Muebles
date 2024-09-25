@@ -1,51 +1,35 @@
 const mongoose = require("mongoose");
 
-const furnitureSchema = new mongoose.Schema({
-  image: {
-    type: String,
-    required:true
-  },
-  category: {
-    type:mongoose.Schema.ObjectId,
-    ref:"Category",
-    require:true
-  },
-  furnitureType:{
-    type:mongoose.Schema.ObjectId,
-    ref:"FurnitureType",
-    required:true
-  },
-  name:{
-    type:String,
-    required:true
-  },
-  description:{
-    type:String,
-    required:true
-  },
-  material:{
-    type:mongoose.Schema.ObjectId,
-    ref:"Materials",
-    required:true
-  },
-  color:{
-    type:mongoose.Schema.ObjectId,
-    ref:"Colors",
-    required:true
-  },
-  stocks:{
-    type:Number,
-    require:true,
-    default:0
-  },
-  price:{
-    type:Number,
-    required:true,
-    default:0
-  }
-},{
-  timestamps:true
-})
+const furnitureSchema = new mongoose.Schema(
+	{
+		images: { type: [String], required: true },
+		category: {
+			type: mongoose.Schema.Types.ObjectId,
+			ref: "Category",
+			required: true,
+		},
+		furnitureType: {
+			type: mongoose.Schema.Types.ObjectId,
+			ref: "FurnitureType",
+			required: true,
+		},
+		name: { type: String, required: true },
+		color: {
+			type: mongoose.Schema.Types.ObjectId,
+			ref: "Color",
+			required: true,
+		},
+		description: { type: String, required: true },
+		stocks: { type: Number, required: true },
+		material: {
+			type: mongoose.Schema.Types.ObjectId,
+			ref: "Materials",
+			required: true,
+		},
+		price: { type: Number, required: true },
+	},
+	{ timestamps: true }
+);
 
-const Furniture = mongoose.model("Furniture",furnitureSchema);
+const Furniture = mongoose.model("Furniture", furnitureSchema);
 module.exports = Furniture;
