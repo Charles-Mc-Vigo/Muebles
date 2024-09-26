@@ -14,18 +14,24 @@ const furnitureSchema = new mongoose.Schema(
 			required: true,
 		},
 		name: { type: String, required: true },
-		color: {
-			type: mongoose.Schema.Types.ObjectId,
-			ref: "Color",
-			required: true,
-		},
+		color: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Color",
+        required: true
+      }
+    ],
 		description: { type: String, required: true },
+		size: {
+			type: String,
+      required:true
+		},
 		stocks: { type: Number, required: true },
-		material: {
+		materials: [{
 			type: mongoose.Schema.Types.ObjectId,
 			ref: "Materials",
 			required: true,
-		},
+		}],
 		price: { type: Number, required: true },
 	},
 	{ timestamps: true }
