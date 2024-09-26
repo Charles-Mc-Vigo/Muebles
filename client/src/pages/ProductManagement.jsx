@@ -32,7 +32,7 @@ const ProductManagement = () => {
 	const fetchCategories = async () => {
 		try {
 			const response = await axios.get("http://localhost:3000/api/categories");
-			setCategories(response.data); // Assume response data contains array of categories
+			setCategories(response.data);
 		} catch (error) {
 			console.error("Error fetching categories:", error);
 			alert("Failed to fetch categories. Please try again.");
@@ -51,48 +51,48 @@ const ProductManagement = () => {
 		}
 	};
 
-		// Fetch furniture color from the backend
-		const fetchColors = async () => {
-			try {
-				const response = await axios.get("http://localhost:3000/api/colors");
-				console.log("Fetched colors:", response.data);
-				setColors(response.data);
-			} catch (error) {
-				console.error("Error fetching colors:", error);
-				alert("Failed to fetch color. Please try again.");
-			}
-		};
-		//fetch furniturestype
-		const fetchFurnitureTypes = async () => {
-			try {
-				const response = await axios.get("http://localhost:3000/api/furniture-types");
-				console.log("Fetched furnituretypes:", response.data);
-				setFurnitureTypes(response.data);
-			} catch (error) {
-				console.error("Error fetching furnituretypes:", error);
-				alert("Failed to fetch furniture types. Please try again.");
-			}
-		};
-		// fetch materials
-		const fetchMaterials = async () => {
-			try {
-				const response = await axios.get("http://localhost:3000/api/materials");
-				console.log("Fetched Material:", response.data);
-				setMaterials(response.data);
-			} catch (error) {
-				console.error("Error fetching materials:", error);
-				alert("Failed to fetch materials. Please try again.");
-			}
-		};
-	
-	
+	// Fetch furniture colors from the backend
+	const fetchColors = async () => {
+		try {
+			const response = await axios.get("http://localhost:3000/api/colors");
+			console.log("Fetched colors:", response.data);
+			setColors(response.data);
+		} catch (error) {
+			console.error("Error fetching colors:", error);
+			alert("Failed to fetch color. Please try again.");
+		}
+	};
+
+	// Fetch furniture types
+	const fetchFurnitureTypes = async () => {
+		try {
+			const response = await axios.get("http://localhost:3000/api/furniture-types");
+			console.log("Fetched furniture types:", response.data);
+			setFurnitureTypes(response.data);
+		} catch (error) {
+			console.error("Error fetching furniture types:", error);
+			alert("Failed to fetch furniture types. Please try again.");
+		}
+	};
+
+	// Fetch materials
+	const fetchMaterials = async () => {
+		try {
+			const response = await axios.get("http://localhost:3000/api/materials");
+			console.log("Fetched materials:", response.data);
+			setMaterials(response.data);
+		} catch (error) {
+			console.error("Error fetching materials:", error);
+			alert("Failed to fetch materials. Please try again.");
+		}
+	};
 
 	useEffect(() => {
-		fetchCategories(); // Fetch categories when the component loads
-		fetchProducts(); // Fetch products when the component loads
-		fetchColors();// Fetch color  when the component loads
-		fetchFurnitureTypes(); // fetch furnituretypes
-		fetchMaterials(); // fetchmaterials
+		fetchCategories();
+		fetchProducts();
+		fetchColors();
+		fetchFurnitureTypes();
+		fetchMaterials();
 	}, []);
 
 	const handleInputChange = (e) => {
@@ -151,7 +151,6 @@ const ProductManagement = () => {
 				material:"",
 				stocks:""
 			});
-			document.getElementById("image").value = "";
 		} catch (error) {
 			console.error("Error creating furniture!", error.response?.data || error.message);
 			alert(error.response?.data?.message || error.message || "Cannot add furniture!");
@@ -167,16 +166,17 @@ const ProductManagement = () => {
 	});
 
 	// Sorting logic based on the created date
-	const sortedProducts = filteredProducts.sort((a, b) =>
-		sortOrder === "newest"
-			? new Date(b.createdAt) - new Date(a.createdAt)
-			: new Date(a.createdAt) - new Date(b.createdAt)
-	);
+	const sortedProducts = filteredProducts.sort((a, b) => {
+		const dateA = new Date(a.createdAt || 0);
+		const dateB = new Date(b.createdAt || 0);
+		return sortOrder === "newest" ? dateB - dateA : dateA - dateB;
+	});
 
+	// Pagination logic
 	const indexOfLastProduct = currentPage * productsPerPage;
 	const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
 	const currentProducts = sortedProducts.slice(indexOfFirstProduct, indexOfLastProduct);
-	const totalPages = Math.ceil(sortedProducts.length / productsPerPage);
+	const totalPages = Math.max(Math.ceil(sortedProducts.length / productsPerPage), 1);
 
 	return (
 		<div className="container mx-auto p-4">
@@ -205,10 +205,11 @@ const ProductManagement = () => {
 					className="bg-gray-100 p-2 rounded-lg border border-gray-300"
 				>
 					<option value="">All Types</option>
-					<option value="sala-set">Sala Set</option>
-					<option value="dining-set">Dining Set</option>
-					<option value="bedroom-set">Bedroom Set</option>
-					<option value="contemporary">Contemporary</option>
+					{furnitureTypes.map((type) => (
+						<option key={type._id} value={type.name}>
+							{type.name}
+						</option>
+					))}
 				</select>
 
 				{/* Sort by Date Dropdown */}
@@ -227,7 +228,6 @@ const ProductManagement = () => {
 				{/* Product Form Section */}
 				<div className="w-full md:w-1/3 bg-white p-6 rounded-lg shadow-lg flex flex-col h-full">
 					<form onSubmit={handleSubmit} className="space-y-6 flex-grow">
-						{/* Category Dropdown */}
 						<select
 							name="category"
 							onChange={handleInputChange}
@@ -243,7 +243,6 @@ const ProductManagement = () => {
 							))}
 						</select>
 
-						{/* Furniture Type Dropdown */}
 						<select
 							name="furnitureType"
 							onChange={handleInputChange}
@@ -257,150 +256,194 @@ const ProductManagement = () => {
 									{furnitureType.name}
 								</option>
 							))}
-							
 						</select>
 
-						{/* Product Name */}
-						
 						<input
 							type="text"
 							name="name"
 							placeholder="Product Name"
 							value={newProduct.name}
 							onChange={handleInputChange}
-							className="w-full p-3 bg-gray-100 border border-gray-300 rounded-lg"
+							className="w-full p-3 bg-gray-100 rounded-lg border border-gray-300"
 							required
 						/>
 
-						{/* Color */}
-						<select 
-							name="color"
-							onChange={handleInputChange}
-							value={newProduct.color}
-							className="bg-gray-100 p-3 rounded-lg w-full border border-gray-300"
-							required
-						>
-							<option value="">Select Furniture Color</option>
-							{colors.map((colors) => (
-								<option key={colors._id} value={colors.name}>
-									{colors.name}
-								</option>
-							))}
-						</select>
-
-						{/* Materials */}
-						<select 
-							name="material"
-							onChange={handleInputChange}
-							value={newProduct.material}
-							className="bg-gray-100 p-3 rounded-lg w-full border border-gray-300"
-							required
-						>
-							<option value="">Select Materials</option>
-							{materials.map((materials) => (
-								<option key={materials._id} value={materials.name}>
-									{materials.name}
-								</option>
-							))}
-						</select>
-
-						{/* stock */}
-						<input
-							type="number"
-							name="stocks"
-							placeholder="Stock"
-							value={newProduct.stocks}
-							onChange={handleInputChange}
-							className="w-full p-3 bg-gray-100 border border-gray-300 rounded-lg"
-							required
-						/>
-
-						{/* Description */}
 						<textarea
 							name="description"
 							placeholder="Description"
 							value={newProduct.description}
 							onChange={handleInputChange}
-							className="w-full p-3 bg-gray-100 border border-gray-300 rounded-lg"
-							rows="4"
+							className="w-full p-3 bg-gray-100 rounded-lg border border-gray-300"
+							required
 						/>
 
-						{/* Price */}
 						<input
 							type="number"
 							name="price"
 							placeholder="Price"
 							value={newProduct.price}
 							onChange={handleInputChange}
-							className="w-full p-3 bg-gray-100 border border-gray-300 rounded-lg"
+							className="w-full p-3 bg-gray-100 rounded-lg border border-gray-300"
 							required
 						/>
 
-						{/* Image Upload */}
-						<div className="flex items-center space-x-4">
-								<label className=" text-black p-1 text-lg rounded-lg cursor-pointer border-2 hover:bg-O">
-									<input
-										type="file"
-										name="image"
-										id="image"
-										onChange={handleInputChange}
-										className="hidden"
-										required
-									/>
-									Choose Image
-								</label>
-								{/* Display selected file name or a message */}
-								{newProduct.image ? (
-									<div className="flex items-center space-x-2">
-										<span>{newProduct.image.name}</span>
-										<button
-											type="button"
-											className="text-red-500 hover:underline"
-											onClick={() => setNewProduct({ ...newProduct, image: null })} 
-										>
-											Remove
-										</button>
-									</div>
-								) : (
-									<span>No file chosen</span>
-								)}
-						</div>
+						{/* Color, Material, and Stock Dropdowns */}
+						<select
+							name="color"
+							onChange={handleInputChange}
+							value={newProduct.color}
+							className="bg-gray-100 p-3 rounded-lg w-full border border-gray-300"
+							required
+						>
+							<option value="">Select Color</option>
+							{colors.map((color) => (
+								<option key={color._id} value={color.name}>
+									{color.name}
+								</option>
+							))}
+						</select>
 
+						<select
+							name="material"
+							onChange={handleInputChange}
+							value={newProduct.material}
+							className="bg-gray-100 p-3 rounded-lg w-full border border-gray-300"
+							required
+						>
+							<option value="">Select Material</option>
+							{materials.map((material) => (
+								<option key={material._id} value={material.name}>
+									{material.name}
+								</option>
+							))}
+						</select>
 
-						{/* Submit Button */}
+						<input
+							type="number"
+							name="stocks"
+							placeholder="Available Stocks"
+							value={newProduct.stocks}
+							onChange={handleInputChange}
+							className="w-full p-3 bg-gray-100 rounded-lg border border-gray-300"
+							required
+						/>
+
+						<input
+							type="file"
+							name="image"
+							id="image"
+							accept="image/*"
+							onChange={handleInputChange}
+							className="w-full p-3 bg-gray-100 rounded-lg border border-gray-300"
+							required
+						/>
+
 						<button
 							type="submit"
-							className="bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600"
+							className="bg-blue-500 text-white px-6 py-3 rounded-lg w-full"
 						>
 							Add Product
 						</button>
 					</form>
 				</div>
 
-				{/* Product List Section */}
-				<div className="w-full md:w-2/3 bg-white p-6 rounded-lg shadow-lg">
-					
+				{/* Product List and Pagination */}
+										
+					<div className="w-full md:w-2/3">
+						{currentProducts.length > 0 ? (
+							<table className="min-w-full bg-white border border-black">
+								<thead>
+									<tr>
+										<th className="px-2 py-2 border-b border-r border-black ">Image</th>
+										<th className="px-2 py-2 border-b border-r border-black ">Product Name</th>
+										<th className="px-2 py-2 border-b border-r  border-black ">Category</th>
+										<th className="px-2 py-2 border-b border-r  border-black ">Furniture Type</th>
+										<th className="px-2 py-2 border-b border-r  border-black ">Description</th>
+										<th className="px-2 py-2 border-b border-r  border-black ">Price</th>
+										<th className="px-2 py-2 border-b border-r border-black ">Color</th>
+										<th className="px-2 py-2 border-b border-r border-black ">Material</th>
+										<th className="px-2 py-2 border-b border-r border-black ">Stocks</th>
+										<th className="px-2 py-2 border-b border-r border-black">Actions</th>
+									</tr>
+								</thead>
+								<tbody>
+									{currentProducts.map((product) => (
+										<tr key={product._id} className="border-b ">
+											{/* Image */}
+											<td className="px-2 py-2">
+												{product.image ? (
+													<img
+														src={`data:image/png;base64,${product.image}`} // Adjust the MIME type as needed
+														alt={product.name}
+														className="w-16 h-16 object-cover rounded-lg"
+													/>
+												) : (
+													<span>No Image</span>
+												)}
+											</td>
+											
+											{/* Product Name */}
+											<td className="px-2 py-2 text-center">{product.name}</td>
 
-					{/* Pagination */}
-					<div className="mt-4 flex justify-between">
-						<button
-							onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-							disabled={currentPage === 1}
-							className="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg disabled:opacity-50"
-						>
-							Previous
-						</button>
-						<span>
-							Page {currentPage} of {totalPages}
-						</span>
-						<button
-							onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-							disabled={currentPage === totalPages}
-							className="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg disabled:opacity-50"
-						>
-							Next
-						</button>
-					</div>
+											{/* Category */}
+											<td className="px-2 py-2 text-center">{product.category?.name}</td>
+
+											{/* Furniture Type */}
+											<td className="px-2 py-2 text-center">{product.furnitureType?.name}</td>
+
+											{/* Description */}
+											<td className="px-2 py-2 text-center">{product.description}</td>
+
+											{/* Price */}
+											<td className="px-2 py-2 text-center">₱{product.price}</td>
+
+											{/* Color */}
+											<td className="px-2 py-2 text-center">{product.color?.name}</td>
+
+											{/* Material */}
+											<td className="px-2 py-2 text-center">{product.material?.name}</td>
+
+											{/* Stocks */}
+											<td className="px-2 py-2 text-center">{product.stocks}</td>
+
+											{/* Actions (Delete) */}
+											<td className="px-2 py-2 text-center">
+												<button
+													onClick={() => handleDelete(product._id)}
+													className="text-red-500 hover:underline"
+												>
+													Delete
+												</button>
+											</td>
+
+										</tr>
+									))}
+								</tbody>
+							</table>
+						) : (
+							<p className="text-center text-gray-600">No products found.</p>
+						)}
+
+						{/* Pagination Controls */}
+						<div className="flex justify-center mt-4">
+							<button
+								onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+								disabled={currentPage === 1}
+								className="px-4 py-2 bg-gray-200 text-gray-600 rounded-lg mr-2"
+							>
+								Previous
+							</button>
+							<span className="px-4 py-2">{currentPage} of {totalPages}</span>
+							<button
+								onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+								disabled={currentPage === totalPages}
+								className="px-4 py-2 bg-gray-200 text-gray-600 rounded-lg ml-2"
+							>
+								Next
+							</button>
+						</div>
+
+
 				</div>
 			</div>
 		</div>
