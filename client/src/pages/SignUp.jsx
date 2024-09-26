@@ -179,12 +179,12 @@ export default function SignUp() {
                   className="bg-slate-100 p-3 rounded-lg"
                   placeholder="Zip Code"
                 />
-                <select
+                <select 
                   id="barangay"
                   required
                   onChange={handleChange}
                   value={formData.barangay}
-                  className="bg-slate-100 p-3 rounded-lg"
+                  className="bg-slate-100 p-3 rounded-lg "
                 >
                   <option value="" disabled hidden>
                     Select Barangay

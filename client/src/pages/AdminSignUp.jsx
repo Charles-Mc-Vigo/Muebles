@@ -27,7 +27,7 @@ export default function AdminSignUp() {
 
 		try {
 			const response = await axios.post(
-				"http://localhost:3000/api/admins/signup",
+				"http://localhost:3000/api/admin/signup",
 				{
 					...admin,
 					headers: {

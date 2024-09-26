@@ -3,20 +3,36 @@ import axios from "axios";
 
 const ProductManagement = () => {
 	const [products, setProducts] = useState([]);
-	const [categories, setCategories] = useState([]); // State to hold fetched categories
+	const [categories, setCategories] = useState([]); 
+	const [colors,setColors] = useState([]);
+	const [furnitureTypes,setFurnitureTypes] = useState([]);
+	const [materials,setMaterials] = useState([]);
 	const [newProduct, setNewProduct] = useState({
 		image: null,
 		category: "",
 		furnitureType: "",
+		name: "",
 		description: "",
 		price: "",
+		color:"",
+		material:"",
+		stocks:""
 	});
+	const [currentPage, setCurrentPage] = useState(1);
+	const [productsPerPage] = useState(5);
+
+	// State for filtering
+	const [filterCategory, setFilterCategory] = useState("");
+	const [filterType, setFilterType] = useState("");
+
+	// State for sorting by date
+	const [sortOrder, setSortOrder] = useState("newest");
 
 	// Fetch categories from the backend
 	const fetchCategories = async () => {
 		try {
-			const response = await axios.get("http://localhost:3000/api/category");
-			setCategories(response.data); // Assume response data contains array of categories
+			const response = await axios.get("http://localhost:3000/api/categories");
+			setCategories(response.data);
 		} catch (error) {
 			console.error("Error fetching categories:", error);
 			alert("Failed to fetch categories. Please try again.");
@@ -27,6 +43,7 @@ const ProductManagement = () => {
 	const fetchProducts = async () => {
 		try {
 			const response = await axios.get("http://localhost:3000/api/furnitures");
+			console.log("Fetched products:", response.data);
 			setProducts(response.data);
 		} catch (error) {
 			console.error("Error fetching products:", error);
@@ -34,9 +51,48 @@ const ProductManagement = () => {
 		}
 	};
 
+	// Fetch furniture colors from the backend
+	const fetchColors = async () => {
+		try {
+			const response = await axios.get("http://localhost:3000/api/colors");
+			console.log("Fetched colors:", response.data);
+			setColors(response.data);
+		} catch (error) {
+			console.error("Error fetching colors:", error);
+			alert("Failed to fetch color. Please try again.");
+		}
+	};
+
+	// Fetch furniture types
+	const fetchFurnitureTypes = async () => {
+		try {
+			const response = await axios.get("http://localhost:3000/api/furniture-types");
+			console.log("Fetched furniture types:", response.data);
+			setFurnitureTypes(response.data);
+		} catch (error) {
+			console.error("Error fetching furniture types:", error);
+			alert("Failed to fetch furniture types. Please try again.");
+		}
+	};
+
+	// Fetch materials
+	const fetchMaterials = async () => {
+		try {
+			const response = await axios.get("http://localhost:3000/api/materials");
+			console.log("Fetched materials:", response.data);
+			setMaterials(response.data);
+		} catch (error) {
+			console.error("Error fetching materials:", error);
+			alert("Failed to fetch materials. Please try again.");
+		}
+	};
+
 	useEffect(() => {
-		fetchCategories(); // Fetch categories when the component loads
-		fetchProducts(); // Fetch products when the component loads
+		fetchCategories();
+		fetchProducts();
+		fetchColors();
+		fetchFurnitureTypes();
+		fetchMaterials();
 	}, []);
 
 	const handleInputChange = (e) => {
@@ -64,12 +120,16 @@ const ProductManagement = () => {
 		form.append("image", newProduct.image);
 		form.append("category", newProduct.category);
 		form.append("furnitureType", newProduct.furnitureType);
+		form.append("name", newProduct.name);
 		form.append("description", newProduct.description);
 		form.append("price", newProduct.price);
+		form.append("color", newProduct.color);
+		form.append("material", newProduct.material);
+		form.append("stocks", newProduct.stocks);
 
 		try {
 			const response = await axios.post(
-				"http://localhost:3000/api/furnitures/add-furniture",
+				"http://localhost:3000/api/furnitures/add",
 				form,
 				{
 					headers: {
@@ -77,145 +137,313 @@ const ProductManagement = () => {
 					},
 				}
 			);
-			alert(`${response.data.furniture.furnitureType} has been added successfully!`);
-			fetchProducts(); // Refetch products after adding a new one
+
+			alert(`${response.data.furniture.name} has been added successfully!`);
+			fetchProducts();
 			setNewProduct({
 				image: null,
 				category: "",
 				furnitureType: "",
+				name: "",
 				description: "",
 				price: "",
+				color:"",
+				material:"",
+				stocks:""
 			});
-			document.getElementById("image").value = "";
 		} catch (error) {
-			console.error(
-				"Error creating furniture!",
-				error.response?.data || error.message
-			);
-			alert(
-				error.response?.data?.message || error.message || "Cannot add furniture!"
-			);
+			console.error("Error creating furniture!", error.response?.data || error.message);
+			alert(error.response?.data?.message || error.message || "Cannot add furniture!");
 		}
 	};
 
+	// Filtering logic based on category and type
+	const filteredProducts = products.filter((product) => {
+		return (
+			(!filterCategory || product.category === filterCategory) &&
+			(!filterType || product.furnitureType === filterType)
+		);
+	});
+
+	// Sorting logic based on the created date
+	const sortedProducts = filteredProducts.sort((a, b) => {
+		const dateA = new Date(a.createdAt || 0);
+		const dateB = new Date(b.createdAt || 0);
+		return sortOrder === "newest" ? dateB - dateA : dateA - dateB;
+	});
+
+	// Pagination logic
+	const indexOfLastProduct = currentPage * productsPerPage;
+	const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+	const currentProducts = sortedProducts.slice(indexOfFirstProduct, indexOfLastProduct);
+	const totalPages = Math.max(Math.ceil(sortedProducts.length / productsPerPage), 1);
+
 	return (
 		<div className="container mx-auto p-4">
-			<h1 className="text-2xl font-bold mb-4">Product Management</h1>
-			<div className="flex flex-col md:flex-row gap-4">
-				{/* Product Form */}
-				<div className="w-full md:w-1/3 bg-white p-4 rounded shadow">
-					<form onSubmit={handleSubmit} className="space-y-4">
-						<input
-							type="file"
-							name="image"
-							id="image"
-							onChange={handleInputChange}
-						/>
+			<h1 className="text-3xl font-bold mb-2 text-center">Product Management</h1>
+
+			{/* Filter and Sort Section */}
+			<div className="mb-2 flex gap-4 justify-end">
+				<select
+					name="filterCategory"
+					onChange={(e) => setFilterCategory(e.target.value)}
+					value={filterCategory}
+					className="bg-gray-100 p-2 rounded-lg border border-gray-300"
+				>
+					<option value="">All Categories</option>
+					{categories.map((category) => (
+						<option key={category._id} value={category.name}>
+							{category.name}
+						</option>
+					))}
+				</select>
+
+				<select
+					name="filterType"
+					onChange={(e) => setFilterType(e.target.value)}
+					value={filterType}
+					className="bg-gray-100 p-2 rounded-lg border border-gray-300"
+				>
+					<option value="">All Types</option>
+					{furnitureTypes.map((type) => (
+						<option key={type._id} value={type.name}>
+							{type.name}
+						</option>
+					))}
+				</select>
+
+				{/* Sort by Date Dropdown */}
+				<select
+					name="sortOrder"
+					onChange={(e) => setSortOrder(e.target.value)}
+					value={sortOrder}
+					className="bg-gray-100 p-3 rounded-lg border border-gray-300"
+				>
+					<option value="newest">Newest</option>
+					<option value="oldest">Oldest</option>
+				</select>
+			</div>
+
+			<div className="flex gap-6">
+				{/* Product Form Section */}
+				<div className="w-full md:w-1/3 bg-white p-6 rounded-lg shadow-lg flex flex-col h-full">
+					<form onSubmit={handleSubmit} className="space-y-6 flex-grow">
 						<select
-							id="category"
 							name="category"
-							required
 							onChange={handleInputChange}
 							value={newProduct.category}
-							className="bg-slate-100 p-3 rounded-lg w-full"
+							className="bg-gray-100 p-3 rounded-lg w-full border border-gray-300"
+							required
 						>
-							<option value="">Select a category</option>
+							<option value="">Select Category</option>
 							{categories.map((category) => (
 								<option key={category._id} value={category.name}>
 									{category.name}
 								</option>
 							))}
 						</select>
+
+						<select
+							name="furnitureType"
+							onChange={handleInputChange}
+							value={newProduct.furnitureType}
+							className="bg-gray-100 p-3 rounded-lg w-full border border-gray-300"
+							required
+						>
+							<option value="">Select Furniture Type</option>
+							{furnitureTypes.map((furnitureType) => (
+								<option key={furnitureType._id} value={furnitureType.name}>
+									{furnitureType.name}
+								</option>
+							))}
+						</select>
+
 						<input
 							type="text"
-							name="furnitureType"
-							placeholder="Type"
-							value={newProduct.furnitureType}
+							name="name"
+							placeholder="Product Name"
+							value={newProduct.name}
 							onChange={handleInputChange}
-							className="w-full p-2 border rounded"
+							className="w-full p-3 bg-gray-100 rounded-lg border border-gray-300"
+							required
 						/>
+
 						<textarea
 							name="description"
 							placeholder="Description"
 							value={newProduct.description}
 							onChange={handleInputChange}
-							className="w-full p-2 border rounded"
-							rows="3"
+							className="w-full p-3 bg-gray-100 rounded-lg border border-gray-300"
+							required
 						/>
+
 						<input
 							type="number"
 							name="price"
 							placeholder="Price"
 							value={newProduct.price}
 							onChange={handleInputChange}
-							className="w-full p-2 border rounded"
+							className="w-full p-3 bg-gray-100 rounded-lg border border-gray-300"
+							required
 						/>
+
+						{/* Color, Material, and Stock Dropdowns */}
+						<select
+							name="color"
+							onChange={handleInputChange}
+							value={newProduct.color}
+							className="bg-gray-100 p-3 rounded-lg w-full border border-gray-300"
+							required
+						>
+							<option value="">Select Color</option>
+							{colors.map((color) => (
+								<option key={color._id} value={color.name}>
+									{color.name}
+								</option>
+							))}
+						</select>
+
+						<select
+							name="material"
+							onChange={handleInputChange}
+							value={newProduct.material}
+							className="bg-gray-100 p-3 rounded-lg w-full border border-gray-300"
+							required
+						>
+							<option value="">Select Material</option>
+							{materials.map((material) => (
+								<option key={material._id} value={material.name}>
+									{material.name}
+								</option>
+							))}
+						</select>
+
+						<input
+							type="number"
+							name="stocks"
+							placeholder="Available Stocks"
+							value={newProduct.stocks}
+							onChange={handleInputChange}
+							className="w-full p-3 bg-gray-100 rounded-lg border border-gray-300"
+							required
+						/>
+
+						<input
+							type="file"
+							name="image"
+							id="image"
+							accept="image/*"
+							onChange={handleInputChange}
+							className="w-full p-3 bg-gray-100 rounded-lg border border-gray-300"
+							required
+						/>
+
 						<button
 							type="submit"
-							className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
+							className="bg-blue-500 text-white px-6 py-3 rounded-lg w-full"
 						>
-							Submit
+							Add Product
 						</button>
 					</form>
 				</div>
 
-				{/* Product Table */}
-				<div className="w-full md:w-2/3">
-					<div className="overflow-x-auto">
-						<table className="w-full bg-white shadow rounded">
-							<thead className="bg-gray-50">
-								<tr>
-									<th className="p-2 text-left">Image</th>
-									<th className="p-2 text-left">Category</th>
-									<th className="p-2 text-left">Type</th>
-									<th className="p-2 text-left">Description</th>
-									<th className="p-2 text-left">Price</th>
-									<th className="p-2 text-left">Action</th>
-								</tr>
-							</thead>
-							<tbody>
-								{products.length === 0 ? (
+				{/* Product List and Pagination */}
+										
+					<div className="w-full md:w-2/3">
+						{currentProducts.length > 0 ? (
+							<table className="min-w-full bg-white border border-black">
+								<thead>
 									<tr>
-										<td colSpan="6" className="text-center">
-											No furnitures found. Create one.
-										</td>
+										<th className="px-2 py-2 border-b border-r border-black ">Image</th>
+										<th className="px-2 py-2 border-b border-r border-black ">Product Name</th>
+										<th className="px-2 py-2 border-b border-r  border-black ">Category</th>
+										<th className="px-2 py-2 border-b border-r  border-black ">Furniture Type</th>
+										<th className="px-2 py-2 border-b border-r  border-black ">Description</th>
+										<th className="px-2 py-2 border-b border-r  border-black ">Price</th>
+										<th className="px-2 py-2 border-b border-r border-black ">Color</th>
+										<th className="px-2 py-2 border-b border-r border-black ">Material</th>
+										<th className="px-2 py-2 border-b border-r border-black ">Stocks</th>
+										<th className="px-2 py-2 border-b border-r border-black">Actions</th>
 									</tr>
-								) : (
-									products.map((product) => (
-										<tr key={product._id} className="border-t">
-											<td className="p-2">
-												{product.image && (
+								</thead>
+								<tbody>
+									{currentProducts.map((product) => (
+										<tr key={product._id} className="border-b ">
+											{/* Image */}
+											<td className="px-2 py-2">
+												{product.image ? (
 													<img
-														src={`data:image/jpeg;base64,${product.image}`}
-														alt={product.furnitureType}
-														className="w-20 h-20 object-cover"
+														src={`data:image/png;base64,${product.image}`} // Adjust the MIME type as needed
+														alt={product.name}
+														className="w-16 h-16 object-cover rounded-lg"
 													/>
+												) : (
+													<span>No Image</span>
 												)}
 											</td>
-											<td className="p-2">{product.category}</td>
-											<td className="p-2">{product.furnitureType}</td>
-											<td className="p-2">{product.description}</td>
-											<td className="p-2">
-												<strong>PHP</strong>
-												<span className="px-2"></span> {product.price}
-											</td>
-											<td className="p-2">
-												<button className="bg-yellow-500 text-white px-2 py-1 rounded mr-2 hover:bg-yellow-600">
-													Edit
-												</button>
+											
+											{/* Product Name */}
+											<td className="px-2 py-2 text-center">{product.name}</td>
+
+											{/* Category */}
+											<td className="px-2 py-2 text-center">{product.category?.name}</td>
+
+											{/* Furniture Type */}
+											<td className="px-2 py-2 text-center">{product.furnitureType?.name}</td>
+
+											{/* Description */}
+											<td className="px-2 py-2 text-center">{product.description}</td>
+
+											{/* Price */}
+											<td className="px-2 py-2 text-center">₱{product.price}</td>
+
+											{/* Color */}
+											<td className="px-2 py-2 text-center">{product.color?.name}</td>
+
+											{/* Material */}
+											<td className="px-2 py-2 text-center">{product.material?.name}</td>
+
+											{/* Stocks */}
+											<td className="px-2 py-2 text-center">{product.stocks}</td>
+
+											{/* Actions (Delete) */}
+											<td className="px-2 py-2 text-center">
 												<button
 													onClick={() => handleDelete(product._id)}
-													className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
+													className="text-red-500 hover:underline"
 												>
 													Delete
 												</button>
 											</td>
+
 										</tr>
-									))
-								)}
-							</tbody>
-						</table>
-					</div>
+									))}
+								</tbody>
+							</table>
+						) : (
+							<p className="text-center text-gray-600">No products found.</p>
+						)}
+
+						{/* Pagination Controls */}
+						<div className="flex justify-center mt-4">
+							<button
+								onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+								disabled={currentPage === 1}
+								className="px-4 py-2 bg-gray-200 text-gray-600 rounded-lg mr-2"
+							>
+								Previous
+							</button>
+							<span className="px-4 py-2">{currentPage} of {totalPages}</span>
+							<button
+								onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+								disabled={currentPage === totalPages}
+								className="px-4 py-2 bg-gray-200 text-gray-600 rounded-lg ml-2"
+							>
+								Next
+							</button>
+						</div>
+
+
 				</div>
 			</div>
 		</div>

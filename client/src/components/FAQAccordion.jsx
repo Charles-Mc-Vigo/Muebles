@@ -9,7 +9,7 @@ const AccordionItem = ({ question, answer }) => {
   };
 
   return (
-    <div className="border-b border-green-300  ">
+    <div className="border-b border-green-700  ">
       <button
         onClick={toggleAccordion}
         className="flex justify-between items-center w-full py-4 text-left focus:outline-none overflow-hidden "

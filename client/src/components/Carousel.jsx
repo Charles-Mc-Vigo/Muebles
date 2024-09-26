@@ -66,7 +66,7 @@ const Carousel = ({ images, interval = 3000 }) => {
               index === currentIndex ? 'opacity-100' : 'opacity-0'
             }`}
           >
-            <img src={image} alt={`Slide ${index}`} className="w-full h-64 md:h-96 object-cover" />
+            <img src={image} alt={`Slide ${index}`} className="w-full h-64 md:h-96 object-fit" />
           </div>
         ))}
       </div>
