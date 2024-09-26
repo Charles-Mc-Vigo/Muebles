@@ -174,7 +174,7 @@ const ItemList = () => {
         </div>
 
         {/* Right Section - Main Content */}
-        <div className="flex-1 w-full md:w-3/4 p-4 border-2 border-oliveGreen overflow-y-auto rounded-lg mb-5" style={{ maxHeight: 'calc(100vh - 4rem)' }}>
+        <div className="flex-1 w-full md:w-3/4 p-4 border-2 border-oliveGreen overflow-y-auto rounded-lg mb-5 object-fit" style={{ maxHeight: 'calc(100vh - 4rem)' }}>
           <h2 className="text-2xl font-semibold mb-6 text-center text-gray-800">Browse Items</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {furnitureList.length > 0 ? (
