@@ -1,3 +1,4 @@
+const { string } = require("joi");
 const mongoose = require("mongoose");
 
 const furnitureSchema = new mongoose.Schema({
@@ -43,6 +44,9 @@ const furnitureSchema = new mongoose.Schema({
     required:true,
     default:0
   }
+  
+
+
 },{
   timestamps:true
 })

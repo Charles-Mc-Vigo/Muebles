@@ -3,9 +3,11 @@ import Cookies from 'js-cookie';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBox, faListUl,  faTruck, faChevronDown, faChevronUp, faHandshake, faWrench } from '@fortawesome/free-solid-svg-icons'; 
 import ProductManagement from './ProductManagement'; 
-import ItemList from '../components/ItemList';
 import Inventory from '../components/Inventory';
 import ServiceSection from '../components/Services';
+import ItemList from '../components/ItemList';
+import DashboardContent from '../components/DashboardContent';
+import Maintenance from '../components/Maintenance';
 
 const DashBoard = () => {
   const [productDropdownOpen, setProductDropdownOpen] = useState(false);
@@ -14,10 +16,10 @@ const DashBoard = () => {
   const [maintenanceDropdownOpen, setMaintenanceDropdownOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('dashboard'); 
 
-  const handleLogout = () => {
-    Cookies.remove('adminToken');
-    console.log('Logging out...');
-  };
+  // const handleLogout = () => {
+  //   Cookies.remove('adminToken');
+  //   console.log('Logging out...');
+  // };
 
   const toggleProductDropdown = () => {
     setProductDropdownOpen(!productDropdownOpen);
@@ -111,12 +113,6 @@ const DashBoard = () => {
                 >
                   View Transactions
                 </li>
-                <li 
-                  className={`px-4 py-2 text-black cursor-pointer ${activeSection === 'refund-transactions' ? 'bg-white rounded-l-3xl' : 'hover:bg-white rounded-l-3xl'}`}
-                  onClick={() => setActiveSection('refund-transactions')}
-                >
-                  Refund Transactions
-                </li>
               </ul>
             )}
             
@@ -187,11 +183,14 @@ const DashBoard = () => {
       {/* Main Content */}
       <main className="flex-1 p-6 overflow-y-auto">
         <div className="h-100 max-h-[calc(50vh-50px)]"> 
-          {activeSection === 'dashboard' && <h2 className="text-2xl font-semibold">Dashboard Content</h2>}
-
+          {activeSection === 'dashboard' &&(
+            <div className='h-full overflow-y-auto'>
+            <DashboardContent />
+          </div>
+          )}
           {activeSection === 'view-products' && (
             <div className='h-full overflow-y-auto'>
-              
+              <ItemList />
             </div>
           )}
 
@@ -213,6 +212,7 @@ const DashBoard = () => {
 
           {activeSection === 'Category' && (
             <div className="h-full overflow-y-auto">
+              <Maintenance />
             </div>
           )}
 
