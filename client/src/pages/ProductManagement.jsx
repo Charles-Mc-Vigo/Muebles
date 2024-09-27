@@ -20,7 +20,7 @@ const ProductManagement = () => {
 	});
 	// Page navigation
 	const [currentPage, setCurrentPage] = useState(1);
-	const [productsPerPage] = useState(5);
+	const [productsPerPage] = useState(4);
 	
 
 
@@ -89,7 +89,6 @@ const ProductManagement = () => {
 			alert("Failed to fetch materials. Please try again.");
 		}
 	};
-
 
 	useEffect(() => {
 		fetchCategories();
