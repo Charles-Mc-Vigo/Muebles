@@ -2,9 +2,17 @@ const FurnitureType = require("../../models/Furniture/furnitureTypeModel");
 
 exports.AddFurnitureType = async(req,res)=>{
   try {
-    const {name} = req.body;
+    const {name, category} = req.body;
 
-    const newFurnitureType = new FurnitureType({name});
+    if(!name || !category){
+      return res.status(400).json({message:"All fields are required:  name, category!"})
+    }
+    const existingName = await FurnitureType.findOne({name, category})
+
+    if(existingName){
+      return res.status(400).json({message:"Furniture type is already existing!"})
+    }
+    const newFurnitureType = new FurnitureType({name, category});
     await newFurnitureType.save();
 
     res.status(201).json({message:`${newFurnitureType.name} is added successfully!`})
@@ -27,3 +35,5 @@ exports.GetFurnitureType = async(req,res)=>{
     res.status(500).json({message:"Server error!"})
   }
 }
+
+//to be continue
