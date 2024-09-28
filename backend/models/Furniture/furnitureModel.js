@@ -1,51 +1,17 @@
 const mongoose = require("mongoose");
 
 const furnitureSchema = new mongoose.Schema({
-  image: {
-    type: String,
-    required:true
-  },
-  category: {
-    type:mongoose.Schema.ObjectId,
-    ref:"Category",
-    require:true
-  },
-  furnitureType:{
-    type:mongoose.Schema.ObjectId,
-    ref:"FurnitureType",
-    required:true
-  },
-  name:{
-    type:String,
-    required:true
-  },
-  description:{
-    type:String,
-    required:true
-  },
-  material:{
-    type:mongoose.Schema.ObjectId,
-    ref:"Materials",
-    required:true
-  },
-  color:{
-    type:mongoose.Schema.ObjectId,
-    ref:"Colors",
-    required:true
-  },
-  stocks:{
-    type:Number,
-    require:true,
-    default:0
-  },
-  price:{
-    type:Number,
-    required:true,
-    default:0
-  }
-},{
-  timestamps:true
-})
+  images: [{ type: String }], // Array of image filenames or URLs
+  category: { type: mongoose.Schema.Types.ObjectId, ref: 'Category', required: true },
+  furnitureType: { type: mongoose.Schema.Types.ObjectId, ref: 'FurnitureType', required: true },
+  name: { type: String, required: true },
+  description: { type: String, required: true },
+  materials: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Materials' }],
+  colors: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Colors' }],
+  sizes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Size' }], // Reference to Size model
+  stocks: { type: Number, required: true },
+  price: { type: Number, required: true },
+});
 
-const Furniture = mongoose.model("Furniture",furnitureSchema);
+const Furniture = mongoose.model("Furniture", furnitureSchema);
 module.exports = Furniture;
