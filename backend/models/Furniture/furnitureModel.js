@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const furnitureSchema = new mongoose.Schema({
-  images: [{ type: String }], // Array of image filenames or URLs
+  images: [{type:String, required:true}],
   category: { type: mongoose.Schema.Types.ObjectId, ref: 'Category', required: true },
   furnitureType: { type: mongoose.Schema.Types.ObjectId, ref: 'FurnitureType', required: true },
   name: { type: String, required: true },
@@ -9,7 +9,7 @@ const furnitureSchema = new mongoose.Schema({
   materials: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Materials' }],
   colors: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Colors' }],
   sizes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Size' }], // Reference to Size model
-  stocks: { type: Number, required: true },
+  stocks: {type:mongoose.Schema.ObjectId, ref:"Stocks"},
   price: { type: Number, required: true },
 });
 
