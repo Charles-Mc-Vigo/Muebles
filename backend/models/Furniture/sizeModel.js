@@ -3,24 +3,24 @@ const mongoose = require("mongoose");
 const sizeSchema = new mongoose.Schema({
   label: { 
     type: String, 
-    required: true // e.g., "twinsize"
+    required: true
   },
   width: {
     type: Number,
-    required: true // Width in cm, mm, or your preferred unit
+    required: true
   },
   height: {
     type: Number,
-    required: true // Height in cm, mm, or your preferred unit
+    required: true 
   },
   depth: {
     type: Number,
-    required: true // Depth in cm, mm, or your preferred unit
+    required: true
   },
   furnitureType: { 
     type: mongoose.Schema.ObjectId, 
     ref: "FurnitureType", 
-    required: true // Link the size to a category
+    required: true
   }
 });
 
