@@ -17,7 +17,7 @@ const sizeSchema = new mongoose.Schema({
     type: Number,
     required: true
   },
-  furnitureType: { 
+  furnitureTypeId: { 
     type: mongoose.Schema.ObjectId, 
     ref: "FurnitureType", 
     required: true
