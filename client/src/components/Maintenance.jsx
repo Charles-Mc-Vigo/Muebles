@@ -6,6 +6,7 @@ const Maintenance = () => {
   const [categories, setCategories] = useState([]);
   const [furnitureTypes, setFurnitureTypes] = useState([]);
   const [colors, setColors] = useState([]);
+  const [sizes, setSizes] = useState([]);
   const [selectedFilter, setSelectedFilter] = useState("");
   const [newItemName, setNewItemName] = useState("");
 
@@ -42,10 +43,22 @@ const Maintenance = () => {
     }
   };
 
+  // Fetch furniture size from the backend
+  const fetchSizes = async () => {
+    try {
+      const response = await axios.get("http://localhost:3000/api/sizes");
+      setSizes(response.data);
+    } catch (error) {
+      console.error("Error fetching Furniture Size:", error);
+      alert("Failed to fetch Size. Please try again.");
+    }
+  };
+
   useEffect(() => {
     fetchCategories();
     fetchColors();
     fetchFurnitureTypes();
+    fetchSizes();
   }, []);
 
   // Handle delete
@@ -80,7 +93,10 @@ const Maintenance = () => {
       } else if (selectedFilter === "Colors") {
         response = await axios.post("http://localhost:3000/api/colors/add", newItem);
         setColors((prevColors) => [response.data, ...prevColors]);
-      }
+      } else if (selectedFilter === "Furniture Size") {
+        response = await axios.post("http://localhost:3000/api/sizes/add", newItem);
+        setSizes((prevSize) => [response.data, ...prevSize]);
+      } 
 
       setNewItemName("");
       alert(`${selectedFilter} added successfully.`);
@@ -108,8 +124,8 @@ const Maintenance = () => {
             <option value="" disabled>Select Type</option>
             <option value="Categories">Categories</option>
             <option value="Furniture Types">Furniture Types</option>
-            <option value="Colors">Colors</option>
-            <option value="Furniture Size"> Furniture Size</option>
+            <option value="Colors">Furniture Colors</option>
+            <option value="Furniture Size">Furniture Size</option>
           </select>
         </div>
 
@@ -145,7 +161,13 @@ const Maintenance = () => {
                 </tr>
               </thead>
               <tbody>
-                {(selectedFilter === "Categories" ? categories : selectedFilter === "Furniture Types" ? furnitureTypes : colors).map((item) => (
+                {(selectedFilter === "Categories" 
+                  ? categories 
+                  : selectedFilter === "Furniture Types" 
+                  ? furnitureTypes 
+                  : selectedFilter === "Furniture Size" 
+                  ? sizes 
+                  : colors).map((item) => (
                   <tr key={item._id} className="border-t">
                     <td className="px-4 py-2 border">{item.name}</td>
                     <td className="px-4 py-2 border">
@@ -158,7 +180,13 @@ const Maintenance = () => {
                     </td>
                   </tr>
                 ))}
-                {!(selectedFilter === "Categories" ? categories : selectedFilter === "Furniture Types" ? furnitureTypes : colors).length && (
+                {!(selectedFilter === "Categories" 
+                  ? categories 
+                  : selectedFilter === "Furniture Types" 
+                  ? furnitureTypes 
+                  : selectedFilter === "Furniture Size" 
+                  ? sizes 
+                  : colors).length && (
                   <tr>
                     <td className="px-4 py-2 text-center border" colSpan="2">
                       No data available.
