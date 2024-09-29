@@ -19,7 +19,7 @@ import EmailVerification from "./pages/EmailVerification";
 import AdminSignUp from "./pages/AdminSignUp";
 import AdminVerify from "./pages/AdminVerify"
 import About from './pages/About'
-import ServicePage from "./pages/ServicePage";
+import ServicePage from "./components/Services";
 
 export default function App() {
 	return (
