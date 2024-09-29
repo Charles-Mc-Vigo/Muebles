@@ -11,6 +11,11 @@ const furnitureSchema = new mongoose.Schema({
   sizes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Size' }], // Reference to Size model
   stocks: {type:mongoose.Schema.ObjectId, ref:"Stocks"},
   price: { type: Number, required: true },
+
+  isArchived:{
+    type:Boolean,
+    default:false
+  }
 });
 
 const Furniture = mongoose.model("Furniture", furnitureSchema);
