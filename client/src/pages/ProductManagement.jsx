@@ -7,6 +7,7 @@ const ProductManagement = () => {
 	const [colors, setColors] = useState([]);
 	const [furnitureTypes, setFurnitureTypes] = useState([]);
 	const [materials, setMaterials] = useState([]);
+	const [sizes, setSizes] = useState([]);
 	const [newProduct, setNewProduct] = useState({
 		image: null,
 		category: "",
@@ -17,20 +18,19 @@ const ProductManagement = () => {
 		color: "",
 		material: "",
 		stocks: "",
-		sizes: ""
+		selectedSize: "", // Updated to hold selected size
 	});
+
 	// Page navigation
 	const [currentPage, setCurrentPage] = useState(1);
 	const [productsPerPage] = useState(5);
-
 	// State for filtering
 	const [filterCategory, setFilterCategory] = useState("");
 	const [filterType, setFilterType] = useState("");
-
 	// State for sorting by date
 	const [sortOrder, setSortOrder] = useState("newest");
 
-	// Fetch categories from the backend
+	// Fetch functions
 	const fetchCategories = async () => {
 		try {
 			const response = await axios.get("http://localhost:3000/api/categories");
@@ -41,7 +41,6 @@ const ProductManagement = () => {
 		}
 	};
 
-	// Fetch furniture products from the backend
 	const fetchProducts = async () => {
 		try {
 			const response = await axios.get("http://localhost:3000/api/furnitures");
@@ -53,7 +52,6 @@ const ProductManagement = () => {
 		}
 	};
 
-	// Fetch furniture colors from the backend
 	const fetchColors = async () => {
 		try {
 			const response = await axios.get("http://localhost:3000/api/colors");
@@ -65,12 +63,9 @@ const ProductManagement = () => {
 		}
 	};
 
-	// Fetch furniture types
 	const fetchFurnitureTypes = async () => {
 		try {
-			const response = await axios.get(
-				"http://localhost:3000/api/furniture-types"
-			);
+			const response = await axios.get("http://localhost:3000/api/furniture-types");
 			console.log("Fetched furniture types:", response.data);
 			setFurnitureTypes(response.data);
 		} catch (error) {
@@ -79,7 +74,6 @@ const ProductManagement = () => {
 		}
 	};
 
-	// Fetch materials
 	const fetchMaterials = async () => {
 		try {
 			const response = await axios.get("http://localhost:3000/api/materials");
@@ -88,6 +82,17 @@ const ProductManagement = () => {
 		} catch (error) {
 			console.error("Error fetching materials:", error);
 			alert("Failed to fetch materials. Please try again.");
+		}
+	};
+
+	const fetchSizes = async () => {
+		try {
+			const response = await axios.get("http://localhost:3000/api/sizes");
+			console.log("Fetched sizes:", response.data);
+			setSizes(response.data);
+		} catch (error) {
+			console.error("Error fetching sizes:", error);
+			alert("Failed to fetch sizes. Please try again.");
 		}
 	};
 
@@ -100,6 +105,7 @@ const ProductManagement = () => {
 					fetchColors(),
 					fetchFurnitureTypes(),
 					fetchMaterials(),
+					fetchSizes(),
 				]);
 			} catch (error) {
 				console.error("Error fetching data:", error);
@@ -108,27 +114,17 @@ const ProductManagement = () => {
 		fetchData();
 	}, []);
 
-  const handleInputChange = (e) => {
-    const { name, value, files } = e.target;
-    if (name.startsWith("sizes.")) {
-      const [, dimension] = name.split(".");
-      setNewProduct((prevData) => ({
-        ...prevData,
-        sizes: [{ ...prevData.sizes[0], [dimension]: value }]
-      }));
-    } else {
-      setNewProduct((prevData) => ({
-        ...prevData,
-        [name]: files ? files[0] : value,
-      }));
-    }
-  };
+	const handleInputChange = (e) => {
+		const { name, value, files } = e.target;
+		setNewProduct((prevData) => ({
+			...prevData,
+			[name]: files ? files[0] : value,
+		}));
+	};
 
 	const handleDelete = async (id) => {
 		try {
-			await axios.delete(
-				`http://localhost:3000/api/furnitures/furniture/${id}`
-			);
+			await axios.delete(`http://localhost:3000/api/furnitures/furniture/${id}`);
 			setProducts(products.filter((product) => product._id !== id));
 			alert("Product deleted successfully.");
 		} catch (error) {
@@ -137,57 +133,45 @@ const ProductManagement = () => {
 		}
 	};
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const form = new FormData();
-    form.append("image", newProduct.image);
-    form.append("category", newProduct.category);
-    form.append("furnitureType", newProduct.furnitureType);
-    form.append("name", newProduct.name);
-    form.append("description", newProduct.description);
-    form.append("price", newProduct.price);
-    form.append("color", newProduct.color);
-    form.append("material", newProduct.material);
-    form.append("stocks", newProduct.stocks);
-    form.append("sizes", JSON.stringify(newProduct.sizes));
+	const handleSubmit = async (e) => {
+		e.preventDefault();
+		const form = new FormData();
+		form.append("image", newProduct.image);
+		form.append("category", newProduct.category);
+		form.append("furnitureType", newProduct.furnitureType);
+		form.append("name", newProduct.name);
+		form.append("description", newProduct.description);
+		form.append("price", newProduct.price);
+		form.append("color", newProduct.color);
+		form.append("material", newProduct.material);
+		form.append("stocks", newProduct.stocks);
+		form.append("selectedSize", newProduct.selectedSize); // Include selected size in the form data
 
-    try {
-      const response = await axios.post(
-        "http://localhost:3000/api/furnitures/add",
-        form,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-
-      alert(`${response.data.furniture.name} has been added successfully!`);
-      fetchProducts();
-      setNewProduct({
-        image: null,
-        category: "",
-        furnitureType: "",
-        name: "",
-        description: "",
-        price: "",
-        color: "",
-        material: "",
-        stocks: "",
-        sizes: ""
-      });
-    } catch (error) {
-      console.error(
-        "Error creating furniture!",
-        error.response?.data || error.message
-      );
-      alert(
-        error.response?.data?.message ||
-          error.message ||
-          "Cannot add furniture!"
-      );
-    }
-  };
+		try {
+			const response = await axios.post("http://localhost:3000/api/furnitures/add", form, {
+				headers: {
+					"Content-Type": "multipart/form-data",
+				},
+			});
+			alert(`${response.data.furniture.name} has been added successfully!`);
+			fetchProducts();
+			setNewProduct({
+				image: null,
+				category: "",
+				furnitureType: "",
+				name: "",
+				description: "",
+				price: "",
+				color: "",
+				material: "",
+				stocks: "",
+				selectedSize: "", // Reset selected size
+			});
+		} catch (error) {
+			console.error("Error creating furniture!", error.response?.data || error.message);
+			alert(error.response?.data?.message || error.message || "Cannot add furniture!");
+		}
+	};
 
 	// Filtering logic based on category and type
 	const filteredProducts = products.filter((product) => {
@@ -207,21 +191,12 @@ const ProductManagement = () => {
 	// Pagination logic
 	const indexOfLastProduct = currentPage * productsPerPage;
 	const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
-	const currentProducts = sortedProducts.slice(
-		indexOfFirstProduct,
-		indexOfLastProduct
-	);
-	const totalPages = Math.max(
-		Math.ceil(sortedProducts.length / productsPerPage),
-		1
-	);
+	const currentProducts = sortedProducts.slice(indexOfFirstProduct, indexOfLastProduct);
+	const totalPages = Math.max(Math.ceil(sortedProducts.length / productsPerPage), 1);
 
 	return (
 		<div className="container mx-auto p-2">
-			<h1 className="text-3xl font-bold mb-2 text-center">
-				Product Management
-			</h1>
-
+			<h1 className="text-3xl font-bold mb-2 text-center">Product Management</h1>
 			{/* Filter and Sort Section */}
 			<div className="mb-2 flex gap-4 justify-end">
 				<select
@@ -237,7 +212,6 @@ const ProductManagement = () => {
 						</option>
 					))}
 				</select>
-
 				<select
 					name="filterType"
 					onChange={(e) => setFilterType(e.target.value)}
@@ -251,7 +225,6 @@ const ProductManagement = () => {
 						</option>
 					))}
 				</select>
-
 				{/* Sort by Date Dropdown */}
 				<select
 					name="sortOrder"
@@ -263,7 +236,6 @@ const ProductManagement = () => {
 					<option value="oldest">Oldest</option>
 				</select>
 			</div>
-
 			<div className="flex gap-6">
 				{/* Product Form Section */}
 				<div className="w-full md:w-1/3 bg-white p-6 rounded-lg shadow-lg flex flex-col h-full">
@@ -282,7 +254,6 @@ const ProductManagement = () => {
 								</option>
 							))}
 						</select>
-
 						<select
 							name="furnitureType"
 							onChange={handleInputChange}
@@ -297,7 +268,6 @@ const ProductManagement = () => {
 								</option>
 							))}
 						</select>
-
 						<input
 							type="text"
 							name="name"
@@ -307,7 +277,6 @@ const ProductManagement = () => {
 							className="w-full p-3 bg-gray-100 rounded-lg border border-gray-300"
 							required
 						/>
-
 						<textarea
 							name="description"
 							placeholder="Description"
@@ -316,7 +285,6 @@ const ProductManagement = () => {
 							className="w-full p-3 bg-gray-100 rounded-lg border border-gray-300"
 							required
 						/>
-
 						<input
 							type="number"
 							name="price"
@@ -326,7 +294,6 @@ const ProductManagement = () => {
 							className="w-full p-3 bg-gray-100 rounded-lg border border-gray-300"
 							required
 						/>
-
 						{/* Color, Material, and Stock Dropdowns */}
 						<select
 							name="color"
@@ -342,7 +309,6 @@ const ProductManagement = () => {
 								</option>
 							))}
 						</select>
-
 						<select
 							name="material"
 							onChange={handleInputChange}
@@ -357,7 +323,6 @@ const ProductManagement = () => {
 								</option>
 							))}
 						</select>
-
 						<input
 							type="number"
 							name="stocks"
@@ -369,51 +334,22 @@ const ProductManagement = () => {
 						/>
 						{/* Furniture Sizes */}
 						<div className="">
-						<div className="space-y-2">
-							<select
-								name="selectedSize"
-								value={newProduct.selectedSize}
-								onChange={handleInputChange}
-								className="w-full p-3 bg-gray-100 rounded-lg border border-gray-300"
-								required
-							>
-								<option value="">Select Furniture Size </option>
-								{materials.map((material) => (
-								<option key={material._id} value={material.name}>
-									{material.name}
-								</option>
-								))}
-							</select>
-						</div>
-
-						{/* <input
-							type="number"
-							name="sizes.width"
-							placeholder="Width"
-							value={newProduct.sizes[0].width}
-							onChange={handleInputChange}
-							className="w-full p-3 bg-gray-100 rounded-lg border border-gray-300"
-							required
-						/>
-						<input
-							type="number"
-							name="sizes.height"
-							placeholder="Height"
-							value={newProduct.sizes[0].height}
-							onChange={handleInputChange}
-							className="w-full p-3 bg-gray-100 rounded-lg border border-gray-300"
-							required
-						/>
-						<input
-							type="number"
-							name="sizes.depth"
-							placeholder="Depth"
-							value={newProduct.sizes[0].depth}
-							onChange={handleInputChange}
-							className="w-full p-3 bg-gray-100 rounded-lg border border-gray-300"
-							required
-						/> */}
-
+							<div className="space-y-2">
+								<select
+									name="selectedSize"
+									value={newProduct.selectedSize}
+									onChange={handleInputChange}
+									className="w-full p-3 bg-gray-100 rounded-lg border border-gray-300"
+									required
+								>
+									<option value="">Select Furniture Size</option>
+									{sizes.map((size) => (
+										<option key={size._id} value={size.name}>
+											{size.name}
+										</option>
+									))}
+								</select>
+							</div>
 						</div>
 						<input
 							type="file"
@@ -424,7 +360,6 @@ const ProductManagement = () => {
 							className="w-full p-3 bg-gray-100 rounded-lg border border-gray-300"
 							required
 						/>
-
 						<button
 							type="submit"
 							className="bg-blue-500 text-white px-6 py-3 rounded-lg w-full"
@@ -433,45 +368,22 @@ const ProductManagement = () => {
 						</button>
 					</form>
 				</div>
-
 				<div className="w-full md:w-2/3 h-1/2 overflow-y-auto">
 					{currentProducts.length > 0 ? (
 						<table className="min-w-full bg-white border border-black">
 							<thead>
 								<tr>
-									<th className="px-2 py-2 border-b border-r border-black">
-										Image
-									</th>
-									<th className="px-2 py-2 border-b border-r border-black">
-										Product Name
-									</th>
-									<th className="px-2 py-2 border-b border-r border-black">
-										Category
-									</th>
-									<th className="px-2 py-2 border-b border-r border-black">
-										Furniture Type
-									</th>
-									<th className="px-2 py-2 border-b border-r border-black">
-										Description
-									</th>
-									<th className="px-2 py-2 border-b border-r border-black">
-										Price
-									</th>
-									<th className="px-2 py-2 border-b border-r border-black">
-										Color
-									</th>
-									<th className="px-2 py-2 border-b border-r border-black">
-										Material
-									</th>
-									<th className="px-2 py-2 border-b border-r border-black">
-										Stocks
-									</th>
-									<th className="px-2 py-2 border-b border-r border-black">
-										Size (W x H x D)
-									</th>
-									<th className="px-2 py-2 border-b border-r border-black">
-										Actions
-									</th>
+									<th className="px-2 py-2 border-b border-r border-black">Image</th>
+									<th className="px-2 py-2 border-b border-r border-black">Product Name</th>
+									<th className="px-2 py-2 border-b border-r border-black">Category</th>
+									<th className="px-2 py-2 border-b border-r border-black">Furniture Type</th>
+									<th className="px-2 py-2 border-b border-r border-black">Description</th>
+									<th className="px-2 py-2 border-b border-r border-black">Price</th>
+									<th className="px-2 py-2 border-b border-r border-black">Color</th>
+									<th className="px-2 py-2 border-b border-r border-black">Material</th>
+									<th className="px-2 py-2 border-b border-r border-black">Stocks</th>
+									<th className="px-2 py-2 border-b border-r border-black">Size</th>
+									<th className="px-2 py-2 border-b border-r border-black">Actions</th>
 								</tr>
 							</thead>
 							<tbody>
@@ -489,27 +401,15 @@ const ProductManagement = () => {
 											)}
 										</td>
 										<td className="px-2 py-2 text-center">{product.name}</td>
-										<td className="px-2 py-2 text-center">
-											{product.category?.name}
-										</td>
-										<td className="px-2 py-2 text-center">
-											{product.furnitureType?.name}
-										</td>
-										<td className="px-2 py-2 text-center">
-											{product.description}
-										</td>
+										<td className="px-2 py-2 text-center">{product.category?.name}</td>
+										<td className="px-2 py-2 text-center">{product.furnitureType?.name}</td>
+										<td className="px-2 py-2 text-center">{product.description}</td>
 										<td className="px-2 py-2 text-center">₱{product.price}</td>
-										<td className="px-2 py-2 text-center">
-											{product.color?.name}
-										</td>
-										<td className="px-2 py-2 text-center">
-											{product.material?.name}
-										</td>
+										<td className="px-2 py-2 text-center">{product.color?.name}</td>
+										<td className="px-2 py-2 text-center">{product.material?.name}</td>
 										<td className="px-2 py-2 text-center">{product.stocks}</td>
 										<td className="px-2 py-2 text-center">
-											{product.sizes && product.sizes[0]
-												? `${product.sizes[0].width} x ${product.sizes[0].height} x ${product.sizes[0].depth}`
-												: "N/A"}
+											{product.selectedSize || "N/A"}
 										</td>
 										<td className="px-2 py-2 text-center">
 											<button
@@ -526,7 +426,6 @@ const ProductManagement = () => {
 					) : (
 						<p className="text-center text-gray-600">No products found.</p>
 					)}
-
 					{/* Pagination Controls */}
 					<div className="flex justify-center mt-4">
 						<button
@@ -540,9 +439,7 @@ const ProductManagement = () => {
 							{currentPage} of {totalPages}
 						</span>
 						<button
-							onClick={() =>
-								setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-							}
+							onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
 							disabled={currentPage === totalPages}
 							className="px-4 py-2 bg-gray-200 text-gray-600 rounded-lg ml-2"
 						>
@@ -554,4 +451,5 @@ const ProductManagement = () => {
 		</div>
 	);
 };
+
 export default ProductManagement;
