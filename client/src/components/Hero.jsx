@@ -32,13 +32,13 @@ export default function Hero() {
 
   return (
     <div>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-7xl m-auto mt-10 p-4">
-        <div className="lg:col-span-2">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-1 max-w-7xl m-auto mt-2 p-4">
+        <div className="lg:col-span-2 ">
           <Carousel images={images} />
         </div>
         
         <div className="text-center lg:text-left">
-          <h1 className="text-4xl lg:text-7xl mb-4 lg:mb-4 font-semi-bold font-sans white space-x-1">
+          <h1 className="text-4xl lg:text-7xl mb-2 lg:mb-4 font-semi-bold font-sans white space-x-1">
             Discover the Beauty of Handcrafted Wood Furniture!
           </h1>
           <p className="text-2xl lg:text-2xl mb-4 lg:mb-4 text-black">

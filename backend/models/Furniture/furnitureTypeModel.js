@@ -5,7 +5,14 @@ const furnitureTypeSchema = new mongoose.Schema({
     type:String,
     required:true,
     unique:true
+  },
+  categoryId:{
+    type:mongoose.Schema.ObjectId,
+    ref:'Category',
+    required:true
   }
+},{
+  timestamps:true
 })
 
 const FurnitureType = mongoose.model("FurnitureType",furnitureTypeSchema);
