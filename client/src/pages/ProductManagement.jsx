@@ -344,8 +344,8 @@ const ProductManagement = () => {
 								>
 									<option value="">Select Furniture Size</option>
 									{sizes.map((size) => (
-										<option key={size._id} value={size.name}>
-											{size.name}
+										<option key={size._id} value={size.label}>
+											{size.label}
 										</option>
 									))}
 								</select>
@@ -408,7 +408,7 @@ const ProductManagement = () => {
 										<td className="px-2 py-2 text-center">{product.color?.name}</td>
 										<td className="px-2 py-2 text-center">{product.material?.name}</td>
 										<td className="px-2 py-2 text-center">{product.stocks}</td>
-										<td className="px-2 py-2 text-center">
+										<td className="px-2 py-2 text-center">{product.sizes.label}
 											{product.selectedSize || "N/A"}
 										</td>
 										<td className="px-2 py-2 text-center">
