@@ -367,35 +367,54 @@ const ProductManagement = () => {
 							className="w-full p-3 bg-gray-100 rounded-lg border border-gray-300"
 							required
 						/>
-            <div className="space-y-2">
-              <input
-                type="number"
-                name="sizes.width"
-                placeholder="Width"
-                value={newProduct.sizes[0].width}
-                onChange={handleInputChange}
-                className="w-full p-3 bg-gray-100 rounded-lg border border-gray-300"
-                required
-              />
-              <input
-                type="number"
-                name="sizes.height"
-                placeholder="Height"
-                value={newProduct.sizes[0].height}
-                onChange={handleInputChange}
-                className="w-full p-3 bg-gray-100 rounded-lg border border-gray-300"
-                required
-              />
-              <input
-                type="number"
-                name="sizes.depth"
-                placeholder="Depth"
-                value={newProduct.sizes[0].depth}
-                onChange={handleInputChange}
-                className="w-full p-3 bg-gray-100 rounded-lg border border-gray-300"
-                required
-              />
-            </div>
+						{/* Furniture Sizes */}
+						<div className="">
+						<div className="space-y-2">
+							<select
+								name="selectedSize"
+								value={newProduct.selectedSize}
+								onChange={handleInputChange}
+								className="w-full p-3 bg-gray-100 rounded-lg border border-gray-300"
+								required
+							>
+								<option value="">Select Furniture Size </option>
+								{materials.map((material) => (
+								<option key={material._id} value={material.name}>
+									{material.name}
+								</option>
+								))}
+							</select>
+						</div>
+
+						{/* <input
+							type="number"
+							name="sizes.width"
+							placeholder="Width"
+							value={newProduct.sizes[0].width}
+							onChange={handleInputChange}
+							className="w-full p-3 bg-gray-100 rounded-lg border border-gray-300"
+							required
+						/>
+						<input
+							type="number"
+							name="sizes.height"
+							placeholder="Height"
+							value={newProduct.sizes[0].height}
+							onChange={handleInputChange}
+							className="w-full p-3 bg-gray-100 rounded-lg border border-gray-300"
+							required
+						/>
+						<input
+							type="number"
+							name="sizes.depth"
+							placeholder="Depth"
+							value={newProduct.sizes[0].depth}
+							onChange={handleInputChange}
+							className="w-full p-3 bg-gray-100 rounded-lg border border-gray-300"
+							required
+						/> */}
+
+						</div>
 						<input
 							type="file"
 							name="image"
@@ -535,5 +554,4 @@ const ProductManagement = () => {
 		</div>
 	);
 };
-
 export default ProductManagement;

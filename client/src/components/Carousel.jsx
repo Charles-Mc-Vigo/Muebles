@@ -2,8 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 
-
-const Carousel = ({ images, interval = 3000 }) => {
+const Carousel = ({ images, interval = 5000 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const timeoutRef = useRef(null);
 
@@ -13,7 +12,7 @@ const Carousel = ({ images, interval = 3000 }) => {
       setCurrentIndex((prevIndex) => (prevIndex === images.length - 1 ? 0 : prevIndex + 1));
     }, interval);
 
-    return () => resetTimeout(); 
+    return () => resetTimeout();
   }, [currentIndex, images.length, interval]);
 
   const resetTimeout = () => {
@@ -35,7 +34,7 @@ const Carousel = ({ images, interval = 3000 }) => {
 
   const handleTouchEnd = () => {
     if (touchStartX - touchEndX > 75) {
-      nextSlide(); 
+      nextSlide();
     } else if (touchStartX - touchEndX < -75) {
       prevSlide();
     }
@@ -53,12 +52,12 @@ const Carousel = ({ images, interval = 3000 }) => {
 
   return (
     <div
-      className="relative w-full max-w-full mx-auto"
+      className="relative w-full max-w-screen-lg mx-auto my-8" // Adjusted container width and added margin
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
     >
-      <div className="relative h-80 overflow-hidden rounded-lg">
+      <div className="relative h-64 md:h-80 overflow-hidden rounded-lg mx-auto"> {/* Adjusted height */}
         {images.map((image, index) => (
           <div
             key={index}
@@ -66,12 +65,13 @@ const Carousel = ({ images, interval = 3000 }) => {
               index === currentIndex ? 'opacity-100' : 'opacity-0'
             }`}
           >
-            <img src={image} alt={`Slide ${index}`} className="w-full h-64 md:h-96 object-fit" />
+            <img src={image} alt={`Slide ${index}`} className="w-full h-64 md:h-80 object-contain" /> {/* Adjusted image height */}
           </div>
         ))}
       </div>
 
-      <button
+      {/* Optional: Uncomment these if you want to add navigation arrows */}
+      {/* <button
         className="absolute top-1/2 left-0 transform -translate-y-1/2 p-2 bg-transparent text-black text-2xl ml-2 mr-2"
         onClick={prevSlide}
       >
@@ -83,9 +83,9 @@ const Carousel = ({ images, interval = 3000 }) => {
         onClick={nextSlide}
       >
         <FontAwesomeIcon icon={faChevronRight} />
-      </button>
+      </button> */}
 
-      <div className="absolute object bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
+      <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 flex space-x-2">
         {images.map((_, index) => (
           <button
             key={index}
