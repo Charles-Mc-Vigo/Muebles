@@ -5,9 +5,9 @@ const FurnitureType = require("../../models/Furniture/furnitureTypeModel");
 // Add a new size
 exports.addSize = async (req, res) => {
 	try {
-		const { label, width, height, depth, furnitureTypeId } = req.body;
+		const { label, width, height, depth,length, furnitureTypeId } = req.body;
 
-		if (!label || !width || !height || !depth || !furnitureTypeId) {
+		if (!label || !width || !height || !length || !depth || !furnitureTypeId) {
 			return res
 				.status(400)
 				.json({
@@ -40,7 +40,7 @@ exports.addSize = async (req, res) => {
 				});
 		}
 
-		const newSize = new Size({ label, width, height, depth, furnitureTypeId });
+		const newSize = new Size({ label, width, height, length, depth, furnitureTypeId });
 		await newSize.save();
 		res
 			.status(201)

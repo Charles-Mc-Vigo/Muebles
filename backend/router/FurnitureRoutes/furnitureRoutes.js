@@ -5,7 +5,8 @@ const {
     getAllFurnitures, 
     getFurnitureById, 
     updateFurniture, 
-    ToArchived, 
+    Archived, 
+    UnArchived,
     ArchivedFurnitures 
 } = require("../../controllers/FurnitureControllers/furnitureController");
 // const adminOnly = require("../middlewares/adminOnly");
@@ -28,7 +29,10 @@ router.put('/:furnitureId', updateFurniture);
 
 // Archive furniture
 // DELETE - /api/furnitures/archived/:furnitureId
-router.delete('/archived/:furnitureId', ToArchived);
+router.delete('/archived/:furnitureId', Archived);
+
+//UnArchiving the furniture
+router.post('/unarchived/:furnitureId', UnArchived);
 
 // Get furniture by ID
 // GET - /api/furnitures/:furnitureId

@@ -5,6 +5,8 @@ const stocksSchema = new mongoose.Schema({
     type:Number,
     required:true
   }
+},{
+  timestamps:true
 })
 
 const Stocks = mongoose.model("Stocks",stocksSchema);

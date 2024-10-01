@@ -305,7 +305,7 @@ exports.updateFurniture = [
 ];
 
 //archieving furniture
-exports.ToArchived = async (req, res) => {
+exports.Archived = async (req, res) => {
 	try {
 			const { furnitureId } = req.params;
 
@@ -322,6 +322,32 @@ exports.ToArchived = async (req, res) => {
 			furniture.isArchived = true;
 			await furniture.save();
 			res.status(200).json({ message: `${furniture.name} has been archived successfully!` });
+	} catch (error) {
+			console.error("Error archiving the furniture: ", error);
+			res.status(500).json({ message: "Server error!" });
+	}
+};
+
+exports.UnArchived = async (req, res) => {
+	try {
+			const { furnitureId } = req.params;
+
+			// Validate ObjectId
+			if (!mongoose.Types.ObjectId.isValid(furnitureId)) {
+					return res.status(400).json({ message: "Invalid furniture ID!" });
+			}
+
+			const furniture = await Furniture.findById(furnitureId);
+			if (!furniture) {
+				return res.status(404).json({ message: "Furniture not found!" });
+			}
+
+			if(furniture.isArchived){
+				furniture.isArchived = false;
+			}
+
+			await furniture.save();
+			res.status(200).json({ message: `${furniture.name} has been unarchived successfully!` });
 	} catch (error) {
 			console.error("Error archiving the furniture: ", error);
 			res.status(500).json({ message: "Server error!" });
