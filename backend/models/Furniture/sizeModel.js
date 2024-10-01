@@ -13,6 +13,10 @@ const sizeSchema = new mongoose.Schema({
     type: Number,
     required: true 
   },
+  length:{
+    type:Number,
+    required:true
+  },
   depth: {
     type: Number,
     required: true
@@ -22,6 +26,8 @@ const sizeSchema = new mongoose.Schema({
     ref: "FurnitureType", 
     required: true
   }
+},{
+  timestamps:true
 });
 
 const Size = mongoose.model("Size", sizeSchema);

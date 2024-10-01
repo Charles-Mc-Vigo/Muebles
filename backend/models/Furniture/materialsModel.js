@@ -6,6 +6,8 @@ const materialSchema = new mongoose.Schema({
     required:true,
     unique:true
   }
+},{
+  timestamps:true
 })
 
 const Materials = mongoose.model("Materials",materialSchema);

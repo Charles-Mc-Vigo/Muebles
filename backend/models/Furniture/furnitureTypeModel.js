@@ -11,6 +11,8 @@ const furnitureTypeSchema = new mongoose.Schema({
     ref:'Category',
     required:true
   }
+},{
+  timestamps:true
 })
 
 const FurnitureType = mongoose.model("FurnitureType",furnitureTypeSchema);
