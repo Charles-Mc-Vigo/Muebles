@@ -17,7 +17,7 @@ const ProductManagement = () => {
 		color: "",
 		material: "",
 		stocks: "",
-		sizes: [{ width: "", height: "", depth: "" }],
+		sizes: ""
 	});
 	// Page navigation
 	const [currentPage, setCurrentPage] = useState(1);
@@ -174,7 +174,7 @@ const ProductManagement = () => {
         color: "",
         material: "",
         stocks: "",
-        sizes: [{ width: "", height: "", depth: "" }]
+        sizes: ""
       });
     } catch (error) {
       console.error(
