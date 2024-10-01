@@ -7,7 +7,6 @@ const ProductManagement = () => {
 	const [colors, setColors] = useState([]);
 	const [furnitureTypes, setFurnitureTypes] = useState([]);
 	const [materials, setMaterials] = useState([]);
-	const [sizes,setSize] = useState([]);
 	const [newProduct, setNewProduct] = useState({
 		image: null,
 		category: "",
@@ -18,13 +17,12 @@ const ProductManagement = () => {
 		color: "",
 		material: "",
 		stocks: "",
-		sizes: "",
+		sizes: [{ width: "", height: "", depth: "" }],
 	});
-
 	// Page navigation
 	const [currentPage, setCurrentPage] = useState(1);
-	const [productsPerPage] = useState(4);
-	
+	const [productsPerPage] = useState(5);
+
 	// State for filtering
 	const [filterCategory, setFilterCategory] = useState("");
 	const [filterType, setFilterType] = useState("");
@@ -93,19 +91,6 @@ const ProductManagement = () => {
 		}
 	};
 
-	// Fetch Furniture Sizes
-	const fetchSize = async () => {
-		try {
-			const response = await axios.get("http://localhost:3000/api/sizes");
-			console.log("Fetched furniture Size:", response.data);
-			setSize(response.data);
-		} catch (error) {
-			console.error("Error fetching Furniture Size:", error);
-			alert("Failed to fetch Furniture Size. Please try again.");
-		}
-	};
-
-
 	useEffect(() => {
 		const fetchData = async () => {
 			try {
@@ -115,7 +100,6 @@ const ProductManagement = () => {
 					fetchColors(),
 					fetchFurnitureTypes(),
 					fetchMaterials(),
-					fetchSize(),
 				]);
 			} catch (error) {
 				console.error("Error fetching data:", error);
@@ -190,7 +174,7 @@ const ProductManagement = () => {
         color: "",
         material: "",
         stocks: "",
-        sizes: ""
+        sizes: [{ width: "", height: "", depth: "" }]
       });
     } catch (error) {
       console.error(
@@ -383,24 +367,26 @@ const ProductManagement = () => {
 							className="w-full p-3 bg-gray-100 rounded-lg border border-gray-300"
 							required
 						/>
-						{/* Furnitures Size */}
-						<select
-							name="sizes"
-							onChange={handleInputChange}
-							value={newProduct.sizes}
-							className="bg-gray-100 p-3 rounded-lg w-full border border-gray-300"
-							required
+						{/* Furniture Sizes */}
+						<div className="">
+						<div className="space-y-2">
+							<select
+								name="selectedSize"
+								value={newProduct.selectedSize}
+								onChange={handleInputChange}
+								className="w-full p-3 bg-gray-100 rounded-lg border border-gray-300"
+								required
 							>
-							<option value="">Select Furniture Sizes</option>
-							{sizes.map((size) => (
-								<option key={size._id} value={size.size}>
-									{size.size}
+								<option value="">Select Furniture Size </option>
+								{materials.map((material) => (
+								<option key={material._id} value={material.name}>
+									{material.name}
 								</option>
-							))}
-						</select>
+								))}
+							</select>
+						</div>
 
-						{/* <div className="space-y-2">
-						<input
+						{/* <input
 							type="number"
 							name="sizes.width"
 							placeholder="Width"
@@ -426,8 +412,9 @@ const ProductManagement = () => {
 							onChange={handleInputChange}
 							className="w-full p-3 bg-gray-100 rounded-lg border border-gray-300"
 							required
-						/>
-        </div> */}
+						/> */}
+
+						</div>
 						<input
 							type="file"
 							name="image"
@@ -480,7 +467,7 @@ const ProductManagement = () => {
 										Stocks
 									</th>
 									<th className="px-2 py-2 border-b border-r border-black">
-										Size
+										Size (W x H x D)
 									</th>
 									<th className="px-2 py-2 border-b border-r border-black">
 										Actions
@@ -518,10 +505,11 @@ const ProductManagement = () => {
 										<td className="px-2 py-2 text-center">
 											{product.material?.name}
 										</td>
+										<td className="px-2 py-2 text-center">{product.stocks}</td>
 										<td className="px-2 py-2 text-center">
-											{product.stocks}</td>
-										<td className="px-2 py-2 text-center">
-											{product.sizes}
+											{product.sizes && product.sizes[0]
+												? `${product.sizes[0].width} x ${product.sizes[0].height} x ${product.sizes[0].depth}`
+												: "N/A"}
 										</td>
 										<td className="px-2 py-2 text-center">
 											<button
@@ -566,5 +554,4 @@ const ProductManagement = () => {
 		</div>
 	);
 };
-
 export default ProductManagement;
