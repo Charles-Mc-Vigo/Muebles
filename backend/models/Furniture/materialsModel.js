@@ -5,6 +5,14 @@ const materialSchema = new mongoose.Schema({
     type:String,
     required:true,
     unique:true
+  },
+  quantity:{
+    type:Number,
+    required:true
+  },
+  isArchived:{
+    type:Boolean,
+    default:false
   }
 },{
   timestamps:true
