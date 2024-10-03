@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css'; 
 
 const Maintenance = () => {
   const [products, setProducts] = useState([]);
@@ -9,7 +11,9 @@ const Maintenance = () => {
   const [sizes, setSizes] = useState([]);
   const [selectedFilter, setSelectedFilter] = useState("");
   const [selectedFurnitureType, setSelectedFurnitureType] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
   const [newItemName, setNewItemName] = useState("");
+  const [loading, setLoading] = useState(false);
   const [newSize, setNewSize] = useState({
     label: "",
     height: "",
@@ -21,6 +25,7 @@ const Maintenance = () => {
 
   // Fetch data from the backend
   const fetchData = async () => {
+    setLoading(true);
     try {
       const [categoriesResponse, furnitureTypesResponse, colorsResponse, sizesResponse] = await Promise.all([
         axios.get("http://localhost:3000/api/categories"),
@@ -28,14 +33,15 @@ const Maintenance = () => {
         axios.get("http://localhost:3000/api/colors"),
         axios.get("http://localhost:3000/api/sizes")
       ]);
-
       setCategories(categoriesResponse.data);
       setFurnitureTypes(furnitureTypesResponse.data);
       setColors(colorsResponse.data);
       setSizes(sizesResponse.data);
     } catch (error) {
       console.error("Error fetching data:", error);
-      alert("Failed to fetch data. Please try again.");
+      toast.error("Failed to fetch data. Please try again."); // Use toast for error
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -48,10 +54,10 @@ const Maintenance = () => {
     try {
       await axios.delete(`http://localhost:3000/api/furnitures/furniture/${id}`);
       setProducts(products.filter((product) => product._id !== id));
-      alert("Product deleted successfully.");
+      toast.success("Product deleted successfully."); // Use toast for success
     } catch (error) {
       console.error("Error deleting product:", error);
-      alert("Failed to delete the product. Please try again.");
+      toast.error("Failed to delete the product. Please try again."); // Use toast for error
     }
   };
 
@@ -63,50 +69,48 @@ const Maintenance = () => {
     }));
   };
 
-
-// Handle adding new item
-const handleAddNewItem = async () => {
-  if (!newItemName && selectedFilter !== "Furniture Size") {
-      alert("Please enter a valid name.");
+  // Handle adding new item
+  const handleAddNewItem = async () => {
+    if (!newItemName && selectedFilter !== "Furniture Size") {
+      toast.error("Please enter a valid name.");
       return;
-  }
-
-  const newItem = selectedFilter === "Furniture Size" ? { ...newSize } : { name: newItemName };
-
-  try {
+    }
+    const newItem = selectedFilter === "Furniture Size" ? { ...newSize } : { name: newItemName };
+    try {
       let response;
       const endpoints = {
-          Categories: "http://localhost:3000/api/categories/add",
-          "Furniture Types": "http://localhost:3000/api/furniture-types/add",
-          Colors: "http://localhost:3000/api/colors/add",
-          "Furniture Size": "http://localhost:3000/api/sizes/add",
+        Categories: "http://localhost:3000/api/categories/add",
+        "Furniture Types": "http://localhost:3000/api/furniture-types/add",
+        Colors: "http://localhost:3000/api/colors/add",
+        "Furniture Size": "http://localhost:3000/api/sizes/add",
       };
 
-      response = await axios.post(endpoints[selectedFilter], newItem, {
-          headers: {
-              'Content-Type': 'application/json',
-          },
-      });
-
-      if (selectedFilter === "Categories") {
-          setCategories((prev) => [response.data, ...prev]);
-      } else if (selectedFilter === "Furniture Types") {
-          setFurnitureTypes((prev) => [response.data, ...prev]);
-      } else if (selectedFilter === "Colors") {
-          setColors((prev) => [response.data, ...prev]);
-      } else if (selectedFilter === "Furniture Size") {
-          // Prepend the new size to the existing sizes
-          setSizes((prev) => [response.data, ...prev]);
+      // Add categoryId when adding furniture types
+      if (selectedFilter === "Furniture Types") {
+        newItem.categoryId = selectedCategory;
       }
-
+      response = await axios.post(endpoints[selectedFilter], newItem, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      if (selectedFilter === "Categories") {
+        setCategories((prev) => [response.data, ...prev]);
+      } else if (selectedFilter === "Furniture Types") {
+        setFurnitureTypes((prev) => [response.data, ...prev]);
+      } else if (selectedFilter === "Colors") {
+        setColors((prev) => [response.data, ...prev]);
+      } else if (selectedFilter === "Furniture Size") {
+        setSizes((prev) => [response.data, ...prev]);
+      }
       setNewItemName("");
       setNewSize({ label: "", height: "", length: "", width: "", depth: "", furnitureTypeId: "" });
-      alert(`${selectedFilter} added successfully.`);
-  } catch (error) {
+      toast.success(`${selectedFilter} added successfully.`); 
+    } catch (error) {
       console.error(`Error adding new ${selectedFilter.toLowerCase()}:`, error);
-      alert(`Failed to add ${selectedFilter.toLowerCase()}. Please try again.`);
-  }
-};
+      toast.error(`Failed to add ${selectedFilter.toLowerCase()}. Please try again.`); 
+    }
+  };
 
   return (
     <div className="flex flex-col items-center py-10">
@@ -127,8 +131,7 @@ const handleAddNewItem = async () => {
             <option value="Furniture Size">Furniture Size</option>
           </select>
         </div>
-        
-        {selectedFilter !== "Furniture Size" && (
+        {selectedFilter !== "Furniture Size" && selectedFilter !== "Furniture Types" && (
           <div className="mb-5 w-1/2">
             <label className="block mb-1">Item Name</label>
             <input
@@ -140,7 +143,6 @@ const handleAddNewItem = async () => {
             />
           </div>
         )}
-
         {selectedFilter === "Furniture Size" && (
           <div className="flex space-x-5 mb-5 w-full">
             <div className="w-1/4">
@@ -193,107 +195,172 @@ const handleAddNewItem = async () => {
             ))}
           </div>
         )}
-
-        <button
-          onClick={handleAddNewItem}
-          className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
-        >
-          Add {selectedFilter}
-        </button>
+        {selectedFilter === "Furniture Types" && (
+          <div className="flex mb-5">
+            <div className="flex-1">
+              <input
+                type="text"
+                value={newItemName}
+                onChange={(e) => setNewItemName(e.target.value)}
+                className="w-full border-2 p-3 rounded-xl border-oliveGreen"
+                placeholder="Enter furniture type name"
+              />
+            </div>
+            <div className="ml-4 flex-1">
+              <select
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                className="w-full border-2 p-3 rounded-xl border-oliveGreen"
+              >
+                <option value="">Select Category</option>
+                {categories.map((category) => (
+                  <option key={category._id} value={category._id}>
+                    {category.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+        )}
+        <div className="mb-5">
+          <button
+            onClick={handleAddNewItem}
+            className="bg-oliveGreen text-white px-4 py-2 rounded-lg"
+          >
+            Add
+          </button>
+        </div>
       </div>
-
-      <div className="container w-3/4 mx-auto p-4 bg-gray-100 shadow-lg rounded-lg border-2 border-oliveGreen mb-10">
-        <h2 className="text-xl font-bold mb-5">Existing Items</h2>
-        {selectedFilter ? (
-          <>
-            <h2 className="text-xl font-bold mb-2">{selectedFilter}</h2>
-            <table className="min-w-full bg-white border border-gray-300 rounded-lg">
+      {/* Display Tables */}
+      <div className="container w-3/4 mx-auto">
+        {selectedFilter === "Categories" && (
+          <div className="bg-gray-100 p-4 rounded-lg shadow-lg border-2 border-oliveGreen mb-10">
+            <h3 className="font-bold mb-3">Categories</h3>
+            <table className="min-w-full border border-gray-300">
               <thead>
-                <tr className="bg-gray-200">
-                  {selectedFilter === "Furniture Size" ? (
-                    <>
-                      <th className="px-4 py-2 text-left border">Label</th>
-                      <th className="px-4 py-2 text-left border">Height (cm)</th>
-                      <th className="px-4 py-2 text-left border">Length (cm)</th>
-                      <th className="px-4 py-2 text-left border">Width (cm)</th>
-                      <th className="px-4 py-2 text-left border">Depth (cm)</th>
-                      <th className="px-4 py-2 text-left border">Furniture Type</th>
-                    </>
-                  ) : (
-                    <>
-                      <th className="px-4 py-2 text-left border">Name</th>
-                    </>
-                  )}
-                  <th className="px-4 py-2 text-left border">Actions</th>
+                <tr>
+                  <th className="border border-gray-300 px-4 py-2">Category Name</th>
+                  <th className="border border-gray-300 px-4 py-2">Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {selectedFilter === "Furniture Size" ? (
-                  sizes.map((item) => {
-                    // Find the furniture type name based on the furnitureTypeId
-                    const furnitureType = furnitureTypes.find(type => type._id === item.furnitureTypeId);
-                    return (
-                      <tr key={item._id} className="border-t">
-                        <td className="px-4 py-2 border">{item.label}</td>
-                        <td className="px-4 py-2 border">{item.height}</td>
-                        <td className="px-4 py-2 border">{item.length}</td>
-                        <td className="px-4 py-2 border">{item.width}</td>
-                        <td className="px-4 py-2 border">{item.depth}</td>
-                        <td className="px-4 py-2 border">{furnitureType ? furnitureType.name : "N/A"}</td>
-                        <td className="px-4 py-2 border">
-                          <button
-                            className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded"
-                            onClick={() => handleDelete(item._id)}
-                          >
-                            Delete
-                          </button>
-                        </td>
-                      </tr>
-                    );
-                  })
-                ) : (
-                  (selectedFilter === "Categories"
-                    ? categories
-                    : selectedFilter === "Furniture Types"
-                    ? furnitureTypes
-                    : colors
-                  ).map((item) => (
-                    <tr key={item._id} className="border-t">
-                      <td className="px-4 py-2 border">{item.name}</td>
-                      <td className="px-4 py-2 border">
+                {categories.map((category) => (
+                  <tr key={category._id}>
+                    <td className="border border-gray-300 px-4 py-2">{category.name}</td>
+                    <td className="border border-gray-300 px-4 py-2">
+                      <button
+                        onClick={() => handleDelete(category._id)}
+                        className="bg-red-600 text-white px-2 py-1 rounded"
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+        {selectedFilter === "Furniture Types" && (
+          <div className="bg-gray-100 p-4 rounded-lg shadow-lg border-2 border-oliveGreen mb-10">
+            <h3 className="font-bold mb-3">Furniture Types</h3>
+            <table className="min-w-full border border-gray-300">
+              <thead>
+                <tr>
+                  <th className="border border-gray-300 px-4 py-2">Furniture Type</th>
+                  <th className="border border-gray-300 px-4 py-2">Category</th>
+                  <th className="border border-gray-300 px-4 py-2">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {furnitureTypes.map((type) => {
+                  const category = categories.find(cat => cat._id === type.categoryId);
+                  return (
+                    <tr key={type._id}>
+                      <td className="border border-gray-300 px-4 py-2">{type.name}</td>
+                      <td className="border border-gray-300 px-4 py-2">{category ? category.name : 'N/A'}</td>
+                      <td className="border border-gray-300 px-4 py-2">
                         <button
-                          className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded"
-                          onClick={() => handleDelete(item._id)}
+                          onClick={() => handleDelete(type._id)}
+                          className="bg-red-600 text-white px-2 py-1 rounded"
                         >
                           Delete
                         </button>
                       </td>
                     </tr>
-                  ))
-                )}
-                {(selectedFilter === "Categories"
-                  ? categories
-                  : selectedFilter === "Furniture Types"
-                  ? furnitureTypes
-                  : selectedFilter === "Furniture Size"
-                  ? sizes
-                  : colors
-                ).length === 0 && (
-                  <tr>
-                    <td className="px-4 py-2 text-center border" colSpan={selectedFilter === "Furniture Size" ? 7 : 2}>
-                      No data available.
-                    </td>
-                  </tr>
-                )}
+                  );
+                })}
               </tbody>
             </table>
-          </>
-        ) : (
-          <p className="text-center text-gray-500">
-            Please select a filter to view data.
-          </p>
+          </div>
+        )}
+        {selectedFilter === "Colors" && (
+          <div className="bg-gray-100 p-4 rounded-lg shadow-lg border-2 border-oliveGreen mb-10">
+            <h3 className="font-bold mb-3">Colors</h3>
+            <table className="min-w-full border border-gray-300">
+              <thead>
+                <tr>
+                  <th className="border border-gray-300 px-4 py-2">Color Name</th>
+                  <th className="border border-gray-300 px-4 py-2">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {colors.map((color) => (
+                  <tr key={color._id}>
+                    <td className="border border-gray-300 px-4 py-2">{color.name}</td>
+                    <td className="border border-gray-300 px-4 py-2">
+                      <button
+                        onClick={() => handleDelete(color._id)}
+                        className="bg-red-600 text-white px-2 py-1 rounded"
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+        {selectedFilter === "Furniture Size" && (
+          <div className="bg-gray-100 p-4 rounded-lg shadow-lg border-2 border-oliveGreen mb-10">
+            <h3 className="font-bold mb-3">Furniture Sizes</h3>
+            <table className="min-w-full border border-gray-300">
+              <thead>
+                <tr>
+                  <th className="border border-gray-300 px-4 py-2">Label</th>
+                  <th className="border border-gray-300 px-4 py-2">Height (cm)</th>
+                  <th className="border border-gray-300 px-4 py-2">Length (cm)</th>
+                  <th className="border border-gray-300 px-4 py-2">Width (cm)</th>
+                  <th className="border border-gray-300 px-4 py-2">Depth (cm)</th>
+                  <th className="border border-gray-300 px-4 py-2">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {sizes.map((size) => (
+                  <tr key={size._id}>
+                    <td className="border border-gray-300 px-4 py-2">{size.label}</td>
+                    <td className="border border-gray-300 px-4 py-2">{size.height}</td>
+                    <td className="border border-gray-300 px-4 py-2">{size.length}</td>
+                    <td className="border border-gray-300 px-4 py-2">{size.width}</td>
+                    <td className="border border-gray-300 px-4 py-2">{size.depth}</td>
+                    <td className="border border-gray-300 px-4 py-2">
+                      <button
+                        onClick={() => handleDelete(size._id)}
+                        className="bg-red-600 text-white px-2 py-1 rounded"
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
+      <ToastContainer 
+      />
     </div>
   );
 };

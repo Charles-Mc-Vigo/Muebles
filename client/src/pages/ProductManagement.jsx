@@ -18,7 +18,7 @@ const ProductManagement = () => {
 		color: "",
 		material: "",
 		stocks: "",
-		selectedSize: "", // Updated to hold selected size
+		selectedSize: "", 
 	});
 
 	// Page navigation
