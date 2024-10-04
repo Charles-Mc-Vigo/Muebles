@@ -57,7 +57,7 @@ const Maintenance = () => {
       toast.success("Product deleted successfully."); // Use toast for success
     } catch (error) {
       console.error("Error deleting product:", error);
-      toast.error("Failed to delete the product. Please try again."); // Use toast for error
+      toast.error("Failed to delete the product. Please try again."); 
     }
   };
 
