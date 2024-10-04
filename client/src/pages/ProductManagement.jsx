@@ -141,13 +141,8 @@ const ProductManagement = () => {
         : prevData[type].filter((item) => item !== value);
       return { ...prevData, [type]: updatedArray };
     });
- };
-  // Handle multiple size selections
-  const handleSizeChange = (e) => {
-    const options = Array.from(e.target.selectedOptions);
-    const selectedSizes = options.map((option) => option.value);
-    setNewProduct((prevData) => ({ ...prevData, selectedSize: selectedSizes }));
   };
+  
 
   const handleDelete = async (id) => {
     try {
@@ -171,10 +166,11 @@ const ProductManagement = () => {
     form.append("name", newProduct.name);
     form.append("description", newProduct.description);
     form.append("price", newProduct.price);
-    form.append("color", JSON.stringify(newProduct.color));
-    form.append("material", JSON.stringify(newProduct.material));
     form.append("stocks", newProduct.stocks);
-    form.append("selectedSize", JSON.stringify(newProduct.selectedSize));
+    form.append("color", JSON.stringify(newProduct.color.length > 0 ? newProduct.color : []));
+    form.append("material", JSON.stringify(newProduct.material.length > 0 ? newProduct.material : []));
+    form.append("stocks", newProduct.stocks);
+    form.append("selectedSize", JSON.stringify(newProduct.selectedSize.length > 0 ? newProduct.selectedSize : []));
     try {
       const response = await axios.post(
         "http://localhost:3000/api/furnitures/add",
@@ -335,7 +331,6 @@ const ProductManagement = () => {
               onChange={handleInputChange}
               className="w-full p-3 bg-gray-100 rounded-lg border border-gray-300"
               required
-              
             />
             <input
               type="number"
@@ -345,9 +340,9 @@ const ProductManagement = () => {
               onChange={handleInputChange}
               className="w-full p-3 bg-gray-100 rounded-lg border border-gray-300"
               required
-              min = "0"
+              min="0"
             />
-             <input
+            <input
               type="number"
               name="stocks"
               placeholder="Available Stocks"
@@ -355,7 +350,7 @@ const ProductManagement = () => {
               onChange={handleInputChange}
               className="w-full p-3 bg-gray-100 rounded-lg border border-gray-300"
               required
-              min = "0"
+              min="0"
             />
             {/* Color Checkboxes */}
             <div className="relative">
@@ -365,16 +360,20 @@ const ProductManagement = () => {
                   <label key={color._id} className="flex items-center">
                     <input
                       type="checkbox"
-                      name={color.name}
-                      checked={newProduct.color.includes(color.name)}
+                      value={color.name}
+                      checked={
+                        Array.isArray(newProduct.color) &&
+                        newProduct.color.includes(color.name)
+                      } // Safeguard
                       onChange={(e) => handleCheckboxChange(e, "color")}
                       className="mr-2"
-                    />
+                    />  
                     {color.name}
                   </label>
                 ))}
               </div>
             </div>
+
             {/* Material Checkboxes */}
             <div className="relative">
               <h3 className="font-semibold">Select Materials</h3>
@@ -383,8 +382,11 @@ const ProductManagement = () => {
                   <label key={material._id} className="flex items-center">
                     <input
                       type="checkbox"
-                      name={material.name}
-                      checked={newProduct.material.includes(material.name)}
+                      value={material.name}
+                      checked={
+                        Array.isArray(newProduct.material) &&
+                        newProduct.material.includes(material.name)
+                      } // Safeguard
                       onChange={(e) => handleCheckboxChange(e, "material")}
                       className="mr-2"
                     />
@@ -393,7 +395,7 @@ const ProductManagement = () => {
                 ))}
               </div>
             </div>
-      
+
             {/* Furniture Sizes */}
             <div className="relative">
               <h3 className="font-semibold">Select Sizes</h3>
@@ -403,7 +405,10 @@ const ProductManagement = () => {
                     <input
                       type="checkbox"
                       value={size.label}
-                      checked={newProduct.selectedSize.includes(size.label)}
+                      checked={
+                        Array.isArray(newProduct.selectedSize) &&
+                        newProduct.selectedSize.includes(size.label)
+                      } // Safeguard
                       onChange={(e) => handleCheckboxChange(e, "selectedSize")}
                       className="mr-2"
                     />
