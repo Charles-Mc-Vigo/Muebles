@@ -28,7 +28,6 @@ const Maintenance = () => {
         axios.get("http://localhost:3000/api/colors"),
         axios.get("http://localhost:3000/api/sizes")
       ]);
-
       setCategories(categoriesResponse.data);
       setFurnitureTypes(furnitureTypesResponse.data);
       setColors(colorsResponse.data);
@@ -63,145 +62,139 @@ const Maintenance = () => {
     }));
   };
 
+  // Handle adding new item
+  const handleAddNewItem = async (e) => {
+    e.preventDefault(); // Prevent the default form submission behavior
 
-// Handle adding new item
-const handleAddNewItem = async () => {
-  if (!newItemName && selectedFilter !== "Furniture Size") {
+    if (!newItemName && selectedFilter !== "Furniture Size") {
       alert("Please enter a valid name.");
       return;
-  }
+    }
 
-  const newItem = selectedFilter === "Furniture Size" ? { ...newSize } : { name: newItemName };
-
-  try {
+    const newItem = selectedFilter === "Furniture Size" ? { ...newSize } : { name: newItemName };
+    try {
       let response;
       const endpoints = {
-          Categories: "http://localhost:3000/api/categories/add",
-          "Furniture Types": "http://localhost:3000/api/furniture-types/add",
-          Colors: "http://localhost:3000/api/colors/add",
-          "Furniture Size": "http://localhost:3000/api/sizes/add",
+        Categories: "http://localhost:3000/api/categories/add",
+        "Furniture Types": "http://localhost:3000/api/furniture-types/add",
+        Colors: "http://localhost:3000/api/colors/add",
+        "Furniture Size": "http://localhost:3000/api/sizes/add",
       };
-
       response = await axios.post(endpoints[selectedFilter], newItem, {
-          headers: {
-              'Content-Type': 'application/json',
-          },
+        headers: {
+          'Content-Type': 'application/json',
+        },
       });
-
       if (selectedFilter === "Categories") {
-          setCategories((prev) => [response.data, ...prev]);
+        setCategories((prev) => [response.data, ...prev]);
       } else if (selectedFilter === "Furniture Types") {
-          setFurnitureTypes((prev) => [response.data, ...prev]);
+        setFurnitureTypes((prev) => [response.data, ...prev]);
       } else if (selectedFilter === "Colors") {
-          setColors((prev) => [response.data, ...prev]);
+        setColors((prev) => [response.data, ...prev]);
       } else if (selectedFilter === "Furniture Size") {
-          // Prepend the new size to the existing sizes
-          setSizes((prev) => [response.data, ...prev]);
+        setSizes((prev) => [response.data, ...prev]);
       }
-
       setNewItemName("");
       setNewSize({ label: "", height: "", length: "", width: "", depth: "", furnitureTypeId: "" });
       alert(`${selectedFilter} added successfully.`);
-  } catch (error) {
+    } catch (error) {
       console.error(`Error adding new ${selectedFilter.toLowerCase()}:`, error);
       alert(`Failed to add ${selectedFilter.toLowerCase()}. Please try again.`);
-  }
-};
+    }
+  };
 
   return (
     <div className="flex flex-col items-center py-10">
       <h1 className="font-bold text-5xl mb-5">JCKAME Maintenance</h1>
       <div className="container w-3/4 mx-auto p-4 bg-gray-100 shadow-lg rounded-lg border-2 border-oliveGreen mb-10">
         <h2 className="text-xl font-bold mb-5">Add New Item</h2>
-        <div className="mb-5 w-1/4">
-          <label className="block mb-1">Select Type</label>
-          <select
-            value={selectedFilter}
-            onChange={(e) => setSelectedFilter(e.target.value)}
-            className="w-full border-2 p-3 rounded-xl border-oliveGreen"
-          >
-            <option value="" disabled>Select Type</option>
-            <option value="Categories">Categories</option>
-            <option value="Furniture Types">Furniture Types</option>
-            <option value="Colors">Furniture Colors</option>
-            <option value="Furniture Size">Furniture Size</option>
-          </select>
-        </div>
-        
-        {selectedFilter !== "Furniture Size" && (
-          <div className="mb-5 w-1/2">
-            <label className="block mb-1">Item Name</label>
-            <input
-              type="text"
-              value={newItemName}
-              onChange={(e) => setNewItemName(e.target.value)}
+        <form onSubmit={handleAddNewItem}>
+          <div className="mb-5 w-1/4">
+            <label className="block mb-1">Select Type</label>
+            <select
+              value={selectedFilter}
+              onChange={(e) => setSelectedFilter(e.target.value)}
               className="w-full border-2 p-3 rounded-xl border-oliveGreen"
-              placeholder="Enter name"
-            />
+            >
+              <option value="" disabled>Select Type</option>
+              <option value="Categories">Categories</option>
+              <option value="Furniture Types">Furniture Types</option>
+              <option value="Colors">Furniture Colors</option>
+              <option value="Furniture Size">Furniture Size</option>
+            </select>
           </div>
-        )}
-
-        {selectedFilter === "Furniture Size" && (
-          <div className="flex space-x-5 mb-5 w-full">
-            <div className="w-1/4">
-              <label className="block mb-1">Select Furniture Types</label>
-              <select
-                name="filterFurnitureTypes"
-                onChange={(e) => {
-                  const selectedValue = e.target.value;
-                  setSelectedFurnitureType(selectedValue);
-                  const selectedFurniture = furnitureTypes.find(type => type.name === selectedValue);
-                  setNewSize(prev => ({
-                    ...prev,
-                    furnitureTypeId: selectedFurniture ? selectedFurniture._id : "",
-                  }));
-                }}
-                value={selectedFurnitureType}
-                className="border-2 p-3 rounded-xl border-oliveGreen"
-              >
-                <option value="">All Furniture Types</option>
-                {furnitureTypes.map(furnitureType => (
-                  <option key={furnitureType._id} value={furnitureType.name}>
-                    {furnitureType.name}
-                  </option>
-                ))}
-              </select>
-            </div>
+          {selectedFilter !== "Furniture Size" && (
             <div className="mb-5 w-1/2">
               <label className="block mb-1">Item Name</label>
               <input
                 type="text"
-                id="label"
-                value={newSize.label}
-                onChange={handleChange}
+                value={newItemName}
+                onChange={(e) => setNewItemName(e.target.value)}
                 className="w-full border-2 p-3 rounded-xl border-oliveGreen"
                 placeholder="Enter name"
               />
             </div>
-            {['height', 'length', 'width', 'depth'].map((dim) => (
-              <div className="w-1/3" key={dim}>
-                <label className="block mb-1">{dim.charAt(0).toUpperCase() + dim.slice(1)} (cm)</label>
+          )}
+          {selectedFilter === "Furniture Size" && (
+            <div className="flex space-x-5 mb-5 w-full">
+              <div className="w-1/4">
+                <label className="block mb-1">Select Furniture Types</label>
+                <select
+                  name="filterFurnitureTypes"
+                  onChange={(e) => {
+                    const selectedValue = e.target.value;
+                    setSelectedFurnitureType(selectedValue);
+                    const selectedFurniture = furnitureTypes.find(type => type.name === selectedValue);
+                    setNewSize(prev => ({
+                      ...prev,
+                      furnitureTypeId: selectedFurniture ? selectedFurniture._id : "",
+                    }));
+                  }}
+                  value={selectedFurnitureType}
+                  className="border-2 p-3 rounded-xl border-oliveGreen"
+                >
+                  <option value="">All Furniture Types</option>
+                  {furnitureTypes.map(furnitureType => (
+                    <option key={furnitureType._id} value={furnitureType.name}>
+                      {furnitureType.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="mb-5 w-1/2">
+                <label className="block mb-1">Item Name</label>
                 <input
-                  type="number"
-                  id={dim}
-                  value={newSize[dim]}
+                  type="text"
+                  id="label"
+                  value={newSize.label}
                   onChange={handleChange}
                   className="w-full border-2 p-3 rounded-xl border-oliveGreen"
-                  placeholder={`Enter ${dim}`}
+                  placeholder="Enter name"
                 />
               </div>
-            ))}
-          </div>
-        )}
-
-        <button
-          onClick={handleAddNewItem}
-          className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
-        >
-          Add {selectedFilter}
-        </button>
+              {['height', 'length', 'width', 'depth'].map((dim) => (
+                <div className="w-1/3" key={dim}>
+                  <label className="block mb-1">{dim.charAt(0).toUpperCase() + dim.slice(1)} (cm)</label>
+                  <input
+                    type="number"
+                    id={dim}
+                    value={newSize[dim]}
+                    onChange={handleChange}
+                    className="w-full border-2 p-3 rounded-xl border-oliveGreen"
+                    placeholder={`Enter ${dim}`}
+                  />
+                </div>
+              ))}
+            </div>
+          )}
+          <button
+            type="submit" // Ensure the button is of type submit
+            className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+          >
+            Add {selectedFilter}
+          </button>
+        </form>
       </div>
-
       <div className="container w-3/4 mx-auto p-4 bg-gray-100 shadow-lg rounded-lg border-2 border-oliveGreen mb-10">
         <h2 className="text-xl font-bold mb-5">Existing Items</h2>
         {selectedFilter ? (
@@ -230,7 +223,6 @@ const handleAddNewItem = async () => {
               <tbody>
                 {selectedFilter === "Furniture Size" ? (
                   sizes.map((item) => {
-                    // Find the furniture type name based on the furnitureTypeId
                     const furnitureType = furnitureTypes.find(type => type._id === item.furnitureTypeId);
                     return (
                       <tr key={item._id} className="border-t">
