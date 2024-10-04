@@ -8,6 +8,7 @@ const ProductManagement = () => {
 	const [furnitureTypes, setFurnitureTypes] = useState([]);
 	const [materials, setMaterials] = useState([]);
 	const [sizes, setSizes] = useState([]);
+	const [filteredFurnitureTypes, setFilteredFurnitureTypes] = useState([]);
 	const [newProduct, setNewProduct] = useState({
 		image: null,
 		category: "",
@@ -18,16 +19,14 @@ const ProductManagement = () => {
 		color: "",
 		material: "",
 		stocks: "",
-		selectedSize: "", // Updated to hold selected size
+		selectedSize: "",
 	});
 
 	// Page navigation
 	const [currentPage, setCurrentPage] = useState(1);
 	const [productsPerPage] = useState(5);
-	// State for filtering
 	const [filterCategory, setFilterCategory] = useState("");
 	const [filterType, setFilterType] = useState("");
-	// State for sorting by date
 	const [sortOrder, setSortOrder] = useState("newest");
 
 	// Fetch functions
@@ -44,7 +43,6 @@ const ProductManagement = () => {
 	const fetchProducts = async () => {
 		try {
 			const response = await axios.get("http://localhost:3000/api/furnitures");
-			console.log("Fetched products:", response.data);
 			setProducts(response.data);
 		} catch (error) {
 			console.error("Error fetching products:", error);
@@ -55,18 +53,16 @@ const ProductManagement = () => {
 	const fetchColors = async () => {
 		try {
 			const response = await axios.get("http://localhost:3000/api/colors");
-			console.log("Fetched colors:", response.data);
 			setColors(response.data);
 		} catch (error) {
 			console.error("Error fetching colors:", error);
-			alert("Failed to fetch color. Please try again.");
+			alert("Failed to fetch colors. Please try again.");
 		}
 	};
 
 	const fetchFurnitureTypes = async () => {
 		try {
 			const response = await axios.get("http://localhost:3000/api/furniture-types");
-			console.log("Fetched furniture types:", response.data);
 			setFurnitureTypes(response.data);
 		} catch (error) {
 			console.error("Error fetching furniture types:", error);
@@ -77,7 +73,6 @@ const ProductManagement = () => {
 	const fetchMaterials = async () => {
 		try {
 			const response = await axios.get("http://localhost:3000/api/materials");
-			console.log("Fetched materials:", response.data);
 			setMaterials(response.data);
 		} catch (error) {
 			console.error("Error fetching materials:", error);
@@ -88,7 +83,6 @@ const ProductManagement = () => {
 	const fetchSizes = async () => {
 		try {
 			const response = await axios.get("http://localhost:3000/api/sizes");
-			console.log("Fetched sizes:", response.data);
 			setSizes(response.data);
 		} catch (error) {
 			console.error("Error fetching sizes:", error);
@@ -113,6 +107,21 @@ const ProductManagement = () => {
 		};
 		fetchData();
 	}, []);
+
+	// Filter furniture types based on category
+	useEffect(() => {
+		if (newProduct.category) {
+			const selectedCategory = categories.find(category => category.name === newProduct.category);
+			if (selectedCategory) {
+				const filteredTypes = furnitureTypes.filter(type => type.categoryId === selectedCategory._id);
+				setFilteredFurnitureTypes(filteredTypes);
+			} else {
+				setFilteredFurnitureTypes([]);
+			}
+		} else {
+			setFilteredFurnitureTypes([]);
+		}
+	}, [newProduct.category, furnitureTypes, categories]);
 
 	const handleInputChange = (e) => {
 		const { name, value, files } = e.target;
@@ -145,8 +154,7 @@ const ProductManagement = () => {
 		form.append("color", newProduct.color);
 		form.append("material", newProduct.material);
 		form.append("stocks", newProduct.stocks);
-		form.append("selectedSize", newProduct.selectedSize); // Include selected size in the form data
-
+		form.append("selectedSize", newProduct.selectedSize);
 		try {
 			const response = await axios.post("http://localhost:3000/api/furnitures/add", form, {
 				headers: {
@@ -165,7 +173,7 @@ const ProductManagement = () => {
 				color: "",
 				material: "",
 				stocks: "",
-				selectedSize: "", // Reset selected size
+				selectedSize: "",
 			});
 		} catch (error) {
 			console.error("Error creating furniture!", error.response?.data || error.message);
@@ -240,6 +248,7 @@ const ProductManagement = () => {
 				{/* Product Form Section */}
 				<div className="w-full md:w-1/3 bg-white p-6 rounded-lg shadow-lg flex flex-col h-full">
 					<form onSubmit={handleSubmit} className="space-y-6 flex-grow">
+						{/* Category Dropdown */}
 						<select
 							name="category"
 							onChange={handleInputChange}
@@ -254,20 +263,24 @@ const ProductManagement = () => {
 								</option>
 							))}
 						</select>
+
+						{/* Furniture Type Dropdown */}
 						<select
 							name="furnitureType"
-							onChange={handleInputChange}
 							value={newProduct.furnitureType}
+							onChange={handleInputChange}
 							className="bg-gray-100 p-3 rounded-lg w-full border border-gray-300"
 							required
 						>
 							<option value="">Select Furniture Type</option>
-							{furnitureTypes.map((furnitureType) => (
-								<option key={furnitureType._id} value={furnitureType.name}>
-									{furnitureType.name}
+							{filteredFurnitureTypes.map((type) => (
+								<option key={type._id} value={type.name}>
+									{type.name}
 								</option>
 							))}
 						</select>
+
+						{/* Other Input Fields */}
 						<input
 							type="text"
 							name="name"
@@ -294,6 +307,7 @@ const ProductManagement = () => {
 							className="w-full p-3 bg-gray-100 rounded-lg border border-gray-300"
 							required
 						/>
+
 						{/* Color, Material, and Stock Dropdowns */}
 						<select
 							name="color"
@@ -332,25 +346,23 @@ const ProductManagement = () => {
 							className="w-full p-3 bg-gray-100 rounded-lg border border-gray-300"
 							required
 						/>
+
 						{/* Furniture Sizes */}
-						<div className="">
-							<div className="space-y-2">
-								<select
-									name="selectedSize"
-									value={newProduct.selectedSize}
-									onChange={handleInputChange}
-									className="w-full p-3 bg-gray-100 rounded-lg border border-gray-300"
-									required
-								>
-									<option value="">Select Furniture Size</option>
-									{sizes.map((size) => (
-										<option key={size._id} value={size.label}>
-											{size.label}
-										</option>
-									))}
-								</select>
-							</div>
-						</div>
+						<select
+							name="selectedSize"
+							value={newProduct.selectedSize}
+							onChange={handleInputChange}
+							className="w-full p-3 bg-gray-100 rounded-lg border border-gray-300"
+							required
+						>
+							<option value="">Select Furniture Size</option>
+							{sizes.map((size) => (
+								<option key={size._id} value={size.label}>
+									{size.label}
+								</option>
+							))}
+						</select>
+
 						<input
 							type="file"
 							name="image"
