@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const furnitureSchema = new mongoose.Schema({
-  images: [{type:String, required:true}],
+  image:{type:String, required:true},
   category: { type: mongoose.Schema.Types.ObjectId, ref: 'Category', required: true },
   furnitureType: { type: mongoose.Schema.Types.ObjectId, ref: 'FurnitureType', required: true },
   name: { type: String, required: true },
