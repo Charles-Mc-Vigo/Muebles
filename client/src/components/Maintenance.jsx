@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css'; 
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Maintenance = () => {
   const [products, setProducts] = useState([]);
@@ -20,18 +20,27 @@ const Maintenance = () => {
     length: "",
     width: "",
     depth: "",
-    furnitureTypeId: ""
+    furnitureTypeId: "",
+  });
+  const [newColor, setNewColor] = useState({
+    name: "",
+    rgb: "",
+    hex: "",
   });
 
-  // Fetch data from the backend
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [categoriesResponse, furnitureTypesResponse, colorsResponse, sizesResponse] = await Promise.all([
+      const [
+        categoriesResponse,
+        furnitureTypesResponse,
+        colorsResponse,
+        sizesResponse,
+      ] = await Promise.all([
         axios.get("http://localhost:3000/api/categories"),
         axios.get("http://localhost:3000/api/furniture-types"),
         axios.get("http://localhost:3000/api/colors"),
-        axios.get("http://localhost:3000/api/sizes")
+        axios.get("http://localhost:3000/api/sizes"),
       ]);
       setCategories(categoriesResponse.data);
       setFurnitureTypes(furnitureTypesResponse.data);
@@ -39,7 +48,7 @@ const Maintenance = () => {
       setSizes(sizesResponse.data);
     } catch (error) {
       console.error("Error fetching data:", error);
-      toast.error("Failed to fetch data. Please try again."); // Use toast for error
+      toast.error("Failed to fetch data. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -49,15 +58,14 @@ const Maintenance = () => {
     fetchData();
   }, []);
 
-  // Handle delete
   const handleDelete = async (id) => {
     try {
       await axios.delete(`http://localhost:3000/api/furnitures/furniture/${id}`);
       setProducts(products.filter((product) => product._id !== id));
-      toast.success("Product deleted successfully."); // Use toast for success
+      toast.success("Product deleted successfully.");
     } catch (error) {
       console.error("Error deleting product:", error);
-      toast.error("Failed to delete the product. Please try again."); 
+      toast.error("Failed to delete the product. Please try again.");
     }
   };
 
@@ -69,15 +77,30 @@ const Maintenance = () => {
     }));
   };
 
-  // Handle adding new item
+  const handleColorChange = (e) => {
+    const { name, value } = e.target;
+    setNewColor((prevColor) => ({
+      ...prevColor,
+      [name]: value,
+    }));
+  };
+
   const handleAddNewItem = async () => {
-    if (!newItemName && selectedFilter !== "Furniture Size") {
+    if (!newItemName && selectedFilter !== "Furniture Size" && selectedFilter !== "Colors") {
       toast.error("Please enter a valid name.");
       return;
     }
-    const newItem = selectedFilter === "Furniture Size" ? { ...newSize } : { name: newItemName };
+
+    let newItem;
+    if (selectedFilter === "Furniture Size") {
+      newItem = { ...newSize };
+    } else if (selectedFilter === "Colors") {
+      newItem = { ...newColor };
+    } else {
+      newItem = { name: newItemName };
+    }
+
     try {
-      let response;
       const endpoints = {
         Categories: "http://localhost:3000/api/categories/add",
         "Furniture Types": "http://localhost:3000/api/furniture-types/add",
@@ -85,15 +108,16 @@ const Maintenance = () => {
         "Furniture Size": "http://localhost:3000/api/sizes/add",
       };
 
-      // Add categoryId when adding furniture types
       if (selectedFilter === "Furniture Types") {
         newItem.categoryId = selectedCategory;
       }
-      response = await axios.post(endpoints[selectedFilter], newItem, {
+
+      const response = await axios.post(endpoints[selectedFilter], newItem, {
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
       });
+
       if (selectedFilter === "Categories") {
         setCategories((prev) => [response.data, ...prev]);
       } else if (selectedFilter === "Furniture Types") {
@@ -103,13 +127,26 @@ const Maintenance = () => {
       } else if (selectedFilter === "Furniture Size") {
         setSizes((prev) => [response.data, ...prev]);
       }
-      setNewItemName("");
-      setNewSize({ label: "", height: "", length: "", width: "", depth: "", furnitureTypeId: "" });
-      toast.success(`${selectedFilter} added successfully.`); 
+
+      resetInputFields();
+      toast.success(`${selectedFilter} added successfully.`);
     } catch (error) {
       console.error(`Error adding new ${selectedFilter.toLowerCase()}:`, error);
-      toast.error(`Failed to add ${selectedFilter.toLowerCase()}. Please try again.`); 
+      toast.error(`Failed to add ${selectedFilter.toLowerCase()}. Please try again.`);
     }
+  };
+
+  const resetInputFields = () => {
+    setNewItemName("");
+    setNewColor({ name: "", rgb: "", hex: "" });
+    setNewSize({
+      label: "",
+      height: "",
+      length: "",
+      width: "",
+      depth: "",
+      furnitureTypeId: "",
+    });
   };
 
   return (
@@ -117,6 +154,7 @@ const Maintenance = () => {
       <h1 className="font-bold text-5xl mb-5">JCKAME Maintenance</h1>
       <div className="container w-3/4 mx-auto p-4 bg-gray-100 shadow-lg rounded-lg border-2 border-oliveGreen mb-10">
         <h2 className="text-xl font-bold mb-5">Add New Item</h2>
+
         <div className="mb-5 w-1/4">
           <label className="block mb-1">Select Type</label>
           <select
@@ -131,7 +169,46 @@ const Maintenance = () => {
             <option value="Furniture Size">Furniture Size</option>
           </select>
         </div>
-        {selectedFilter !== "Furniture Size" && selectedFilter !== "Furniture Types" && (
+
+        {selectedFilter === "Colors" && (
+          <>
+            <div className="mb-5 w-1/2">
+              <label className="block mb-1">Color Name</label>
+              <input
+                type="text"
+                name="name"
+                value={newColor.name}
+                onChange={handleColorChange}
+                className="w-full border-2 p-3 rounded-xl border-oliveGreen"
+                placeholder="Enter color name"
+              />
+            </div>
+            <div className="mb-5 w-1/2">
+              <label className="block mb-1">RGB Value</label>
+              <input
+                type="text"
+                name="rgb"
+                value={newColor.rgb}
+                onChange={handleColorChange}
+                className="w-full border-2 p-3 rounded-xl border-oliveGreen"
+                placeholder="Enter RGB value (e.g., rgb(255, 0, 0))"
+              />
+            </div>
+            <div className="mb-5 w-1/2">
+              <label className="block mb-1">Hex Value</label>
+              <input
+                type="text"
+                name="hex"
+                value={newColor.hex}
+                onChange={handleColorChange}
+                className="w-full border-2 p-3 rounded-xl border-oliveGreen"
+                placeholder="Enter hex value (e.g., #FF0000)"
+              />
+            </div>
+          </>
+        )}
+
+        {selectedFilter !== "Furniture Size" && selectedFilter !== "Furniture Types" && selectedFilter !== "Colors" && (
           <div className="mb-5 w-1/2">
             <label className="block mb-1">Item Name</label>
             <input
@@ -143,33 +220,37 @@ const Maintenance = () => {
             />
           </div>
         )}
+
         {selectedFilter === "Furniture Size" && (
-          <div className="flex space-x-5 mb-5 w-full">
-            <div className="w-1/4">
-              <label className="block mb-1">Select Furniture Types</label>
+          <div className="flex space-x-5 mb-2 w-full">
+            <div className="flex-1 mb-4">
+              
+              <label className="block mb-1">Select Furniture Type</label>
               <select
                 name="filterFurnitureTypes"
                 onChange={(e) => {
                   const selectedValue = e.target.value;
                   setSelectedFurnitureType(selectedValue);
-                  const selectedFurniture = furnitureTypes.find(type => type.name === selectedValue);
-                  setNewSize(prev => ({
+                  const selectedFurniture = furnitureTypes.find(
+                    (type) => type.name === selectedValue
+                  );
+                  setNewSize((prev) => ({
                     ...prev,
                     furnitureTypeId: selectedFurniture ? selectedFurniture._id : "",
                   }));
                 }}
                 value={selectedFurnitureType}
-                className="border-2 p-3 rounded-xl border-oliveGreen"
+                className="border-2 p-3 rounded-xl border-oliveGreen w-full"
               >
-                <option value="">All Furniture Types</option>
-                {furnitureTypes.map(furnitureType => (
+                <option value="">Select Furniture Types</option>
+                {furnitureTypes.map((furnitureType) => (
                   <option key={furnitureType._id} value={furnitureType.name}>
                     {furnitureType.name}
                   </option>
                 ))}
               </select>
             </div>
-            <div className="mb-5 w-1/2">
+            <div className="flex-1 mb-4">
               <label className="block mb-1">Item Name</label>
               <input
                 type="text"
@@ -180,8 +261,8 @@ const Maintenance = () => {
                 placeholder="Enter name"
               />
             </div>
-            {['height', 'length', 'width', 'depth'].map((dim) => (
-              <div className="w-1/3" key={dim}>
+            {["width", "length", "height", "depth"].map((dim) => (
+              <div className="flex-1 mb-4" key={dim}>
                 <label className="block mb-1">{dim.charAt(0).toUpperCase() + dim.slice(1)} (cm)</label>
                 <input
                   type="number"
@@ -195,6 +276,7 @@ const Maintenance = () => {
             ))}
           </div>
         )}
+
         {selectedFilter === "Furniture Types" && (
           <div className="flex mb-5">
             <div className="flex-1">
@@ -222,15 +304,17 @@ const Maintenance = () => {
             </div>
           </div>
         )}
+
         <div className="mb-5">
           <button
             onClick={handleAddNewItem}
             className="bg-oliveGreen text-white px-4 py-2 rounded-lg"
           >
-            Add
+            Add New Item
           </button>
         </div>
       </div>
+
       {/* Display Tables */}
       <div className="container w-3/4 mx-auto">
         {selectedFilter === "Categories" && (
@@ -261,6 +345,8 @@ const Maintenance = () => {
             </table>
           </div>
         )}
+        
+        {/* Furniture */}
         {selectedFilter === "Furniture Types" && (
           <div className="bg-gray-100 p-4 rounded-lg shadow-lg border-2 border-oliveGreen mb-10">
             <h3 className="font-bold mb-3">Furniture Types</h3>
@@ -274,11 +360,11 @@ const Maintenance = () => {
               </thead>
               <tbody>
                 {furnitureTypes.map((type) => {
-                  const category = categories.find(cat => cat._id === type.categoryId);
+                  const category = categories.find((cat) => cat._id === type.categoryId);
                   return (
                     <tr key={type._id}>
                       <td className="border border-gray-300 px-4 py-2">{type.name}</td>
-                      <td className="border border-gray-300 px-4 py-2">{category ? category.name : 'N/A'}</td>
+                      <td className="border border-gray-300 px-4 py-2">{category ? category.name : "N/A"}</td>
                       <td className="border border-gray-300 px-4 py-2">
                         <button
                           onClick={() => handleDelete(type._id)}
@@ -294,6 +380,7 @@ const Maintenance = () => {
             </table>
           </div>
         )}
+        
         {selectedFilter === "Colors" && (
           <div className="bg-gray-100 p-4 rounded-lg shadow-lg border-2 border-oliveGreen mb-10">
             <h3 className="font-bold mb-3">Colors</h3>
@@ -322,6 +409,7 @@ const Maintenance = () => {
             </table>
           </div>
         )}
+
         {selectedFilter === "Furniture Size" && (
           <div className="bg-gray-100 p-4 rounded-lg shadow-lg border-2 border-oliveGreen mb-10">
             <h3 className="font-bold mb-3">Furniture Sizes</h3>
@@ -329,9 +417,9 @@ const Maintenance = () => {
               <thead>
                 <tr>
                   <th className="border border-gray-300 px-4 py-2">Label</th>
-                  <th className="border border-gray-300 px-4 py-2">Height (cm)</th>
-                  <th className="border border-gray-300 px-4 py-2">Length (cm)</th>
                   <th className="border border-gray-300 px-4 py-2">Width (cm)</th>
+                  <th className="border border-gray-300 px-4 py-2">Length (cm)</th>
+                  <th className="border border-gray-300 px-4 py-2">Height (cm)</th>
                   <th className="border border-gray-300 px-4 py-2">Depth (cm)</th>
                   <th className="border border-gray-300 px-4 py-2">Actions</th>
                 </tr>
@@ -359,8 +447,8 @@ const Maintenance = () => {
           </div>
         )}
       </div>
-      <ToastContainer 
-      />
+
+      <ToastContainer />
     </div>
   );
 };
