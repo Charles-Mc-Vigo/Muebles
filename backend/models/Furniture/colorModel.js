@@ -13,6 +13,10 @@ const colorSchema = new mongoose.Schema({
   hex: {
     type: String,
     required: true
+  },
+  isArchived:{
+    type:Boolean,
+    default:false
   }
 }, {
   timestamps: true
