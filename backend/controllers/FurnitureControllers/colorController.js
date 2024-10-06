@@ -1,24 +1,39 @@
 const Colors = require("../../models/Furniture/colorModel");
 
+const isValidRGB = (rgb) => {
+  const rgbArray = rgb.split(',').map(Number);
+  // Check if there are exactly 3 values and each is between 0 and 255
+  return rgbArray.length === 3 && rgbArray.every(value => value >= 0 && value <= 255);
+};
+
 exports.addColor = async (req, res) => {
   try {
-    const { name, rgb, hex } = req.body;
-    if (!name || !rgb || !hex) {
-      return res.status(400).json({ message: "All inputs are required! name, rgb, hex" });
-    }
+      const { name, rgb, hex } = req.body;
 
-    // Validate hex and rgb
-    if (!isValidHex(hex)) return res.status(400).json({ message: "Invalid hex format!" });
-    if (!isValidRGB(rgb)) return res.status(400).json({ message: "Invalid RGB format!" });
+      // Validate required inputs
+      if (!name || !rgb || !hex) {
+          return res.status(400).json({ message: "All inputs are required! name, rgb, hex" });
+      }
 
-    const newColor = new Colors({ name, rgb, hex });
-    await newColor.save();
-    res.status(201).json({ message: `${newColor.name} is added successfully!` });
+      // Validate hex format
+      if (!isValidHex(hex)) {
+          return res.status(400).json({ message: "Invalid hex format!" });
+      }
+
+      // Validate RGB format (assuming it's a string like "255, 0, 0")
+      if (!isValidRGB(rgb)) {
+          return res.status(400).json({ message: "Invalid RGB format! Use '255, 0, 0' format." });
+      }
+
+      const newColor = new Colors({ name, rgb, hex });
+      await newColor.save();
+      res.status(201).json({ message: `${newColor.name} is added successfully!` });
   } catch (error) {
-    console.log('Error adding color: ', error);
-    res.status(500).json({ message: "Server error!" });
+      console.log('Error adding color: ', error);
+      res.status(500).json({ message: "Server error!" });
   }
-}
+};
+
 
 exports.getColors = async (req, res) => {
   try {
@@ -88,19 +103,6 @@ const isValidHex = (hex) => {
   // Regular expression to match hex color codes
   const hexRegex = /^#([0-9A-F]{3}|[0-9A-F]{6})$/i;
   return hexRegex.test(hex);
-};
-
-// Function to validate RGB color format
-const isValidRGB = (rgb) => {
-  // Regular expression to match RGB format
-  const rgbRegex = /^rgb\(\s*([0-9]{1,3}\s*),\s*([0-9]{1,3}\s*),\s*([0-9]{1,3}\s*)\)$/;
-  const match = rgb.match(rgbRegex);
-  if (!match) return false;
-  // Check if each RGB value is between 0 and 255
-  const r = parseInt(match[1]);
-  const g = parseInt(match[2]);
-  const b = parseInt(match[3]);
-  return r >= 0 && r <= 255 && g >= 0 && g <= 255 && b >= 0 && b <= 255;
 };
 
 exports.editColor = async (req, res) => {
