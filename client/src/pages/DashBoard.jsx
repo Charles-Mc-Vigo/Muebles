@@ -1,7 +1,14 @@
-import React, { useState } from 'react';
-import Cookies from 'js-cookie';
+import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBox, faListUl, faTruck, faChevronDown, faChevronUp, faHandshake, faWrench } from '@fortawesome/free-solid-svg-icons';
+import { 
+  faBox, 
+  faListUl, 
+  faTruck, 
+  faChevronDown, 
+  faChevronUp, 
+  faHandshake, 
+  faWrench 
+} from '@fortawesome/free-solid-svg-icons';
 import ProductManagement from './ProductManagement';
 import Inventory from '../components/Inventory';
 import ServiceSection from '../components/Services';
@@ -9,144 +16,220 @@ import ItemList from '../components/ItemList';
 import DashboardContent from '../components/DashboardContent';
 import Maintenance from '../components/Maintenance';
 
-const DashBoard = () => {
-  const [productDropdownOpen, setProductDropdownOpen] = useState(false);
-  const [transactionDropdownOpen, setTransactionDropdownOpen] = useState(false);
-  const [deliveryDropdownOpen, setDeliveryDropdownOpen] = useState(false);
-  const [maintenanceDropdownOpen, setMaintenanceDropdownOpen] = useState(false);
+const Dashboard = () => {
+  // State management for dropdowns
+  const [dropdowns, setDropdowns] = useState({
+    product: false,
+    transaction: false,
+    delivery: false,
+    maintenance: false
+  });
+
   const [activeSection, setActiveSection] = useState('dashboard');
 
-  const toggleProductDropdown = () => setProductDropdownOpen(!productDropdownOpen);
-  const toggleTransactionDropdown = () => setTransactionDropdownOpen(!transactionDropdownOpen);
-  const toggleDeliveryDropdown = () => setDeliveryDropdownOpen(!deliveryDropdownOpen);
-  const toggleMaintenanceDropdown = () => setMaintenanceDropdownOpen(!maintenanceDropdownOpen);
+  // Load active section from localStorage
+  useEffect(() => {
+    const storedSection = localStorage.getItem('activeSection');
+    if (storedSection) {
+      setActiveSection(storedSection);
+    }
+  }, []);
+
+  // Save active section to localStorage
+  useEffect(() => {
+    localStorage.setItem('activeSection', activeSection);
+  }, [activeSection]);
+
+  // Toggle dropdown handler
+  const toggleDropdown = (dropdown) => {
+    setDropdowns(prev => ({
+      ...prev,
+      [dropdown]: !prev[dropdown]
+    }));
+  };
+
+  // Navigation item component
+  const NavItem = ({ icon, label, isActive, onClick, hasDropdown, isOpen }) => (
+    <li 
+      className={`px-4 py-2 flex items-center justify-between text-black cursor-pointer 
+        ${isActive ? 'bg-white rounded-l-3xl' : 'hover:bg-white hover:rounded-l-3xl'}`}
+      onClick={onClick}
+    >
+      <span className="flex items-center">
+        <FontAwesomeIcon icon={icon} className="mr-2" /> {label}
+      </span>
+      {hasDropdown && (
+        <FontAwesomeIcon icon={isOpen ? faChevronUp : faChevronDown} />
+      )}
+    </li>
+  );
+
+  // Dropdown item component
+  const DropdownItem = ({ label, section, currentSection, onClick }) => (
+    <li 
+      className={`px-4 py-2 text-black cursor-pointer 
+        ${currentSection === section ? 'bg-white rounded-l-3xl' : 'hover:bg-white rounded-l-3xl'}`}
+      onClick={() => onClick(section)}
+    >
+      {label}
+    </li>
+  );
+
+  // Content mapping
+  const contentMap = {
+    'dashboard': <DashboardContent />,
+    'view-products': <ItemList />,
+    'modify-product': <ProductManagement />,
+    'inventory': <Inventory />,
+    'order-management': <h2 className="text-2xl font-semibold">Order Management Content</h2>,
+    'track-delivery': <h2 className="text-2xl font-semibold">Track Delivery Content</h2>,
+    'manage-delivery': <h2 className="text-2xl font-semibold">Manage Delivery Content</h2>,
+    'Category': <Maintenance />,
+    'Services': <ServiceSection />,
+    'repair-hardware': <h2 className="text-2xl font-semibold">Repair Hardware Content</h2>
+  };
 
   return (
     <div className="flex h-screen bg-gray-100">
+      {/* Sidebar */}
       <aside className="w-64 bg-oliveGreen text-white flex flex-col items-center py-5 rounded-l-3xl ml-1 h-50 mt-2 mb-2">
         <h1 className="text-2xl font-bold mb-6">JCKAME</h1>
         <nav className="w-full">
           <ul className="space-y-4">
-            <h1 className={`px-4 py-2 flex items-center text-black text-xl cursor-pointer ${activeSection === 'dashboard' ? 'bg-white rounded-l-3xl' : ''}`} onClick={() => setActiveSection('dashboard')}>
-              <FontAwesomeIcon icon={faBox} className="mr-2" /> Dashboard
-            </h1>
+            <NavItem 
+              icon={faBox}
+              label="Dashboard"
+              isActive={activeSection === 'dashboard'}
+              onClick={() => setActiveSection('dashboard')}
+            />
 
-            <li className={`px-4 py-2 flex items-center justify-between text-black cursor-pointer ${activeSection.startsWith('product') ? 'bg-white rounded-l-3xl' : ''}`} onClick={toggleProductDropdown}>
-              <span className="flex items-center">
-                <FontAwesomeIcon icon={faBox} className="mr-2" /> Product Management
-              </span>
-              <FontAwesomeIcon icon={productDropdownOpen ? faChevronUp : faChevronDown} />
-            </li>
-            {productDropdownOpen && (
+            {/* Product Management Section */}
+            <NavItem 
+              icon={faBox}
+              label="Product Management"
+              isActive={activeSection.startsWith('product')}
+              onClick={() => toggleDropdown('product')}
+              hasDropdown
+              isOpen={dropdowns.product}
+            />
+            {dropdowns.product && (
               <ul className="ml-8 space-y-2">
-                <li className={`px-4 py-2 text-black cursor-pointer ${activeSection === 'view-products' ? 'bg-white rounded-l-3xl' : 'hover:bg-white rounded-l-3xl'}`} onClick={() => setActiveSection('view-products')}>
-                  View Products
-                </li>
-                <li className={`px-4 py-2 text-black cursor-pointer ${activeSection === 'modify-product' ? 'bg-white rounded-l-3xl' : 'hover:bg-white rounded-l-3xl'}`} onClick={() => setActiveSection('modify-product')}>
-                  Modify Product
-                </li>
+                <DropdownItem 
+                  label="View Products"
+                  section="view-products"
+                  currentSection={activeSection}
+                  onClick={setActiveSection}
+                />
+                <DropdownItem 
+                  label="Modify Product"
+                  section="modify-product"
+                  currentSection={activeSection}
+                  onClick={setActiveSection}
+                />
               </ul>
             )}
 
-            <li className={`px-4 py-2 flex items-center text-black cursor-pointer ${activeSection === 'order-management' ? 'bg-white rounded-l-3xl' : 'hover:bg-white rounded-l-3xl'}`} onClick={() => setActiveSection('order-management')}>
-              <FontAwesomeIcon icon={faListUl} className="mr-2" /> Order Management
-            </li>
+            {/* Order Management */}
+            <NavItem 
+              icon={faListUl}
+              label="Order Management"
+              isActive={activeSection === 'order-management'}
+              onClick={() => setActiveSection('order-management')}
+            />
 
-            <li className={`px-4 py-2 flex items-center text-black cursor-pointer ${activeSection === 'inventory' ? 'bg-white rounded-l-3xl' : 'hover:bg-white rounded-l-3xl'}`} onClick={() => setActiveSection('inventory')}>
-              <FontAwesomeIcon icon={faBox} className="mr-2" /> Inventory
-            </li>
+            {/* Inventory */}
+            <NavItem 
+              icon={faBox}
+              label="Inventory"
+              isActive={activeSection === 'inventory'}
+              onClick={() => setActiveSection('inventory')}
+            />
 
-            <li className={`px-4 py-2 flex items-center justify-between text-black cursor-pointer ${activeSection.startsWith('transaction') ? 'bg-white rounded-l-3xl' : ''}`} onClick={toggleTransactionDropdown}>
-              <span className="flex items-center">
-                <FontAwesomeIcon icon={faHandshake} className="mr-2" /> Transaction
-              </span>
-              <FontAwesomeIcon icon={transactionDropdownOpen ? faChevronUp : faChevronDown} />
-            </li>
-            {transactionDropdownOpen && (
+            {/* Transaction Section */}
+            <NavItem 
+              icon={faHandshake}
+              label="Transaction"
+              isActive={activeSection.startsWith('transaction')}
+              onClick={() => toggleDropdown('transaction')}
+              hasDropdown
+              isOpen={dropdowns.transaction}
+            />
+            {dropdowns.transaction && (
               <ul className="ml-8 space-y-2">
-                <li className={`px-4 py-2 text-black cursor-pointer ${activeSection === 'view-transactions' ? 'bg-white rounded-l-3xl' : 'hover:bg-white rounded-l-3xl'}`} onClick={() => setActiveSection('view-transactions')}>
-                  View Transactions
-                </li>
+                <DropdownItem 
+                  label="View Transactions"
+                  section="view-transactions"
+                  currentSection={activeSection}
+                  onClick={setActiveSection}
+                />
               </ul>
             )}
 
-            <li className={`px-4 py-2 flex items-center justify-between text-black cursor-pointer ${activeSection.startsWith('delivery') ? 'bg-white rounded-l-3xl' : ''}`} onClick={toggleDeliveryDropdown}>
-              <span className="flex items-center">
-                <FontAwesomeIcon icon={faTruck} className="mr-2" /> Delivery
-              </span>
-              <FontAwesomeIcon icon={deliveryDropdownOpen ? faChevronUp : faChevronDown} />
-            </li>
-            {deliveryDropdownOpen && (
+            {/* Delivery Section */}
+            <NavItem 
+              icon={faTruck}
+              label="Delivery"
+              isActive={activeSection.startsWith('delivery')}
+              onClick={() => toggleDropdown('delivery')}
+              hasDropdown
+              isOpen={dropdowns.delivery}
+            />
+            {dropdowns.delivery && (
               <ul className="ml-8 space-y-2">
-                <li className={`px-4 py-2 text-black cursor-pointer ${activeSection === 'track-delivery' ? 'bg-white rounded-l-3xl' : 'hover:bg-white rounded-l-3xl'}`} onClick={() => setActiveSection('track-delivery')}>
-                  Track Delivery
-                </li>
-                <li className={`px-4 py-2 text-black cursor-pointer ${activeSection === 'manage-delivery' ? 'bg-white rounded-l-3xl' : 'hover:bg-white rounded-l-3xl'}`} onClick={() => setActiveSection('manage-delivery')}>
-                  Manage Delivery
-                </li>
+                <DropdownItem 
+                  label="Track Delivery"
+                  section="track-delivery"
+                  currentSection={activeSection}
+                  onClick={setActiveSection}
+                />
+                <DropdownItem 
+                  label="Manage Delivery"
+                  section="manage-delivery"
+                  currentSection={activeSection}
+                  onClick={setActiveSection}
+                />
               </ul>
             )}
 
-            <li className={`px-4 py-2 flex items-center justify-between text-black cursor-pointer ${activeSection.startsWith('maintenance') ? 'bg-white rounded-l-3xl' : ''}`} onClick={toggleMaintenanceDropdown}>
-              <span className="flex items-center">
-                <FontAwesomeIcon icon={faWrench} className="mr-2" /> Maintenance
-              </span>
-              <FontAwesomeIcon icon={maintenanceDropdownOpen ? faChevronUp : faChevronDown} />
-            </li>
-            {maintenanceDropdownOpen && (
+            {/* Maintenance Section */}
+            <NavItem 
+              icon={faWrench}
+              label="Maintenance"
+              isActive={activeSection.startsWith('maintenance')}
+              onClick={() => toggleDropdown('maintenance')}
+              hasDropdown
+              isOpen={dropdowns.maintenance}
+            />
+            {dropdowns.maintenance && (
               <ul className="ml-8 space-y-2">
-                <li className={`px-4 py-2 text-black cursor-pointer ${activeSection === 'Category' ? 'bg-white rounded-l-3xl' : 'hover:bg-white rounded-l-3xl'}`} onClick={() => setActiveSection('Category')}>
-                  Category
-                </li>
-                <li className={`px-4 py-2 text-black cursor-pointer ${activeSection === 'Services' ? 'bg-white rounded-l-3xl' : 'hover:bg-white rounded-l-3xl'}`} onClick={() => setActiveSection('Services')}>
-                  Services
-                </li>
+                <DropdownItem 
+                  label="Category"
+                  section="Category"
+                  currentSection={activeSection}
+                  onClick={setActiveSection}
+                />
+                <DropdownItem 
+                  label="Services"
+                  section="Services"
+                  currentSection={activeSection}
+                  onClick={setActiveSection}
+                />
               </ul>
             )}
           </ul>
         </nav>
       </aside>
 
+      {/* Main Content */}
       <main className="flex-1 p-6 overflow-y-auto">
         <div className="h-100 max-h-[calc(50vh-50px)]">
-          {activeSection === 'dashboard' && (
-            <div className='h-full overflow-y-auto'>
-              <DashboardContent />
-            </div>
-          )}
-          {activeSection === 'view-products' && (
-            <div className='h-full overflow-y-auto'>
-              <ItemList />
-            </div>
-          )}
-          {activeSection === 'modify-product' && (
-            <div className="h-full overflow-y-auto">
-              <ProductManagement />
-            </div>
-          )}
-          {activeSection === 'inventory' && (
-            <div>
-              <Inventory />
-            </div>
-          )}
-          {activeSection === 'order-management' && <h2 className="text-2xl font-semibold">Order Management Content</h2>}
-          {activeSection === 'track-delivery' && <h2 className="text-2xl font-semibold">Track Delivery Content</h2>}
-          {activeSection === 'manage-delivery' && <h2 className="text-2xl font-semibold">Manage Delivery Content</h2>}
-          {activeSection === 'Category' && (
-            <div className="h-full overflow-y-auto">
-              <Maintenance />
-            </div>
-          )}
-          {activeSection === 'Services' && (
-            <div className="h-full overflow-y-auto">
-              <ServiceSection />
-            </div>
-          )}
-          {activeSection === 'repair-hardware' && <h2 className="text-2xl font-semibold">Repair Hardware Content</h2>}
+          <div className={`h-full overflow-y-auto ${activeSection !== 'inventory' ? '' : ''}`}>
+            {contentMap[activeSection]}
+          </div>
         </div>
       </main>
     </div>
   );
 };
 
-export default DashBoard;
+export default Dashboard;

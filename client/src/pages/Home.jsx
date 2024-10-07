@@ -207,8 +207,8 @@ const Home = () => {
                       <button
                         className="bg-blue-500 text-white px-4 py-2 rounded w-full"
                         onClick={(e) => {
-                          e.stopPropagation(); // Prevent triggering the card click
-                          handleCardClick(product); // Handle button click
+                          e.stopPropagation(); 
+                          handleCardClick(product); 
                         }}
                       >
                         View Product

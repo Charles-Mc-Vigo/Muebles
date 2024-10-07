@@ -1,557 +1,469 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+import React, { useEffect, useState } from "react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const ProductManagement = () => {
-	const [products, setProducts] = useState([]);
+	const [selectedCategory, setSelectedCategory] = useState("");
+	const [selectedFurnitureType, setSelectedFurnitureType] = useState("");
 	const [categories, setCategories] = useState([]);
-	const [colors, setColors] = useState([]);
+	const [filteredFurnitureTypes, setFilteredFurnitureTypes] = useState([]);
+	const [filteredSizes, setFilteredSizes] = useState([]);
 	const [furnitureTypes, setFurnitureTypes] = useState([]);
 	const [materials, setMaterials] = useState([]);
-	const [newProduct, setNewProduct] = useState({
-		image: null,
+	const [colors, setColors] = useState([]);
+	const [sizes, setSizes] = useState([]);
+	const [newFurniture, setNewFurniture] = useState({
+		image: "",
+		name: "",
 		category: "",
 		furnitureType: "",
-		name: "",
 		description: "",
-		price: "",
-		color: "",
-		material: "",
+		materials: [],
+		colors: [],
+		sizes: [],
 		stocks: "",
-		sizes: ""
+		price: "",
 	});
-	// Page navigation
-	const [currentPage, setCurrentPage] = useState(1);
-	const [productsPerPage] = useState(5);
+	const [furnitureData, setFurnitureData] = useState([]); // State for furniture data
 
-	// State for filtering
-	const [filterCategory, setFilterCategory] = useState("");
-	const [filterType, setFilterType] = useState("");
-
-	// State for sorting by date
-	const [sortOrder, setSortOrder] = useState("newest");
-
-	// Fetch categories from the backend
-	const fetchCategories = async () => {
+	const fetchFurnitureData = async () => {
 		try {
-			const response = await axios.get("http://localhost:3000/api/categories");
-			setCategories(response.data);
+			const response = await fetch("http://localhost:3000/api/furnitures");
+			if (!response.ok) {
+				throw new Error("Failed to fetch furniture data");
+			}
+			const data = await response.json();
+			// console.log(data); // Log the data to check its structure
+			setFurnitureData(data.furnitures || []); // Set fetched furniture data
+			setCategories(data.categories || []);
+			setMaterials(data.materials || []);
+			setColors(data.colors || []);
+			setSizes(data.sizes || []);
 		} catch (error) {
-			console.error("Error fetching categories:", error);
-			alert("Failed to fetch categories. Please try again.");
+			console.error("Error fetching furniture data:", error);
+			toast.error("Error fetching furniture data");
 		}
 	};
 
-	// Fetch furniture products from the backend
-	const fetchProducts = async () => {
-		try {
-			const response = await axios.get("http://localhost:3000/api/furnitures");
-			console.log("Fetched products:", response.data);
-			setProducts(response.data);
-		} catch (error) {
-			console.error("Error fetching products:", error);
-			alert("Failed to fetch products. Please try again.");
-		}
-	};
-
-	// Fetch furniture colors from the backend
-	const fetchColors = async () => {
-		try {
-			const response = await axios.get("http://localhost:3000/api/colors");
-			console.log("Fetched colors:", response.data);
-			setColors(response.data);
-		} catch (error) {
-			console.error("Error fetching colors:", error);
-			alert("Failed to fetch color. Please try again.");
-		}
-	};
-
-	// Fetch furniture types
 	const fetchFurnitureTypes = async () => {
 		try {
-			const response = await axios.get(
-				"http://localhost:3000/api/furniture-types"
-			);
-			console.log("Fetched furniture types:", response.data);
-			setFurnitureTypes(response.data);
+			const response = await fetch("http://localhost:3000/api/furniture-types");
+			if (!response.ok) {
+				throw new Error("Failed to fetch furniture types");
+			}
+			const data = await response.json();
+			setFurnitureTypes(data || []);
 		} catch (error) {
 			console.error("Error fetching furniture types:", error);
-			alert("Failed to fetch furniture types. Please try again.");
+			toast.error("Error fetching furniture types:");
 		}
 	};
 
-	// Fetch materials
+	const fetchCategories = async () => {
+		try {
+			const response = await fetch("http://localhost:3000/api/categories");
+			if (!response.ok) {
+				throw new Error("Failed to fetch categories");
+			}
+			const data = await response.json();
+			setCategories(data || []);
+		} catch (error) {
+			console.error("Error fetching categories types:", error);
+			toast.error("Error fetching categories types");
+		}
+	};
+
 	const fetchMaterials = async () => {
 		try {
-			const response = await axios.get("http://localhost:3000/api/materials");
-			console.log("Fetched materials:", response.data);
-			setMaterials(response.data);
+			const response = await fetch("http://localhost:3000/api/materials");
+			if (!response.ok) {
+				throw new Error("Failed to fetch categories");
+			}
+			const data = await response.json();
+			setMaterials(data || []);
 		} catch (error) {
-			console.error("Error fetching materials:", error);
-			alert("Failed to fetch materials. Please try again.");
+			console.error("Error fetching categories types:", error);
+			toast.error("Error fetching categories types");
+		}
+	};
+
+	const fetchColors = async () => {
+		try {
+			const response = await fetch("http://localhost:3000/api/colors");
+			if (!response.ok) {
+				throw new Error("Failed to fetch colors");
+			}
+			const data = await response.json();
+			setColors(data || []);
+		} catch (error) {
+			console.error("Error fetching colors :", error);
+			toast.error("Error fetching colors");
+		}
+	};
+
+	const fetchSizes = async () => {
+		try {
+			const response = await fetch("http://localhost:3000/api/sizes");
+			if (!response.ok) {
+				throw new Error("Failed to fetch sizes");
+			}
+			const data = await response.json();
+			setSizes(data || []);
+		} catch (error) {
+			console.error("Error fetching sizes :", error);
+			toast.error("Error fetching sizes");
 		}
 	};
 
 	useEffect(() => {
-		const fetchData = async () => {
-			try {
-				await Promise.all([
-					fetchCategories(),
-					fetchProducts(),
-					fetchColors(),
-					fetchFurnitureTypes(),
-					fetchMaterials(),
-				]);
-			} catch (error) {
-				console.error("Error fetching data:", error);
-			}
-		};
-		fetchData();
+		fetchFurnitureData();
+		fetchFurnitureTypes();
+		fetchCategories();
+		fetchMaterials();
+		fetchColors();
+		fetchSizes();
 	}, []);
 
-  const handleInputChange = (e) => {
-    const { name, value, files } = e.target;
-    if (name.startsWith("sizes.")) {
-      const [, dimension] = name.split(".");
-      setNewProduct((prevData) => ({
-        ...prevData,
-        sizes: [{ ...prevData.sizes[0], [dimension]: value }]
-      }));
-    } else {
-      setNewProduct((prevData) => ({
-        ...prevData,
-        [name]: files ? files[0] : value,
-      }));
-    }
-  };
+	const handleCategoryChange = (e) => {
+		const categoryId = e.target.value;
+		setSelectedCategory(categoryId);
+		setNewFurniture((prev) => ({
+			...prev,
+			category: categoryId,
+			furnitureType: "",
+		}));
+		setSelectedFurnitureType("");
+		const filteredTypes = furnitureTypes.filter(
+			(type) => type.categoryId === categoryId
+		);
+		setFilteredFurnitureTypes(filteredTypes);
+	};
 
-	const handleDelete = async (id) => {
-		try {
-			await axios.delete(
-				`http://localhost:3000/api/furnitures/furniture/${id}`
-			);
-			setProducts(products.filter((product) => product._id !== id));
-			alert("Product deleted successfully.");
-		} catch (error) {
-			console.error("Error deleting product:", error);
-			alert("Failed to delete the product. Please try again.");
+	const handleFurnitureTypeChange = (e) => {
+		const furnitureTypeId = e.target.value;
+		setSelectedFurnitureType(furnitureTypeId);
+		setNewFurniture((prev) => ({
+			...prev,
+			furnitureType: furnitureTypeId,
+		}));
+		const filtered = sizes.filter(
+			(size) => size.furnitureTypeId === furnitureTypeId
+		);
+		setFilteredSizes(filtered);
+	};
+
+	const handleInputChange = (e) => {
+		const { name, value, type, checked } = e.target;
+		if (type === "checkbox") {
+			if (name === "material") {
+				setNewFurniture((prev) => ({
+					...prev,
+					materials: checked
+						? [...prev.materials, value]
+						: prev.materials.filter((material) => material !== value),
+				}));
+			} else if (name === "color") {
+				setNewFurniture((prev) => ({
+					...prev,
+					colors: checked
+						? [...prev.colors, value]
+						: prev.colors.filter((color) => color !== value),
+				}));
+			} else if (name === "sizes") {
+				setNewFurniture((prev) => ({
+					...prev,
+					sizes: checked
+						? [...prev.sizes, value]
+						: prev.sizes.filter((size) => size !== value),
+				}));
+			}
+		} else {
+			setNewFurniture((prev) => ({
+				...prev,
+				[name]: value,
+			}));
 		}
 	};
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const form = new FormData();
-    form.append("image", newProduct.image);
-    form.append("category", newProduct.category);
-    form.append("furnitureType", newProduct.furnitureType);
-    form.append("name", newProduct.name);
-    form.append("description", newProduct.description);
-    form.append("price", newProduct.price);
-    form.append("color", newProduct.color);
-    form.append("material", newProduct.material);
-    form.append("stocks", newProduct.stocks);
-    form.append("sizes", JSON.stringify(newProduct.sizes));
+	const handleFileChange = (e) => {
+		const file = e.target.files[0];
+		if (file) {
+			const reader = new FileReader();
+			reader.onloadend = () => {
+				setNewFurniture((prev) => ({
+					...prev,
+					image: reader.result.split(",")[1],
+				}));
+			};
+			reader.readAsDataURL(file);
+		}
+	};
 
-    try {
-      const response = await axios.post(
-        "http://localhost:3000/api/furnitures/add",
-        form,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-
-      alert(`${response.data.furniture.name} has been added successfully!`);
-      fetchProducts();
-      setNewProduct({
-        image: null,
-        category: "",
-        furnitureType: "",
-        name: "",
-        description: "",
-        price: "",
-        color: "",
-        material: "",
-        stocks: "",
-        sizes: ""
-      });
-    } catch (error) {
-      console.error(
-        "Error creating furniture!",
-        error.response?.data || error.message
-      );
-      alert(
-        error.response?.data?.message ||
-          error.message ||
-          "Cannot add furniture!"
-      );
-    }
-  };
-
-	// Filtering logic based on category and type
-	const filteredProducts = products.filter((product) => {
-		return (
-			(!filterCategory || product.category === filterCategory) &&
-			(!filterType || product.furnitureType === filterType)
-		);
-	});
-
-	// Sorting logic based on the created date
-	const sortedProducts = filteredProducts.sort((a, b) => {
-		const dateA = new Date(a.createdAt || 0);
-		const dateB = new Date(b.createdAt || 0);
-		return sortOrder === "newest" ? dateB - dateA : dateA - dateB;
-	});
-
-	// Pagination logic
-	const indexOfLastProduct = currentPage * productsPerPage;
-	const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
-	const currentProducts = sortedProducts.slice(
-		indexOfFirstProduct,
-		indexOfLastProduct
-	);
-	const totalPages = Math.max(
-		Math.ceil(sortedProducts.length / productsPerPage),
-		1
-	);
-
+	const handleSubmit = async (e) => {
+		e.preventDefault();
+		try {
+			const response = await fetch("http://localhost:3000/api/furnitures/add", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					image: newFurniture.image,
+					name: newFurniture.name,
+					category: newFurniture.category,
+					furnitureType: newFurniture.furnitureType,
+					description: newFurniture.description,
+					materials: newFurniture.materials,
+					colors: newFurniture.colors,
+					sizes: newFurniture.sizes,
+					stocks: newFurniture.stocks,
+					price: newFurniture.price,
+				}),
+			});
+			if (response.ok) {
+				const data = await response.json();
+				toast.success(data.message);
+				setNewFurniture({
+					image: "",
+					name: "",
+					category: "",
+					furnitureType: "",
+					description: "",
+					materials: [],
+					colors: [],
+					sizes: [],
+					stocks: "",
+					price: "",
+				});
+				await fetchFurnitureData(); // Refresh furniture data
+			} else {
+				const errorData = await response.json();
+				toast.error(errorData.message);
+			}
+		} catch (error) {
+			console.error("Error adding new Furniture:", error);
+			toast.error("Failed to add new Furniture");
+		}
+	};
 	return (
-		<div className="container mx-auto p-2">
-			<h1 className="text-3xl font-bold mb-2 text-center">
+		<div className="container mx-auto p-4">
+			<h1 className="text-3xl font-bold mb-6 text-center">
 				Product Management
 			</h1>
-
-			{/* Filter and Sort Section */}
-			<div className="mb-2 flex gap-4 justify-end">
-				<select
-					name="filterCategory"
-					onChange={(e) => setFilterCategory(e.target.value)}
-					value={filterCategory}
-					className="bg-gray-100 p-2 rounded-lg border border-gray-300"
-				>
-					<option value="">All Categories</option>
-					{categories.map((category) => (
-						<option key={category._id} value={category.name}>
-							{category.name}
-						</option>
-					))}
-				</select>
-
-				<select
-					name="filterType"
-					onChange={(e) => setFilterType(e.target.value)}
-					value={filterType}
-					className="bg-gray-100 p-2 rounded-lg border border-gray-300"
-				>
-					<option value="">All Types</option>
-					{furnitureTypes.map((type) => (
-						<option key={type._id} value={type.name}>
-							{type.name}
-						</option>
-					))}
-				</select>
-
-				{/* Sort by Date Dropdown */}
-				<select
-					name="sortOrder"
-					onChange={(e) => setSortOrder(e.target.value)}
-					value={sortOrder}
-					className="bg-gray-100 p-3 rounded-lg border border-gray-300"
-				>
-					<option value="newest">Newest</option>
-					<option value="oldest">Oldest</option>
-				</select>
-			</div>
-
-			<div className="flex gap-6">
-				{/* Product Form Section */}
-				<div className="w-full md:w-1/3 bg-white p-6 rounded-lg shadow-lg flex flex-col h-full">
-					<form onSubmit={handleSubmit} className="space-y-6 flex-grow">
-						<select
-							name="category"
-							onChange={handleInputChange}
-							value={newProduct.category}
-							className="bg-gray-100 p-3 rounded-lg w-full border border-gray-300"
-							required
-						>
-							<option value="">Select Category</option>
-							{categories.map((category) => (
-								<option key={category._id} value={category.name}>
-									{category.name}
-								</option>
-							))}
-						</select>
-
-						<select
-							name="furnitureType"
-							onChange={handleInputChange}
-							value={newProduct.furnitureType}
-							className="bg-gray-100 p-3 rounded-lg w-full border border-gray-300"
-							required
-						>
-							<option value="">Select Furniture Type</option>
-							{furnitureTypes.map((furnitureType) => (
-								<option key={furnitureType._id} value={furnitureType.name}>
-									{furnitureType.name}
-								</option>
-							))}
-						</select>
-
-						<input
-							type="text"
-							name="name"
-							placeholder="Product Name"
-							value={newProduct.name}
-							onChange={handleInputChange}
-							className="w-full p-3 bg-gray-100 rounded-lg border border-gray-300"
-							required
-						/>
-
-						<textarea
-							name="description"
-							placeholder="Description"
-							value={newProduct.description}
-							onChange={handleInputChange}
-							className="w-full p-3 bg-gray-100 rounded-lg border border-gray-300"
-							required
-						/>
-
-						<input
-							type="number"
-							name="price"
-							placeholder="Price"
-							value={newProduct.price}
-							onChange={handleInputChange}
-							className="w-full p-3 bg-gray-100 rounded-lg border border-gray-300"
-							required
-						/>
-
-						{/* Color, Material, and Stock Dropdowns */}
-						<select
-							name="color"
-							onChange={handleInputChange}
-							value={newProduct.color}
-							className="bg-gray-100 p-3 rounded-lg w-full border border-gray-300"
-							required
-						>
-							<option value="">Select Color</option>
-							{colors.map((color) => (
-								<option key={color._id} value={color.name}>
-									{color.name}
-								</option>
-							))}
-						</select>
-
-						<select
-							name="material"
-							onChange={handleInputChange}
-							value={newProduct.material}
-							className="bg-gray-100 p-3 rounded-lg w-full border border-gray-300"
-							required
-						>
-							<option value="">Select Material</option>
+			<div className="flex flex-row justify-center">
+				<form onSubmit={handleSubmit} className="mb-6 space-y-4 w-1/2">
+					{/* Form fields remain unchanged */}
+					<input
+						id="name"
+						type="text"
+						name="name"
+						placeholder="Product Name"
+						value={newFurniture.name}
+						onChange={handleInputChange}
+						required
+						className="border rounded p-2 w-full"
+					/>
+					<select
+						id="category"
+						name="category"
+						value={selectedCategory}
+						onChange={handleCategoryChange}
+						required
+						className="border rounded p-2 w-full"
+					>
+						<option value="">Select Category</option>
+						{categories.map((category) => (
+							<option key={category._id} value={category._id}>
+								{category.name}
+							</option>
+						))}
+					</select>
+					<select
+						id="furnitureType"
+						name="furnitureType"
+						value={selectedFurnitureType}
+						onChange={handleFurnitureTypeChange}
+						required
+						className="border rounded p-2 w-full"
+					>
+						<option value="">Select Type</option>
+						{filteredFurnitureTypes.map((furnitureType) => (
+							<option key={furnitureType._id} value={furnitureType._id}>
+								{furnitureType.name}
+							</option>
+						))}
+					</select>
+					<textarea
+						id="description"
+						name="description"
+						placeholder="Description"
+						value={newFurniture.description}
+						onChange={handleInputChange}
+						required
+						className="border rounded p-2 w-full"
+					/>
+					<input
+						id="price"
+						type="number"
+						name="price"
+						placeholder="Price"
+						value={newFurniture.price}
+						onChange={handleInputChange}
+						required
+						className="border rounded p-2 w-full"
+					/>
+					<input
+						id="stocks"
+						type="number"
+						name="stocks"
+						placeholder="Available Stocks"
+						value={newFurniture.stocks}
+						onChange={handleInputChange}
+						required
+						className="border rounded p-2 w-full"
+					/>
+					{/* Materials, Colors, Sizes checkboxes remain unchanged */}
+					<div className="mb-4">
+						<label className="block font-semibold">Materials:</label>
+						<div className="flex flex-col space-y-2">
 							{materials.map((material) => (
-								<option key={material._id} value={material.name}>
-									{material.name}
-								</option>
+								<label key={material._id} className="flex items-center">
+									<input
+										type="checkbox"
+										name="material"
+										value={material.name}
+										checked={newFurniture.materials.includes(material.name)}
+										onChange={handleInputChange}
+										className="mr-2 h-4 w-4 border rounded text-blue-600 focus:ring-blue-500"
+									/>
+									<span className="text-gray-700">
+										{material.name.charAt(0).toUpperCase() +
+											material.name.slice(1)}
+									</span>
+								</label>
 							))}
-						</select>
-
-						<input
-							type="number"
-							name="stocks"
-							placeholder="Available Stocks"
-							value={newProduct.stocks}
-							onChange={handleInputChange}
-							className="w-full p-3 bg-gray-100 rounded-lg border border-gray-300"
-							required
-						/>
-						{/* Furniture Sizes */}
-						<div className="">
-						<div className="space-y-2">
-							<select
-								name="selectedSize"
-								value={newProduct.selectedSize}
-								onChange={handleInputChange}
-								className="w-full p-3 bg-gray-100 rounded-lg border border-gray-300"
-								required
-							>
-								<option value="">Select Furniture Size </option>
-								{materials.map((material) => (
-								<option key={material._id} value={material.name}>
-									{material.name}
-								</option>
-								))}
-							</select>
 						</div>
-
-						{/* <input
-							type="number"
-							name="sizes.width"
-							placeholder="Width"
-							value={newProduct.sizes[0].width}
-							onChange={handleInputChange}
-							className="w-full p-3 bg-gray-100 rounded-lg border border-gray-300"
-							required
-						/>
-						<input
-							type="number"
-							name="sizes.height"
-							placeholder="Height"
-							value={newProduct.sizes[0].height}
-							onChange={handleInputChange}
-							className="w-full p-3 bg-gray-100 rounded-lg border border-gray-300"
-							required
-						/>
-						<input
-							type="number"
-							name="sizes.depth"
-							placeholder="Depth"
-							value={newProduct.sizes[0].depth}
-							onChange={handleInputChange}
-							className="w-full p-3 bg-gray-100 rounded-lg border border-gray-300"
-							required
-						/> */}
-
-						</div>
-						<input
-							type="file"
-							name="image"
-							id="image"
-							accept="image/*"
-							onChange={handleInputChange}
-							className="w-full p-3 bg-gray-100 rounded-lg border border-gray-300"
-							required
-						/>
-
-						<button
-							type="submit"
-							className="bg-blue-500 text-white px-6 py-3 rounded-lg w-full"
-						>
-							Add Product
-						</button>
-					</form>
-				</div>
-
-				<div className="w-full md:w-2/3 h-1/2 overflow-y-auto">
-					{currentProducts.length > 0 ? (
-						<table className="min-w-full bg-white border border-black">
-							<thead>
-								<tr>
-									<th className="px-2 py-2 border-b border-r border-black">
-										Image
-									</th>
-									<th className="px-2 py-2 border-b border-r border-black">
-										Product Name
-									</th>
-									<th className="px-2 py-2 border-b border-r border-black">
-										Category
-									</th>
-									<th className="px-2 py-2 border-b border-r border-black">
-										Furniture Type
-									</th>
-									<th className="px-2 py-2 border-b border-r border-black">
-										Description
-									</th>
-									<th className="px-2 py-2 border-b border-r border-black">
-										Price
-									</th>
-									<th className="px-2 py-2 border-b border-r border-black">
-										Color
-									</th>
-									<th className="px-2 py-2 border-b border-r border-black">
-										Material
-									</th>
-									<th className="px-2 py-2 border-b border-r border-black">
-										Stocks
-									</th>
-									<th className="px-2 py-2 border-b border-r border-black">
-										Size (W x H x D)
-									</th>
-									<th className="px-2 py-2 border-b border-r border-black">
-										Actions
-									</th>
-								</tr>
-							</thead>
-							<tbody>
-								{currentProducts.map((product) => (
-									<tr key={product._id} className="border-b">
-										<td className="px-2 py-2">
-											{product.image ? (
-												<img
-													src={`data:image/png;base64,${product.image}`}
-													alt={product.name}
-													className="w-16 h-16 object-cover rounded-lg"
-												/>
-											) : (
-												<span>No Image</span>
-											)}
-										</td>
-										<td className="px-2 py-2 text-center">{product.name}</td>
-										<td className="px-2 py-2 text-center">
-											{product.category?.name}
-										</td>
-										<td className="px-2 py-2 text-center">
-											{product.furnitureType?.name}
-										</td>
-										<td className="px-2 py-2 text-center">
-											{product.description}
-										</td>
-										<td className="px-2 py-2 text-center">₱{product.price}</td>
-										<td className="px-2 py-2 text-center">
-											{product.color?.name}
-										</td>
-										<td className="px-2 py-2 text-center">
-											{product.material?.name}
-										</td>
-										<td className="px-2 py-2 text-center">{product.stocks}</td>
-										<td className="px-2 py-2 text-center">
-											{product.sizes && product.sizes[0]
-												? `${product.sizes[0].width} x ${product.sizes[0].height} x ${product.sizes[0].depth}`
-												: "N/A"}
-										</td>
-										<td className="px-2 py-2 text-center">
-											<button
-												onClick={() => handleDelete(product._id)}
-												className="text-red-500 hover:underline"
-											>
-												Delete
-											</button>
-										</td>
-									</tr>
-								))}
-							</tbody>
-						</table>
-					) : (
-						<p className="text-center text-gray-600">No products found.</p>
-					)}
-
-					{/* Pagination Controls */}
-					<div className="flex justify-center mt-4">
-						<button
-							onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-							disabled={currentPage === 1}
-							className="px-4 py-2 bg-gray-200 text-gray-600 rounded-lg mr-2"
-						>
-							Previous
-						</button>
-						<span className="px-4 py-2">
-							{currentPage} of {totalPages}
-						</span>
-						<button
-							onClick={() =>
-								setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-							}
-							disabled={currentPage === totalPages}
-							className="px-4 py-2 bg-gray-200 text-gray-600 rounded-lg ml-2"
-						>
-							Next
-						</button>
 					</div>
-				</div>
+					<div className="mb-4">
+						<label className="block font-semibold">Colors:</label>
+						<div className="flex flex-col space-y-2">
+							{colors.map((color) => (
+								<label key={color._id} className="flex items-center">
+									<input
+										type="checkbox"
+										name="color"
+										value={color.name}
+										checked={newFurniture.colors.includes(color.name)}
+										onChange={handleInputChange}
+										className="mr-2 h-4 w-4 border rounded text-blue-600 focus:ring-blue-500"
+									/>
+									<span className="text-gray-700">
+										{color.name.charAt(0).toUpperCase() + color.name.slice(1)}
+									</span>
+								</label>
+							))}
+						</div>
+					</div>
+					<div className="mb-4">
+						<label className="block font-semibold">Sizes:</label>
+						<div className="flex flex-col space-y-2">
+							{filteredSizes.length > 0 ? (
+								filteredSizes.map((size) => (
+									<label key={size._id} className="flex items-center">
+										<input
+											type="checkbox"
+											name="sizes"
+											value={size.label}
+											checked={newFurniture.sizes.includes(size.label)}
+											onChange={handleInputChange}
+											className="mr-2 h-4 w-4 border rounded text-blue-600 focus:ring-blue-500"
+										/>
+										<span className="text-gray-700">
+											{size.label.charAt(0).toUpperCase() + size.label.slice(1)}
+										</span>
+									</label>
+								))
+							) : (
+								<p className="text-gray-500">No sizes available</p>
+							)}
+						</div>
+					</div>
+					<input
+						id="image"
+						type="file"
+						name="image"
+						onChange={handleFileChange}
+						required
+						className="border rounded p-2 w-full"
+					/>
+					<button
+						type="submit"
+						className="bg-blue-500 text-white p-2 rounded w-full"
+					>
+						Add Product
+					</button>
+				</form>
 			</div>
+			{/* Table to display furniture data */}
+			<div className="mt-8">
+				<h2 className="text-2xl font-bold mb-4">Furniture List</h2>
+				<table className="min-w-full border-collapse border border-gray-200">
+					<thead>
+						<tr className="bg-gray-100">
+							<th className="border border-gray-300 p-2">Image</th>
+							<th className="border border-gray-300 p-2">Name</th>
+							<th className="border border-gray-300 p-2">Category</th>
+							<th className="border border-gray-300 p-2">Type</th>
+							<th className="border border-gray-300 p-2">Sizes</th>
+							<th className="border border-gray-300 p-2">Price</th>
+							<th className="border border-gray-300 p-2">Stocks</th>
+							<th className="border border-gray-300 p-2">Actions</th>
+						</tr>
+					</thead>
+					<tbody>
+						{furnitureData && furnitureData.length > 0 ? (
+							furnitureData.map((furniture) => (
+								<tr key={furniture._id}>
+									<td className="border border-gray-300 p-2">
+										<img
+											src={`data:image/jpeg;base64,${furniture.image}`}	
+											alt={furniture.name}
+											className="w-16 h-16 object-cover"
+										/>
+									</td>
+									<td className="border border-gray-300 p-2">
+										{furniture.name}
+									</td>
+									<td className="border border-gray-300 p-2">
+										{furniture.category.name}
+									</td>
+									<td className="border border-gray-300 p-2">
+										{furniture.furnitureType}
+									</td>
+									<td className="border border-gray-300 p-2">
+										{furniture.sizes.join(", ")}
+									</td>
+									<td className="border border-gray-300 p-2">
+										{furniture.price}
+									</td>
+									<td className="border border-gray-300 p-2">
+										{furniture.stocks}
+									</td>
+								</tr>
+							))
+						) : (
+							<tr>
+								<td colSpan="7" className="text-center p-4">
+									No furniture available
+								</td>
+							</tr>
+						)}
+					</tbody>
+				</table>
+			</div>
+			<ToastContainer />
 		</div>
 	);
 };
+
 export default ProductManagement;

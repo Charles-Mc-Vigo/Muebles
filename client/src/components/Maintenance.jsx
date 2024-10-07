@@ -1,301 +1,610 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-const Maintenance = () => {
-  const [products, setProducts] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [furnitureTypes, setFurnitureTypes] = useState([]);
-  const [colors, setColors] = useState([]);
-  const [sizes, setSizes] = useState([]);
-  const [selectedFilter, setSelectedFilter] = useState("");
-  const [selectedFurnitureType, setSelectedFurnitureType] = useState("");
-  const [newItemName, setNewItemName] = useState("");
-  const [newSize, setNewSize] = useState({
-    label: "",
-    height: "",
-    length: "",
-    width: "",
-    depth: "",
-    furnitureTypeId: ""
-  });
-
-  // Fetch data from the backend
-  const fetchData = async () => {
-    try {
-      const [categoriesResponse, furnitureTypesResponse, colorsResponse, sizesResponse] = await Promise.all([
-        axios.get("http://localhost:3000/api/categories"),
-        axios.get("http://localhost:3000/api/furniture-types"),
-        axios.get("http://localhost:3000/api/colors"),
-        axios.get("http://localhost:3000/api/sizes")
-      ]);
-
-      setCategories(categoriesResponse.data);
-      setFurnitureTypes(furnitureTypesResponse.data);
-      setColors(colorsResponse.data);
-      setSizes(sizesResponse.data);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-      alert("Failed to fetch data. Please try again.");
-    }
-  };
-
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  // Handle delete
-  const handleDelete = async (id) => {
-    try {
-      await axios.delete(`http://localhost:3000/api/furnitures/furniture/${id}`);
-      setProducts(products.filter((product) => product._id !== id));
-      alert("Product deleted successfully.");
-    } catch (error) {
-      console.error("Error deleting product:", error);
-      alert("Failed to delete the product. Please try again.");
-    }
-  };
-
-  const handleChange = (e) => {
-    const { id, value } = e.target;
-    setNewSize((prevSize) => ({
-      ...prevSize,
-      [id]: value,
-    }));
-  };
-
-
-// Handle adding new item
-const handleAddNewItem = async () => {
-  if (!newItemName && selectedFilter !== "Furniture Size") {
-      alert("Please enter a valid name.");
-      return;
-  }
-
-  const newItem = selectedFilter === "Furniture Size" ? { ...newSize } : { name: newItemName };
-
-  try {
-      let response;
-      const endpoints = {
-          Categories: "http://localhost:3000/api/categories/add",
-          "Furniture Types": "http://localhost:3000/api/furniture-types/add",
-          Colors: "http://localhost:3000/api/colors/add",
-          "Furniture Size": "http://localhost:3000/api/sizes/add",
-      };
-
-      response = await axios.post(endpoints[selectedFilter], newItem, {
-          headers: {
-              'Content-Type': 'application/json',
-          },
-      });
-
-      if (selectedFilter === "Categories") {
-          setCategories((prev) => [response.data, ...prev]);
-      } else if (selectedFilter === "Furniture Types") {
-          setFurnitureTypes((prev) => [response.data, ...prev]);
-      } else if (selectedFilter === "Colors") {
-          setColors((prev) => [response.data, ...prev]);
-      } else if (selectedFilter === "Furniture Size") {
-          // Prepend the new size to the existing sizes
-          setSizes((prev) => [response.data, ...prev]);
-      }
-
-      setNewItemName("");
-      setNewSize({ label: "", height: "", length: "", width: "", depth: "", furnitureTypeId: "" });
-      alert(`${selectedFilter} added successfully.`);
-  } catch (error) {
-      console.error(`Error adding new ${selectedFilter.toLowerCase()}:`, error);
-      alert(`Failed to add ${selectedFilter.toLowerCase()}. Please try again.`);
-  }
+const Table = ({ headers, data }) => {
+	return (
+		<table className="min-w-full border-collapse border border-gray-300 mb-6">
+			<thead className="bg-gray-200">
+				<tr>
+					{headers.map((header, index) => (
+						<th
+							key={index}
+							className="border border-gray-300 p-2 text-left font-semibold text-gray-700"
+						>
+							{header}
+						</th>
+					))}
+				</tr>
+			</thead>
+			<tbody>
+				{data.map((row, index) => (
+					<tr
+						key={index}
+						className="hover:bg-gray-100 transition-colors duration-200"
+					>
+						{Object.values(row).map((cell, cellIndex) => (
+							<td key={cellIndex} className="border border-gray-300 p-2">
+								{cell}
+							</td>
+						))}
+					</tr>
+				))}
+			</tbody>
+		</table>
+	);
 };
 
-  return (
-    <div className="flex flex-col items-center py-10">
-      <h1 className="font-bold text-5xl mb-5">JCKAME Maintenance</h1>
-      <div className="container w-3/4 mx-auto p-4 bg-gray-100 shadow-lg rounded-lg border-2 border-oliveGreen mb-10">
-        <h2 className="text-xl font-bold mb-5">Add New Item</h2>
-        <div className="mb-5 w-1/4">
-          <label className="block mb-1">Select Type</label>
-          <select
-            value={selectedFilter}
-            onChange={(e) => setSelectedFilter(e.target.value)}
-            className="w-full border-2 p-3 rounded-xl border-oliveGreen"
-          >
-            <option value="" disabled>Select Type</option>
-            <option value="Categories">Categories</option>
-            <option value="Furniture Types">Furniture Types</option>
-            <option value="Colors">Furniture Colors</option>
-            <option value="Furniture Size">Furniture Size</option>
-          </select>
-        </div>
-        
-        {selectedFilter !== "Furniture Size" && (
-          <div className="mb-5 w-1/2">
-            <label className="block mb-1">Item Name</label>
-            <input
-              type="text"
-              value={newItemName}
-              onChange={(e) => setNewItemName(e.target.value)}
-              className="w-full border-2 p-3 rounded-xl border-oliveGreen"
-              placeholder="Enter name"
-            />
-          </div>
-        )}
+const Maintenance = () => {
+	const initialSizeState = {
+		label: "",
+		height: "",
+		length: "",
+		width: "",
+		depth: "",
+		furnitureTypeId: "",
+	};
+	const initialColorState = {
+		name: "",
+		rgb: "",
+		hex: "",
+	};
 
-        {selectedFilter === "Furniture Size" && (
-          <div className="flex space-x-5 mb-5 w-full">
-            <div className="w-1/4">
-              <label className="block mb-1">Select Furniture Types</label>
-              <select
-                name="filterFurnitureTypes"
-                onChange={(e) => {
-                  const selectedValue = e.target.value;
-                  setSelectedFurnitureType(selectedValue);
-                  const selectedFurniture = furnitureTypes.find(type => type.name === selectedValue);
-                  setNewSize(prev => ({
-                    ...prev,
-                    furnitureTypeId: selectedFurniture ? selectedFurniture._id : "",
-                  }));
-                }}
-                value={selectedFurnitureType}
-                className="border-2 p-3 rounded-xl border-oliveGreen"
-              >
-                <option value="">All Furniture Types</option>
-                {furnitureTypes.map(furnitureType => (
-                  <option key={furnitureType._id} value={furnitureType.name}>
-                    {furnitureType.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="mb-5 w-1/2">
-              <label className="block mb-1">Item Name</label>
-              <input
-                type="text"
-                id="label"
-                value={newSize.label}
-                onChange={handleChange}
-                className="w-full border-2 p-3 rounded-xl border-oliveGreen"
-                placeholder="Enter name"
-              />
-            </div>
-            {['height', 'length', 'width', 'depth'].map((dim) => (
-              <div className="w-1/3" key={dim}>
-                <label className="block mb-1">{dim.charAt(0).toUpperCase() + dim.slice(1)} (cm)</label>
-                <input
-                  type="number"
-                  id={dim}
-                  value={newSize[dim]}
-                  onChange={handleChange}
-                  className="w-full border-2 p-3 rounded-xl border-oliveGreen"
-                  placeholder={`Enter ${dim}`}
-                />
-              </div>
-            ))}
-          </div>
-        )}
+	const [categories, setCategories] = useState([]);
+	const [furnitureTypes, setFurnitureTypes] = useState([]);
+	const [colors, setColors] = useState([]);
+	const [sizes, setSizes] = useState([]);
+	const [materials, setMaterials] = useState([]);
+	const [newMaterial, setNewMaterial] = useState({ name: "", quantity: "" });
+	const [selectedFilter, setSelectedFilter] = useState("");
+	const [selectedFurnitureType, setSelectedFurnitureType] = useState("");
+	const [selectedCategory, setSelectedCategory] = useState("");
+	const [newItemName, setNewItemName] = useState("");
+	const [newSize, setNewSize] = useState(initialSizeState);
+	const [newColor, setNewColor] = useState(initialColorState);
 
-        <button
-          onClick={handleAddNewItem}
-          className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
-        >
-          Add {selectedFilter}
-        </button>
-      </div>
+	useEffect(() => {
+		const fetchData = async () => {
+			await fetchCategories(); // Fetch categories
+			await fetchFurnitureTypes(); // Fetch furniture types
+			await fetchColors(); // Fetch colors
+			await fetchSizes(); // Fetch sizes
+			await fetchMaterials();
+		};
+		fetchData();
+	}, []);
 
-      <div className="container w-3/4 mx-auto p-4 bg-gray-100 shadow-lg rounded-lg border-2 border-oliveGreen mb-10">
-        <h2 className="text-xl font-bold mb-5">Existing Items</h2>
-        {selectedFilter ? (
-          <>
-            <h2 className="text-xl font-bold mb-2">{selectedFilter}</h2>
-            <table className="min-w-full bg-white border border-gray-300 rounded-lg">
-              <thead>
-                <tr className="bg-gray-200">
-                  {selectedFilter === "Furniture Size" ? (
-                    <>
-                      <th className="px-4 py-2 text-left border">Label</th>
-                      <th className="px-4 py-2 text-left border">Height (cm)</th>
-                      <th className="px-4 py-2 text-left border">Length (cm)</th>
-                      <th className="px-4 py-2 text-left border">Width (cm)</th>
-                      <th className="px-4 py-2 text-left border">Depth (cm)</th>
-                      <th className="px-4 py-2 text-left border">Furniture Type</th>
-                    </>
-                  ) : (
-                    <>
-                      <th className="px-4 py-2 text-left border">Name</th>
-                    </>
-                  )}
-                  <th className="px-4 py-2 text-left border">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {selectedFilter === "Furniture Size" ? (
-                  sizes.map((item) => {
-                    // Find the furniture type name based on the furnitureTypeId
-                    const furnitureType = furnitureTypes.find(type => type._id === item.furnitureTypeId);
-                    return (
-                      <tr key={item._id} className="border-t">
-                        <td className="px-4 py-2 border">{item.label}</td>
-                        <td className="px-4 py-2 border">{item.height}</td>
-                        <td className="px-4 py-2 border">{item.length}</td>
-                        <td className="px-4 py-2 border">{item.width}</td>
-                        <td className="px-4 py-2 border">{item.depth}</td>
-                        <td className="px-4 py-2 border">{furnitureType ? furnitureType.name : "N/A"}</td>
-                        <td className="px-4 py-2 border">
-                          <button
-                            className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded"
-                            onClick={() => handleDelete(item._id)}
-                          >
-                            Delete
-                          </button>
-                        </td>
-                      </tr>
-                    );
-                  })
-                ) : (
-                  (selectedFilter === "Categories"
-                    ? categories
-                    : selectedFilter === "Furniture Types"
-                    ? furnitureTypes
-                    : colors
-                  ).map((item) => (
-                    <tr key={item._id} className="border-t">
-                      <td className="px-4 py-2 border">{item.name}</td>
-                      <td className="px-4 py-2 border">
-                        <button
-                          className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded"
-                          onClick={() => handleDelete(item._id)}
-                        >
-                          Delete
-                        </button>
-                      </td>
-                    </tr>
-                  ))
-                )}
-                {(selectedFilter === "Categories"
-                  ? categories
-                  : selectedFilter === "Furniture Types"
-                  ? furnitureTypes
-                  : selectedFilter === "Furniture Size"
-                  ? sizes
-                  : colors
-                ).length === 0 && (
-                  <tr>
-                    <td className="px-4 py-2 text-center border" colSpan={selectedFilter === "Furniture Size" ? 7 : 2}>
-                      No data available.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </>
-        ) : (
-          <p className="text-center text-gray-500">
-            Please select a filter to view data.
-          </p>
-        )}
-      </div>
-    </div>
-  );
+	const fetchMaterials = async () => {
+		try {
+			const response = await fetch("http://localhost:3000/api/materials");
+			const data = await response.json();
+			setMaterials(data);
+		} catch (error) {
+			console.error("Error fetching materials:", error);
+			toast.error("Failed to fetch materials");
+		}
+	};
+
+	const fetchFurnitureTypes = async () => {
+		try {
+			const response = await fetch("http://localhost:3000/api/furniture-types");
+			const data = await response.json();
+			setFurnitureTypes(data);
+		} catch (error) {
+			console.error("Error fetching furniture types:", error);
+		}
+	};
+
+	const fetchCategories = async () => {
+		try {
+			const response = await fetch("http://localhost:3000/api/categories");
+			const data = await response.json();
+			setCategories(data);
+		} catch (error) {
+			console.error("Failed to fetch categories:", error);
+		}
+	};
+
+	const fetchColors = async () => {
+		try {
+			const response = await fetch("http://localhost:3000/api/colors");
+			const data = await response.json();
+			setColors(data);
+		} catch (error) {
+			console.error("Failed to fetch colors:", error);
+		}
+	};
+
+	const fetchSizes = async () => {
+		try {
+			const response = await fetch("http://localhost:3000/api/sizes");
+			const data = await response.json();
+			setSizes(data);
+		} catch (error) {
+			console.error("Failed to fetch sizes:", error);
+		}
+	};
+
+	const handleAddNewMaterial = async () => {
+		const { name, quantity } = newMaterial;
+		if (!name || !quantity) {
+			toast.error("Please provide valid name and quantity.");
+			return;
+		}
+		try {
+			const response = await fetch("http://localhost:3000/api/materials/add", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({ name, quantity }),
+			});
+			if (response.ok) {
+				const data = await response.json();
+				toast.success("Material added successfully.");
+				setNewMaterial({ name: "", quantity: "" }); // Reset input
+				await fetchMaterials(); // Refresh the list
+			} else {
+				const errorData = await response.json();
+				toast.error(errorData.message);
+			}
+		} catch (error) {
+			console.error("Error adding material:", error);
+			toast.error("Failed to add material");
+		}
+	};
+
+	const handleAddNewSize = async () => {
+		if (!newSize.label || !selectedFurnitureType) {
+			toast.error(
+				"Please enter a valid size name and select a furniture type."
+			);
+			return;
+		}
+		try {
+			const response = await fetch("http://localhost:3000/api/sizes/add", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					label: newSize.label,
+					height: newSize.height,
+					length: newSize.length,
+					width: newSize.width,
+					depth: newSize.depth,
+					furnitureTypeId: selectedFurnitureType,
+				}),
+			});
+			if (response.ok) {
+				const data = await response.json();
+				toast.success(data.message);
+				resetInputFields();
+				await fetchSizes(); // Refresh sizes list
+			} else {
+				const errorData = await response.json();
+				toast.error(errorData.message);
+			}
+		} catch (error) {
+			console.error("Error adding size:", error);
+			toast.error("Failed to add size");
+		}
+	};
+
+	const handleColorChange = (e) => {
+		const { name, value } = e.target;
+		setNewColor((prevColor) => ({ ...prevColor, [name]: value }));
+	};
+
+	const handleAddNewColor = async () => {
+		if (!newColor.name || !newColor.rgb || !newColor.hex) {
+			toast.error("Please provide all color details.");
+			return;
+		}
+		try {
+			const response = await fetch("http://localhost:3000/api/colors/add", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					name: newColor.name,
+					rgb: newColor.rgb,
+					hex: newColor.hex,
+				}),
+			});
+			const data = await response.json();
+			if (!response.ok) {
+				console.log("Response Error:", data);
+				throw new Error(data.message || "Failed to add color.");
+			}
+			toast.success("Color added successfully.");
+			resetInputFields(); // Reset fields after adding color
+			await fetchColors(); // Refresh colors list
+		} catch (error) {
+			toast.error(error.message);
+		}
+	};
+
+	const handleAddNewItem = async () => {
+		if (
+			!newItemName &&
+			selectedFilter !== "Furniture Size" &&
+			selectedFilter !== "Colors" && selectedFilter !== "Furniture Materials"
+		) {
+			toast.error("Please enter a valid name.");
+			return;
+		}
+		try {
+			if (selectedFilter === "Categories") {
+				const response = await fetch(
+					"http://localhost:3000/api/categories/add",
+					{
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json",
+						},
+						body: JSON.stringify({ name: newItemName }),
+					}
+				);
+				if (!response.ok) {
+					throw new Error("Failed to add category.");
+				}
+				toast.success("Category added successfully.");
+				await fetchCategories(); // Refresh categories list
+			}
+			if (selectedFilter === "Furniture Types") {
+				if (!selectedCategory) {
+					toast.error("Please select a category.");
+					return;
+				}
+				const response = await fetch(
+					"http://localhost:3000/api/furniture-types/add",
+					{
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json",
+						},
+						body: JSON.stringify({
+							name: newItemName,
+							categoryId: selectedCategory,
+						}),
+					}
+				);
+				
+				if (!response.ok) {
+					throw new Error("Failed to add furniture type.");
+				}
+				const newFurnitureType = await response.json();
+				setFurnitureTypes((prevTypes) => [...prevTypes, newFurnitureType]);
+				toast.success("Furniture type added successfully.");
+			}
+			
+			resetInputFields();
+		} catch (error) {
+			toast.error(error.message);
+		}
+	};
+
+	const resetInputFields = () => {
+		setNewItemName("");
+		setNewColor(initialColorState);
+		setNewSize(initialSizeState);
+		setSelectedFurnitureType("");
+		setSelectedCategory(""); // Reset the selected category
+	};
+
+	const renderInputField = (
+		label,
+		name,
+		value,
+		onChange,
+		type = "text",
+		placeholder
+	) => (
+		<div className="mb-4" key={name}>
+			<label className="block mb-1 font-semibold text-gray-700">{label}</label>
+			<input
+				type={type}
+				name={name}
+				value={value}
+				onChange={onChange}
+				className="w-full border rounded-lg p-2 shadow-sm focus:ring focus:ring-blue-300"
+				placeholder={placeholder}
+			/>
+		</div>
+	);
+
+	return (
+		<div className="container mx-auto p-6">
+			<h1 className="text-3xl font-bold mb-6 text-center text-blue-600">
+				JCKAME Maintenance
+			</h1>
+			<div className="flex flex-row justify-between">
+				{/* Left Side for Form */}
+				<div className="w-1/2 pr-4">
+					<form
+						onSubmit={(e) => {
+							e.preventDefault();
+							if (selectedFilter === "Furniture Size") {
+								handleAddNewSize();
+							} else if (selectedFilter === "Colors") {
+								handleAddNewColor();
+							}else if (selectedFilter === "Furniture Materials") {
+								handleAddNewMaterial();
+							} else {
+								handleAddNewItem();
+							}
+						}}
+						className="mb-6 space-y-4 bg-gray-100 p-4 rounded-lg shadow-md"
+					>
+						<div className="mb-4">
+							<label className="block mb-1 font-semibold text-gray-700">
+								Select Type
+							</label>
+							<select
+								value={selectedFilter}
+								onChange={(e) => setSelectedFilter(e.target.value)}
+								className="w-full border rounded-lg p-2 shadow-sm focus:ring focus:ring-blue-300"
+							>
+								<option value="">-- Select --</option>
+								<option value="Categories">Categories</option>
+								<option value="Furniture Types">Furniture Types</option>
+								<option value="Furniture Size">Furniture Size</option>
+								<option value="Furniture Materials">Furniture Materials</option>
+								<option value="Colors">Colors</option>
+							</select>
+						</div>
+
+						{/* Dynamic Input Fields */}
+						{selectedFilter === "Categories" &&
+							renderInputField(
+								"New Category",
+								"newCategory",
+								newItemName,
+								(e) => setNewItemName(e.target.value)
+							)}
+						{selectedFilter === "Furniture Types" && (
+							<>
+								{renderInputField(
+									"New Furniture Type",
+									"newFurnitureType",
+									newItemName,
+									(e) => setNewItemName(e.target.value)
+								)}
+								<div className="mb-4">
+									<label className="block mb-1 font-semibold text-gray-700">
+										Select Category
+									</label>
+									<select
+										value={selectedCategory}
+										onChange={(e) => setSelectedCategory(e.target.value)}
+										className="w-full border rounded-lg p-2 shadow-sm focus:ring focus:ring-blue-300"
+									>
+										<option value="">-- Select --</option>
+										{categories.map((category) => (
+											<option key={category._id} value={category._id}>
+												{category.name}
+											</option>
+										))}
+									</select>
+								</div>
+							</>
+						)}
+
+						{selectedFilter === "Furniture Size" && (
+							<>
+								{renderInputField("Label", "label", newSize.label, (e) =>
+									setNewSize({ ...newSize, label: e.target.value })
+								)}
+								{renderInputField(
+									"Height",
+									"height",
+									newSize.height,
+									(e) => setNewSize({ ...newSize, height: e.target.value }),
+									"number"
+								)}
+								{renderInputField(
+									"Length",
+									"length",
+									newSize.length,
+									(e) => setNewSize({ ...newSize, length: e.target.value }),
+									"number"
+								)}
+								{renderInputField(
+									"Width",
+									"width",
+									newSize.width,
+									(e) => setNewSize({ ...newSize, width: e.target.value }),
+									"number"
+								)}
+								{renderInputField(
+									"Depth",
+									"depth",
+									newSize.depth,
+									(e) => setNewSize({ ...newSize, depth: e.target.value }),
+									"number"
+								)}
+								<div className="mb-4">
+									<label className="block mb-1 font-semibold text-gray-700">
+										Select Furniture Type
+									</label>
+									<select
+										value={selectedFurnitureType}
+										onChange={(e) => setSelectedFurnitureType(e.target.value)}
+										className="w-full border rounded-lg p-2 shadow-sm focus:ring focus:ring-blue-300"
+									>
+										<option value="">-- Select --</option>
+										{furnitureTypes.map((type) => (
+											<option key={type._id} value={type._id}>
+												{type.name}
+											</option>
+										))}
+									</select>
+								</div>
+							</>
+						)}
+
+						{selectedFilter === "Colors" && (
+							<>
+								{renderInputField(
+									"Color Name",
+									"name",
+									newColor.name,
+									handleColorChange
+								)}
+								{renderInputField(
+									"RGB Value",
+									"rgb",
+									newColor.rgb,
+									handleColorChange
+								)}
+								{renderInputField(
+									"Hex Value",
+									"hex",
+									newColor.hex,
+									handleColorChange
+								)}
+							</>
+						)}
+
+						{selectedFilter === "Furniture Materials" && (
+							<>
+								{renderInputField(
+									"Material Name",
+									"name",
+									newMaterial.name,
+									(e) =>
+										setNewMaterial({ ...newMaterial, name: e.target.value })
+								)}
+								{renderInputField(
+									"Quantity",
+									"quantity",
+									newMaterial.quantity,
+									(e) =>
+										setNewMaterial({
+											...newMaterial,
+											quantity: e.target.value,
+										}),
+									"number"
+								)}
+							</>
+						)}
+
+						<button
+							type="submit"
+							className="w-full bg-green-800 text-white rounded-lg p-2 font-semibold hover:bg-green-700 transition duration-200"
+						>
+							Add New {selectedFilter}
+						</button>
+					</form>
+				</div>
+
+				{/* Right Side for Tables */}
+				<div className="w-1/2 pl-4">
+					{selectedFilter === "Categories" && (
+						<div className="space-y-4">
+							<h2 className="text-2xl font-bold mb-4">Categories</h2>
+							<div className="max-h-96 overflow-y-auto">
+								<Table
+									headers={["ID", "Category Name"]}
+									data={categories.map((category) => ({
+										id: category._id,
+										name: category.name,
+									}))}
+								/>
+							</div>
+						</div>
+					)}
+
+					{selectedFilter === "Furniture Types" && (
+						<div className="space-y-4">
+							<h2 className="text-2xl font-bold mb-4">Furniture Types</h2>
+							<div className="max-h-96 overflow-y-auto">
+								<Table
+									headers={["ID", "Furniture Type", "Category"]}
+									data={furnitureTypes.map((type) => ({
+										id: type._id,
+										name: type.name,
+										category:
+											categories.find((cat) => cat._id === type.categoryId)
+												?.name || "N/A",
+									}))}
+								/>
+							</div>
+						</div>
+					)}
+
+					{selectedFilter === "Furniture Size" && (
+						<div className="space-y-4">
+							<h2 className="text-2xl font-bold mb-4">Furniture Sizes</h2>
+							<div className="max-h-96 overflow-y-auto">
+								<Table
+									headers={[
+										"ID",
+										"Label",
+										"Height",
+										"Length",
+										"Width",
+										"Depth",
+										"Furniture Type",
+									]}
+									data={sizes.map((size) => ({
+										id: size._id,
+										label: size.label,
+										height: size.height,
+										length: size.length,
+										width: size.width,
+										depth: size.depth,
+										furnitureType:
+											furnitureTypes.find(
+												(type) => type._id === size.furnitureTypeId
+											)?.name || "N/A",
+									}))}
+								/>
+							</div>
+						</div>
+					)}
+
+					{selectedFilter === "Colors" && (
+						<div className="space-y-4">
+							<h2 className="text-2xl font-bold mb-4">Furniture Colors</h2>
+							<div className="max-h-96 overflow-y-auto">
+								<Table
+									headers={["ID", "Color Name", "RGB", "Hex"]}
+									data={colors.map((color) => ({
+										id: color._id,
+										name: color.name,
+										rgb: color.rgb,
+										hex: color.hex,
+									}))}
+								/>
+							</div>
+						</div>
+					)}
+
+					{/* Right Side for Furniture Materials */}
+					{selectedFilter === "Furniture Materials" && (
+						<div className="space-y-4 mt-8">
+							<h2 className="text-2xl font-bold mb-4">Furniture Materials</h2>
+							<div className="max-h-96 overflow-y-auto">
+								<Table
+									headers={["ID", "Material Name", "Quantity"]}
+									data={materials.map((material) => ({
+										id: material._id,
+										name: material.name,
+										quantity: material.quantity,
+									}))}
+								/>
+							</div>
+						</div>
+					)}
+				</div>
+			</div>
+			<ToastContainer />
+
+		</div>
+	);
 };
 
 export default Maintenance;
