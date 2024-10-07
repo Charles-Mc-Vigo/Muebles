@@ -601,6 +601,8 @@ const Maintenance = () => {
 					)}
 				</div>
 			</div>
+			<ToastContainer />
+
 		</div>
 	);
 };
