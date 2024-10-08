@@ -230,7 +230,8 @@ const Maintenance = () => {
 		if (
 			!newItemName &&
 			selectedFilter !== "Furniture Size" &&
-			selectedFilter !== "Colors" && selectedFilter !== "Furniture Materials"
+			selectedFilter !== "Colors" &&
+			selectedFilter !== "Furniture Materials"
 		) {
 			toast.error("Please enter a valid name.");
 			return;
@@ -271,7 +272,7 @@ const Maintenance = () => {
 						}),
 					}
 				);
-				
+
 				if (!response.ok) {
 					throw new Error("Failed to add furniture type.");
 				}
@@ -279,7 +280,7 @@ const Maintenance = () => {
 				setFurnitureTypes((prevTypes) => [...prevTypes, newFurnitureType]);
 				toast.success("Furniture type added successfully.");
 			}
-			
+
 			resetInputFields();
 		} catch (error) {
 			toast.error(error.message);
@@ -316,13 +317,15 @@ const Maintenance = () => {
 	);
 
 	return (
-		<div className="container mx-auto p-6">
+		<div className="container mx-auto p-6 flex flex-col">
 			<h1 className="text-3xl font-bold mb-6 text-center text-blue-600">
 				JCKAME Maintenance
 			</h1>
 			<div className="flex flex-row justify-between">
 				{/* Left Side for Form */}
-				<div className="w-1/2 pr-4">
+				<div className="w-1/5">
+					{" "}
+					{/* Set width to 40% */}
 					<form
 						onSubmit={(e) => {
 							e.preventDefault();
@@ -330,7 +333,7 @@ const Maintenance = () => {
 								handleAddNewSize();
 							} else if (selectedFilter === "Colors") {
 								handleAddNewColor();
-							}else if (selectedFilter === "Furniture Materials") {
+							} else if (selectedFilter === "Furniture Materials") {
 								handleAddNewMaterial();
 							} else {
 								handleAddNewItem();
@@ -339,7 +342,7 @@ const Maintenance = () => {
 						className="mb-6 space-y-4 bg-gray-100 p-4 rounded-lg shadow-md"
 					>
 						<div className="mb-4">
-							<label className="block mb-1 font-semibold text-gray-700">
+							<label className="block font-semibold text-2xl">
 								Select Type
 							</label>
 							<select
@@ -355,7 +358,6 @@ const Maintenance = () => {
 								<option value="Colors">Colors</option>
 							</select>
 						</div>
-
 						{/* Dynamic Input Fields */}
 						{selectedFilter === "Categories" &&
 							renderInputField(
@@ -391,7 +393,6 @@ const Maintenance = () => {
 								</div>
 							</>
 						)}
-
 						{selectedFilter === "Furniture Size" && (
 							<>
 								{renderInputField("Label", "label", newSize.label, (e) =>
@@ -444,7 +445,6 @@ const Maintenance = () => {
 								</div>
 							</>
 						)}
-
 						{selectedFilter === "Colors" && (
 							<>
 								{renderInputField(
@@ -467,7 +467,6 @@ const Maintenance = () => {
 								)}
 							</>
 						)}
-
 						{selectedFilter === "Furniture Materials" && (
 							<>
 								{renderInputField(
@@ -490,7 +489,6 @@ const Maintenance = () => {
 								)}
 							</>
 						)}
-
 						<button
 							type="submit"
 							className="w-full bg-green-800 text-white rounded-lg p-2 font-semibold hover:bg-green-700 transition duration-200"
@@ -499,9 +497,10 @@ const Maintenance = () => {
 						</button>
 					</form>
 				</div>
-
 				{/* Right Side for Tables */}
-				<div className="w-1/2 pl-4">
+				<div className="w-4/5 pl-4">
+					{" "}
+					{/* Set width to 60% */}
 					{selectedFilter === "Categories" && (
 						<div className="space-y-4">
 							<h2 className="text-2xl font-bold mb-4">Categories</h2>
@@ -516,7 +515,6 @@ const Maintenance = () => {
 							</div>
 						</div>
 					)}
-
 					{selectedFilter === "Furniture Types" && (
 						<div className="space-y-4">
 							<h2 className="text-2xl font-bold mb-4">Furniture Types</h2>
@@ -534,7 +532,6 @@ const Maintenance = () => {
 							</div>
 						</div>
 					)}
-
 					{selectedFilter === "Furniture Size" && (
 						<div className="space-y-4">
 							<h2 className="text-2xl font-bold mb-4">Furniture Sizes</h2>
@@ -565,7 +562,6 @@ const Maintenance = () => {
 							</div>
 						</div>
 					)}
-
 					{selectedFilter === "Colors" && (
 						<div className="space-y-4">
 							<h2 className="text-2xl font-bold mb-4">Furniture Colors</h2>
@@ -582,7 +578,6 @@ const Maintenance = () => {
 							</div>
 						</div>
 					)}
-
 					{/* Right Side for Furniture Materials */}
 					{selectedFilter === "Furniture Materials" && (
 						<div className="space-y-4 mt-8">
@@ -602,7 +597,6 @@ const Maintenance = () => {
 				</div>
 			</div>
 			<ToastContainer />
-
 		</div>
 	);
 };
