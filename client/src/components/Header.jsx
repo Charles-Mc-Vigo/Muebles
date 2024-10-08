@@ -1,156 +1,67 @@
-import React, { useState } from "react";
-import PropTypes from "prop-types"; // Import PropTypes
-import { FaBars, FaShoppingCart, FaChevronDown, FaChevronUp } from "react-icons/fa";
+import React from 'react';
+import { FaSearch, FaTruck, FaShoppingCart } from 'react-icons/fa';
 import { Link } from "react-router-dom";
-import { RiCustomerServiceFill } from "react-icons/ri";
 
-export default function Header({ showLogin = true, showLogout = false }) {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isHomeFurnitureDropdownOpen, setIsHomeFurnitureDropdownOpen] = useState(false);
-
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
-
-  const toggleHomeFurnitureDropdown = () => {
-    setIsHomeFurnitureDropdownOpen(!isHomeFurnitureDropdownOpen);
-  };
-
+const Header = () => {
   return (
-    <div className="bg-slate-100 border border-green-700 border-solid md:border-solid">
-      <div className="relative flex flex-col lg:flex-row items-center justify-between max-w-7xl mx-auto p-5">
-        {/* Mobile Menu Button */}
-        <div className="lg:hidden flex items-center justify-between w-full">
-          <button onClick={toggleMenu}>
-            <FaBars />
+    <>
+      {/* Main Header */}
+      <header className="flex justify-center items-center mx-auto p-2">
+        {/* Left - Logo */}
+        <div className="flex items-center space-x-5 m-2">
+          <Link to="/" className="text-2xl font-bold text-teal-600">MUEBLES</Link> 
+        </div>
+        {/* Middle - Search Bar */}
+        <div className="flex items-center w-full max-w-2xl m-2">
+          <input
+            type="text"
+            placeholder="What are you looking for?"
+            className="flex-grow border border-gray-300 px-4 py-2 focus:outline-none"
+          />
+          <button className="bg-teal-600 text-white p-3">
+            <FaSearch />
           </button>
-          <div className="flex-1 text-center">
-            <Link to="/">
-              <h1 className="font-semibold font-serif text-2xl text-black">JCKAME</h1>
-            </Link>
-          </div>
-          <Link to="/cart" className="lg:hidden">
-            <FaShoppingCart className="text-3xl cursor-pointer hover:bg-green-300" />
-          </Link>
         </div>
-
-        {/* Desktop Logo */}
-        <div className="hidden lg:flex items-center justify-start flex-1">
-          <Link to="/">
-            <h1 className="font-semibold font-serif text-2xl text-black">JCKAME</h1>
-          </Link>
-        </div>
-
-        {/* Centered Menu Items */}
-        <div className="hidden lg:flex justify-center flex-1 space-x-8 font-sans">
-          <ul className="flex items-center space-x-4">
-            <li className="relative hover:opacity-100 cursor-pointer">
-              <button
-                onClick={toggleHomeFurnitureDropdown}
-                className="flex items-center"
-              >
-                Home Furniture {isHomeFurnitureDropdownOpen ? <FaChevronUp className="ml-1" /> : <FaChevronDown className="ml-1" />}
-              </button>
-              {isHomeFurnitureDropdownOpen && (
-                <ul className="absolute left-0 mt-2 w-40 bg-white border border-gray-200 rounded-md shadow-lg z-50 font-sans">
-                  <Link to="/home">
-                    <li className="px-4 py-2 hover:underline">All Furnitures </li>
-                  </Link>
-                  <Link to="/livingroom">
-                    <li className="px-4 py-2 hover:underline">Living Room</li>
-                  </Link>
-                  <Link to="/bedroom">
-                    <li className="px-4 py-2 hover:underline">Bedroom</li>
-                  </Link>
-                  <Link to="/diningroom">
-                    <li className="px-4 py-2 hover:underline">Dining Room</li>
-                  </Link>
-                </ul>
-              )}
-            </li>
-            <Link to="/about" className="hover:underline">About Us</Link>
-            <Link to="/featured" className="hover:underline">Featured</Link>
-            <Link to="/service-page" className="hover:underline">Services</Link>
-          </ul>
-        </div>
-
-        {/* Right Side: Cart, Log In, Log Out, Customer Service */}
-        <div className="hidden lg:flex items-center space-x-6 ml-10">
-          <Link to="/customer-service" className="flex items-center hover:underline">
-            <RiCustomerServiceFill className="mr-2 text-2xl lg:text-1xl" />
-            Customer Service
-          </Link>
-          <Link to="/cart">
-            <FaShoppingCart className="text-2xl cursor-pointer hover:underline" />
-          </Link>
-          {showLogout ? (
-            <button className="rounded-md py-2 px-4 bg-transparent text-black text-lg font-semibold hover:underline">
-              Log Out
-            </button>
-          ) : showLogin ? (
-            <Link to="/login">
-              <button className="rounded-md py-2 px-4 bg-transparent text-black text-lg font-semibold hover:underline ">
-                Log In
-              </button>
-            </Link>
-          ) : null}
-        </div>
-
-        {/* Mobile Menu Items */}
-        <div
-          className={`absolute top-full left-0 w-full bg-white border border-gray-200 rounded-md shadow-lg z-50 ${isMenuOpen ? "block" : "hidden"} lg:hidden`}
-        >
-          <ul className="flex flex-col space-y-2 mt-4">
-            <li className="relative hover:opacity-100 cursor-pointer text-left">
-              <button
-                onClick={toggleHomeFurnitureDropdown}
-                className="flex items-center justify-start w-full"
-              >
-                Home Furniture {isHomeFurnitureDropdownOpen ? <FaChevronUp className="ml-1" /> : <FaChevronDown className="ml-1" />}
-              </button>
-              {isHomeFurnitureDropdownOpen && (
-                <ul className="absolute left-0 mt-2 w-40 bg-white border border-gray-200 rounded-md shadow-lg z-50">
-                  <Link to="/pages/home">
-                    <li className="px-4 py-2 hover:bg-gray-100">All Furnitures</li>
-                  </Link>
-                  <Link to="/livingroom">
-                    <li className="px-4 py-2 hover:bg-gray-100">Living Room</li>
-                  </Link>
-                  <Link to="/bedroom">
-                    <li className="px-4 py-2 hover:bg-gray-100">Bedroom</li>
-                  </Link>
-                  <Link to="/diningroom">
-                    <li className="px-4 py-2 hover:bg-gray-100">Dining Room</li>
-                  </Link>
-                </ul>
-              )}
-            </li>
-            <Link to="/about" className="hover:text-gray-400 ml-2">About Us</Link>
-            <Link to="/featured" className="hover:text-gray-400 ml-2">Featured</Link>
-            <Link to="/ServicePage" className="hover:text-gray-400 ml-2">Services</Link>
-            <Link to="/customer-service" className="hover:text-gray-400 flex items-center">
-              <RiCustomerServiceFill className="mr-2 ml-2" />
-              Customer Service
-            </Link>
-            {showLogout ? (
-              <button className="flex items-center rounded-md py-2 px-8 bg-transparent text-black bg-slate-300 text-lg font-semibold hover:bg-green-300">
-                Log Out
-              </button>
-            ) : showLogin ? (
-              <Link to="/login">
-                <button className="flex items-center rounded-md py-2 px-8 bg-transparent text-black bg-slate-300 text-lg font-semibold hover:bg-green-300">
-                  Log In
-                </button>
-              </Link>
-            ) : null}
-          </ul>
-        </div>
-      </div>
+        {/* Right - Info, Login/Register, Cart */}
+        <div className="flex items-center space-x-10 m-2">
+        <div className="flex items-center space-x-2 cursor-pointer">
+  <Link to="/delivery-info" className="flex items-center space-x-2"> {/* Wrap with Link */}
+    <FaTruck className="text-gray-600 text-5xl" />
+    <div>
+      <p className="text-sm font-semibold text-gray-700">Shipping Info.</p>
+      <p className="text-xs text-black">Delivery Method</p>
     </div>
+  </Link>
+</div>
+          {/* Login / Register */}
+          <div className="flex items-center space-x-2 text-sm font-semibold text-gray-700">
+            <Link to="/login" className="cursor-pointer">Login</Link>
+            <span>|</span>
+            <Link to="/signup" className="cursor-pointer">Register</Link>
+          </div>
+          {/* Cart Icon */}
+          <div className="relative cursor-pointer">
+            <FaShoppingCart className="text-gray-600 text-2xl" />
+            {/* Cart item count */}
+            <span className="absolute -top-2 -right-2 bg-teal-600 text-white text-xs rounded-full px-1">1</span>
+          </div>
+        </div>
+      </header>
+      {/* Second Navigation Bar */}
+      <nav className="flex justify-center space-x-8 py-0 bg-white text-lg">
+        <Link className="text-black py-2 hover:underline m-2" to="/home">All Furnitures</Link>
+        <Link className="text-black py-2 hover:underline m-2" to="/about">About Us</Link>
+        <Link className="text-black py-2 hover:underline m-2" to="/featured">Featured</Link>
+        <Link className="text-black py-2 hover:underline m-2" to="/service-page">Services</Link>
+        <div className="flex items-center space-x-2 text-sm text-black py-2 m-2">
+          <span className="text-teal-500">•</span>
+          <Link to="/brochure" className="text-teal-500 hover:underline">Brochure</Link>
+          <span className="text-gray-400">•</span>
+          <Link to="/store-location" className="text-gray-700 hover:underline">Store Location</Link>
+        </div>
+      </nav>
+    </>
   );
-}
-
-Header.propTypes = {
-  showLogin: PropTypes.bool,
-  showLogout: PropTypes.bool,
 };
+
+export default Header;

@@ -21,6 +21,7 @@ import AdminVerify from "./pages/AdminVerify"
 import About from './pages/About';
 import ServicePage from "./pages/ServicePage";
 import ProductTable from "./components/ProductTable";
+import Delivery from "./components/Delivery";
 
 export default function App() {
 	return (
@@ -38,6 +39,7 @@ export default function App() {
 				<Route path="/table" element={<ProductTable/>} />
 				<Route path="/home" element={<Home />} />
 				<Route path="/service-page" element={<ServicePage />} />
+				<Route path="/delivery-info" element={<Delivery />} />
 				{/* <Route path="/home" element={<ProtectedRoute element={<Home />} />} /> */}
 				<Route path="/furniture-list" element={<ProtectedRoute element={<FurnitureList />} />} />
 				{/* <Route path="/dashboard" element={<AdminOnlyRoutes element={<DashBoard />} />} /> */}

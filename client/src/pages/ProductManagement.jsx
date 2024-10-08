@@ -33,7 +33,7 @@ const ProductManagement = () => {
 				throw new Error("Failed to fetch furniture data");
 			}
 			const data = await response.json();
-			// console.log(data); // Log the data to check its structure
+			console.log(data); // Log the data to check its structure
 			setFurnitureData(data.furnitures || []); // Set fetched furniture data
 			setCategories(data.categories || []);
 			setMaterials(data.materials || []);

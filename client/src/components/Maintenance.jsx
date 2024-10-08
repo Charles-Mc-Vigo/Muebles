@@ -317,7 +317,7 @@ const Maintenance = () => {
 
 	return (
 		<div className="container mx-auto p-6">
-			<h1 className="text-3xl font-bold mb-6 text-center text-blue-600">
+			<h1 className="text-4xl font-bold mb-6 text-center text-black">
 				JCKAME Maintenance
 			</h1>
 			<div className="flex flex-row justify-between">
@@ -336,7 +336,7 @@ const Maintenance = () => {
 								handleAddNewItem();
 							}
 						}}
-						className="mb-6 space-y-4 bg-gray-100 p-4 rounded-lg shadow-md"
+						className="mb-6 space-y-4 bg-gray-100 p-4 rounded-lg shadow-md border-3 border-bg-oliveGreen"
 					>
 						<div className="mb-4">
 							<label className="block mb-1 font-semibold text-gray-700">
