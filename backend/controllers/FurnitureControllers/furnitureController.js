@@ -13,23 +13,24 @@ const upload = multer({ storage: multer.memoryStorage() }).single("image"); // A
 
 // Get all furnitures or furniture by ID
 exports.getAllFurnitures = async (req, res) => {
-    try {
-        const furnitures = await Furniture.find({ isArchived: false }).populate([
-            { path: "category", select: "name -_id" },
-            { path: "furnitureType", select: "name -_id" },
-            { path: "materials", select: "name -_id" },
-            { path: "colors", select: "name -_id" },
-            { path: "stocks", select: "stocks -_id" },
-            { path: "sizes", select: "label -_id" },
-        ]);
-        if (furnitures.length === 0)
-            return res.status(404).json({ message: "No furnitures found!" });
-        res.status(200).json(furnitures);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Server error!" });
-    }
+	try {
+			const furnitures = await Furniture.find({ isArchived: false }).populate([
+					{ path: "category", select: "name -_id" },
+					{ path: "furnitureType", select: "name -_id" },
+					{ path: "materials", select: "name -_id" },
+					{ path: "colors", select: "name -_id" },
+					{ path: "stocks", select: "stocks -_id" },
+					{ path: "sizes", select: "label -_id" },
+			]);
+			
+			// Return the fetched furnitures
+			res.status(200).json({ furnitures }); // Changed here
+	} catch (error) {
+			console.error(error);
+			res.status(500).json({ message: "Server error!" });
+	}
 };
+
 
 exports.ArchivedFurnitures = async (req, res) => {
 	try {
@@ -170,7 +171,7 @@ exports.createFurniture = [
       await newFurniture.save();
       res.status(201).json({
         message: "New furniture added successfully!",
-        furniture: newFurniture,
+        newFurniture,
       });
     } catch (error) {
       console.error(error);
