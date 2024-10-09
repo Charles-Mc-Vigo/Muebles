@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const User = require("../models/userModel");
+const User = require("../../backend/models/User/userModel");
 
 const authRoutes = async (req, res, next) => {
   const token = req.cookies.authToken; // Siguraduhin na tama ang cookie name

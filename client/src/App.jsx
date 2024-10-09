@@ -37,6 +37,7 @@ export default function App() {
 				<Route path="/dashboard" element={<DashBoard />} />
 				<Route path="/table" element={<ProductTable/>} />
 				<Route path="/home" element={<Home />} />
+
 				<Route path="/service-page" element={<ServicePage />} />
 				{/* <Route path="/home" element={<ProtectedRoute element={<Home />} />} /> */}
 				<Route path="/furniture-list" element={<ProtectedRoute element={<FurnitureList />} />} />

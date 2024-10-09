@@ -8,9 +8,9 @@ const {
   viewFurnitures,
   viewCart,
   addToCart
-} = require("../controllers/userController");
+} = require("../../controllers/User/userController")
 
-const authRoutes = require("../middlewares/authRoutes");
+const authRoutes = require("../../middlewares/authRoutes");
 router.post("/signup", SignUp);
 router.post('/verify-email', verifyEmail);
 router.post("/login", LogIn);
