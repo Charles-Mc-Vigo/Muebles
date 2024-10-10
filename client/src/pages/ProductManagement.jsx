@@ -308,7 +308,7 @@ const ProductManagement = () => {
 							required
 							className="border rounded p-2 w-full"
 						/>
-						<div className="mb-4">
+						<div className="mt-4 mb-4  bg-slate-200 rounded-md px-5 py-2">
 							<label className="block font-semibold">Materials:</label>
 							<div className="flex flex-col space-y-2">
 								{materials.map((material) => (
@@ -329,35 +329,37 @@ const ProductManagement = () => {
 								))}
 							</div>
 						</div>
-						<div className="mb-4">
+						<div className="mb-4  bg-slate-200 rounded-md p-2">
 							<label className="block font-semibold">Colors:</label>
-							<div className="flex flex-col space-y-2">
-								{colors.map((color) => (
-									<label key={color._id} className="flex items-center">
-										<input
-											type="checkbox"
-											name="color"
-											value={color.name}
-											checked={newFurniture.colors.includes(color.name)}
-											onChange={handleInputChange}
-											className="mr-2 h-4 w-4 border rounded text-blue-600 focus:ring-blue-500"
-										/>
-										<span className="text-gray-700 mr-5">
-											{color.name.charAt(0).toUpperCase() + color.name.slice(1)}
-										</span>
-										<div
-											className="mr-2 h-4 w-4 border rounded"
-											style={{ backgroundColor: color.hex }} // Use the hex value for background color
-										/>
-									</label>
-								))}
-							</div>
+              <div className="flex flex-wrap gap-4">
+                  {colors.map((color) => (
+                    <label key={color._id} className="flex items-center w-1/4">
+                      {" "}
+                      <input
+                        type="checkbox"
+                        name="color"
+                        value={color.name}
+                        checked={newFurniture.colors.includes(color.name)}
+                        onChange={handleInputChange}
+                        className="mr-2 h-4 w-4 border rounded text-blue-600 focus:ring-blue-500"
+                      />
+                      <span className="text-gray-700 mr-5">
+                        {color.name.charAt(0).toUpperCase() +
+                          color.name.slice(1)}
+                      </span>
+                      <div
+                        className="mr-2 h-4 w-4 border rounded"
+                        style={{ backgroundColor: color.hex }}
+                      />
+                    </label>
+                  ))}
+                </div>
 						</div>
-						<div className="mb-4">
+						<div className="mb-4 bg-slate-200 rounded-md p-2">
 							<label className="block font-semibold my-2 mb-2">
 								Sizes: (Height X Width X Length X Depth){" "}
 							</label>
-							<div className="flex flex-col my-2 mb-2">
+							<div className="flex flex-wrap gap-4">
 								{filteredSizes.length > 0 ? (
 									filteredSizes.map((size) => (
 										<label key={size._id} className="flex items-center">
