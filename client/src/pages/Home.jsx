@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
-import Delivery from "../components/Delivery";
 
 const Home = () => {
   const [products, setProducts] = useState([]);
@@ -157,7 +156,7 @@ const Home = () => {
                     key={product._id}
                     className="bg-white shadow-lg rounded-lg overflow-clip border border-gray-200 cursor-pointer"
                     style={{ width: '260px', height: '420px', margin: '1px' }}
-                    onClick={() => handleCardClick(product)} 
+                    onClick={() => handleCardClick(product)} // Make the card clickable
                   >
                     <div
                       className="bg-gray-100 flex items-center justify-center"
