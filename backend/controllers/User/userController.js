@@ -1,15 +1,15 @@
-const User = require("../models/userModel");
-const Furniture = require("../models/Furniture/furnitureModel");
-const Cart = require('../models/cartModel');
+const User = require("../../models/User/userModel");
+const Furniture = require("../../models/Furniture/furnitureModel");
+const Cart = require('../../models/cartModel');
 const bcrypt = require("bcrypt");
 const mongoose = require('mongoose');
 const validator = require("validator");
-const { UserSchemaValidator } = require("../middlewares/JoiSchemaValidation");
+const { UserSchemaValidator } = require("../../middlewares/JoiSchemaValidation");
 const jwt = require("jsonwebtoken");
 const {
 	sendVerificationEmail,
 	generateVerificationCode,
-} = require("../utils/EmailVerification");
+} = require("../../utils/EmailVerification");
 
 //task
 //user could,login, signup, request account deletion, request password reset, view products, add to cart, make payment, direct order, view order or purchase, view purchase history

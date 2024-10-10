@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter, Routes, Route} from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import LandingPage from "./pages/LandingPage";
 import SignUp from "./pages/SignUp";
 import Login from "./pages/Login";
@@ -14,14 +14,15 @@ import UserManagement from "./pages/UserManagement";
 import OrderManagement from "./pages/OrderManagement";
 import ProductManagement from "./pages/ProductManagement";
 import ProductCustomization from "./pages/ProductCustomization";
-import FurnitureList from './components/FurnitureList'
+import FurnitureList from "./components/FurnitureList";
 import EmailVerification from "./pages/EmailVerification";
 import AdminSignUp from "./pages/AdminSignUp";
-import AdminVerify from "./pages/AdminVerify"
-import About from './pages/About';
+import AdminVerify from "./pages/AdminVerify";
+import About from "./pages/About";
 import ServicePage from "./pages/ServicePage";
 import ProductTable from "./components/ProductTable";
 import Delivery from "./components/Delivery";
+import ViewProduct from "./components/ViewProduct";
 
 export default function App() {
 	return (
@@ -32,23 +33,36 @@ export default function App() {
 				<Route path="/signup" element={<SignUp />} />
 				<Route path="/verify-email" element={<EmailVerification />} />
 				<Route path="/login" element={<Login />} />
-				<Route path="/admin-login" element={<AdminLogin />}/>
-				<Route path="/admin-signup" element={<AdminSignUp />}/>
-				<Route path="/admin-verify" element={<AdminVerify />}/>
+				<Route path="/admin-login" element={<AdminLogin />} />
+				<Route path="/admin-signup" element={<AdminSignUp />} />
+				<Route path="/admin-verify" element={<AdminVerify />} />
 				<Route path="/dashboard" element={<DashBoard />} />
-				<Route path="/table" element={<ProductTable/>} />
-				<Route path="/home" element={<Home />} />
+				<Route path="/table" element={<ProductTable />} />
+				<Route path="/home" element={<ProtectedRoute element={<Home />} />} />
+				<Route path={`/furnitures/:id`} element={<ViewProduct />} />
 				<Route path="/service-page" element={<ServicePage />} />
 				<Route path="/delivery-info" element={<Delivery />} />
-				{/* <Route path="/home" element={<ProtectedRoute element={<Home />} />} /> */}
-				<Route path="/furniture-list" element={<ProtectedRoute element={<FurnitureList />} />} />
+				<Route
+					path="/furniture-list"
+					element={<ProtectedRoute element={<FurnitureList />} />}
+				/>
 				{/* <Route path="/dashboard" element={<AdminOnlyRoutes element={<DashBoard />} />} /> */}
-				<Route path="/user-management" element={<AdminOnlyRoutes element={<UserManagement />} />} />
-				<Route path="/order-management" element={<AdminOnlyRoutes element={<OrderManagement />} />} />
-				<Route path="/product-management" element={<AdminOnlyRoutes element={<ProductManagement />} />} />
-				<Route path="/product-customization" element={<AdminOnlyRoutes element={<ProductCustomization />} />} />
-				
-
+				<Route
+					path="/user-management"
+					element={<AdminOnlyRoutes element={<UserManagement />} />}
+				/>
+				<Route
+					path="/order-management"
+					element={<AdminOnlyRoutes element={<OrderManagement />} />}
+				/>
+				<Route
+					path="/product-management"
+					element={<AdminOnlyRoutes element={<ProductManagement />} />}
+				/>
+				<Route
+					path="/product-customization"
+					element={<AdminOnlyRoutes element={<ProductCustomization />} />}
+				/>
 				<Route
 					path="/logout"
 					element={<ProtectedRoute element={<Logout />} />}
