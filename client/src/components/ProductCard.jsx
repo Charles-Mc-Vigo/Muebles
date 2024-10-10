@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const ProductCard = ({ id, image, name, price, description }) => {
   // Function to truncate the description
@@ -12,7 +13,7 @@ const ProductCard = ({ id, image, name, price, description }) => {
   const maxDescriptionLength = 100; // Set the max length for the description
 
   return (
-    <div className="bg-white rounded-md shadow-lg transition-transform transform hover:scale-105 p-6 flex flex-col justify-between">
+    <div className="bg-white rounded-md shadow-lg transition-transform transform hover:scale-105 p-6 flex flex-col justify-between w-auto">
       <img
         src={`data:image/jpeg;base64,${image}`}
         alt={name}
@@ -24,12 +25,10 @@ const ProductCard = ({ id, image, name, price, description }) => {
         <p className="mt-2 text-gray-500">{truncateDescription(description, maxDescriptionLength)}</p>
       </div>
       <div className="mt-4 flex flex-col">
-        <a
-          href={`/set/${id}`}
-          className="text-right mr-5 text-green-600 hover:underline mb-2"
+        <Link to={`/furnitures/${id}` }          className="text-right mr-5 text-green-600 hover:underline mb-2"
         >
-          View Set
-        </a>
+        View Product Details
+        </Link>
         <button className="bg-green-600 hover:bg-green-700 text-white py-2 rounded-md transition-colors duration-300">
           Add Set to Cart
         </button>
