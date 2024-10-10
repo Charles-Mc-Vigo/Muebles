@@ -1,5 +1,5 @@
 const Order = require("../models/orderModel");
-const User = require("../models/userModel");
+const User = require("../../backend/models/User/userModel");
 const Furniture = require("../models/Furniture/furnitureModel");
 const {OrderSchemaValidator} = require("../middlewares/JoiSchemaValidation")
 

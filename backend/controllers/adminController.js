@@ -1,5 +1,5 @@
 const Admin = require('../models/adminModel');
-const User = require('../models/userModel');
+const User = require('../models/User/userModel');
 const {AdminSchemaValidator} = require('../middlewares/JoiSchemaValidation');
 const bcrypt = require("bcrypt");
 const validator = require("validator");

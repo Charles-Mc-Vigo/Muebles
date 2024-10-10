@@ -2,7 +2,6 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
-const userRoutes = require("./router/userRoutes");
 
 //furnitures
 const furnitureRoutes = require("./router/FurnitureRoutes/furnitureRoutes");
@@ -12,6 +11,9 @@ const materialsRoutes = require('./router/FurnitureRoutes/materialsRoutes')
 const colorRoutes = require('../backend/router/FurnitureRoutes/colorRoutes');
 const sizeRoutes = require('../backend/router/FurnitureRoutes/sizeRoutes');
 const stocksRoutes = require('../backend/router/FurnitureRoutes/stocksRoutes');
+
+//Users
+const userRoutes = require('../backend/router/User/userRoutes')
 
 const adminRoutes = require('./router/adminRoutes')
 const orderRoutes = require("./router/orderRoutes");
