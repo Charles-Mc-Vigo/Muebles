@@ -81,6 +81,7 @@ const Home = () => {
 							description={furniture.description}
 							showViewDetails={true}
 							showAddToCart={true}
+							showUpdateButton={false}
 						/>
 					))}
 				</div>
