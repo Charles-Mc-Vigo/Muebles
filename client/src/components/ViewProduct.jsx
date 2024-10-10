@@ -30,7 +30,8 @@ function ViewProduct() {
 	}, [id]);
 
 	if (loading) return <div className="text-center text-xl">Loading...</div>;
-	if (error) return <div className="text-red-600 text-center">Error: {error}</div>;
+	if (error)
+		return <div className="text-red-600 text-center">Error: {error}</div>;
 
 	// Ensure that furniture is not null before rendering
 	if (!furniture) return <div>No product found.</div>;
@@ -78,21 +79,20 @@ function ViewProduct() {
 						</div>
 
 						{/* Color Options */}
-            <div className="flex items-center space-x-2 mt-4">
-	<label className="mr-4 text-lg">Available Ngulay:</label>
-	<div className="flex space-x-2">
-		{furniture.colors &&
-			furniture.colors.map((color, index) => (
-				<button
-					key={index}
-					className="border p-2 rounded hover:bg-gray-100"
-				>
-					{typeof color === "string" ? color : color.name}
-				</button>
-			))}
-	</div>
-</div>
-
+						<div className="flex items-center space-x-2 mt-4">
+							<label className="mr-4 text-lg">Available Ngulay:</label>
+							<div className="flex space-x-2">
+								{furniture.colors &&
+									furniture.colors.map((color, index) => (
+										<button
+											key={index}
+											className="border p-2 rounded hover:bg-gray-100"
+										>
+											{typeof color === "string" ? color : color.name}
+										</button>
+									))}
+							</div>
+						</div>
 
 						{/* Price and Discount */}
 						<div className="mb-4">
@@ -106,9 +106,12 @@ function ViewProduct() {
 
 						{/* Quantity Selection */}
 						<div className="justify-end flex items-center gap-3">
-            <label className="mr-4 text-lg">Quantity:</label>
-	
-							<button onClick={decrementQuantity} className="border px-3 py-1 rounded-l-md bg-gray-200 hover:bg-gray-300">
+							<label className="mr-4 text-lg">Quantity:</label>
+
+							<button
+								onClick={decrementQuantity}
+								className="border px-3 py-1 rounded-l-md bg-gray-200 hover:bg-gray-300"
+							>
 								-
 							</button>
 							<input
@@ -117,7 +120,10 @@ function ViewProduct() {
 								readOnly
 								className="border p-2 w-50 text-center"
 							/>
-							<button onClick={incrementQuantity} className="border px-3 py-1 rounded-r-md bg-gray-200 hover:bg-gray-300">
+							<button
+								onClick={incrementQuantity}
+								className="border px-3 py-1 rounded-r-md bg-gray-200 hover:bg-gray-300"
+							>
 								+
 							</button>
 						</div>

@@ -25,7 +25,7 @@ router.post("/add", createFurniture);
 
 // Update furniture
 // PUT - /api/furnitures/:furnitureId
-router.put('/:furnitureId', updateFurniture);
+router.put('/edit/:furnitureId', updateFurniture);
 
 // Archive furniture
 // DELETE - /api/furnitures/archived/:furnitureId

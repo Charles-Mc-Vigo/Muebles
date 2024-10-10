@@ -79,6 +79,8 @@ const Home = () => {
 							name={furniture.name}
 							price={furniture.price}
 							description={furniture.description}
+							showViewDetails={true}
+							showAddToCart={true}
 						/>
 					))}
 				</div>

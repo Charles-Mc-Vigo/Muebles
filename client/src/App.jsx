@@ -22,6 +22,7 @@ import About from "./pages/About";
 import ServicePage from "./pages/ServicePage";
 import ProductTable from "./components/ProductTable";
 import ViewProduct from "./components/ViewProduct";
+import EditProduct from "./components/EditProduct";
 
 export default function App() {
 	return (
@@ -39,6 +40,7 @@ export default function App() {
 				<Route path="/table" element={<ProductTable />} />
 				<Route path="/home" element={<ProtectedRoute element={<Home />} />} />
 				<Route path={`/furnitures/:id`} element={<ViewProduct />} />
+				<Route path={`/furnitures/edit/:id`} element={<EditProduct />} />
 
 				<Route path="/service-page" element={<ServicePage />} />
 				<Route

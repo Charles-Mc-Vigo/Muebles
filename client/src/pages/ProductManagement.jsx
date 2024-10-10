@@ -238,16 +238,6 @@ const ProductManagement = () => {
 			) : (
 				<div className="flex flex-row justify-center">
 					<form onSubmit={handleSubmit} className="mb-6 space-y-4 w-1/2">
-						<input
-							id="name"
-							type="text"
-							name="name"
-							placeholder="Product Name"
-							value={newFurniture.name}
-							onChange={handleInputChange}
-							required
-							className="border rounded p-2 w-full"
-						/>
 						<select
 							id="category"
 							name="category"
@@ -278,6 +268,16 @@ const ProductManagement = () => {
 								</option>
 							))}
 						</select>
+            <input
+							id="name"
+							type="text"
+							name="name"
+							placeholder="Product Name"
+							value={newFurniture.name}
+							onChange={handleInputChange}
+							required
+							className="border rounded p-2 w-full"
+						/>
 						<textarea
 							id="description"
 							name="description"
@@ -302,7 +302,7 @@ const ProductManagement = () => {
 							id="stocks"
 							type="number"
 							name="stocks"
-							placeholder="Available Stocks"
+							placeholder="Stocks"
 							value={newFurniture.stocks}
 							onChange={handleInputChange}
 							required
@@ -419,7 +419,6 @@ const ProductManagement = () => {
 							<th className="border border-gray-300 p-2">Materials</th>
 							<th className="border border-gray-300 p-2">Price</th>
 							<th className="border border-gray-300 p-2">Stocks</th>
-							<th className="border border-gray-300 p-2">Actions</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -458,20 +457,6 @@ const ProductManagement = () => {
                 </td>
                 <td className="border border-gray-300 p-2">{furniture.price}</td>
                 <td className="border border-gray-300 p-2">{furniture.stocks.stocks || "N/A"}</td>
-                <td className="border border-gray-300 p-2 flex space-x-2">
-                    <button
-                        onClick={() => handleEdit(furniture._id)}
-                        className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
-                    >
-                        Edit
-                    </button>
-                    <button
-                        onClick={() => handleArchive(furniture._id)}
-                        className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
-                    >
-                        Archive
-                    </button>
-                </td>
             </tr>
         ))
     ) : (

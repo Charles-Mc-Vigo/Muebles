@@ -12,7 +12,7 @@ import {
 import ProductManagement from './ProductManagement';
 import Inventory from '../components/Inventory';
 import ServiceSection from '../components/Services';
-import ItemList from '../components/ItemList';
+import ViewProduct from '../components/ViewProduct';
 import DashboardContent from '../components/DashboardContent';
 import Maintenance from '../components/Maintenance';
 
@@ -78,7 +78,7 @@ const Dashboard = () => {
   // Content mapping
   const contentMap = {
     'dashboard': <DashboardContent />,
-    'view-products': <ItemList />,
+    'view-products': <ViewProduct />,
     'modify-product': <ProductManagement />,
     'inventory': <Inventory />,
     'order-management': <h2 className="text-2xl font-semibold">Order Management Content</h2>,
