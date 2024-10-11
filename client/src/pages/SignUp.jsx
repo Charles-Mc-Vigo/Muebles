@@ -54,37 +54,41 @@ export default function SignUp() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     if (formData.password !== formData.confirmPassword) {
       alert("Passwords do not match");
       return;
     }
-
+  
     if (!formData.agreeToTerms) {
       alert("Please agree to the Terms and Conditions");
       return;
     }
-
+  
     try {
-      const response = await axios.post(
-        "http://localhost:3000/api/users/signup",
-        {
+      const response = await fetch("http://localhost:3000/api/users/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
           ...formData,
           zipCode,
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }
-      );
-      
-      navigate('/verify-email');
+        }),
+      });
+  
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Sign up failed");
+      }
+      //make sure to update the api after successfully send
+      // On successful response
+      navigate("/:userId/verify-email");
     } catch (error) {
-      console.error("Sign up error", error.response?.data || error.message);
-      alert(error.response?.data?.message || error.message || "Sign up failed");
+      console.error("Sign up error", error.message);
+      alert(error.message || "Sign up failed");
     }
-  };
+  };  
 
   return (
     <div className="min-h-screen flex justify-center items-center">

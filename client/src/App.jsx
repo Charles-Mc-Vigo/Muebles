@@ -31,7 +31,7 @@ export default function App() {
 				<Route path="/" element={<LandingPage />} />
 				<Route path="/about" element={<About />} />
 				<Route path="/signup" element={<SignUp />} />
-				<Route path="/verify-email" element={<EmailVerification />} />
+				<Route path="/:userId/verify-email" element={<EmailVerification />} />
 				<Route path="/login" element={<Login />} />
 				<Route path="/admin-login" element={<AdminLogin />} />
 				<Route path="/admin-signup" element={<AdminSignUp />} />

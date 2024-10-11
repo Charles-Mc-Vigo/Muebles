@@ -1,59 +1,106 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-import Cookies from 'js-cookie'
-  
-const EmailVerification = () => {
-  const [email, setEmail] = useState(''); // Initialize with an empty string
-  const [code, setCode] = useState('');
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import Cookies from 'js-cookie';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css'; // Import the CSS for toast notifications
 
+const EmailVerification = () => {
+  const { userId } = useParams();
+  const [code, setCode] = useState('');
+  const [user, setUser] = useState(null); // State for storing the user object
+  const [email, setEmail] = useState('');
+  const [isResendDisabled, setIsResendDisabled] = useState(false); // State for button disable
+  const [resendTimer, setResendTimer] = useState(60); // Countdown timer for resend button
   const navigate = useNavigate();
 
-  const handleEmailChange = (e) => {
-    setEmail(e.target.value);
-  };
+  // Fetch user data when the component mounts
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const response = await fetch(`http://localhost:3000/api/users/${userId}`);
+        if (!response.ok) {
+          throw new Error('User not found');
+        }
+        const userData = await response.json();
+        setUser(userData); // Set the entire user object
+        setEmail(userData.email);
+      } catch (error) {
+        console.error('Error fetching user:', error);
+        toast.error('Could not fetch user data. Please try again.');
+      }
+    };
+    fetchUser();
+  }, [userId]);
 
   const handleCodeChange = (e) => {
     const codeValue = e.target.value;
-    // Ensure the code is 6 digits and numeric
     if (codeValue.length <= 6 && /^[0-9]*$/.test(codeValue)) {
-      setCode(codeValue); // Corrected setCode
+      setCode(codeValue);
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const response = await axios.post(
-        "http://localhost:3000/api/users/verify-email",
-        {
-          email,
-          code
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json', // Change this to 'application/json'
-          },
-        }
-      );
-      console.log('Response:', response.data);
-  
-      if (response.data.token) {
-        Cookies.set('authToken', response.data.token, {
-          expires: 3, // Token expiration in days
-          secure: process.env.NODE_ENV === 'production' // Use HTTPS in production
-        });
-  
-        alert('Account verified successfully!');
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  try {
+    const response = await fetch(`http://localhost:3000/api/users/${userId}/verify-email`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ code }),
+    });
+    const data = await response.json();
+    if (data.token) {
+      Cookies.set('authToken', data.token, {
+        expires: 3,
+        secure: process.env.NODE_ENV === 'production',
+      });
+      toast.success('Account verified successfully!');
+      
+      // Add a timeout to delay the redirection to home
+      setTimeout(() => {
         navigate('/home');
-      } else {
-        alert('Account verification unsuccessful!');
+      }, 3000); // Delay for 3 seconds (3000 milliseconds)
+    } else {
+      toast.error('Account verification unsuccessful!');
+    }
+  } catch (error) {
+    console.error('Error verifying email:', error);
+    toast.error('Error verifying email. Please try again.');
+  }
+};
+
+  const handleResendCode = async () => {
+    try {
+      const response = await fetch(`http://localhost:3000/api/users/${userId}/resend-verification`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      if (!response.ok) {
+        throw new Error('Failed to resend verification code');
       }
+      toast.success('Verification code resent successfully!');
+      
+      // Disable the button and start the timer
+      setIsResendDisabled(true);
+      setResendTimer(60); // Set the timer to 60 seconds
+
+      const intervalId = setInterval(() => {
+        setResendTimer((prevTimer) => {
+          if (prevTimer === 1) {
+            clearInterval(intervalId); // Stop the interval when time is up
+            setIsResendDisabled(false); // Re-enable the button
+          }
+          return prevTimer - 1;
+        });
+      }, 1000);
     } catch (error) {
-      console.error('Error verifying email:', error);
+      console.error('Error resending verification code:', error);
+      toast.error('Error resending verification code. Please try again.');
     }
   };
-  
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
@@ -61,16 +108,9 @@ const EmailVerification = () => {
         <h2 className="text-2xl font-semibold text-center mb-6">Email Verification</h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
-            <input
-              type="email"
-              id="email"
-              value={email}
-              onChange={handleEmailChange}
-              required
-              className="mt-1 p-3 w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              placeholder="Enter your email"
-            />
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              We have sent a verification email to {user ? user.email : 'loading...'}
+            </label>
           </div>
           <div className="mb-6">
             <label htmlFor="code" className="block text-sm font-medium text-gray-700">Verification Code</label>
@@ -91,8 +131,19 @@ const EmailVerification = () => {
           >
             Verify
           </button>
+          <button
+            type="button"
+            onClick={handleResendCode}
+            disabled={isResendDisabled} // Disable button when needed
+            className={`mt-4 w-full py-3 px-4 ${
+              isResendDisabled ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-gray-300 text-gray-800 hover:bg-gray-400'
+            } font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500`}
+          >
+            {isResendDisabled ? `Resend available in ${resendTimer}s` : 'Resend Verification Code'}
+          </button>
         </form>
       </div>
+      <ToastContainer /> {/* Add ToastContainer to render toasts */}
     </div>
   );
 };

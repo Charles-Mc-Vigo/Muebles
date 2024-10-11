@@ -1,10 +1,12 @@
 const User = require("../../models/User/userModel");
 const Furniture = require("../../models/Furniture/furnitureModel");
-const Cart = require('../../models/cartModel');
+const Cart = require("../../models/cartModel");
 const bcrypt = require("bcrypt");
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 const validator = require("validator");
-const { UserSchemaValidator } = require("../../middlewares/JoiSchemaValidation");
+const {
+	UserSchemaValidator,
+} = require("../../middlewares/JoiSchemaValidation");
 const jwt = require("jsonwebtoken");
 const {
 	sendVerificationEmail,
@@ -116,9 +118,13 @@ exports.SignUp = async (req, res) => {
 		});
 
 		await newUser.save();
-		res.status(201).json({ message: "We’ve sent a verification email to your inbox. Please check your email to verify your account." 
-		});
-		} catch (err) {
+		res
+			.status(201)
+			.json({
+				message:
+					"We’ve sent a verification email to your inbox. Please check your email to verify your account.",
+			});
+	} catch (err) {
 		console.error(err);
 		res.status(500).json({ message: "Server error!" });
 	}
@@ -127,18 +133,22 @@ exports.SignUp = async (req, res) => {
 //for verifying user account
 exports.verifyEmail = async (req, res) => {
 	try {
-		const { email, code } = req.body;
+		const { userId } = req.params;
+
+		const user = await User.findById(userId);
+
+		if (!user) {
+			return res.status(404).json({ message: "User not found!" });
+		}
+
+		const email = user.email;
+
+		const { code } = req.body;
 
 		if (!email || !code) {
 			return res
 				.status(400)
 				.json({ message: "Email and verification code are required!" });
-		}
-
-		const user = await User.findOne({ email });
-
-		if (!user) {
-			return res.status(400).json({ message: "User not found!" });
 		}
 
 		if (
@@ -173,6 +183,55 @@ exports.verifyEmail = async (req, res) => {
 	}
 };
 
+//resend verification
+exports.resendVerificationCode = async (req, res) => {
+	try {
+			const { userId } = req.params; // Assuming userId is passed as a URL parameter
+			const user = await User.findById(userId);
+			
+			if (!user) {
+					return res.status(404).json({ message: "User not found!" });
+			}
+
+			// Check if the user is already verified
+			if (user.isVerified) {
+					return res.status(400).json({ message: "User is already verified!" });
+			}
+
+			// Generate a new verification code
+			const verificationCode = generateVerificationCode();
+			const verificationCodeExpires = Date.now() + 15 * 60 * 1000; // 15 minutes from now
+
+			// Send the verification email
+			await sendVerificationEmail(user.email, verificationCode);
+
+			// Update the user's verification code and expiration
+			user.verificationCode = verificationCode;
+			user.verificationCodeExpires = verificationCodeExpires;
+			await user.save();
+
+			res.status(200).json({ message: "A new verification code has been sent to your email." });
+	} catch (error) {
+			console.log("Error resending Verification code: ", error);
+			res.status(500).json({ message: "Server error!" });
+	}
+};
+
+//get user by id
+exports.getUserById = async(req,res) =>{
+	try {
+		const {userId} = req.params;
+		const user = await User.findById(userId);
+
+		if(!user) return res.status(404).json({message: "User not found!"})
+		
+			res.status(200).json(user)
+	} catch (error) {
+		console.log("Error fetching the user by its id: ",error);
+		res.status(500).json({message:"Server error!"})
+	}
+}
+
 //login
 exports.LogIn = async (req, res) => {
 	try {
@@ -197,30 +256,26 @@ exports.LogIn = async (req, res) => {
 			sameSite: "strict",
 		});
 
-		res
-			.status(200)
-			.json({ message: "Login successful!", token });
+		res.status(200).json({ message: "Login successful!", token });
 	} catch (error) {
 		res.status(500).json({ message: "Server error!" });
 	}
 };
 
 //view all furnitures
-exports.viewFurnitures = async (req,res) => {
+exports.viewFurnitures = async (req, res) => {
 	try {
-
 		const furnitures = await Furniture.find(req.query);
 
-		if(furnitures.length === 0){
-			return res.status(404).json({message:"No furniture found!"})
+		if (furnitures.length === 0) {
+			return res.status(404).json({ message: "No furniture found!" });
 		}
-		res.status(200).json(furnitures)
+		res.status(200).json(furnitures);
 	} catch (error) {
-		console.log("Failed to view products:",error);
-		res.status(500).json({message:"Server error!"})
+		console.log("Failed to view products:", error);
+		res.status(500).json({ message: "Server error!" });
 	}
-}
-
+};
 
 //logout
 exports.Logout = async (req, res) => {
@@ -236,36 +291,32 @@ exports.Logout = async (req, res) => {
 		res.clearCookie("authToken", {
 			httpOnly: true,
 			secure: process.env.NODE_ENV === "production",
-			sameSite: "strict"
+			sameSite: "strict",
 		});
 
 		res.status(200).json({ message: "Logout successful!" });
 		console.log("Logout successful!");
 	} catch (error) {
 		res.status(500).json({ message: "Server error!" });
-		console.error("Failed to log out:",error);
+		console.error("Failed to log out:", error);
 	}
 };
 
 //view cart
-exports.viewCart = async (req,res) => {
+exports.viewCart = async (req, res) => {
 	try {
 		const userId = req.user._id;
 		const userCart = await Cart.findOne({ user: userId });
 		res.status(200).json(userCart);
 	} catch (error) {
-		console.log("Failed to view cart",error);
-		res.status(500).json({message:"Server error!"})
+		console.log("Failed to view cart", error);
+		res.status(500).json({ message: "Server error!" });
 	}
-}
+};
 
 exports.addToCart = async (req, res) => {
 	//task here
-}
-
-
-
-
+};
 
 // exports.getUserByID = async (req, res) => {
 // 	try {
