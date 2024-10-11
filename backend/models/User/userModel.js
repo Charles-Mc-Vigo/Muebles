@@ -49,6 +49,11 @@ const userSchema = new mongoose.Schema({
   verificationCodeExpires: {
     type: Date
   },
+  agreeToTerms:{
+    type:Boolean,
+    default:false,
+    required:true
+  },
   orders:[{
     type:mongoose.Schema.ObjectId,
     ref:"Order"

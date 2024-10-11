@@ -8,7 +8,6 @@ const EmailVerification = () => {
   const { userId } = useParams();
   const [code, setCode] = useState('');
   const [user, setUser] = useState(null); // State for storing the user object
-  const [email, setEmail] = useState('');
   const [isResendDisabled, setIsResendDisabled] = useState(false); // State for button disable
   const [resendTimer, setResendTimer] = useState(60); // Countdown timer for resend button
   const navigate = useNavigate();
@@ -17,13 +16,12 @@ const EmailVerification = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const response = await fetch(`http://localhost:3000/api/users/${userId}`);
+        const response = await fetch(`http://localhost:3000/api/users/user/${userId}`);
         if (!response.ok) {
           throw new Error('User not found');
         }
         const userData = await response.json();
         setUser(userData); // Set the entire user object
-        setEmail(userData.email);
       } catch (error) {
         console.error('Error fetching user:', error);
         toast.error('Could not fetch user data. Please try again.');
@@ -42,7 +40,7 @@ const EmailVerification = () => {
 const handleSubmit = async (e) => {
   e.preventDefault();
   try {
-    const response = await fetch(`http://localhost:3000/api/users/${userId}/verify-email`, {
+    const response = await fetch(`http://localhost:3000/api/users/verify-email/${userId}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -72,7 +70,7 @@ const handleSubmit = async (e) => {
 
   const handleResendCode = async () => {
     try {
-      const response = await fetch(`http://localhost:3000/api/users/${userId}/resend-verification`, {
+      const response = await fetch(`http://localhost:3000/api/users/resend-verification/${userId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

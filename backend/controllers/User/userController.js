@@ -118,12 +118,8 @@ exports.SignUp = async (req, res) => {
 		});
 
 		await newUser.save();
-		res
-			.status(201)
-			.json({
-				message:
-					"We’ve sent a verification email to your inbox. Please check your email to verify your account.",
-			});
+		res.status(201).json(newUser);
+		// res.send("We’ve sent a verification email to your inbox. Please check your email to verify your account."); //this causing trouble, kailangan kita icomment haha
 	} catch (err) {
 		console.error(err);
 		res.status(500).json({ message: "Server error!" });
@@ -210,7 +206,8 @@ exports.resendVerificationCode = async (req, res) => {
 			user.verificationCodeExpires = verificationCodeExpires;
 			await user.save();
 
-			res.status(200).json({ message: "A new verification code has been sent to your email." });
+			res.status(200).json({ message: "A new verification code has been sent to your email." },user);
+
 	} catch (error) {
 			console.log("Error resending Verification code: ", error);
 			res.status(500).json({ message: "Server error!" });
@@ -228,6 +225,19 @@ exports.getUserById = async(req,res) =>{
 			res.status(200).json(user)
 	} catch (error) {
 		console.log("Error fetching the user by its id: ",error);
+		res.status(500).json({message:"Server error!"})
+	}
+}//get user by id
+
+exports.GetAllUsers = async(req,res) =>{
+	try {
+		const users = await User.find();
+
+		if(users.length === 0) return res.status(404).json({message: "No users found!"})
+		
+			res.status(200).json(users)
+	} catch (error) {
+		console.log("Error fetching users : ",error);
 		res.status(500).json({message:"Server error!"})
 	}
 }

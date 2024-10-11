@@ -9,18 +9,21 @@ const {
   viewCart,
   addToCart,
   resendVerificationCode,
-  getUserById
+  getUserById,
+  GetAllUsers
 } = require("../../controllers/User/userController")
 
-const authRoutes = require("../../middlewares/authRoutes");
-router.get('/:userId', getUserById);
-router.post('/:userId/verify-email', verifyEmail);
-router.post('/:userId/resend-verification',resendVerificationCode)
+// const authRoutes = require("../../middlewares/authRoutes");
+
+router.get("/",GetAllUsers);
 router.post("/signup", SignUp);
 router.post("/login", LogIn);
+router.get('/user/:userId', getUserById);
+router.post('/verify-email/:userId', verifyEmail);
+router.post('/resend-verification/:userId',resendVerificationCode)
 
 
-router.use(authRoutes);
+// router.use(authRoutes);
 
 router.get("/view-furnitures",viewFurnitures)
 router.get("/cart/view-cart",viewCart)

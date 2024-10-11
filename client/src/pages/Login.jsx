@@ -1,13 +1,15 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import Cookies from 'js-cookie';
-import { FaFingerprint } from 'react-icons/fa'; // Import an icon for the top
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+import Cookies from "js-cookie";
+import { FaFingerprint } from "react-icons/fa"; // Import an icon for the top
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css"; // Import Toastify CSS
 
 export default function Login() {
 	const [formData, setFormData] = useState({
-		email: '',
-		password: ''
+		email: "",
+		password: "",
 	});
 	const navigate = useNavigate();
 
@@ -19,34 +21,48 @@ export default function Login() {
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 		try {
-			const response = await axios.post('http://localhost:3000/api/users/login', {
-				...formData,
-				headers: { 'Content-Type': 'application/json' }
-			});
+			const response = await axios.post(
+				"http://localhost:3000/api/users/login",
+				{
+					...formData,
+					headers: { "Content-Type": "application/json" },
+				}
+			);
 			if (response.data.token) {
-				Cookies.set('authToken', response.data.token, {
+				Cookies.set("authToken", response.data.token, {
 					expires: 3,
-					secure: process.env.NODE_ENV === 'production'
+					secure: process.env.NODE_ENV === "production",
 				});
-				alert('Logged in successfully');
-				navigate('/home');
-			} else {
-				alert('Login unsuccessful');
+				toast.success("Logged in successfully");
+				setTimeout(() => {
+					navigate('/home');
+				}, 3000);			} else {
+				toast.error("Login unsuccessful");
 			}
 		} catch (error) {
 			console.error("Log in error", error.response?.data || error.message);
-			alert(error.response?.data?.message || error.message || "Log in failed");
+			toast.error(
+				error.response?.data?.message || error.message || "Log in failed"
+			);
 		}
 	};
 
 	return (
-		<div className="min-h-screen bg-fill flex justify-center items-center"
-			 style={{ backgroundImage: 'url(/landingimage/jckamecover.jpg)', backgroundSize: 'cover', backgroundPosition: 'center' }}>
+		<div
+			className="min-h-screen bg-fill flex justify-center items-center"
+			style={{
+				backgroundImage: "url(/landingimage/jckamecover.jpg)",
+				backgroundSize: "cover",
+				backgroundPosition: "center",
+			}}
+		>
 			<div className="bg-teal-800 bg-opacity-90 p-6 md:p-10 rounded-lg max-w-md w-full">
 				<div className="flex justify-center mb-6">
 					<FaFingerprint className="text-white text-4xl" />
 				</div>
-				<h1 className="text-center text-white text-2xl font-semibold mb-6">Log In</h1>
+				<h1 className="text-center text-white text-2xl font-semibold mb-6">
+					Log In
+				</h1>
 				<form onSubmit={handleSubmit} className="space-y-4">
 					<input
 						type="email"
@@ -73,13 +89,20 @@ export default function Login() {
 				</form>
 				<p className="text-white text-sm text-center mt-4">
 					Don't have an account?{" "}
-					<Link to="/SignUp" className="underline">Sign up Now</Link>.
+					<Link to="/SignUp" className="underline">
+						Sign up Now
+					</Link>
+					.
 				</p>
 				<p className="text-white text-sm text-center mt-2">
 					Forgot password?{" "}
-					<Link to="/login" className="underline">Click here</Link>.
+					<Link to="/login" className="underline">
+						Click here
+					</Link>
+					.
 				</p>
 			</div>
+			<ToastContainer />
 		</div>
 	);
 }
