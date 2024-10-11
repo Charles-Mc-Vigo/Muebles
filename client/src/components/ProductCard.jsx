@@ -25,7 +25,7 @@ const ProductCard = ({ id, image, name, price, description }) => {
         <p className="mt-2 text-gray-500">{truncateDescription(description, maxDescriptionLength)}</p>
       </div>
       <div className="mt-4 flex flex-col">
-        <Link to={`/furnitures/${id}` }          className="text-right mr-5 text-green-600 hover:underline mb-2"
+        <Link to={`/furnitures/${id}` }className="text-right mr-5 text-green-600 hover:underline mb-2"
         >
         View Product Details
         </Link>
