@@ -3,6 +3,7 @@ const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 
+
 //furnitures
 const furnitureRoutes = require("./router/FurnitureRoutes/furnitureRoutes");
 const categoryRoutes = require("../backend/router/FurnitureRoutes/categoryRoutes")

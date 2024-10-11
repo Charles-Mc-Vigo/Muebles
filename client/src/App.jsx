@@ -21,7 +21,8 @@ import AdminVerify from "./pages/AdminVerify"
 import About from './pages/About';
 import ServicePage from "./pages/ServicePage";
 import ProductTable from "./components/ProductTable";
-import Delivery from "./components/Delivery";
+import ProductDetails from "./components/ProductDetails";
+import EditProduct from "./components/EditProduct";
 
 export default function App() {
 	return (
@@ -30,14 +31,17 @@ export default function App() {
 				<Route path="/" element={<LandingPage />} />
 				<Route path="/about" element={<About />} />
 				<Route path="/signup" element={<SignUp />} />
-				<Route path="/verify-email" element={<EmailVerification />} />
+				<Route path="/verify-email/:userId" element={<EmailVerification />} />
 				<Route path="/login" element={<Login />} />
 				<Route path="/admin-login" element={<AdminLogin />}/>
 				<Route path="/admin-signup" element={<AdminSignUp />}/>
 				<Route path="/admin-verify" element={<AdminVerify />}/>
 				<Route path="/dashboard" element={<DashBoard />} />
-				<Route path="/table" element={<ProductTable/>} />
-				<Route path="/home" element={<Home />} />
+				<Route path="/table" element={<ProductTable />} />
+				<Route path="/home" element={<ProtectedRoute element={<Home />} />} />
+				<Route path={`/furnitures/:id`} element={<ProductDetails />} />
+				<Route path={`/furnitures/edit/:id`} element={<EditProduct />} />
+
 				<Route path="/service-page" element={<ServicePage />} />
 				<Route path="/delivery-info" element={<Delivery />} />
 				{/* <Route path="/home" element={<ProtectedRoute element={<Home />} />} /> */}
