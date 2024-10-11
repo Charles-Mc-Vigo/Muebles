@@ -33,6 +33,7 @@ exports.SignUp = async (req, res) => {
 			municipality,
 			barangay,
 			email,
+			agreeToTerms,
 			password,
 			confirmPassword,
 		} = req.body;
@@ -47,7 +48,8 @@ exports.SignUp = async (req, res) => {
 			!barangay ||
 			!email ||
 			!password ||
-			!confirmPassword
+			!confirmPassword ||
+			!agreeToTerms
 		) {
 			return res.status(400).json({ message: "All fields are required!" });
 		}
@@ -112,6 +114,7 @@ exports.SignUp = async (req, res) => {
 			municipality,
 			barangay,
 			email,
+			agreeToTerms,
 			password: hashedPassword,
 			verificationCode,
 			verificationCodeExpires,

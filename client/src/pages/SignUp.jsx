@@ -15,7 +15,7 @@ export default function SignUp() {
     email: "",
     password: "",
     confirmPassword: "",
-    agreeToTerms: false,
+    agreeToTerms: "",
   });
 
   const [zipCode, setZipcode] = useState("");
