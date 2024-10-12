@@ -1,6 +1,6 @@
 const User = require("../../models/User/userModel");
 const Furniture = require("../../models/Furniture/furnitureModel");
-const Cart = require("../../models/cartModel");
+const Cart = require("../../models/Cart/cartModel");
 const bcrypt = require("bcrypt");
 const mongoose = require("mongoose");
 const validator = require("validator");
@@ -331,8 +331,7 @@ exports.addToCart = async (req, res) => {
 	//task here
 };
 
-// exports.getUserByID = async (req, res) => {
-// 	try {
+
 // 		const { id } = req.params;
 // 		const user = await User.findById(id);
 
