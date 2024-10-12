@@ -1,11 +1,9 @@
 const express = require('express');
-const { addItemsToCart, removeItemFromCart, updateItemQuantities, getCart } = require('../../controllers/Cart/cartController');
+const { addItemsToCart, removeItemFromCart, updateItemQuantities, getCart, checkout} = require('../../controllers/Cart/cartController');
 const router = express.Router();
 
-router.get('/', (req,res) => {
-  res.send("Cart Api is working!");
-});
 router.get('/cart/:userId', getCart);
+router.post('/cart/:userId/checkout', checkout);
 router.post('/cart/:userId/add', addItemsToCart);
 router.put('/cart/:userId/update', updateItemQuantities);
 router.delete('/cart/:userId/remove', removeItemFromCart);
