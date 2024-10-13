@@ -5,12 +5,10 @@ const {
   LogIn,
   Logout,
   verifyEmail,
-  viewFurnitures,
-  viewCart,
-  addToCart,
   resendVerificationCode,
   getUserById,
-  GetAllUsers
+  GetAllUsers,
+  UpdateUserInformation
 } = require("../../controllers/User/userController")
 
 // const authRoutes = require("../../middlewares/authRoutes");
@@ -21,13 +19,11 @@ router.post("/login", LogIn);
 router.get('/user/:userId', getUserById);
 router.post('/verify-email/:userId', verifyEmail);
 router.post('/resend-verification/:userId',resendVerificationCode)
+router.put('/settings/update/:userId',UpdateUserInformation);
 
 
 // router.use(authRoutes);
 
-router.get("/view-furnitures",viewFurnitures)
-router.get("/cart/view-cart",viewCart)
-router.post("/cart/add-to-cart",addToCart)
 router.post("/logout", Logout);
 
 module.exports = router;

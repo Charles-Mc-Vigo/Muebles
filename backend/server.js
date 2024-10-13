@@ -18,7 +18,9 @@ const userRoutes = require('../backend/router/User/userRoutes')
 
 const adminRoutes = require('./router/adminRoutes')
 const orderRoutes = require("./router/orderRoutes");
-const cartRoutes = require('./router/cartRoutes');
+
+//Cart
+const cartRoutes = require('./router/Cart/cartRoutes');
 const connectDB = require("./database/db");
 const cookieParser = require('cookie-parser');
 
@@ -76,7 +78,10 @@ app.use("/api/colors",colorRoutes)
 app.use("/api/sizes",sizeRoutes)
 app.use("/api/stocks",stocksRoutes)
 
+// Cart
 app.use('/api/carts', cartRoutes);
+
+
 app.use("/api/admin", adminRoutes);
 
 app.use("/api/orders", orderRoutes);

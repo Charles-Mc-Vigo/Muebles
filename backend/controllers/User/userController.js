@@ -1,6 +1,6 @@
 const User = require("../../models/User/userModel");
 const Furniture = require("../../models/Furniture/furnitureModel");
-const Cart = require("../../models/cartModel");
+const Cart = require("../../models/Cart/cartModel");
 const bcrypt = require("bcrypt");
 const mongoose = require("mongoose");
 const validator = require("validator");
@@ -327,115 +327,54 @@ exports.viewCart = async (req, res) => {
 	}
 };
 
-exports.addToCart = async (req, res) => {
-	//task here
+
+exports.UpdateUserInformation = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    // Find the user by ID
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Initialize an updates object
+    const updates = {};
+
+    // Update fields if they are provided in the request body
+    if (req.body.firstname && req.body.firstname !== user.firstname) updates.firstname = req.body.firstname;
+    if (req.body.lastname && req.body.lastname !== user.lastname) updates.lastname = req.body.lastname;
+    if (req.body.gender && req.body.gender !== user.gender) updates.gender = req.body.gender;
+    if (req.body.phoneNumber && req.body.phoneNumber !== user.phoneNumber) updates.phoneNumber = req.body.phoneNumber;
+    if (req.body.streetAddress && req.body.streetAddress !== user.streetAddress) updates.streetAddress = req.body.streetAddress;
+    if (req.body.municipality && req.body.municipality !== user.municipality) updates.municipality = req.body.municipality;
+    if (req.body.barangay && req.body.barangay !== user.barangay) updates.barangay = req.body.barangay;
+    if (req.body.zipCode && req.body.zipCode !== user.zipCode) updates.zipCode = req.body.zipCode;
+    if (req.body.email && req.body.email !== user.email) updates.email = req.body.email;
+
+    // Handle image upload from a file
+    if (req.file) {
+      const imageBuffer = req.file.buffer; // Assuming you're using multer
+      const base64Image = imageBuffer.toString('base64');
+      updates.image = `data:${req.file.mimetype};base64,${base64Image}`;
+    }
+
+    // Handle image URL
+    if (req.body.image) {
+      updates.image = req.body.image; // Set the image to the provided URL
+    }
+
+    // Check if there are no changes
+    if (Object.keys(updates).length === 0) {
+      return res.status(400).json({ message: 'No changes made to user information' });
+    }
+
+    // Update the user in the database
+    await User.findByIdAndUpdate(userId, updates, { new: true });
+
+    return res.status(200).json({ message: 'User information updated successfully', user: updates });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'An error occurred while updating user information', error });
+  }
 };
-
-// exports.getUserByID = async (req, res) => {
-// 	try {
-// 		const { id } = req.params;
-// 		const user = await User.findById(id);
-
-// 		if (!user) {
-// 			return res.status(404).json({ message: "User not found!" });
-// 		}
-
-// 		res.status(200).json(user);
-// 	} catch (error) {
-// 		res.status(400).json({ message: error.message });
-// 		console.log(error);
-// 	}
-// };
-
-// exports.showAdmins = async (req, res) => {
-// 	try {
-// 		const users = await User.find({}, "firstname lastname email isAdmin");
-
-// 		if (!users.length) {
-// 			return res.status(404).json({ message: "No users found!" });
-// 		}
-// 		res.status(200).json(users);
-// 	} catch (error) {
-// 		res.status(400).json({ message: error.message });
-// 		console.log(error);
-// 	}
-// };
-
-// exports.editUserInfo = async (req, res) => {
-// 	try {
-// 		const { id } = req.params;
-// 		const {
-// 			firstname,
-// 			lastname,
-// 			gender,
-// 			phoneNumber,
-// 			streetAddress,
-// 			municipality,
-// 			email,
-// 			role,
-// 		} = req.body;
-
-// 		const existingUser = await User.findById(id);
-// 		if (!existingUser) {
-// 			return res.status(404).json({ message: "User not found!" });
-// 		}
-
-// 		if (email && !validator.isEmail(email)) {
-// 			return res.status(400).json({ message: "Invalid email address!" });
-// 		}
-
-// 		if (phoneNumber && !validator.isMobilePhone(phoneNumber, "en-PH")) {
-// 			return res.status(400).json({ message: "Invalid phone number!" });
-// 		}
-
-// 		if (firstname) existingUser.firstname = firstname;
-// 		if (lastname) existingUser.lastname = lastname;
-// 		if (gender) existingUser.gender = gender;
-// 		if (phoneNumber) existingUser.phoneNumber = phoneNumber;
-// 		if (streetAddress) existingUser.streetAddress = streetAddress;
-// 		if (municipality) existingUser.municipality = municipality;
-// 		if (email) existingUser.email = email;
-// 		if (role) existingUser.role = role;
-
-// 		existingUser.updatedAt = new Date();
-
-// 		const { error } = UserSchemaValidator.validate({
-// 			firstname: existingUser.firstname,
-// 			lastname: existingUser.lastname,
-// 			gender: existingUser.gender,
-// 			streetAddress: existingUser.streetAddress,
-// 			municipality: existingUser.municipality,
-// 			password: existingUser.password,
-// 		});
-// 		if (error) {
-// 			return res.status(400).json({ message: error.details[0].message });
-// 		}
-
-// 		const modifiedUser = await existingUser.save();
-
-// 		res
-// 			.status(200)
-// 			.json({
-// 				message: "User information updated successfully!",
-// 				user: modifiedUser,
-// 			});
-// 	} catch (error) {
-// 		console.error(error);
-// 		res.status(500).json({ message: "Server error!" });
-// 	}
-// };
-
-// exports.deleteUserbyID = async (req, res) => {
-// 	try {
-// 		const {id} = req.params
-// 		const user = await User.findByIdAndDelete(id);
-// 		if (!user) {
-// 			return res.status(404).json({ message: "User not found!" });
-// 		}
-
-// 		res.status(200).json({ message: "User has been deleted!", user });
-// 	} catch (error) {
-// 		console.error("Failed to delete the user:",error);
-// 		res.status(500).json({ message: "Server error!" });
-// 	}
-// };

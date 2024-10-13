@@ -23,6 +23,7 @@ import ServicePage from "./pages/ServicePage";
 import ProductTable from "./components/ProductTable";
 import ProductDetails from "./components/ProductDetails";
 import EditProduct from "./components/EditProduct";
+import Delivery from "./components/Delivery";
 
 export default function App() {
 	return (

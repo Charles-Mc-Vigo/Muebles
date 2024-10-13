@@ -1,6 +1,10 @@
 const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema({
+  image:{
+    type:String,
+    default:null
+  },
 	firstname: { type: String, required: true },
 	lastname: { type: String, required: true },
   gender:{
@@ -60,7 +64,8 @@ const userSchema = new mongoose.Schema({
   }],
   cart:[{
     type:mongoose.Schema.ObjectId,
-    ref:"Cart"
+    ref:"Cart",
+    default:null
   }]
 },{
   timestamps:true
