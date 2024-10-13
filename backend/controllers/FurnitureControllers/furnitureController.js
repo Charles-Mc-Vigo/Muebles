@@ -9,7 +9,7 @@ const Size = require("../../models/Furniture/sizeModel");
 const Stocks = require("../../models/Furniture/stocksModel");
 
 // Multer setup for handling image uploads in memory
-const upload = multer({ storage: multer.memoryStorage() }).single("image"); // Accept only one image
+const upload = multer({ storage: multer.memoryStorage() }).array("images"); // Accept only one image
 
 // Get all furnitures or furniture by ID
 exports.getAllFurnitures = async (req, res) => {
@@ -82,14 +82,19 @@ exports.createFurniture = [
   upload, // Multer to handle the image upload
   async (req, res) => {
     try {
-      let image; 
+      let images; 
       if (req.file) {
-        image = req.file.buffer.toString("base64"); // Convert the image to base64
-      } else if (req.body.image) {
-        image = req.body.image;
+        images = req.file.buffer.toString("base64"); // Convert the image to base64
+      } else if (req.body.images) {
+        images = req.body.images;
       } else {
         return res.status(400).json({ message: "No image provided!" });
       }
+
+				// Check if at least 5 images are provided
+				if (images.length < 5) {
+					return res.status(400).json({ message: "At least 5 images are required!" });
+				}
 
       const {
         category,
@@ -156,7 +161,7 @@ exports.createFurniture = [
 
       // Create new furniture item
       const newFurniture = new Furniture({
-        image, // Storing base64 string
+        images, // Storing base64 string
         category: existingCategory._id,
         furnitureType: existingFurnitureType._id,
         name,
@@ -168,6 +173,7 @@ exports.createFurniture = [
         price,
       });
 
+			console.log('New Furniture has been added!',newFurniture) //console log muna bago i-save haha burat
       await newFurniture.save();
       res.status(201).json({
         message: "New furniture added successfully!",
@@ -183,100 +189,108 @@ exports.createFurniture = [
 
 // Update Furniture
 exports.updateFurniture = [
-	upload, // Use the updated multer configuration
-	async (req, res) => {
-			try {
-					const { furnitureId } = req.params;
-					const furniture = await Furniture.findById(furnitureId);
-					if (!furniture) {
-							return res.status(404).json({ message: "Furniture not found!" });
-					}
+  upload, // Use the updated multer configuration
+  async (req, res) => {
+    try {
+      const { furnitureId } = req.params;
+      const furniture = await Furniture.findById(furnitureId);
+      if (!furniture) {
+        return res.status(404).json({ message: "Furniture not found!" });
+      }
 
-					let images = furniture.images; // Preserve existing images
-					if (req.files && req.files.length > 0) {
-							images = req.files.map((file) => file.buffer.toString("base64")); // Convert each new image to base64
-					} else if (req.body.images) {
-							if (Array.isArray(req.body.images)) {
-									images = req.body.images; // Use provided images if they are in the correct format
-							} else {
-									return res.status(400).json({ message: "Images must be an array!" });
-							}
-					}
+      // Preserve existing images
+      let images = [...furniture.images]; // Start with existing images
 
-					const {
-							category,
-							furnitureType,
-							name,
-							description,
-							stocks,
-							materials,
-							colors,
-							sizes,
-							price,
-					} = req.body;
+      if (req.files && req.files.length > 0) {
+        const newImages = req.files.map((file) => file.buffer.toString("base64")); // Convert each new image to base64
+        images = [...images, ...newImages]; // Combine existing and new images
+      } else if (req.body.images) {
+        if (Array.isArray(req.body.images)) {
+          images = [...images, ...req.body.images]; // Append provided images if they are in the correct format
+        } else {
+          return res.status(400).json({ message: "Images must be an array!" });
+        }
+      }
 
-					// Find the category, furniture type, materials, and colors by name
-					if (category) {
-							const existingCategory = await Category.findOne({ name: category });
-							if (existingCategory) {
-									furniture.category = existingCategory._id;
-							} else {
-									return res.status(400).json({ message: "Invalid category!" });
-							}
-					}
+      // Check if at least 5 images are present
+      if (images.length < 5) {
+        return res.status(400).json({ message: "At least 5 images are required!" });
+      }
 
-					if (furnitureType) {
-							const existingFurnitureType = await FurnitureType.findOne({ name: furnitureType });
-							if (existingFurnitureType) {
-									furniture.furnitureType = existingFurnitureType._id;
-							} else {
-									return res.status(400).json({ message: "Invalid furniture type!" });
-							}
-					}
+      const {
+        category,
+        furnitureType,
+        name,
+        description,
+        stocks,
+        materials,
+        colors,
+        sizes,
+        price,
+      } = req.body;
 
-					if (materials) {
-							const existingMaterials = await Materials.find({ name: { $in: materials } });
-							if (existingMaterials.length !== materials.length) {
-									return res.status(400).json({ message: "Some materials are invalid!" });
-							}
-							furniture.materials = existingMaterials.map((material) => material._id);
-					}
+      // Find the category, furniture type, materials, and colors by name
+      if (category) {
+        const existingCategory = await Category.findOne({ name: category });
+        if (existingCategory) {
+          furniture.category = existingCategory._id;
+        } else {
+          return res.status(400).json({ message: "Invalid category!" });
+        }
+      }
 
-					if (colors) {
-							const existingColors = await Colors.find({ name: { $in: colors } });
-							if (existingColors.length !== colors.length) {
-									return res.status(400).json({ message: "Some colors are invalid!" });
-							}
-							furniture.colors = existingColors.map((color) => color._id);
-					}
+      if (furnitureType) {
+        const existingFurnitureType = await FurnitureType.findOne({ name: furnitureType });
+        if (existingFurnitureType) {
+          furniture.furnitureType = existingFurnitureType._id;
+        } else {
+          return res.status(400).json({ message: "Invalid furniture type!" });
+        }
+      }
 
-					if (sizes) {
-							const existingSize = await Size.find({ label: { $in: sizes }, furnitureTypeId: furniture.furnitureType });
-							if (existingSize.length !== sizes.length) {
-									return res.status(400).json({
-											message: `Some sizes are invalid for the given furniture type. Please ensure all sizes are correct.`,
-									});
-							}
-							furniture.sizes = existingSize.map((size) => size._id);
-					}
+      if (materials) {
+        const existingMaterials = await Materials.find({ name: { $in: materials } });
+        if (existingMaterials.length !== materials.length) {
+          return res.status(400).json({ message: "Some materials are invalid!" });
+        }
+        furniture.materials = existingMaterials.map((material) => material._id);
+      }
 
-					// Update other properties
-					furniture.images = images;
-					furniture.name = name || furniture.name; // Only update if provided
-					furniture.description = description || furniture.description; // Only update if provided
-					furniture.price = price || furniture.price; // Only update if provided
-					furniture.stocks = stocks ? stocks._id : furniture.stocks; // Only update if stocks are provided
+      if (colors) {
+        const existingColors = await Colors.find({ name: { $in: colors } });
+        if (existingColors.length !== colors.length) {
+          return res.status(400).json({ message: "Some colors are invalid!" });
+        }
+        furniture.colors = existingColors.map((color) => color._id);
+      }
 
-					await furniture.save();
-					res.status(200).json({
-							message: "Furniture updated successfully!",
-							furniture,
-					});
-			} catch (error) {
-					console.error(error);
-					res.status(500).json({ message: "Server error!", error: error.message });
-			}
-	},
+      if (sizes) {
+        const existingSize = await Size.find({ label: { $in: sizes }, furnitureTypeId: furniture.furnitureType });
+        if (existingSize.length !== sizes.length) {
+          return res.status(400).json({
+            message: `Some sizes are invalid for the given furniture type. Please ensure all sizes are correct.`,
+          });
+        }
+        furniture.sizes = existingSize.map((size) => size._id);
+      }
+
+      // Update other properties
+      furniture.images = images; // Update images
+      furniture.name = name || furniture.name; // Only update if provided
+      furniture.description = description || furniture.description; // Only update if provided
+      furniture.price = price || furniture.price; // Only update if provided
+      furniture.stocks = stocks ? stocks._id : furniture.stocks; // Only update if stocks are provided
+
+      await furniture.save();
+      res.status(200).json({
+        message: "Furniture updated successfully!",
+        furniture,
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Server error!", error: error.message });
+    }
+  },
 ];
 
 //archieving furniture
