@@ -16,8 +16,8 @@ const stocksRoutes = require('../backend/router/FurnitureRoutes/stocksRoutes');
 //Users
 const userRoutes = require('../backend/router/User/userRoutes')
 
-const adminRoutes = require('./router/adminRoutes')
-const orderRoutes = require("./router/orderRoutes");
+const adminRoutes = require('./router/Admin/adminRoutes')
+const orderRoutes = require('../backend/router/Order/orderRoutes');
 
 //Cart
 const cartRoutes = require('./router/Cart/cartRoutes');

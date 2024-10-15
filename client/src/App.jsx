@@ -23,6 +23,7 @@ import ServicePage from "./pages/ServicePage";
 import ProductTable from "./components/ProductTable";
 import ProductDetails from "./components/ProductDetails";
 import EditProduct from "./components/EditProduct";
+import AdminPendingPage from "./pages/AdminPendingPage";
 
 export default function App() {
 	return (
@@ -32,6 +33,8 @@ export default function App() {
 				<Route path="/about" element={<About />} />
 				<Route path="/signup" element={<SignUp />} />
 				<Route path="/verify-email/:userId" element={<EmailVerification />} />
+				<Route path="/admin-verification/:adminId" element={<AdminVerify />} />
+				<Route path="/admin-verification/:adminId/pending" element={<AdminPendingPage />} />
 				<Route path="/login" element={<Login />} />
 				<Route path="/admin-login" element={<AdminLogin />} />
 				<Route path="/admin-signup" element={<AdminSignUp />} />

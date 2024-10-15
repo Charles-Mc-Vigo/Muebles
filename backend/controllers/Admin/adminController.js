@@ -1,13 +1,13 @@
-const Admin = require('../models/adminModel');
-const User = require('../models/User/userModel');
-const {AdminSchemaValidator} = require('../middlewares/JoiSchemaValidation');
+const Admin = require('../../models/Admin/adminModel');
+const User = require('../../models/User/userModel');
+const {AdminSchemaValidator} = require('../../middlewares/JoiSchemaValidation');
 const bcrypt = require("bcrypt");
 const validator = require("validator");
 const jwt = require("jsonwebtoken");
 const {
 	sendVerificationEmail,
 	generateVerificationCode,
-} = require("../utils/EmailVerification");
+} = require("../../utils/EmailVerification");
 
 //create token with the combination of id and secrets followed by the expiration date
 const createToken = (_id) => {
@@ -80,9 +80,12 @@ exports.AdminSignup = async (req,res) =>{
 			verificationCodeExpires,
 		});
 
+		console.log(newAdmin.email)
+
 		await newAdmin.save();
-		res.status(201).json({ message: "We’ve sent a verification email to your inbox. Please check your email to verify your admin account." 
-		});
+		res.status(201).json(newAdmin)
+		// res.status(201).json({ message: "We’ve sent a verification email to your inbox. Please check your email to verify your admin account." 
+		// });
 
 	} catch (error) {
 		console.log(error);
@@ -132,18 +135,20 @@ exports.AdminLogin = async (req, res) => {
 //admin account verification
 exports.verifyEmail = async (req, res) => {
 	try {
-		const { email, code } = req.body;
+		const {adminId} = req.params;
+
+		const admin = await Admin.findById(adminId);
+
+		if(!admin) return res.status(404).json({message:"Admin not found!"});
+
+		const email = admin.email;
+
+		const { code } = req.body;
 
 		if (!email || !code) {
 			return res
 				.status(400)
 				.json({ message: "Email and verification code are required!" });
-		}
-
-		const admin = await Admin.findOne({ email });
-
-		if (!admin) {
-			return res.status(400).json({ message: "Admin not found!" });
 		}
 
 		if (
@@ -161,21 +166,39 @@ exports.verifyEmail = async (req, res) => {
 
 		await admin.save();
 
-		const token = createToken(admin._id);
+		// const token = createToken(admin._id);
 
-		res.cookie("adminToken", token, {
-			httpOnly: true,
-			secure: process.env.NODE_ENV === "production",
-			maxAge: 3 * 24 * 60 * 60 * 1000,
-		});
+		// res.cookie("adminToken", token, {
+		// 	httpOnly: true,
+		// 	secure: process.env.NODE_ENV === "production",
+		// 	maxAge: 3 * 24 * 60 * 60 * 1000,
+		// });
 		// console.log(token);
 
-		res.status(200).json({ message: "Admin account was verified successfully!", token });
+		// res.status(200).json({ message: "Admin account was verified successfully!", token });
+
+		res.status(200).json({message:"Your admin account is successfully verified. However, the admin manager must accept your request to proceed!"})
 	} catch (err) {
 		console.error("Email verification error:",err);
 		res.status(500).json({ message: "Server error!" });
 	}
 };
+
+//get admin by id
+exports.getAdminById = async(req,res) => {
+	try {
+		const {adminId} = req.params;
+
+		const admin = await Admin.findById(adminId);
+
+		if(!admin) return res.status(404).json({message:"Admin not found!"});
+
+		res.status(200).json(admin);
+	} catch (error) {
+		console.log("Error fetching admin by id: ",error);
+		res.status(500).json({message:"Server error!"});
+	}
+}
 
 //get all admins
 exports.AllAdmins = async(req,res)=>{
