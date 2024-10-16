@@ -1,9 +1,32 @@
-import React from 'react';
-import { useLocation } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const AdminPendingPage = () => {
     const location = useLocation();
+    const navigate = useNavigate();
     const { message } = location.state || {};
+
+    const approvalStatus = "Accepted"; 
+
+    useEffect(() => {
+        switch (approvalStatus) {
+            case "Pending":
+                toast.info('Your request is still pending.');
+                break;
+            case "Accepted":
+                toast.success('Your request has been approved!');
+                setTimeout(() => navigate('/dashboard'), 3000);
+                break;
+            case "Rejected":
+                toast.error('Your request was rejected.');
+                setTimeout(() => navigate('/admin-signup'), 3000); 
+                break;
+            default:
+                toast.warn('Unknown status.');
+        }
+    }, [approvalStatus, navigate]);
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
@@ -19,6 +42,7 @@ const AdminPendingPage = () => {
                     </p>
                 )}
             </div>
+            <ToastContainer />
         </div>
     );
 };

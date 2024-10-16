@@ -104,7 +104,7 @@ exports.AdminLogin = async (req, res) => {
 			return res.status(404).json({ message: "Incorrect email account!" });
 		}
 
-		if (admin.role !== "Admin") {
+		if (admin.role !== "Admin" &&  admin.role !== "Admin Manager") {
 			return res.status(403).json({ message: "Access denied: Admins only!" });
 		}
 
@@ -114,21 +114,26 @@ exports.AdminLogin = async (req, res) => {
 			return res.status(400).json({ message: "Incorrect password!" });
 		}
 
-		const token = createToken(admin._id);
+		// const token = createToken(admin._id);
 
-		res.cookie("adminToken", token, {
-			httpOnly: true,
-			secure: process.env.NODE_ENV === "production",
-			maxAge: 3 * 24 * 60 * 60 * 1000,
-			sameSite: "strict",
-		});
+		// res.cookie("adminToken", token, {
+		// 	httpOnly: true,
+		// 	secure: process.env.NODE_ENV === "production",
+		// 	maxAge: 3 * 24 * 60 * 60 * 1000,
+		// 	sameSite: "strict",
+		// });
 
-		res
+		// res
+		// 	.status(200)
+		// 	.json({ message: "Successfully logged in as an Admin!", token });
+
+			res
 			.status(200)
-			.json({ message: "Successfully logged in as an Admin!", token });
+			.json(admin);
+
 	} catch (error) {
+		console.log("Error admin login : ",error);
 		res.status(500).json({ message: "Server error!" });
-		console.error(error);
 	}
 };
 
@@ -178,6 +183,8 @@ exports.verifyEmail = async (req, res) => {
 		// res.status(200).json({ message: "Admin account was verified successfully!", token });
 
 		res.status(200).json({message:"Your admin account is successfully verified. However, the admin manager must accept your request to proceed!"})
+
+		
 	} catch (err) {
 		console.error("Email verification error:",err);
 		res.status(500).json({ message: "Server error!" });
@@ -199,6 +206,7 @@ exports.getAdminById = async(req,res) => {
 		res.status(500).json({message:"Server error!"});
 	}
 }
+
 
 //get all admins
 exports.AllAdmins = async(req,res)=>{
