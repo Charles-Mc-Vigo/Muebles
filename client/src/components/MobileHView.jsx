@@ -36,9 +36,9 @@ const MobileHeader = () => {
         <input
           type="text"
           placeholder="What are you looking for?"
-          className="flex-grow border border-gray-300 px-2 py-1 rounded-l-md focus:outline-none"
+          className="flex-grow border border-gray-300 px-5 py-1 rounded-l-md focus:outline-none mr-2"
         />
-        <button className="bg-teal-600 text-white p-2 rounded-r-md">
+        <button className="bg-teal-600 text-white p-2 px-2 rounded-r-md">
           Search
         </button>
       </div>
@@ -46,7 +46,8 @@ const MobileHeader = () => {
       {/* Shipping Info */}
       <div className="flex items-center justify-center p-2 md:hidden">
         <FaTruck className="text-gray-600 text-xl mr-1" />
-        <Link to="/delivery-info" className="text-black text-sm">Shipping Info.</Link>
+        <Link to="/delivery-info" className="text-black text-base font-medium">Shipping Info.</Link>
+        <p className="text-sm text-black">Delivery Method</p>
       </div>
 
       {isMenuOpen && (

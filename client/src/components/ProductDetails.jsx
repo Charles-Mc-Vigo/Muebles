@@ -94,7 +94,7 @@ function ProductDetails() {
 											Price
 										</td>
 										<td className="border px-6 py-3 text-green-600">
-											<strong>PHP</strong>
+											<strong>₱</strong>
 											{furnitureData.price}
 										</td>
 									</tr>
