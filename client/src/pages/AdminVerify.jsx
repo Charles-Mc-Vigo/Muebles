@@ -60,7 +60,7 @@ const AdminVerify = () => {
 			toast.success("Admin verified successfully!"); // Notify success
 
       setTimeout(()=>{
-        navigate(`/admin-verification/${adminId}/pending`, { state: { message: data.message } });
+        navigate(`/admin-verification/${adminId}/pending`);
       },3000)
 		} catch (error) {
 			console.error("Error verifying email:", error);

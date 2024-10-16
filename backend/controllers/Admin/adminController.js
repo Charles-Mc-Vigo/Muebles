@@ -93,47 +93,45 @@ exports.AdminSignup = async (req,res) =>{
 	}
 }
 
-//admin login
+// Admin login
 exports.AdminLogin = async (req, res) => {
 	try {
 		const { email, password } = req.body;
 
+		// Fetch admin by email
 		const admin = await Admin.findOne({ email });
-
 		if (!admin) {
 			return res.status(404).json({ message: "Incorrect email account!" });
 		}
 
-		if (admin.role !== "Admin" &&  admin.role !== "Admin Manager") {
+		// Check for admin role
+		if (!["Admin", "Admin Manager"].includes(admin.role)) {
 			return res.status(403).json({ message: "Access denied: Admins only!" });
 		}
 
+		// Validate password
 		const isMatch = await bcrypt.compare(password, admin.password);
-
 		if (!isMatch) {
 			return res.status(400).json({ message: "Incorrect password!" });
 		}
 
-		// const token = createToken(admin._id);
+		// Create token and set cookie
+		const token = createToken(admin._id);
+		res.cookie("adminToken", token, {
+			httpOnly: true,
+			secure: process.env.NODE_ENV === "production",
+			maxAge: 3 * 24 * 60 * 60 * 1000, // 3 days
+			sameSite: "strict",
+		});
 
-		// res.cookie("adminToken", token, {
-		// 	httpOnly: true,
-		// 	secure: process.env.NODE_ENV === "production",
-		// 	maxAge: 3 * 24 * 60 * 60 * 1000,
-		// 	sameSite: "strict",
-		// });
+		// Update admin status and send response
+		admin.isActive = true;
+		await admin.save();
 
-		// res
-		// 	.status(200)
-		// 	.json({ message: "Successfully logged in as an Admin!", token });
-
-			res
-			.status(200)
-			.json(admin);
-
+		return res.status(200).json({ token, admin });
 	} catch (error) {
-		console.log("Error admin login : ",error);
-		res.status(500).json({ message: "Server error!" });
+		console.error("Error during admin login:", error);
+		return res.status(500).json({ message: "Server error!" });
 	}
 };
 
@@ -171,19 +169,16 @@ exports.verifyEmail = async (req, res) => {
 
 		await admin.save();
 
-		// const token = createToken(admin._id);
+		const token = createToken(admin._id);
 
-		// res.cookie("adminToken", token, {
-		// 	httpOnly: true,
-		// 	secure: process.env.NODE_ENV === "production",
-		// 	maxAge: 3 * 24 * 60 * 60 * 1000,
-		// });
-		// console.log(token);
+		res.cookie("adminToken", token, {
+			httpOnly: true,
+			secure: process.env.NODE_ENV === "production",
+			maxAge: 3 * 24 * 60 * 60 * 1000,
+		});
+		console.log(token);
 
-		// res.status(200).json({ message: "Admin account was verified successfully!", token });
-
-		res.status(200).json({message:"Your admin account is successfully verified. However, the admin manager must accept your request to proceed!"})
-
+		res.status(200).json({ message: "Admin account was verified successfully!", token });
 		
 	} catch (err) {
 		console.error("Email verification error:",err);
@@ -192,20 +187,71 @@ exports.verifyEmail = async (req, res) => {
 };
 
 //get admin by id
-exports.getAdminById = async(req,res) => {
+//routes ("/admin/:adminId",getAdminById)
+exports.getAdminById = async (req, res) => {
+  try {
+    const { adminId } = req.params;
+    const admin = await Admin.findById(adminId);
+
+    if (!admin) return res.status(404).json({ message: "Admin not found!" });
+
+    if (admin.adminApproval === "Pending") {
+      return res.status(200).json({
+        message:
+          "Your admin account is successfully verified. However, the admin manager must accept your request to proceed!",
+      });
+    }
+		await admin.save();
+    res.status(200).json(admin);
+  } catch (error) {
+    console.log("Error fetching admin by id: ", error);
+    res.status(500).json({ message: "Server error!" });
+  }
+};
+
+
+//admin manager power
+exports.AcceptAdminRequest = async (req,res) => {
 	try {
-		const {adminId} = req.params;
+		//check if role is an Admin Manager
+		const {adminManagerId} = req.params;
+		const adminManager = await Admin.findById(adminManagerId);
+
+		if(!adminManager) return res.status(404).json({message:"Admin Manager not found!"});
+
+		if(adminManager.role !== "Admin Manager") return res.status(400).json({message:"Action denied: Admin Manager only!"});
+
+		const {adminId} = req.body;
 
 		const admin = await Admin.findById(adminId);
-
 		if(!admin) return res.status(404).json({message:"Admin not found!"});
 
-		res.status(200).json(admin);
+		if(admin.adminApproval==="Accepted") return res.status(400).json({message:"This Admin is already accepted!"})
+
+		admin.adminApproval = "Accepted";
+		admin.role="Admin"
+		admin.isActive=true;
+		await admin.save();
+		res.status(200).json({message:"Admin request accepted!"});
 	} catch (error) {
-		console.log("Error fetching admin by id: ",error);
+		console.log("Error accepting admin request: ",error);
 		res.status(500).json({message:"Server error!"});
 	}
 }
+
+//pending admin request
+exports.PendingAdminRequest = async (req,res) => {
+	try {
+		const admins = await Admin.find({adminApproval:"Pending"});
+		if(admins.length === 0) return res.status(400).json({message:"No admin request found!"});
+		res.status(200).json(admins)
+	} catch (error) {
+		console.log("Error fetching pending admin request : ",error);
+		res.status(500).json({message:"Server error!"});
+	}
+}
+
+
 
 
 //get all admins
@@ -262,7 +308,7 @@ exports.getUsers = async (req, res) => {
 
 exports.adminLogout = async (req, res) => {
 	try {
-		const adminId = req.user._id;
+		const {adminId} = req.params;
 
 		const admin = await Admin.findById(adminId);
 
@@ -276,8 +322,8 @@ exports.adminLogout = async (req, res) => {
 			sameSite: "strict"
 		});
 
-		res.status(200).json({ message: "Admin: Logout successful!" });
-		console.log("Admin: Logout successful!");
+		admin.isActive=false;
+		await admin.save();
 	} catch (error) {
 		res.status(500).json({ message: "Server error!" });
 		console.error("Failed to Admin: log out:",error);

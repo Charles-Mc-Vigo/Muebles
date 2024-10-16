@@ -36,6 +36,10 @@ const adminSchema = new mongoose.Schema({
     type: String,
     default:"Guest"
   },
+  isActive:{
+    type:Boolean,
+    default:false
+  },
   adminApproval:{
     type:String,
     enum:["Pending","Accepted","Rejected"],
