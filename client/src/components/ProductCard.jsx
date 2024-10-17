@@ -10,6 +10,7 @@ const ProductCard = ({
 	showAddToCart,
 	showUpdateButton,
 }) => {
+
 	// Function to truncate the description
 	const truncateDescription = (desc, maxLength) => {
 		if (desc.length > maxLength) {
@@ -17,13 +18,12 @@ const ProductCard = ({
 		}
 		return desc;
 	};
-
 	const maxDescriptionLength = 60; // Set the max length for the description
 
 	return (
 		<Link
 			to={`/furnitures/${id}`}
-			className="bg-white rounded-md shadow-lg transition-transform transform hover:scale-105 p-6 flex flex-col justify-between w-auto"
+			className="bg-white border-2 rounded-md shadow-lg transition-transform transform hover:scale-105 p-6 flex flex-col justify-between w-auto"
 		>
 			<img
 				src={`data:image/jpeg;base64,${image}`}

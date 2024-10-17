@@ -139,7 +139,7 @@ const Home = () => {
         <section className="w-full">
 
           {/* Furniture Sets Section */}
-          <section className="py-16 px-8 bg-gray-500 flex-grow m-2">
+          <section className="py-16 px-8  flex-grow m-2">
             <h2 className="text-4xl font-bold text-center mb-10">
               Furniture Sets
             </h2>
