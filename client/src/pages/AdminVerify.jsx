@@ -29,6 +29,7 @@ const AdminVerify = () => {
 				}
 				const adminData = await response.json();
 				setAdmin(adminData); // Set the entire user object
+				console.log(adminData)
 			} catch (error) {
 				console.error("Error fetching user:", error);
 				toast.error("Could not fetch admin data. Please try again.");
@@ -49,7 +50,7 @@ const AdminVerify = () => {
 					},
 					body: JSON.stringify({
 						email: admin.email, // Make sure to send the email of the admin
-						code,
+						code
 					}),
 				}
 			);

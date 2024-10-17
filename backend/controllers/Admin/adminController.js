@@ -78,6 +78,7 @@ exports.AdminSignup = async (req,res) =>{
 			password: hashedPassword,
 			verificationCode,
 			verificationCodeExpires,
+			role: "Guest",
 		});
 
 		console.log(newAdmin.email)
@@ -172,6 +173,17 @@ exports.verifyEmail = async (req, res) => {
 		admin.verificationCodeExpires = undefined;
 
 		await admin.save();
+
+		// const token = createToken(admin._id);
+
+		// res.cookie("adminToken", token, {
+		// 	httpOnly: true,
+		// 	secure: process.env.NODE_ENV === "production",
+		// 	maxAge: 3 * 24 * 60 * 60 * 1000,
+		// });
+		// console.log(token);
+
+		res.status(200).json({ message: "Admin account was verified successfully!" });
 	} catch (err) {
 		console.error("Email verification error:",err);
 		res.status(500).json({ message: "Server error!" });
@@ -203,43 +215,52 @@ exports.getAdminById = async (req, res) => {
 
 
 //admin manager power
-exports.AcceptAdminRequest = async (req,res) => {
+exports.AcceptAdminRequest = async (req, res) => {
 	try {
-		//check if role is an Admin Manager
-		const {adminManagerId} = req.params;
-		const adminManager = await Admin.findById(adminManagerId);
+			const { adminManagerId } = req.params;
+			// Fetch the Admin Manager details
+			const adminManager = await Admin.findById(adminManagerId);
+			// Check if Admin Manager exists and has the appropriate role
+			if (!adminManager) {
+					return res.status(404).json({ message: "Admin Manager not found!" });
+			}
+			if (adminManager.role !== "Admin Manager") {
+					return res.status(400).json({ message: "Action denied: Admin Manager only!" });
+			}
+			// Fetch the admin to be accepted
+			const { adminId } = req.body;
+			const admin = await Admin.findById(adminId);
+			if (!admin) {
+					return res.status(404).json({ message: "Admin not found!" });
+			}
+			// Check if the admin has already been accepted
+			if (admin.adminApproval === "Accepted") {
+					return res.status(400).json({ message: "This Admin is already accepted!" });
+			}
+			// Update admin's approval status and role
+			admin.adminApproval = "Accepted";
+			admin.role = "Admin"; // Change role to "Admin"
+			admin.isActive = true;
 
-		if(!adminManager) return res.status(404).json({message:"Admin Manager not found!"});
-
-		if(adminManager.role !== "Admin Manager") return res.status(400).json({message:"Action denied: Admin Manager only!"});
-
-		const {adminId} = req.body;
-
-		const admin = await Admin.findById(adminId);
-		if(!admin) return res.status(404).json({message:"Admin not found!"});
-
-		if(admin.adminApproval==="Accepted") return res.status(400).json({message:"This Admin is already accepted!"})
-
-		admin.adminApproval = "Accepted";
-		admin.role="Admin"
-		admin.isActive=true;
-		await admin.save();
-
-		const token = createToken(admin._id);
-
-		res.cookie("adminToken", token, {
-			httpOnly: true,
-			secure: process.env.NODE_ENV === "production",
-			maxAge: 3 * 24 * 60 * 60 * 1000,
-		});
-		console.log(token);
-
-		res.status(200).json({ message: "Your admin request has been accepted!", token });
+			// Create token for the accepted admin
+			const token = createToken(admin._id);
+			// Set token in cookies
+			res.cookie("adminToken", token, {
+					httpOnly: true,
+					secure: process.env.NODE_ENV === "production", // Use secure cookie in production
+					maxAge: 3 * 24 * 60 * 60 * 1000 // Set cookie expiration to 3 days
+			});
+			
+			// Save updated admin to the database
+			await admin.save();
+			// Send a success response
+			res.status(200).json({ message: "Admin request accepted successfully!", token });
 	} catch (error) {
-		console.log("Error accepting admin request: ",error);
-		res.status(500).json({message:"Server error!"});
+			console.error("Error accepting admin request:", error);
+			res.status(500).json({ message: "Server error!" });
 	}
-}
+};
+
 
 //pending admin request
 exports.PendingAdminRequest = async (req,res) => {
