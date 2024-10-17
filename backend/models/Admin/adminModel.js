@@ -1,6 +1,10 @@
 const mongoose = require('mongoose');
 
 const adminSchema = new mongoose.Schema({
+  image:{
+    type:String,
+    default:null
+  },
   firstname:{
     type:String,
     required:true
@@ -30,7 +34,16 @@ const adminSchema = new mongoose.Schema({
   },
   role:{
     type: String,
-    default:"Admin"
+    default:"Guest"
+  },
+  isActive:{
+    type:Boolean,
+    default:false
+  },
+  adminApproval:{
+    type:String,
+    enum:["Pending","Accepted","Rejected"],
+    default:"Pending"
   },
   isVerified:{
     type:Boolean,

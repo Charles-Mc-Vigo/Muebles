@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const Admin = require('../models/adminModel')
+const Admin = require('../models/Admin/adminModel');
 
 //admin onyly middleware
 //it authenticate the admin before accessing any api endpoints

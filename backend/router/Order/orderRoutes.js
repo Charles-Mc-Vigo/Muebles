@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const {getAllOrders, createOrders, editOrder, getOrderById, deleteOrderById, getOrdersByStatus} = require("../controllers/orderController");
+const {getAllOrders, createOrders, editOrder, getOrderById, deleteOrderById, getOrdersByStatus} = require('../../controllers/Order/orderController');
 // const authRoutes = require("../middlewares/authRoutes");
 
 

@@ -23,21 +23,36 @@ import ServicePage from "./pages/ServicePage";
 import ProductTable from "./components/ProductTable";
 import ProductDetails from "./components/ProductDetails";
 import EditProduct from "./components/EditProduct";
+<<<<<<< HEAD
 import Delivery from "./components/Delivery";
+=======
+import AdminPendingPage from "./pages/AdminPendingPage";
+>>>>>>> f27017adc1de0c673397f390e1a0f26ce85f580f
 
 export default function App() {
 	return (
 		<BrowserRouter>
 			<Routes>
+				{/* user */}
 				<Route path="/" element={<LandingPage />} />
 				<Route path="/about" element={<About />} />
 				<Route path="/signup" element={<SignUp />} />
-				<Route path="/verify-email/:userId" element={<EmailVerification />} />
 				<Route path="/login" element={<Login />} />
+<<<<<<< HEAD
 				<Route path="/admin-login" element={<AdminLogin />}/>
 				<Route path="/admin-signup" element={<AdminSignUp />}/>
 				<Route path="/admin-verify" element={<AdminVerify />}/>
 				<Route path="/dashboard" element={<DashBoard />} />
+=======
+				<Route path="/verify-email/:userId" element={<EmailVerification />} />
+
+				{/* admin */}
+				<Route path="/admin-login" element={<AdminLogin />} />
+				<Route path="/admin-signup" element={<AdminSignUp />} />
+				<Route path="/admin-verification/:adminId" element={<AdminVerify />} />
+				<Route path="/admin-verification/:adminId/pending" element={<AdminPendingPage />} />
+				<Route path="/:adminId/dashboard" element={<DashBoard />} />
+>>>>>>> f27017adc1de0c673397f390e1a0f26ce85f580f
 				<Route path="/table" element={<ProductTable />} />
 				<Route path="/home" element={<ProtectedRoute element={<Home />} />} />
 				<Route path={`/furnitures/:id`} element={<ProductDetails />} />
