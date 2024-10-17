@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const {AdminSignup, AdminLogin, AllAdmins,verifyEmail, adminLogout, getAdminById, PendingAdminRequest, AcceptAdminRequest, updateProfile} = require('../../controllers/Admin/adminController');
+const {AdminSignup, AdminLogin, AllAdmins,verifyEmail, adminLogout, getAdminById, PendingAdminRequest, AcceptAdminRequest, updateProfile, myProfile} = require('../../controllers/Admin/adminController');
 const adminOnly = require('../../middlewares/adminOnly');
 const multer = require('multer');
 
@@ -24,6 +24,7 @@ router.get("/notification/pending-request",PendingAdminRequest);
 
 //settings
 router.put("/setting/update-profile",upload.single('image'),updateProfile)
+router.get("/setting/my-profile/view",myProfile);
 
 
 module.exports = router;

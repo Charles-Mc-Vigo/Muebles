@@ -126,9 +126,9 @@ exports.AdminSignup = async (req,res) =>{
 		});
 
 		await newAdmin.save();
-		res.status(201).json({  message: "Your account has been created successfully. Please check your email to verify your account."
-		})
-		console.log("New admin created: ",newAdmin)
+		res.status(201).json(newAdmin)
+		// res.status(201).json({  message: "Your account has been created successfully. Please check your email to verify your account."})
+		// console.log("New admin created: ",newAdmin)
 
 	} catch (error) {
 		console.log(error);
@@ -405,4 +405,26 @@ exports.updateProfile = async (req, res) => {
     res.status(500).json({ message: "Server error!" });
   }
 };
+
+//myprofile
+exports.myProfile = async (req,res) => {
+	try {
+		const token = req.cookies.adminToken; // Get token from cookies
+    if (!token) return res.status(401).json({ message: "No token, authorization denied!" });
+
+    // Verify and decode the token to extract the admin's ID
+    const decoded = jwt.verify(token, process.env.SECRET);
+    const adminId = decoded._id;
+
+    const admin = await Admin.findById(adminId);
+    if (!admin) {
+      return res.status(404).json({ message: "Admin not found!" });
+    }
+
+		res.status(200).json(admin)
+	} catch (error) {
+		console.log("Error fetching my profile: ",error);
+		res.status(500).json({message:"Server error!"})
+	}
+}
 

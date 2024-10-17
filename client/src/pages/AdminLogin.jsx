@@ -37,13 +37,6 @@ const AdminLogin = () => {
       }
 
       const data = await response.json();
-      if (!data || !data.admin._id) {
-        throw new Error("No admin ID received from server");
-      }
-
-      const adminId = data.admin._id;
-
-      console.log(adminId)
 
       // Check if the user is an admin
       if (data.token) {
@@ -54,7 +47,7 @@ const AdminLogin = () => {
         });
         toast.success('Admin Logged in successfully');
         setTimeout(()=> {
-          navigate(`/${adminId}/dashboard`);
+          navigate(`/dashboard`);
         },3000)
       } else {
         toast.error('You do not have admin privileges.');

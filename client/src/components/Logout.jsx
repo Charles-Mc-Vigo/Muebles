@@ -1,65 +1,36 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import Cookies from 'js-cookie';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { PiSignOut } from 'react-icons/pi';
 
-const Logout = ({ isAdmin }) => {
-  const { adminId } = useParams(); // Get the adminId from the URL params
+const Logout = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const [admin, setAdmin] = useState(null); // Store admin details
   const [error, setError] = useState('');
 
-  useEffect(() => {
-    // Fetch admin details on component load
-    const fetchAdminDetails = async () => {
+  const handleLogout = async () => {
+    const confirmLogout = window.confirm("Are you sure you want to log out?");
+    if (confirmLogout) {
+      setLoading(true);
       try {
-        const response = await fetch(`http://localhost:3000/api/admin/${adminId}`);
-        const data = await response.json();
+        // Make a request to log out on the server-side, including credentials
+        const response = await fetch(`http://localhost:3000/api/admin/logout`, {
+          method: 'POST',
+          credentials: 'include', // Ensure cookies are sent with the request
+        });
 
         if (!response.ok) {
-          throw new Error(data.message || 'Failed to fetch admin details.');
+          const data = await response.json(); // Get error message from response
+          throw new Error(data.message || 'Failed to log out. Please try again.');
         }
 
-        setAdmin(data); // Set admin data to state
-      } catch (err) {
-        console.error('Error fetching admin:', err);
-        setError('Error fetching admin details. Please try again.');
+        // Redirect to the admin login page
+        navigate('/admin-login');
+      } catch (error) {
+        console.error('Error logging out:', error);
+        setError(error.message);
+      } finally {
+        setLoading(false);
       }
-    };
-
-    fetchAdminDetails();
-  }, [adminId]);
-
-  const handleLogout = async () => {
-    // Ensure the admin is active before logging out
-    if (admin && admin.isActive) {
-      const confirmLogout = window.confirm("Are you sure you want to log out?");
-      if (confirmLogout) {
-        setLoading(true);
-
-        try {
-          // Log out the admin and update isActive to false
-          const response = await fetch(`http://localhost:3000/api/admin/logout/${adminId}`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          });
-
-          if (!response.ok) {
-            throw new Error('Failed to log out. Please try again.');
-          }
-          navigate('/admin-login');      // Redirect to the admin login page
-        } catch (error) {
-          console.error('Error logging out:', error);
-          setError(error.message);
-        } finally {
-          setLoading(false);
-        }
-      }
-    } else {
-      alert("Admin is not active or couldn't be fetched.");
     }
   };
 

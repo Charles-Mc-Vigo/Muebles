@@ -55,7 +55,10 @@ app.use((err, req, res, next) => {
 
 // Middlewares
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+	origin: 'http://localhost:5173',
+	credentials: true,
+}));
 app.use(cookieParser())
 app.use(bodyParser.json({limit: '100mb'}));
 app.use(bodyParser.urlencoded({limit: '100mb', extended: true}));
