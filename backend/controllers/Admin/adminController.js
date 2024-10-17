@@ -115,6 +115,10 @@ exports.AdminLogin = async (req, res) => {
 			return res.status(400).json({ message: "Incorrect password!" });
 		}
 
+		if(admin.isActive){
+			return res.status(404).json({message:"This admin is currently online!"})
+		}
+
 		// Create token and set cookie
 		const token = createToken(admin._id);
 		res.cookie("adminToken", token, {
@@ -311,6 +315,10 @@ exports.adminLogout = async (req, res) => {
 			return res.status(404).json({ message: "Admin not found!" });
 		}
 
+		if(!admin.isActive){
+			return res.status(404).json({message:"This admin is currently offline"})
+		}
+
 		res.clearCookie("adminToken", {
 			httpOnly: true,
 			secure: process.env.NODE_ENV === "production",
@@ -319,6 +327,7 @@ exports.adminLogout = async (req, res) => {
 
 		admin.isActive=false;
 		await admin.save();
+		res.status(200).json({message:"Logout successful!"})
 	} catch (error) {
 		res.status(500).json({ message: "Server error!" });
 		console.error("Failed to Admin: log out:",error);
