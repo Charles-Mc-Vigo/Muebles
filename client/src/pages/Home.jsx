@@ -124,7 +124,7 @@ const Home = () => {
           <input
             type="range"
             min="0"
-            max="1000"
+            max="50000"
             step="10"
             value={priceRange.join(",")}
             onChange={handlePriceRangeChange}
@@ -136,14 +136,14 @@ const Home = () => {
           </div>
         </section>
 
-        {/* Right Section - Main Content */}
-        <section className="w-auto flex flex-col">
+        <section className="w-full">
+
           {/* Furniture Sets Section */}
           <section className="py-16 px-8 bg-gray-500 flex-grow m-2">
             <h2 className="text-4xl font-bold text-center mb-10">
               Furniture Sets
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
               {furnitureData.slice(0, visibleCount).map((furniture) => (
                 <ProductCard
                   key={furniture._id} // Ensure this id is unique for each furniture item
