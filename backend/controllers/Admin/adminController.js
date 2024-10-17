@@ -8,10 +8,55 @@ const {
 	sendVerificationEmail,
 	generateVerificationCode,
 } = require("../../utils/EmailVerification");
+const createToken = require('../../utils/tokenUtils');
 
-//create token with the combination of id and secrets followed by the expiration date
-const createToken = (_id) => {
-	return jwt.sign({ _id }, process.env.SECRET, { expiresIn: "3d" });
+// Admin login
+exports.AdminLogin = async (req, res) => {
+	try {
+		const { email, password } = req.body;
+
+		// Fetch admin by email
+		const admin = await Admin.findOne({ email });
+		if (!admin) {
+			return res.status(404).json({ message: "Incorrect email account!" });
+		}
+
+		// Check for admin role
+		if (!["Admin", "Admin Manager"].includes(admin.role)) {
+			return res.status(403).json({ message: "Access denied: Admins only!" });
+		}
+
+		// Validate password
+		const isMatch = await bcrypt.compare(password, admin.password);
+		if (!isMatch) {
+			return res.status(400).json({ message: "Incorrect password!" });
+		}
+
+		if(admin.isActive){
+			return res.status(404).json({message:"This admin is currently online!"})
+		}
+
+	const token = createToken(admin._id);
+
+		// Update admin status and send response
+		admin.isActive = true;
+		await admin.save();
+
+		// Set token in the response as a cookie
+		res.cookie("adminToken", token, {
+			httpOnly: true,
+			secure: process.env.NODE_ENV === "production", // Use secure cookies in production
+			maxAge: 3 * 24 * 60 * 60 * 1000, // 3 days
+			sameSite: "strict",
+		});
+
+		// Send response
+		return res.status(200).json({ message: "Login successful!", token});
+
+	} catch (error) {
+		console.error("Error during admin login:", error);
+		return res.status(500).json({ message: "Server error!" });
+	}
 };
 
 //Admin Sign up here
@@ -77,68 +122,19 @@ exports.AdminSignup = async (req,res) =>{
 			email,
 			password: hashedPassword,
 			verificationCode,
-			verificationCodeExpires,
-			role: "Guest",
+			verificationCodeExpires
 		});
 
-		console.log(newAdmin.email)
-
 		await newAdmin.save();
-		res.status(201).json(newAdmin)
-		// res.status(201).json({ message: "We’ve sent a verification email to your inbox. Please check your email to verify your admin account." 
-		// });
+		res.status(201).json({  message: "Your account has been created successfully. Please check your email to verify your account."
+		})
+		console.log("New admin created: ",newAdmin)
 
 	} catch (error) {
 		console.log(error);
 		res.status(500).json({message:"Server Error"})
 	}
 }
-
-// Admin login
-exports.AdminLogin = async (req, res) => {
-	try {
-		const { email, password } = req.body;
-
-		// Fetch admin by email
-		const admin = await Admin.findOne({ email });
-		if (!admin) {
-			return res.status(404).json({ message: "Incorrect email account!" });
-		}
-
-		// Check for admin role
-		if (!["Admin", "Admin Manager"].includes(admin.role)) {
-			return res.status(403).json({ message: "Access denied: Admins only!" });
-		}
-
-		// Validate password
-		const isMatch = await bcrypt.compare(password, admin.password);
-		if (!isMatch) {
-			return res.status(400).json({ message: "Incorrect password!" });
-		}
-
-		if(admin.isActive){
-			return res.status(404).json({message:"This admin is currently online!"})
-		}
-
-		// Create token and set cookie
-		const token = createToken(admin._id);
-		res.cookie("adminToken", token, {
-			httpOnly: true,
-			secure: process.env.NODE_ENV === "production",
-			maxAge: 3 * 24 * 60 * 60 * 1000, // 3 days
-			sameSite: "strict",
-		});
-
-		// Update admin status and send response
-		admin.isActive = true;
-		await admin.save();
-
-		return res.status(200).json({ token, admin });
-	} catch (error) {
-		console.error("Error during admin login:", error);
-		return res.status(500).json({ message: "Server error!" });
-	}
-};
 
 //admin account verification
 exports.verifyEmail = async (req, res) => {
@@ -169,22 +165,12 @@ exports.verifyEmail = async (req, res) => {
 		}
 
 		admin.isVerified = true;
-		admin.adminApproval = "Pending"
 		admin.verificationCode = undefined;
 		admin.verificationCodeExpires = undefined;
 
 		await admin.save();
 
-		// const token = createToken(admin._id);
-
-		// res.cookie("adminToken", token, {
-		// 	httpOnly: true,
-		// 	secure: process.env.NODE_ENV === "production",
-		// 	maxAge: 3 * 24 * 60 * 60 * 1000,
-		// });
-		// console.log(token);
-
-		res.status(200).json({ message: "Admin account was verified successfully!" });
+		res.status(200).json({ message: "Your account was successfully verified! However, the Admin Manager must first accept your request to proceed." });
 	} catch (err) {
 		console.error("Email verification error:",err);
 		res.status(500).json({ message: "Server error!" });
@@ -213,52 +199,64 @@ exports.getAdminById = async (req, res) => {
 };
 
 
-//admin manager power
+// Admin Manager power
 exports.AcceptAdminRequest = async (req, res) => {
-	try {
-			const { adminManagerId } = req.params;
-			// Fetch the Admin Manager details
-			const adminManager = await Admin.findById(adminManagerId);
-			// Check if Admin Manager exists and has the appropriate role
-			if (!adminManager) {
-					return res.status(404).json({ message: "Admin Manager not found!" });
-			}
-			if (adminManager.role !== "Admin Manager") {
-					return res.status(400).json({ message: "Action denied: Admin Manager only!" });
-			}
-			// Fetch the admin to be accepted
-			const { adminId } = req.body;
-			const admin = await Admin.findById(adminId);
-			if (!admin) {
-					return res.status(404).json({ message: "Admin not found!" });
-			}
-			// Check if the admin has already been accepted
-			if (admin.adminApproval === "Accepted") {
-					return res.status(400).json({ message: "This Admin is already accepted!" });
-			}
-			// Update admin's approval status and role
-			admin.adminApproval = "Accepted";
-			admin.role = "Admin"; // Change role to "Admin"
-			admin.isActive = true;
+  try {
+    // Get the admin token from the request cookies
+    const adminToken = req.cookies.adminToken;
+    
+    // Verify the token
+    if (!adminToken) {
+      return res.status(401).json({ message: "No access token!" });
+    }
 
-			// Create token for the accepted admin
-			const token = createToken(admin._id);
-			// Set token in cookies
-			res.cookie("adminToken", token, {
-					httpOnly: true,
-					secure: process.env.NODE_ENV === "production", // Use secure cookie in production
-					maxAge: 3 * 24 * 60 * 60 * 1000 // Set cookie expiration to 3 days
-			});
-			
-			// Save updated admin to the database
-			await admin.save();
-			// Send a success response
-			res.status(200).json({ message: "Admin request accepted successfully!", token });
-	} catch (error) {
-			console.error("Error accepting admin request:", error);
-			res.status(500).json({ message: "Server error!" });
-	}
+    let decoded;
+    try {
+      decoded = jwt.verify(adminToken, process.env.SECRET);
+    } catch (error) {
+      return res.status(401).json({ message: "Invalid token!" });
+    }
+
+    // Fetch the admin from the token to check their role
+    const adminManager = await Admin.findById(decoded._id);
+    if (!adminManager || adminManager.role !== "Admin Manager") {
+      return res.status(403).json({ message: "Action denied: Admin Manager only!" });
+    }
+
+    const { adminId } = req.params; // Get adminId from URL parameters
+
+    // Fetch the admin who is requesting to be accepted
+    const admin = await Admin.findById(adminId);
+    if (!admin || admin.adminApproval === "Accepted") {
+      return res.status(400).json({ message: "Admin already accepted or not found!" });
+    }
+
+    // Update the admin's approval and role
+    admin.adminApproval = "Accepted";
+    admin.role = "Admin";
+    admin.isActive = true;
+
+    // Create token after the admin is approved
+    const token = createToken(admin._id);
+
+    // Set token in the response as a cookie
+    res.cookie("adminToken", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 3 * 24 * 60 * 60 * 1000, // 3 days
+      sameSite: "strict",
+    });
+
+    await admin.save();
+
+    // Send a success response with the token
+    res.status(200).json({ message: "Admin request accepted successfully!", token });
+  } catch (error) {
+    console.error("Error accepting admin request:", error);
+    res.status(500).json({ message: "Server error!" });
+  }
 };
+
 
 
 //pending admin request
@@ -298,58 +296,113 @@ exports.AllAdmins = async(req,res)=>{
 	}
 }
 
-//get all user
-//get users by id using quiery
-exports.getUsers = async (req, res) => {
-	try {
-		//get specific user by id
-		const {id} = req.query;
-
-		if(id){
-			const user = await User.findById(id);
-
-			if(!user){
-				return res.status(404).json({message:"User not found!"})
-			}
-		}
-		//get all users
-		const users = await User.find();
-		if(users.length === 0){
-			return res.status(404).json({message:"No users found!"})
-		}
-		res.status(200).json(users);
-	} catch (err) {
-		console.error("Failed to fetch user data:",err);
-		res.status(500).json({ message: "Server error!" });
-	}
-};
-
-
 exports.adminLogout = async (req, res) => {
-	try {
-		const {adminId} = req.params;
+  try {
+    const token = req.cookies.adminToken; // Get token from cookies
+    if (!token) return res.status(401).json({ message: "No token, authorization denied!" });
 
-		const admin = await Admin.findById(adminId);
+    // Verify and decode the token to extract the admin's ID
+    const decoded = jwt.verify(token, process.env.SECRET);
+    const adminId = decoded._id;
 
-		if (!admin) {
-			return res.status(404).json({ message: "Admin not found!" });
-		}
+    const admin = await Admin.findById(adminId);
+    if (!admin) {
+      return res.status(404).json({ message: "Admin not found!" });
+    }
 
-		if(!admin.isActive){
-			return res.status(404).json({message:"This admin is currently offline"})
-		}
+    if (!admin.isActive) {
+      return res.status(400).json({ message: "This admin is currently offline" });
+    }
 
-		res.clearCookie("adminToken", {
-			httpOnly: true,
-			secure: process.env.NODE_ENV === "production",
-			sameSite: "strict"
-		});
+    // Clear the token from cookies
+    res.clearCookie("adminToken", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict"
+    });
 
-		admin.isActive=false;
-		await admin.save();
-		res.status(200).json({message:"Logout successful!"})
-	} catch (error) {
-		res.status(500).json({ message: "Server error!" });
-		console.error("Failed to Admin: log out:",error);
-	}
+    // Update admin status and save
+    admin.isActive = false;
+    await admin.save();
+
+    return res.status(200).json({ message: "Logout successful!" });
+  } catch (error) {
+    console.error("Failed to log out admin:", error);
+    return res.status(500).json({ message: "Server error!" });
+  }
 };
+
+
+// Update profile
+exports.updateProfile = async (req, res) => {
+  try {
+    const token = req.cookies.adminToken; // Get token from cookies
+    if (!token) return res.status(401).json({ message: "No token, authorization denied!" });
+
+    // Verify and decode the token to extract the admin's ID
+    const decoded = jwt.verify(token, process.env.SECRET);
+    const adminId = decoded._id;
+
+    // Find the admin by ID
+    const admin = await Admin.findById(adminId);
+    if (!admin) {
+      return res.status(404).json({ message: "Admin not found!" });
+    }
+
+    // Fields to be updated
+    const { firstname, lastname, phoneNumber, gender, image } = req.body;
+    let isChanged = false; // To track if any changes are made
+    const updatedFields = {};
+
+    // Compare each field with the current value and only add to updatedFields if they are different
+    if (firstname && firstname !== admin.firstname) {
+      updatedFields.firstname = firstname;
+      isChanged = true;
+    }
+    if (lastname && lastname !== admin.lastname) {
+      updatedFields.lastname = lastname;
+      isChanged = true;
+    }
+    if (phoneNumber && phoneNumber !== admin.phoneNumber) {
+      updatedFields.phoneNumber = phoneNumber;
+      isChanged = true;
+    }
+    if (gender && gender !== admin.gender && ["Male", "Female"].includes(gender)) {
+      updatedFields.gender = gender;
+      isChanged = true;
+    }
+
+    // Handle image URL if provided and different from current
+    if (image && image !== admin.image) {
+      updatedFields.image = image;
+      isChanged = true;
+    }
+
+    // Handle uploaded image file (convert to base64 and compare)
+    if (req.file) {
+      const imageBuffer = req.file.buffer; // Get the file buffer
+      const imageBase64 = imageBuffer.toString('base64'); // Convert to base64
+      const mimeType = req.file.mimetype;
+      const base64Image = `data:${mimeType};base64,${imageBase64}`;
+
+      if (base64Image !== admin.image) {
+        updatedFields.image = base64Image;
+        isChanged = true;
+      }
+    }
+
+    // If no changes were made, return a message
+    if (!isChanged) {
+      return res.status(400).json({ message: "No changes made to the profile." });
+    }
+
+    // Update the admin document with the new fields
+    const updatedAdmin = await Admin.findByIdAndUpdate(adminId, updatedFields, { new: true });
+
+    res.status(200).json({ message: "Profile updated successfully!", admin: updatedAdmin });
+  } catch (error) {
+    console.error("Error updating profile setting", error);
+    res.status(500).json({ message: "Server error!" });
+  }
+};
+

@@ -2,6 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
+const cookieParser = require('cookie-parser');
 
 
 //furnitures
@@ -22,7 +23,6 @@ const orderRoutes = require('../backend/router/Order/orderRoutes');
 //Cart
 const cartRoutes = require('./router/Cart/cartRoutes');
 const connectDB = require("./database/db");
-const cookieParser = require('cookie-parser');
 
 
 const app = express();

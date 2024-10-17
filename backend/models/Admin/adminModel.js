@@ -33,14 +33,16 @@ const adminSchema = new mongoose.Schema({
     required:true
   },
   role:{
-    type: String
+    type: String,
+    default:"Guest"
   },
   isActive:{
     type:Boolean,
     default:false
   },
   adminApproval:{
-    type:String
+    type:String,
+    default:"Pending"
   },
   isVerified:{
     type:Boolean,
@@ -54,7 +56,7 @@ const adminSchema = new mongoose.Schema({
   }
 },
 {
-  timestamp:true
+  timestamps:true
 })
 
 const Admin = mongoose.model('Admin',adminSchema);
