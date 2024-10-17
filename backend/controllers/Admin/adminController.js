@@ -168,18 +168,6 @@ exports.verifyEmail = async (req, res) => {
 		admin.verificationCodeExpires = undefined;
 
 		await admin.save();
-
-		const token = createToken(admin._id);
-
-		res.cookie("adminToken", token, {
-			httpOnly: true,
-			secure: process.env.NODE_ENV === "production",
-			maxAge: 3 * 24 * 60 * 60 * 1000,
-		});
-		console.log(token);
-
-		res.status(200).json({ message: "Admin account was verified successfully!", token });
-		
 	} catch (err) {
 		console.error("Email verification error:",err);
 		res.status(500).json({ message: "Server error!" });
@@ -232,7 +220,17 @@ exports.AcceptAdminRequest = async (req,res) => {
 		admin.role="Admin"
 		admin.isActive=true;
 		await admin.save();
-		res.status(200).json({message:"Admin request accepted!"});
+
+		const token = createToken(admin._id);
+
+		res.cookie("adminToken", token, {
+			httpOnly: true,
+			secure: process.env.NODE_ENV === "production",
+			maxAge: 3 * 24 * 60 * 60 * 1000,
+		});
+		console.log(token);
+
+		res.status(200).json({ message: "Your admin request has been accepted!", token });
 	} catch (error) {
 		console.log("Error accepting admin request: ",error);
 		res.status(500).json({message:"Server error!"});
@@ -250,9 +248,6 @@ exports.PendingAdminRequest = async (req,res) => {
 		res.status(500).json({message:"Server error!"});
 	}
 }
-
-
-
 
 //get all admins
 exports.AllAdmins = async(req,res)=>{

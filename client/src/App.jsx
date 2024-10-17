@@ -41,7 +41,7 @@ export default function App() {
 				<Route path="/admin-signup" element={<AdminSignUp />} />
 				<Route path="/admin-verification/:adminId" element={<AdminVerify />} />
 				<Route path="/admin-verification/:adminId/pending" element={<AdminPendingPage />} />
-				<Route path="/:adminId/dashboard" element={<DashBoard />} />
+				{/* <Route path="/:adminId/dashboard" element={<DashBoard />} /> */}
 				<Route path="/table" element={<ProductTable />} />
 				<Route path="/home" element={<ProtectedRoute element={<Home />} />} />
 				<Route path={`/furnitures/:id`} element={<ProductDetails />} />
@@ -52,7 +52,7 @@ export default function App() {
 					path="/furniture-list"
 					element={<ProtectedRoute element={<FurnitureList />} />}
 				/>
-				{/* <Route path="/dashboard" element={<AdminOnlyRoutes element={<DashBoard />} />} /> */}
+				<Route path="/:adminId/dashboard" element={<AdminOnlyRoutes element={<DashBoard />} />} />
 				<Route
 					path="/user-management"
 					element={<AdminOnlyRoutes element={<UserManagement />} />}

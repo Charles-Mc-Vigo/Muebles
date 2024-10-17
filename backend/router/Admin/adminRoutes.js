@@ -5,7 +5,7 @@ const adminOnly = require('../../middlewares/adminOnly');
 
 
 router.get("/",AllAdmins)
-router.get("/pending-request",PendingAdminRequest);
+router.get("/notification/pending-request",PendingAdminRequest);
 
 //admin log in and signup
 router.post("/signup",AdminSignup)
