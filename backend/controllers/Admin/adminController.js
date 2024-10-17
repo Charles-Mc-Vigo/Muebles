@@ -169,6 +169,7 @@ exports.verifyEmail = async (req, res) => {
 		}
 
 		admin.isVerified = true;
+		admin.adminApproval = "Pending"
 		admin.verificationCode = undefined;
 		admin.verificationCodeExpires = undefined;
 
@@ -199,14 +200,12 @@ exports.getAdminById = async (req, res) => {
 
     if (!admin) return res.status(404).json({ message: "Admin not found!" });
 
-    if (admin.adminApproval === "Pending") {
-      return res.status(200).json({
-        message:
-          "Your admin account is successfully verified. However, the admin manager must accept your request to proceed!",
-      });
-    }
-		await admin.save();
+		// if(admin.adminApproval === "Pending"){
+		// 	return res.status(400).json({message:"Your request is still on process"})
+		// }
+
     res.status(200).json(admin);
+		// console.log(admin)
   } catch (error) {
     console.log("Error fetching admin by id: ", error);
     res.status(500).json({ message: "Server error!" });

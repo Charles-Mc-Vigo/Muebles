@@ -40,9 +40,7 @@ const adminSchema = new mongoose.Schema({
     default:false
   },
   adminApproval:{
-    type:String,
-    enum:["Pending","Accepted","Rejected"],
-    default:"Pending"
+    type:String
   },
   isVerified:{
     type:Boolean,
