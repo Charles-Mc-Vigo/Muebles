@@ -98,14 +98,6 @@ export default function SignUp() {
           className="hidden md:flex md:w-1/2 items-center bg-contain rounded-l-lg"
           style={{ backgroundImage: `url('/landingimage/Buynow.png')` }}
         >
-          <div className="flex items-center justify-center w-full bg-gray-500 bg-opacity-50 p-8 rounded-l-lg">
-            <div className="text-center text-black">
-              <h2 className="text-4xl font-bold mb-4">Sign Up</h2>
-              <p className="text-lg">
-                Please enter your details to sign up and be part of our great community.
-              </p>
-            </div>
-          </div>
         </div>
 
         {/* Right side with form */}

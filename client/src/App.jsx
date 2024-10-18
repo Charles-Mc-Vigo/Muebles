@@ -26,8 +26,6 @@ import EditProduct from "./components/EditProduct";
 import Delivery from "./components/Delivery";
 import AdminPendingPage from "./pages/AdminPendingPage";
 import  Profile from "../src/components/Profile";
-import Delivery from "./components/Delivery";
-
 export default function App() {
 	return (
 		<BrowserRouter>
@@ -35,6 +33,7 @@ export default function App() {
 				<Route path="/" element={<LandingPage />} />
 				<Route path="/about" element={<About />} />
 				<Route path="/signup" element={<SignUp />} />
+				<Route path="/login" element={<Login />} />
 				<Route path="/verify-email/:userId" element={<EmailVerification />} />
 				<Route path="/setting/my-profile/view" element={<Profile />} />
 
@@ -43,7 +42,6 @@ export default function App() {
 				<Route path="/admin-signup" element={<AdminSignUp />} />
 				<Route path="/verify-account/:adminId" element={<AdminVerify />} />
 				<Route path="/verify-account/:adminId/pending" element={<AdminPendingPage />} />
-				{/* <Route path="/:adminId/dashboard" element={<DashBoard />} /> */}
 				<Route path="/table" element={<ProductTable />} />
 				<Route path="/home" element={<ProtectedRoute element={<Home />} />} />
 				<Route path={`/furnitures/:id`} element={<ProductDetails />} />
