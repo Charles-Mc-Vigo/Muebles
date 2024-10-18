@@ -7,7 +7,13 @@ const Card = ({ image, title, link }) => {
   return (
     <Link to={link}>
       <div className="bg-white rounded-lg overflow-hidden shadow-lg text-center font-serif cursor-pointer">
-        <img src={image} alt={title} className="w-full h-50 object-cover" />
+        <div className="overflow-hidden">
+          <img
+            src={image}
+            alt={title}
+            className="w-full h-50 object-cover transform transition-transform duration-300 ease-in-out hover:scale-110"
+          />
+        </div>
         <div className="p-4">
           <h3 className="text-lg font-semibold">{title}</h3>
         </div>

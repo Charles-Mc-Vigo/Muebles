@@ -25,6 +25,7 @@ import ProductDetails from "./components/ProductDetails";
 import EditProduct from "./components/EditProduct";
 import AdminPendingPage from "./pages/AdminPendingPage";
 import  Profile from "../src/components/Profile";
+import Delivery from "./components/Delivery";
 
 export default function App() {
 	return (
@@ -50,6 +51,7 @@ export default function App() {
 				<Route path={`/furnitures/edit/:id`} element={<EditProduct />} />
 
 				<Route path="/service-page" element={<ServicePage />} />
+				<Route path="/delivery-info" element={<Delivery />} />
 				<Route
 					path="/furniture-list"
 					element={<ProtectedRoute element={<FurnitureList />} />}

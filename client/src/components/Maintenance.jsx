@@ -323,7 +323,7 @@ const Maintenance = () => {
 			</h1>
 			<div className="flex flex-row justify-between">
 				{/* Left Side for Form */}
-				<div className="w-1/5">
+				<div className="w-2/5">
 					{" "}
 					{/* Set width to 40% */}
 					<form
@@ -339,7 +339,7 @@ const Maintenance = () => {
 								handleAddNewItem();
 							}
 						}}
-						className="mb-6 space-y-4 bg-gray-100 p-4 rounded-lg shadow-md"
+						className="mb-6 space-y-4 bg-gray-100 p-4 rounded-lg shadow-md border-3 border-bg-oliveGreen"
 					>
 						<div className="mb-4">
 							<label className="block font-semibold text-2xl">
@@ -358,6 +358,7 @@ const Maintenance = () => {
 								<option value="Colors">Colors</option>
 							</select>
 						</div>
+
 						{/* Dynamic Input Fields */}
 						{selectedFilter === "Categories" &&
 							renderInputField(
@@ -498,7 +499,7 @@ const Maintenance = () => {
 					</form>
 				</div>
 				{/* Right Side for Tables */}
-				<div className="w-4/5 pl-4">
+				<div className="w-4/5  pl-4 border-2">
 					{" "}
 					{/* Set width to 60% */}
 					{selectedFilter === "Categories" && (
