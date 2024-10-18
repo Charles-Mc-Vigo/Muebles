@@ -42,7 +42,6 @@ const adminSchema = new mongoose.Schema({
   },
   adminApproval:{
     type:String,
-    enum:["Pending","Accepted","Rejected"],
     default:"Pending"
   },
   isVerified:{
@@ -57,7 +56,7 @@ const adminSchema = new mongoose.Schema({
   }
 },
 {
-  timestamp:true
+  timestamps:true
 })
 
 const Admin = mongoose.model('Admin',adminSchema);

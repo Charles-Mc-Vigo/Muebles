@@ -2,6 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
+const cookieParser = require('cookie-parser');
 
 
 //furnitures
@@ -22,7 +23,6 @@ const orderRoutes = require('../backend/router/Order/orderRoutes');
 //Cart
 const cartRoutes = require('./router/Cart/cartRoutes');
 const connectDB = require("./database/db");
-const cookieParser = require('cookie-parser');
 
 
 const app = express();
@@ -55,7 +55,10 @@ app.use((err, req, res, next) => {
 
 // Middlewares
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+	origin: 'http://localhost:5173',
+	credentials: true,
+}));
 app.use(cookieParser())
 app.use(bodyParser.json({limit: '100mb'}));
 app.use(bodyParser.urlencoded({limit: '100mb', extended: true}));
