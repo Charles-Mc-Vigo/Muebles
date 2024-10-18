@@ -57,7 +57,7 @@ const MobileHeader = () => {
               <div className="flex items-start">
                 <Link to="/login" onClick={toggleMenu} className="mr-2">Login</Link>
                 <span className="mx-1">|</span>
-                <Link to="/signup" onClick={toggleMenu} className="ml-2">Register</Link>
+                <Link to="/signup" onClick={toggleMenu} className="ml-2">Sign Up</Link>
               </div>
               <button onClick={toggleMenu} className="text-xl text-gray-600">
                 X
