@@ -343,30 +343,34 @@ const ProductManagement = () => {
                 ))}
               </div>
             </div>
-            <div className="mb-4 bg-slate-200 rounded-md p-2">
-              <label className="block font-semibold">Colors:</label>
-              <div className="flex flex-wrap gap-4">
-                {colors.map((color) => (
-                  <label key={color._id} className="flex items-center w-1/4">
-                    <input
-                      type="checkbox"
-                      name="color"
-                      value={color.name}
-                      checked={newFurniture.colors.includes(color.name)}
-                      onChange={handleInputChange}
-                      className="mr-2 h-4 w-4 border rounded text-blue-600 focus:ring-blue-500"
-                    />
-                    <span className="text-gray-700 mr-5">
-                      {color.name.charAt(0).toUpperCase() + color.name.slice(1)}
-                    </span>
-                    <div
-                      className="mr-2 h-4 w-4 border rounded"
-                      style={{ backgroundColor: color.hex }}
-                    />
-                  </label>
-                ))}
-              </div>
-            </div>
+            {/* Colors Section as Buttons with Rounded Color Indicators */}
+<div className="mb-4 bg-slate-200 rounded-md p-2">
+  <label className="block font-semibold">Colors:</label>
+  <div className="flex flex-wrap gap-4">
+    {furnitureData.colors?.map((color) => (
+      <div key={color.id} className="flex items-center w-1/4">
+        <button
+          onClick={() => handleColorClick(color)}
+          className={`flex items-center w-full h-10 p-2 border rounded-md ${
+            selectedColors.includes(color.name)
+              ? "border-blue-600"
+              : "border-gray-400"
+          }`}
+        >
+          <span className="text-gray-700 mr-2">
+            {color.name.charAt(0).toUpperCase() + color.name.slice(1)}
+          </span>
+        </button>
+        {/* Color Indicator Div (Separate from Button) */}
+        <div
+          className="h-6 w-6 border rounded-full"
+          style={{ backgroundColor: color.hex }}
+        />
+      </div>
+    ))}
+  </div>
+</div>
+
             <div className="mb-4 bg-slate-200 rounded-md p-2">
               <label className="block font-semibold my-2 mb-2">
                 Sizes: (Height X Width X Length X Depth)
