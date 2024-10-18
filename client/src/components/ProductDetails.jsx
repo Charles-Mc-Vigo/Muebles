@@ -116,20 +116,6 @@ function ProductDetails() {
   return (
     <section>
       <Header />
-<<<<<<< HEAD
-      <div className="flex justify-center items-centers">
-        <div className="w-full max-w-7xl h-full flex items-center justify-center bg-gray-200 mx-5 mb-2">
-          {/* Left Side: Product Image (Centered in 3/4 height) */}
-          <div className="flex justify-center items-center h-3/4  m-5">
-            <div className="aspect-square w-3/4 border  overflow-hidden">
-              <img
-                src={`data:image/jpeg;base64,${furnitureData.image}`}
-                alt={furnitureData.name}
-                className="w-full h-full object-contain"
-              />
-            </div>
-          </div>
-=======
       <div className="flex justify-center items-start p-5 border-t-2 border-black">
         {/* Left: Product Image */}
         <div className="w-[639px] h-[639px] p-5 flex justify-center items-center ">
@@ -139,7 +125,6 @@ function ProductDetails() {
             className="w-full h-full object-contain "
           />
         </div>
->>>>>>> 58d320f3535b8986b19206c031f88078fe9bd39e
 
         {/* Right: Product Details */}
         <div className="w-[462px] h-[1057px] p-5 flex flex-col justify-between border-2 border-black">

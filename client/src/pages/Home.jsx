@@ -94,16 +94,16 @@ const Home = () => {
           className="w-full h-80 object-cover"
         />
         <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 text-white text-center">
-          <h1 className="text-5xl font-bold">Browse Our Collection</h1>
+          <h1 className="text-5xl font-bold"style={{ fontFamily: "Playfair Display, serif" }} >Browse Our Collection</h1>
         </div>
       </section>
 
       {/* Main Content Area */}
       <div className="flex flex-1">
         {/* Left Section - Vertical Filter */}
-        <section className="w-1/5 border p-4 mb-2 mr-2 mt-2 flex flex-col">
-          <h1 className="text-2xl font-bold mb-4">ALL FURNITURES</h1>
-          <h2 className="text-lg font-bold mb-2">Categories</h2>
+        <section className="w-1/5 border p-4 mb-2 mr-2 mt-2 flex flex-col" >
+          <h1 className="text-2xl font-bold mb-4"style={{ fontFamily: "Playfair Display, serif" }} >ALL FURNITURES</h1>
+          <h2 className="text-lg font-bold mb-2"style={{ fontFamily: "Playfair Display, serif" }} >Categories</h2>
           <ul className="space-y-2 flex-col">
             {categories.map((category) => (
               <li key={category._id} className="flex items-center">
@@ -130,7 +130,7 @@ const Home = () => {
             onChange={handlePriceRangeChange}
             className="w-full"
           />
-          <div className="flex justify-between">
+          <div className="flex justify-between"style={{ fontFamily: "Lato, sans-serif font-weight:400 font-style:normal" }}>
             <span>₱{priceRange[0]}</span>
             <span>₱{priceRange[1]}</span>
           </div>
@@ -139,8 +139,8 @@ const Home = () => {
         <section className="w-full">
 
           {/* Furniture Sets Section */}
-          <section className="py-16 px-8  flex-grow m-2">
-            <h2 className="text-4xl font-bold text-center mb-10">
+          <section className="py-16 px-8  flex-grow m-2" >
+            <h2 className="text-4xl font-bold text-center mb-10"style={{ fontFamily: "Playfair Display, serif" }}>
               Furniture Sets
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
