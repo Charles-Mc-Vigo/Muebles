@@ -67,12 +67,15 @@ function ProductDetails() {
     };
 
     return (
-      <div className="border-b-2 border-black ">
+      <div className="border-b-2 border-black">
         <button
           onClick={toggleAccordion}
           className="flex justify-between items-center w-full py-4 text-left focus:outline-none overflow-hidden"
         >
-          <h3 className="text-xl font-medium text-black " style={{ fontFamily: "Playfair Display, serif" }}>
+          <h3
+            className="text-xl font-medium text-black"
+            style={{ fontFamily: "Playfair Display, serif" }}
+          >
             {question}
           </h3>
           <span className="text-lg text-black">
@@ -80,8 +83,12 @@ function ProductDetails() {
           </span>
         </button>
         {isOpen && (
-          <div className="py-4 text-black  text-lg text-justify"
-          style={{ fontFamily: "Playfair Display, serif" }}>{answer}</div>
+          <div
+            className="py-4 text-black text-lg text-justify"
+            style={{ fontFamily: "Playfair Display, serif" }}
+          >
+            {answer}
+          </div>
         )}
       </div>
     );
@@ -131,8 +138,12 @@ function ProductDetails() {
 
             <div className="mt-2">
               <h2 className="text-lg font-semibold">Price</h2>
-              <p className="border-b-2 border-black"
-              style={{ fontFamily: "Playfair Display, serif" }}>₱ {furnitureData.price}</p>
+              <p
+                className="border-b-2 border-black"
+                style={{ fontFamily: "Playfair Display, serif" }}
+              >
+                ₱ {furnitureData.price}
+              </p>
             </div>
 
             {/* Color Selection */}
@@ -158,7 +169,12 @@ function ProductDetails() {
 
             {/* Furniture Materials */}
             <div className="mt-4">
-              <h2 className="text-lg font-semibold"style={{ fontFamily: "Playfair Display, serif" }}>Materials</h2>
+              <h2
+                className="text-lg font-semibold"
+                style={{ fontFamily: "Playfair Display, serif" }}
+              >
+                Materials
+              </h2>
               <div className="flex space-x-2">
                 {furnitureData.materials?.map((material) => (
                   <span
@@ -195,10 +211,13 @@ function ProductDetails() {
                 ))}
               </div>
             </div>
+
             <div className="border-t-2 mt-2 flex border-black"></div>
 
             <div className="flex gap-5 mt-3  ">
-              <button className="border-2 border-black p-2 rounded-t-lg ">Buy NoW</button>
+              <button className="border-2 border-black p-2 rounded-t-lg ">
+                Buy Now
+              </button>
               <button className="border-2 p-3 border-black rounded-t-lg ">
                 Add to Cart
               </button>
@@ -236,6 +255,17 @@ function ProductDetails() {
               </div>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Recommended Products Section */}
+      <div className="w-[1329px] h-[629px] p-5 border-2 border-black mt-10 mx-auto mb-5">
+        <h2 className="text-2xl font-bold mb-4" style={{ fontFamily: "Playfair Display, serif" }}>
+          Recommended Products
+        </h2>
+        <div>
+          {/* Placeholder or dynamic content for recommended products */}
+          <p>Product recommendations will appear here...</p>
         </div>
       </div>
 
