@@ -9,7 +9,22 @@ const Size = require("../../models/Furniture/sizeModel");
 const Stocks = require("../../models/Furniture/stocksModel");
 
 // Multer setup for handling image uploads in memory
-const upload = multer({ storage: multer.memoryStorage() }).array("images"); 
+
+// Multer setup for handling image uploads in memory
+const upload = multer({ 
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB file size limit
+  },
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype.startsWith('image/')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Not an image! Please upload only images.'), false);
+    }
+  },
+}).array("images", 5); // Allow up to 5 image uploads
+
 
 // Get all furnitures or furniture by ID
 exports.getAllFurnitures = async (req, res) => {
@@ -77,24 +92,26 @@ exports.getFurnitureById = async (req, res) => {
 		res.status(500).json({ message: "Server error!" });
 	}
 };
-// Create Furniture
-exports.createFurniture = [
-  upload, // Multer to handle the image upload
-  async (req, res) => {
+
+exports.createFurniture = async (req, res) => {
+  upload(req, res, async (err) => {
+    if (err instanceof multer.MulterError) {
+      return res.status(400).json({ message: err.message });
+    } else if (err) {
+      return res.status(500).json({ message: err.message });
+    }
+
     try {
-      let images=[]; 
-      if (req.file) {
-        images = req.file.buffer.toString("base64"); // Convert the image to base64
+      let images = [];
+      if (req.files && req.files.length > 0) {
+        images = req.files.map(file => file.buffer.toString('base64'));
       } else if (req.body.images) {
         images = req.body.images;
-      } else {
-        return res.status(400).json({ message: "No image provided!" });
       }
 
-				// Check if at least 5 images are provided
-				if (images.length < 3) {
-					return res.status(400).json({ message: "At least 5 images are required!" });
-				}
+      if (images.length < 3) {
+        return res.status(400).json({ message: "At least 3 images are required!" });
+      }
 
       const {
         category,
@@ -161,7 +178,7 @@ exports.createFurniture = [
 
       // Create new furniture item
       const newFurniture = new Furniture({
-        images, // Storing base64 string
+        images,
         category: existingCategory._id,
         furnitureType: existingFurnitureType._id,
         name,
@@ -173,7 +190,7 @@ exports.createFurniture = [
         price,
       });
 
-			console.log('New Furniture has been added!',newFurniture) //console log muna bago i-save haha burat
+      console.log('New Furniture has been added!', newFurniture);
       await newFurniture.save();
       res.status(201).json({
         message: "New furniture added successfully!",
@@ -183,14 +200,18 @@ exports.createFurniture = [
       console.error(error);
       res.status(500).json({ message: "Server error!", error: error.message });
     }
-  },
-];
+  });
+};
 
 
-// Update Furniture
-exports.updateFurniture = [
-  upload, // Use the updated multer configuration
-  async (req, res) => {
+exports.updateFurniture = async (req, res) => {
+  upload(req, res, async (err) => {
+    if (err instanceof multer.MulterError) {
+      return res.status(400).json({ message: err.message });
+    } else if (err) {
+      return res.status(500).json({ message: err.message });
+    }
+
     try {
       const { furnitureId } = req.params;
       const furniture = await Furniture.findById(furnitureId);
@@ -199,22 +220,21 @@ exports.updateFurniture = [
       }
 
       // Preserve existing images
-      let images = [...furniture.images]; // Start with existing images
+      let images = [...furniture.images];
 
       if (req.files && req.files.length > 0) {
-        const newImages = req.files.map((file) => file.buffer.toString("base64")); // Convert each new image to base64
-        images = [...images, ...newImages]; // Combine existing and new images
+        const newImages = req.files.map(file => file.buffer.toString('base64'));
+        images = [...images, ...newImages];
       } else if (req.body.images) {
         if (Array.isArray(req.body.images)) {
-          images = [...images, ...req.body.images]; // Append provided images if they are in the correct format
+          images = [...images, ...req.body.images];
         } else {
           return res.status(400).json({ message: "Images must be an array!" });
         }
       }
 
-      // Check if at least 5 images are present
-      if (images.length < 5) {
-        return res.status(400).json({ message: "At least 5 images are required!" });
+      if (images.length < 3) {
+        return res.status(400).json({ message: "At least 3 images are required!" });
       }
 
       const {
@@ -275,11 +295,11 @@ exports.updateFurniture = [
       }
 
       // Update other properties
-      furniture.images = images; // Update images
-      furniture.name = name || furniture.name; // Only update if provided
-      furniture.description = description || furniture.description; // Only update if provided
-      furniture.price = price || furniture.price; // Only update if provided
-      furniture.stocks = stocks ? stocks._id : furniture.stocks; // Only update if stocks are provided
+      furniture.images = images;
+      furniture.name = name || furniture.name;
+      furniture.description = description || furniture.description;
+      furniture.price = price || furniture.price;
+      furniture.stocks = stocks ? stocks._id : furniture.stocks;
 
       await furniture.save();
       res.status(200).json({
@@ -290,8 +310,8 @@ exports.updateFurniture = [
       console.error(error);
       res.status(500).json({ message: "Server error!", error: error.message });
     }
-  },
-];
+  });
+};
 
 //archieving furniture
 exports.Archived = async (req, res) => {

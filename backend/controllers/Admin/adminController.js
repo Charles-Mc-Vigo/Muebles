@@ -1,5 +1,4 @@
 const Admin = require('../../models/Admin/adminModel');
-const User = require('../../models/User/userModel');
 const {AdminSchemaValidator} = require('../../middlewares/JoiSchemaValidation');
 const bcrypt = require("bcrypt");
 const validator = require("validator");
@@ -20,7 +19,10 @@ exports.AdminLogin = async (req, res) => {
 		if (!admin) {
 			return res.status(404).json({ message: "Incorrect email account!" });
 		}
-
+		
+		if(admin.isActive){
+			return res.status(404).json({message:"This admin is currently online!"})
+		}
 		// Check for admin role
 		if (!["Admin", "Admin Manager"].includes(admin.role)) {
 			return res.status(403).json({ message: "Access denied: Admins only!" });
@@ -30,10 +32,6 @@ exports.AdminLogin = async (req, res) => {
 		const isMatch = await bcrypt.compare(password, admin.password);
 		if (!isMatch) {
 			return res.status(400).json({ message: "Incorrect password!" });
-		}
-
-		if(admin.isActive){
-			return res.status(404).json({message:"This admin is currently online!"})
 		}
 
 	const token = createToken(admin._id);

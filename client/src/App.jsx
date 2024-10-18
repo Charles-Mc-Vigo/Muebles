@@ -35,15 +35,16 @@ export default function App() {
 				<Route path="/signup" element={<SignUp />} />
 				<Route path="/login" element={<Login />} />
 				<Route path="/verify-email/:userId" element={<EmailVerification />} />
-				<Route path="/setting/my-profile/view" element={<Profile />} />
+				<Route path="/home" element={<ProtectedRoute element={<Home />} />} />
 
 				{/* admin */}
 				<Route path="/admin-login" element={<AdminLogin />} />
 				<Route path="/admin-signup" element={<AdminSignUp />} />
 				<Route path="/verify-account/:adminId" element={<AdminVerify />} />
 				<Route path="/verify-account/:adminId/pending" element={<AdminPendingPage />} />
+				<Route path="/dashboard" element={<AdminOnlyRoutes element={<DashBoard />} />} />
+				<Route path="/dashboard/setting/my-profile/view" element={<AdminOnlyRoutes element={<Profile />}/>} />
 				<Route path="/table" element={<ProductTable />} />
-				<Route path="/home" element={<ProtectedRoute element={<Home />} />} />
 				<Route path={`/furnitures/:id`} element={<ProductDetails />} />
 				<Route path={`/furnitures/edit/:id`} element={<EditProduct />} />
 
@@ -53,7 +54,6 @@ export default function App() {
 					path="/furniture-list"
 					element={<ProtectedRoute element={<FurnitureList />} />}
 				/>
-				<Route path="/dashboard" element={<AdminOnlyRoutes element={<DashBoard />} />} />
 				<Route
 					path="/user-management"
 					element={<AdminOnlyRoutes element={<UserManagement />} />}
