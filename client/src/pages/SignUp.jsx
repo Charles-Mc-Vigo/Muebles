@@ -95,7 +95,7 @@ export default function SignUp() {
         {/* Left side with background image */}
         <div
           className="hidden md:flex md:w-1/2 items-center bg-contain rounded-l-lg"
-          style={{ backgroundImage: `url('/landingimage/LOGO.jpg')` }}
+          style={{ backgroundImage: `url('/landingimage/Buynow.png')` }}
         >
           <div className="flex items-center justify-center w-full bg-gray-500 bg-opacity-50 p-8 rounded-l-lg">
             <div className="text-center text-black">
@@ -278,5 +278,4 @@ export default function SignUp() {
     </div>
   );
 }
-
 
