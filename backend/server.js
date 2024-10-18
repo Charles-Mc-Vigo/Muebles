@@ -2,7 +2,8 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
-const userRoutes = require("./router/userRoutes");
+const cookieParser = require('cookie-parser');
+
 
 //furnitures
 const furnitureRoutes = require("./router/FurnitureRoutes/furnitureRoutes");
@@ -13,11 +14,15 @@ const colorRoutes = require('../backend/router/FurnitureRoutes/colorRoutes');
 const sizeRoutes = require('../backend/router/FurnitureRoutes/sizeRoutes');
 const stocksRoutes = require('../backend/router/FurnitureRoutes/stocksRoutes');
 
-const adminRoutes = require('./router/adminRoutes')
-const orderRoutes = require("./router/orderRoutes");
-const cartRoutes = require('./router/cartRoutes');
+//Users
+const userRoutes = require('../backend/router/User/userRoutes')
+
+const adminRoutes = require('./router/Admin/adminRoutes')
+const orderRoutes = require('../backend/router/Order/orderRoutes');
+
+//Cart
+const cartRoutes = require('./router/Cart/cartRoutes');
 const connectDB = require("./database/db");
-const cookieParser = require('cookie-parser');
 
 
 const app = express();
@@ -50,7 +55,10 @@ app.use((err, req, res, next) => {
 
 // Middlewares
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+	origin: 'http://localhost:5173',
+	credentials: true,
+}));
 app.use(cookieParser())
 app.use(bodyParser.json({limit: '100mb'}));
 app.use(bodyParser.urlencoded({limit: '100mb', extended: true}));
@@ -73,7 +81,10 @@ app.use("/api/colors",colorRoutes)
 app.use("/api/sizes",sizeRoutes)
 app.use("/api/stocks",stocksRoutes)
 
+// Cart
 app.use('/api/carts', cartRoutes);
+
+
 app.use("/api/admin", adminRoutes);
 
 app.use("/api/orders", orderRoutes);

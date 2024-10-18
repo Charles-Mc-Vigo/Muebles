@@ -1,79 +1,104 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-import Cookies from 'js-cookie'
-  
+import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css'; // Import toast styles
+
 const AdminVerify = () => {
-  const [email, setEmail] = useState(''); // Initialize with an empty string
-  const [code, setCode] = useState('');
-
+  const { adminId } = useParams();
+  const [admin, setAdmin] = useState(null);
+  const [code, setCode] = useState("");
   const navigate = useNavigate();
-
-  const handleEmailChange = (e) => {
-    setEmail(e.target.value);
-  };
 
   const handleCodeChange = (e) => {
     const codeValue = e.target.value;
     // Ensure the code is 6 digits and numeric
     if (codeValue.length <= 6 && /^[0-9]*$/.test(codeValue)) {
-      setCode(codeValue); // Corrected setCode
+      setCode(codeValue);
     }
   };
+
+  useEffect(() => {
+    const fetchAdmin = async () => {
+      try {
+        const response = await fetch(
+          `http://localhost:3000/api/admin/${adminId}`
+        );
+        if (!response.ok) {
+          throw new Error("User not found");
+        }
+        const adminData = await response.json();
+        setAdmin(adminData); // Set the entire user object
+        console.log(adminData);
+      } catch (error) {
+        console.error("Error fetching user:", error);
+        toast.error("Could not fetch admin data. Please try again.");
+      }
+    };
+    fetchAdmin();
+  }, [adminId]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!admin) {
+      toast.error("Admin data is not loaded yet.");
+      return;
+    }
+
     try {
-      const response = await axios.post(
-        "http://localhost:3000/api/admins/verify-email",
+      const response = await fetch(
+        `http://localhost:3000/api/admin/verify-account/${adminId}`,
         {
-          email,
-          code
-        },
-        {
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json', // Change this to 'application/json'
+            "Content-Type": "application/json", // Set the content type to JSON
           },
+          body: JSON.stringify({
+            email: admin.email, // Make sure to send the email of the admin
+            code,
+          }),
         }
       );
-      // console.log('Response:', response.data);
-  
-      if (response.data.token) {
-        Cookies.set('adminToken', response.data.token, {
-          expires: 3, // Token expiration in days
-          secure: process.env.NODE_ENV === 'production' // Use HTTPS in production
-        });
-  
-        alert('Admin verified successfully!');
-        navigate('/dashboard');
-      } else {
-        alert('Account verification unsuccessful!');
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Account verification unsuccessful!");
       }
+
+      toast.success("Admin verified successfully!");
+
+      setTimeout(() => {
+        navigate(`/verify-account/${adminId}/pending`);
+      }, 3000);
     } catch (error) {
-      console.error('Error verifying email:', error);
+      console.error("Error verifying email:", error);
+      toast.error(error.message); // Notify error
     }
   };
-  
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
+      <ToastContainer />
       <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
-        <h2 className="text-2xl font-semibold text-center mb-6">Email Verification</h2>
+        <h2 className="text-2xl font-semibold text-center mb-6">
+          Email Verification
+        </h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
-            <input
-              type="email"
-              id="email"
-              value={email}
-              onChange={handleEmailChange}
-              required
-              className="mt-1 p-3 w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              placeholder="Enter your email"
-            />
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-gray-700"
+            >
+              We have sent a verification email to{" "}
+              {admin ? admin.email : "loading..."}
+            </label>
           </div>
           <div className="mb-6">
-            <label htmlFor="code" className="block text-sm font-medium text-gray-700">Verification Code</label>
+            <label
+              htmlFor="code"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Verification Code
+            </label>
             <input
               type="text"
               id="code"

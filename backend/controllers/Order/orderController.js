@@ -1,7 +1,7 @@
-const Order = require("../models/orderModel");
-const User = require("../models/userModel");
-const Furniture = require("../models/Furniture/furnitureModel");
-const {OrderSchemaValidator} = require("../middlewares/JoiSchemaValidation")
+const Order = require("../../models/Order/orderModel");
+const User = require("../../models/User/userModel");
+const Furniture = require("../../models/Furniture/furnitureModel");
+const {OrderSchemaValidator} = require("../../middlewares/JoiSchemaValidation")
 
 
 // Getting all the orders

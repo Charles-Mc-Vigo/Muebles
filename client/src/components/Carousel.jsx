@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
+// import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+// import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 
 const Carousel = ({ images, interval = 5000 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -65,7 +65,7 @@ const Carousel = ({ images, interval = 5000 }) => {
               index === currentIndex ? 'opacity-100' : 'opacity-0'
             }`}
           >
-            <img src={image} alt={`Slide ${index}`} className="w-full h-64 md:h-80 object-contain" /> {/* Adjusted image height */}
+            <img src={image} alt={`Slide ${index}`} className="w-full h-100 md:h-80 object-contain" /> {/* Adjusted image height */}
           </div>
         ))}
       </div>

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css'; // Import Toastify CSS
 
 export default function SignUp() {
   const [formData, setFormData] = useState({
@@ -14,7 +15,7 @@ export default function SignUp() {
     email: "",
     password: "",
     confirmPassword: "",
-    agreeToTerms: false,
+    agreeToTerms: "",
   });
 
   const [zipCode, setZipcode] = useState("");
@@ -44,45 +45,48 @@ export default function SignUp() {
   };
 
   const barangays = {
-		Boac: ["Agot", "Agumaymayan", "Amoingon", "Apitong", "Balagasan", "Balaring", "Balimbing", "Balogo", "Bamban", "Bangbangalon", "Bantad", "Bantay", "Bayuti", "Binunga", "Boi", "Boton", "Buliasnin", "Bunganay", "Caganhao", "Canat", "Catubugan", "Cawit", "Daig", "Daypay", "Duyay", "Hinapulan", "Ihatub", "Isok I", "Isok II Poblacion", "Laylay", "Lupac", "Mahinhin", "Mainit", "Malbog", "Maligaya", "Malusak", "Mansiwat", "Mataas na Bayan", "Maybo", "Mercado", "Murallon", "Ogbac", "Pawa", "Pili", "Poctoy", "Poras", "Puting Buhangin", "Puyog", "Sabong", "San Miguel", "Santol", "Sawi", "Tabi", "Tabigue", "Tagwak", "Tambunan", "Tampus", "Tanza", "Tugos", "Tumagabok", "Tumapon"],
-    Mogpog: ["Anapog-Sibucao", "Argao","Balanacan","Banto","Bintakay","Bocboc","Butansapa","Candahon","Capayang","Danao","Dulong Bayan","Gitnang Bayan","Guisian","Hinadharan","Hinanggayon","Ino","Janagdong","Lamesa","Laon","Magapua","Malayak","Malusak","Mampaitan","Mangyan-Mababad","Market Site","Mataas na Bayan","Mendez","Nangka I","Nangka II","Paye","Pili","Puting Buhangin","Sayao","Silangan","Sumangga","Tarug","Villa Mendez"],
-		SantaCruz: ["Alobo", "Angas", "Aturan", "Bagong Silang Poblacion", "Baguidbirin", "Baliis", "Balogo", "Banahaw Poblacion", "Bangcuangan", "Banogbog", "Biga", "Botilao", "Buyabod", "Dating Bayan", "Devilla", "Dolores", "Haguimit", "Hupi", "Ipil", "Jolo", "Kaganhao", "Kalangkang", "Kamandugan", "Kasily", "Kilo-kilo", "Kiñaman", "Labo", "Lamesa", "Landy", "Lapu-lapu Poblacion", "Libjo", "Lipa", "Lusok", "Maharlika Poblacion", "Makulapnit", "Maniwaya", "Manlibunan", "Masaguisi", "Masalukot", "Matalaba", "Mongpong", "Morales", "Napo", "Pag-asa Poblacion", "Pantayin", "Polo", "Pulong-Parang", "Punong", "San Antonio", "San Isidro", "Tagum", "Tamayo", "Tambangan", "Tawiran", "Taytay"],
-		Gasan: ["Antipolo", "Bachao Ibaba", "Bachao Ilaya", "Bacongbacong", "Bahi", "Bangbang", "Banot", "Banuyo", "Barangay I", "Barangay II", "Barangay III", "Bognuyan", "Cabugao", "Dawis", "Dili", "Libtangin", "Mahunig", "Mangiliol", "Masiga", "Matandang Gasan", "Pangi", "Pingan", "Tabionan", "Tapuyan", "Tiguion"],
-		Buenavista: ["Bagacay", "Bagtingon", "Barangay I", "Barangay II", "Barangay III", "Barangay IV", "Bicas-bicas", "Caigangan", "Daykitin", "Libas", "Malbog", "Sihi", "Timbo", "Tungib-Lipata", "Yook"],
-		Torrijos: ["Bangwayin", "Bayakbakin", "Bolo", "Bonliw", "Buangan", "Cabuyo", "Cagpo", "Dampulan", "Kay Duke", "Mabuhay", "Makawayan", "Malibago", "Malinao", "Maranlig", "Marlangga", "Matuyatuya", "Nangka", "Pakaskasan", "Payanas", "Poblacion", "Poctoy", "Sibuyao", "Suha", "Talawan", "Tigwi"]
+    Boac: ["Agot", "Agumaymayan", "Amoingon", "Apitong", "Balagasan", "Balaring", "Balimbing", "Balogo", "Bamban", "Bangbangalon", "Bantad", "Bantay", "Bayuti", "Binunga", "Boi", "Boton", "Buliasnin", "Bunganay", "Caganhao", "Canat", "Catubugan", "Cawit", "Daig", "Daypay", "Duyay", "Hinapulan", "Ihatub", "Isok I", "Isok II Poblacion", "Laylay", "Lupac", "Mahinhin", "Mainit", "Malbog", "Maligaya", "Malusak", "Mansiwat", "Mataas na Bayan", "Maybo", "Mercado", "Murallon", "Ogbac", "Pawa", "Pili", "Poctoy", "Poras", "Puting Buhangin", "Puyog", "Sabong", "San Miguel", "Santol", "Sawi", "Tabi", "Tabigue", "Tagwak", "Tambunan", "Tampus", "Tanza", "Tugos", "Tumagabok", "Tumapon"],
+    Mogpog: ["Anapog-Sibucao", "Argao", "Balanacan", "Banto", "Bintakay", "Bocboc", "Butansapa", "Candahon", "Capayang", "Danao", "Dulong Bayan", "Gitnang Bayan", "Guisian", "Hinadharan", "Hinanggayon", "Ino", "Janagdong", "Lamesa", "Laon", "Magapua", "Malayak", "Malusak", "Mampaitan", "Mangyan-Mababad", "Market Site", "Mataas na Bayan", "Mendez", "Nangka I", "Nangka II", "Paye", "Pili", "Puting Buhangin", "Sayao", "Silangan", "Sumangga", "Tarug", "Villa Mendez"],
+    Santa_Cruz: ["Alobo", "Angas", "Aturan", "Bagong Silang Poblacion", "Baguidbirin", "Baliis", "Balogo", "Banahaw Poblacion", "Bangcuangan", "Banogbog", "Biga", "Botilao", "Buyabod", "Dating Bayan", "Devilla", "Dolores", "Haguimit", "Hupi", "Ipil", "Jolo", "Kaganhao", "Kalangkang", "Kamandugan", "Kasily", "Kilo-kilo", "Kiñaman", "Labo", "Lamesa", "Landy", "Lapu-lapu Poblacion", "Libjo", "Lipa", "Lusok", "Maharlika Poblacion", "Makulapnit", "Maniwaya", "Manlibunan", "Masaguisi", "Masalukot", "Matalaba", "Mongpong", "Morales", "Napo", "Pag-asa Poblacion", "Pantayin", "Polo", "Pulong-Parang", "Punong", "San Antonio", "San Isidro", "Tagum", "Tamayo", "Tambangan", "Tawiran", "Taytay"],
+    Gasan: ["Antipolo", "Bachao Ibaba", "Bachao Ilaya", "Bacongbacong", "Bahi", "Bangbang", "Banot", "Banuyo", "Barangay I", "Barangay II", "Barangay III", "Bognuyan", "Cabugao", "Dawis", "Dili", "Libtangin", "Mahunig", "Mangiliol", "Masiga", "Matandang Gasan", "Pangi", "Pingan", "Tabionan", "Tapuyan", "Tiguion"],
+    Buenavista: ["Bagacay", "Bagtingon", "Barangay I", "Barangay II", "Barangay III", "Barangay IV", "Bicas-bicas", "Caigangan", "Daykitin", "Libas", "Malbog", "Sihi", "Timbo", "Tungib-Lipata", "Yook"],
+    Torrijos: ["Bangwayin", "Bayakbakin", "Bolo", "Bonliw", "Buangan", "Cabuyo", "Cagpo", "Dampulan", "Kay Duke", "Mabuhay", "Makawayan", "Malibago", "Malinao", "Maranlig", "Marlangga", "Matuyatuya", "Nangka", "Pakaskasan", "Payanas", "Poblacion", "Poctoy", "Sibuyao", "Suha", "Talawan", "Tigwi"]
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (formData.password !== formData.confirmPassword) {
-      alert("Passwords do not match");
+      toast.error("Passwords do not match");
       return;
     }
-
     if (!formData.agreeToTerms) {
-      alert("Please agree to the Terms and Conditions");
+      toast.error("Please agree to the Terms and Conditions");
       return;
     }
-
+    
     try {
-      const response = await axios.post(
-        "http://localhost:3000/api/users/signup",
-        {
+      const response = await fetch("http://localhost:3000/api/users/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
           ...formData,
           zipCode,
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }
-      );
-      
-      navigate('/verify-email');
+        }),
+      });
+
+      const data = await response.json();
+      if (!data || !data._id) {
+        throw new Error("No user ID received from server");
+      }
+
+      const userId = data._id;
+      toast.success("Sign up successful! Redirecting...");
+      navigate(`/verify-email/${userId}`);
     } catch (error) {
-      console.error("Sign up error", error.response?.data || error.message);
-      alert(error.response?.data?.message || error.message || "Sign up failed");
+      console.error("Sign up error:", error.message);
+      toast.error(error.message || "Sign up failed");
     }
   };
 
@@ -92,16 +96,8 @@ export default function SignUp() {
         {/* Left side with background image */}
         <div
           className="hidden md:flex md:w-1/2 items-center bg-contain rounded-l-lg"
-          style={{ backgroundImage: `url('/landingimage/LOGO.jpg')` }}
+          style={{ backgroundImage: `url('/landingimage/Buynow.png')` }}
         >
-          <div className="flex items-center justify-center w-full bg-gray-500 bg-opacity-50 p-8 rounded-l-lg">
-            <div className="text-center text-black">
-              <h2 className="text-4xl font-bold mb-4">Sign Up</h2>
-              <p className="text-lg">
-                Please enter your details to sign up and be part of our great community.
-              </p>
-            </div>
-          </div>
         </div>
 
         {/* Right side with form */}
@@ -244,37 +240,35 @@ export default function SignUp() {
                   checked={formData.agreeToTerms}
                 />
                 <span className="absolute text-white opacity-0 peer-checked:opacity-100 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor"
-                    stroke="currentColor" strokeWidth="1">
-                    <path fillRule="evenodd"
-                      d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                      clipRule="evenodd"></path>
-                  </svg>
+                  ✔
                 </span>
               </label>
-              <label className="cursor-pointer ml-2 text-slate-600 text-sm" htmlFor="agreeToTerms">
-                I agree to the <Link to="/terms" className="text-blue-500">Terms and Conditions</Link>
-              </label>
+              <p className="pl-3 text-xs sm:text-sm">
+                I accept the&nbsp;
+                <Link to="/terms-and-conditions" className="text-blue-600 hover:underline">
+                  Terms and Conditions
+                </Link>
+              </p>
             </div>
 
             <button
               type="submit"
-              className="p-3 bg-green-600 rounded-lg text-white font-bold uppercase hover:bg-green-500"
+              className="w-full bg-green-800 hover:bg-green-600 text-white p-3 rounded-lg font-semibold"
             >
-              Sign up
+              Sign Up
             </button>
-
-            <div>
-              <p>
-                Already have an account?{" "}
-                <Link to="/login">
-                  <span className="text-blue-500">Log in</span>
-                </Link>
-              </p>
-            </div>
           </form>
+
+          <div className="text-center mt-4">
+            Already have an account?&nbsp;
+            <Link to="/sign-in" className="text-blue-600 hover:underline">
+              Sign In
+            </Link>
+          </div>
         </div>
       </div>
+      <ToastContainer />
     </div>
   );
 }
+

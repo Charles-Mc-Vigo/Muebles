@@ -1,233 +1,180 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
-import Header from "../components/Header";
+import React, { useEffect, useState } from "react";
+import ProductCard from "../components/ProductCard";
 import Footer from "../components/Footer";
+import Header from "../components/Header";
 
 const Home = () => {
-  const [products, setProducts] = useState([]);
-  const [furnitureTypes, setFurnitureTypes] = useState([]);
-  const [selectedCategories, setSelectedCategories] = useState({
-    livingRoom: false,
-    bedroom: false,
-    diningRoom: false,
-  });
-  const [selectedFurnitureTypes, setSelectedFurnitureTypes] = useState({});
+  const [furnitureData, setFurnitureData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [categories, setCategories] = useState([]);
+  const [visibleCount, setVisibleCount] = useState(6); // Initial number of visible items
+  const [selectedCategories, setSelectedCategories] = useState(new Set()); // State to manage selected categories
+  const [priceRange, setPriceRange] = useState([0, 1000]); // Default price range
 
-  // Fetch furniture products from the backend
-  const fetchProducts = async () => {
-    try {
-      const response = await axios.get("http://localhost:3000/api/furnitures");
-      console.log("Fetched products:", response.data);
-      setProducts(response.data);
-    } catch (error) {
-      console.error("Error fetching products:", error);
-      alert("Failed to fetch products. Please try again.");
-    }
-  };
-
-  // Fetch furniture types from the backend
-  const fetchFurnitureTypes = async () => {
-    try {
-      const response = await axios.get("http://localhost:3000/api/furniture-types");
-      console.log("Fetched furniture types:", response.data);
-      setFurnitureTypes(response.data);
-    } catch (error) {
-      console.error("Error fetching furniture types:", error);
-      alert("Failed to fetch furniture types. Please try again.");
-    }
-  };
-
+  // Fetch the furniture data from API
   useEffect(() => {
-    fetchProducts();
-    fetchFurnitureTypes();
+    const fetchFurnitureData = async () => {
+      try {
+        const response = await fetch("http://localhost:3000/api/furnitures");
+        if (!response.ok) {
+          throw new Error("Failed to fetch furniture sets");
+        }
+        const data = await response.json();
+        console.log("Fetched Data:", data); // Log to check the structure of data
+
+        if (Array.isArray(data)) {
+          setFurnitureData(data);
+        } else if (data && Array.isArray(data.furnitures)) {
+          setFurnitureData(data.furnitures);
+        } else {
+          throw new Error("Invalid data format received");
+        }
+        setLoading(false);
+      } catch (error) {
+        setError(error.message);
+        setLoading(false);
+      }
+    };
+
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch("http://localhost:3000/api/categories");
+        const data = await response.json();
+        setCategories(data);
+      } catch (error) {
+        console.error("Failed to fetch categories:", error);
+      }
+    };
+
+    fetchFurnitureData();
+    fetchCategories(); // Call to fetch categories
   }, []);
 
-  // Handle checkbox change for categories
-  const handleCategoryCheckboxChange = (event) => {
-    const { name, checked } = event.target;
-    setSelectedCategories((prevCategories) => ({
-      ...prevCategories,
-      [name]: checked,
-    }));
+  const loadMore = () => {
+    setVisibleCount((prevCount) => prevCount + 6); // Increase the visible count
   };
 
-  // Handle checkbox change for furniture types
-  const handleFurnitureTypeCheckboxChange = (event) => {
-    const { name, checked } = event.target;
-    setSelectedFurnitureTypes((prevTypes) => ({
-      ...prevTypes,
-      [name]: checked,
-    }));
+  const handleCheckboxChange = (event) => {
+    const { value, checked } = event.target;
+    setSelectedCategories((prev) => {
+      const newSelection = new Set(prev);
+      if (checked) {
+        newSelection.add(value);
+      } else {
+        newSelection.delete(value);
+      }
+      return newSelection;
+    });
   };
 
-  // Filtering products on selected categories and furniture types
-  const filteredProducts = products.filter((product) => {
-    const isLivingRoom = selectedCategories.livingRoom && product.category?.name === "Living Room";
-    const isBedroom = selectedCategories.bedroom && product.category?.name === "Bed Room";
-    const isDiningRoom = selectedCategories.diningRoom && product.category?.name === "Dining Room";
-
-    const isFurnitureTypeSelected = selectedFurnitureTypes[product.furnitureType?.name] || !Object.values(selectedFurnitureTypes).some(Boolean);
-
-    return (isLivingRoom || isBedroom || isDiningRoom || (!selectedCategories.livingRoom && !selectedCategories.bedroom && !selectedCategories.diningRoom)) && isFurnitureTypeSelected;
-  });
-
-  const handleCardClick = (product) => {
-    // Logic to show product information, e.g., modal or navigate to product detail page
-    console.log("Product clicked:", product);
+  const handlePriceRangeChange = (event) => {
+    const value = event.target.value.split(",").map(Number);
+    setPriceRange(value);
   };
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <header className="w-full">
-        <Header />
-      </header>
-      <div className="flex-grow flex">
-        <aside className="w-60 bg-white border-2 border-oliveGreen p-5 text-black mt-2 ml-2 mb-2 overflow-y-auto h-full">
-          <h2 className="text-xl font-bold mb-2">JCKAME Furnitures</h2>
+    <div className="bg-white text-gray-800 flex flex-col min-h-screen">
+      {/* Header */}
+      <Header showLogout={true} />
 
-          {/* Categories Filter */}
-          <div className="mb-4">
-            <h3 className="text-lg font-semibold">Categories</h3>
-            <label className="flex items-center mb-2">
-              <input
-                type="checkbox"
-                name="livingRoom"
-                checked={selectedCategories.livingRoom}
-                onChange={handleCategoryCheckboxChange}
-                className="mr-2"
-              />
-              Living Room
-            </label>
-            <label className="flex items-center mb-2">
-              <input
-                type="checkbox"
-                name="bedroom"
-                checked={selectedCategories.bedroom}
-                onChange={handleCategoryCheckboxChange}
-                className="mr-2"
-              />
-              Bed Room
-            </label>
-            <label className="flex items-center mb-2">
-              <input
-                type="checkbox"
-                name="diningRoom"
-                checked={selectedCategories.diningRoom}
-                onChange={handleCategoryCheckboxChange}
-                className="mr-2"
-              />
-              Dining Room
-            </label>
-          </div>
+      {/* Shop Hero Section */}
+      <section className="relative">
+        <img
+          src="https://images.pexels.com/photos/245219/pexels-photo-245219.jpeg?auto=compress&cs=tinysrgb&w=600"
+          alt="Shop Hero"
+          className="w-full h-80 object-cover"
+        />
+        <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 text-white text-center">
+          <h1 className="text-5xl font-bold">Browse Our Collection</h1>
+        </div>
+      </section>
 
-          {/* Furniture Types Filter */}
-          <div className="mb-4">
-            <h3 className="text-lg font-semibold">Furniture Types</h3>
-            {furnitureTypes.map((type) => (
-              <label key={type._id} className="flex items-center mb-2">
+      {/* Main Content Area */}
+      <div className="flex flex-1">
+        {/* Left Section - Vertical Filter */}
+        <section className="w-1/5 border p-4 mb-2 mr-2 mt-2 flex flex-col">
+          <h1 className="text-2xl font-bold mb-4">ALL FURNITURES</h1>
+          <h2 className="text-lg font-bold mb-2">Categories</h2>
+          <ul className="space-y-2 flex-col">
+            {categories.map((category) => (
+              <li key={category._id} className="flex items-center">
                 <input
                   type="checkbox"
-                  name={type.name}
-                  checked={selectedFurnitureTypes[type.name] || false}
-                  onChange={handleFurnitureTypeCheckboxChange}
+                  value={category.name} // Use category name as the value
+                  checked={selectedCategories.has(category.name)}
+                  onChange={handleCheckboxChange}
                   className="mr-2"
                 />
-                {type.name}
-              </label>
+                <label>{category.name}</label>
+              </li>
             ))}
-          </div>
-
-          {/* Additional Options */}
-          <h3 className="text-lg font-semibold">Other Options</h3>
-          <ul>
-            <li className="mb-2">Option 1</li>
-            <li className="mb-2">Option 2</li>
-            <li className="mb-2">Option 3</li>
           </ul>
-        </aside>
 
-        {/* Main content section */}
-        <main className="flex-grow container ml-2 p-2">
-          <div className="h-full overflow-y-auto p-2">
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 border-2 p-5 border-oliveGreen">
-              {filteredProducts.length > 0 ? (
-                filteredProducts.map((product) => (
-                  <div
-                    key={product._id}
-                    className="bg-white shadow-lg rounded-lg overflow-clip border border-gray-200 cursor-pointer"
-                    style={{ width: '260px', height: '420px', margin: '1px' }}
-                    onClick={() => handleCardClick(product)} // Make the card clickable
-                  >
-                    <div
-                      className="bg-gray-100 flex items-center justify-center"
-                      style={{ width: '100%', height: '180px' }}
-                    >
-                      {product.image ? (
-                        <img
-                          src={`data:image/png;base64,${product.image}`}
-                          alt={product.name}
-                          className="w-full h-full object-contain"
-                        />
-                      ) : (
-                        <span className="text-gray-500">No Image</span>
-                      )}
-                    </div>
-                    <div className="p-2">
-                      <h2 className="text-lg font-semibold text-gray-800 mb-1">
-                        {product.name}
-                      </h2>
-                      <p className="text-gray-600 mb-1">
-                        Category:{" "}
-                        <span className="text-gray-800 font-medium">
-                          {product.category?.name}
-                        </span>
-                      </p>
-                      <p className="text-gray-600 mb-1">
-                        Type:{" "}
-                        <span className="text-gray-800 font-medium">
-                          {product.furnitureType?.name}
-                        </span>
-                      </p>
-                      <p className="text-gray-600 mb-1">
-                        Price:{" "}
-                        <span className="text-green-600 font-bold">
-                          ₱{product.price}
-                        </span>
-                      </p>
-                      <p className="text-gray-600 mb-1">
-                        Stock:{" "}
-                        <span className="text-green-600 font-bold">
-                          {product.stocks}
-                        </span>
-                      </p>
-                    </div>
-                    
-                    {/* View Product Button */}
-                    <div className="p-2">
-                      <button
-                        className="bg-blue-500 text-white px-4 py-2 rounded w-full"
-                        onClick={(e) => {
-                          e.stopPropagation(); 
-                          handleCardClick(product); 
-                        }}
-                      >
-                        View Product
-                      </button>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <p className="text-center text-gray-600 col-span-full">
-                  No products found.
-                </p>
-              )}
-            </div>
+          {/* Price Range Filter */}
+          <h2 className="text-lg font-bold mb-2 mt-4">Price Range</h2>
+          <input
+            type="range"
+            min="0"
+            max="50000"
+            step="10"
+            value={priceRange.join(",")}
+            onChange={handlePriceRangeChange}
+            className="w-full"
+          />
+          <div className="flex justify-between">
+            <span>₱{priceRange[0]}</span>
+            <span>₱{priceRange[1]}</span>
           </div>
-        </main>
+        </section>
+
+        <section className="w-full">
+
+          {/* Furniture Sets Section */}
+          <section className="py-16 px-8  flex-grow m-2">
+            <h2 className="text-4xl font-bold text-center mb-10">
+              Furniture Sets
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+              {furnitureData.slice(0, visibleCount).map((furniture) => (
+                <ProductCard
+                  key={furniture._id} // Ensure this id is unique for each furniture item
+                  id={furniture._id}
+                  image={furniture.image}
+                  name={furniture.name}
+                  price={furniture.price}
+                  description={furniture.description}
+                  showViewDetails={true}
+                  showAddToCart={true}
+                  showUpdateButton={false}
+                />
+              ))}
+            </div>
+
+            {visibleCount < furnitureData.length && ( // Check if there are more items to load
+              <div className="text-center mt-8">
+                <button
+                  onClick={loadMore}
+                  className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700"
+                >
+                  Load More
+                </button>
+              </div>
+            )}
+          </section>
+        </section>
       </div>
-      <footer className="w-full mt-auto">
-        <Footer />
-      </footer>
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 };
