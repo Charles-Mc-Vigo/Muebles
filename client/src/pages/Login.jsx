@@ -2,7 +2,9 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import Cookies from "js-cookie";
-import { FaFingerprint } from "react-icons/fa"; // Import an icon for the top
+import { FaFingerprint } from "react-icons/fa"; 
+import Header from '../components/Header'; // Assuming you have this component
+import Footer from '../components/Footer'; // Assuming you have a Footer component
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css"; // Import Toastify CSS
 
@@ -104,8 +106,6 @@ export default function Login() {
 				</p>
 			</div>
 			<ToastContainer />
-			<div className="min-h-screen flex flex-col bg-fill">
-			</div>
 		</div>
 	);
 }

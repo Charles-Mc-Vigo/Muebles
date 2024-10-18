@@ -9,7 +9,7 @@ const Size = require("../../models/Furniture/sizeModel");
 const Stocks = require("../../models/Furniture/stocksModel");
 
 // Multer setup for handling image uploads in memory
-const upload = multer({ storage: multer.memoryStorage() }).array("images"); // Accept only one image
+const upload = multer({ storage: multer.memoryStorage() }).array("images"); 
 
 // Get all furnitures or furniture by ID
 exports.getAllFurnitures = async (req, res) => {
@@ -82,7 +82,7 @@ exports.createFurniture = [
   upload, // Multer to handle the image upload
   async (req, res) => {
     try {
-      let images; 
+      let images=[]; 
       if (req.file) {
         images = req.file.buffer.toString("base64"); // Convert the image to base64
       } else if (req.body.images) {
@@ -92,7 +92,7 @@ exports.createFurniture = [
       }
 
 				// Check if at least 5 images are provided
-				if (images.length < 5) {
+				if (images.length < 3) {
 					return res.status(400).json({ message: "At least 5 images are required!" });
 				}
 

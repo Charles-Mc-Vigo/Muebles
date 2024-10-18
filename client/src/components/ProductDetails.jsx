@@ -1,173 +1,210 @@
-import React, { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
-import { MdOutlineArchive } from "react-icons/md";
-import { FaRegEdit } from "react-icons/fa";
+import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import Header from "./Header";
+import Footer from "./Footer";
+import { FaChevronUp, FaChevronDown } from "react-icons/fa";
 
 function ProductDetails() {
-	const { id } = useParams();
-	const [furnitureData, setFurnitureData] = useState(null);
-	const [loading, setLoading] = useState(true);
-	const [error, setError] = useState(null);
+  const { id } = useParams();
+  const [furnitureData, setFurnitureData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [selectedColor, setSelectedColor] = useState(null);
+  const [selectedMaterial, setSelectedMaterial] = useState(null);
+  const [selectedSize, setSelectedSize] = useState(null);
 
-	useEffect(() => {
-		const fetchFurnitureDetails = async () => {
-			try {
-				const response = await fetch(
-					`http://localhost:3000/api/furnitures/${id}`
-				);
-				if (!response.ok) {
-					throw new Error("Failed to fetch furniture details");
-				}
-				const data = await response.json();
-				console.log("Data fetched:", data);
+  useEffect(() => {
+    const fetchFurnitureDetails = async () => {
+      try {
+        const response = await fetch(
+          `http://localhost:3000/api/furnitures/${id}`
+        );
+        if (!response.ok) {
+          throw new Error("Failed to fetch furniture details");
+        }
+        const data = await response.json();
+        setFurnitureData(data);
+      } catch (error) {
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-				if (data) {
-					setFurnitureData(data);
-				} else {
-					throw new Error("Furniture data not found");
-				}
-			} catch (error) {
-				setError(error.message);
-			} finally {
-				setLoading(false);
-			}
-		};
+    fetchFurnitureDetails();
+  }, [id]);
 
-		fetchFurnitureDetails();
-	}, [id]);
+  const handleColorClick = (color) => {
+    setSelectedColor(color.name);
+    setSelectedMaterial(null);
+    setSelectedSize(null);
+  };
 
-	if (loading) return <div className="text-center">Loading...</div>;
-	if (error) return <div className="text-red-500 text-center">{error}</div>;
-	if (!furnitureData)
-		return <div className="text-center">No furniture found</div>;
+  const handleMaterialClick = (material) => {
+    setSelectedMaterial(material.name);
+  };
 
-	console.log("Furniture Data:", furnitureData);
+  const handleSizeClick = (size) => {
+    setSelectedSize(size.label);
+  };
 
-	return (
-		<div className="min-h-screen flex items-center justify-center bg-gray-100">
-			<div className="max-w-7xl w-full min-h-[700px] mx-auto bg-white rounded-lg shadow-lg p-12">
-				<div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-					{/* Left side - Image and Back Button */}
-					<div className="space-y-6">
-						<div className="aspect-square w-full border rounded-lg overflow-hidden">
-							<img
-								src={`data:image/jpeg;base64,${furnitureData.image}`}
-								alt={furnitureData.name}
-								className="w-full h-full object-cover"
-							/>
-						</div>
-						<Link
-							to="/dashboard"
-							className="inline-block bg-green-100 hover:bg-green-200 text-green-700 px-6 py-3 rounded-md transition-colors duration-300"
-						>
-							Go back
-						</Link>
-					</div>
+  if (loading) return <div className="text-center">Loading...</div>;
+  if (error) return <div className="text-red-500 text-center">{error}</div>;
+  if (!furnitureData)
+    return <div className="text-center">No furniture found</div>;
 
-					{/* Right side - Product Details */}
-					<div className="bg-slate-100 p-6 rounded-lg flex flex-col h-full">
-						<div className="flex-grow space-y-8">
-							<div>
-								<h1 className="text-3xl font-bold text-gray-900">
-									{furnitureData.name}
-								</h1>
-								<p className="mt-4 text-gray-600">
-									{furnitureData.description}
-								</p>
-							</div>
+  const FAQAccordion = ({ question, answer }) => {
+    const [isOpen, setIsOpen] = useState(false);
 
-							{/* Product Specifications Table */}
-							<table className="w-full table-auto border-collapse border border-gray-300 shadow-sm">
-								<thead className="bg-green-100">
-									<tr>
-										<th className="border px-6 py-3 font-semibold text-left text-green-700">
-											Specification
-										</th>
-										<th className="border px-6 py-3 font-semibold text-left text-green-700">
-											Details
-										</th>
-									</tr>
-								</thead>
-								<tbody>
-									<tr>
-										<td className="border px-6 py-3 font-semibold text-gray-700">
-											Price
-										</td>
-										<td className="border px-6 py-3 text-green-600">
-											<strong>PHP</strong>
-											{furnitureData.price}
-										</td>
-									</tr>
-									<tr>
-										<td className="border px-6 py-3 font-semibold text-gray-700">
-											Colors
-										</td>
-										<td className="border px-6 py-3 flex items-center space-x-2">
-											{furnitureData.colors &&
-											furnitureData.colors.length > 0 ? (
-												furnitureData.colors.map((color) => (
-													<div
-														key={`${color.id}-${color.name}`}
-														className="flex items-center"
-													>
-														<div
-															className="w-6 h-6 rounded-full"
-															style={{ backgroundColor: color.rgb }}
-															title={color.name}
-														/>
-														<span className="ml-2 text-gray-700">
-															{color.name}
-														</span>
-													</div>
-												))
-											) : (
-												<span className="text-gray-600">
-													No colors available
-												</span>
-											)}
-										</td>
-									</tr>
-									<tr>
-										<td className="border px-6 py-3 font-semibold text-gray-700">
-											Materials
-										</td>
-										<td className="border px-6 py-3">
-											{furnitureData.materials
-												.map((material) => material.name)
-												.join(", ")}
-										</td>
-									</tr>
-									<tr>
-										<td className="border px-6 py-3 font-semibold text-gray-700">
-											Sizes
-										</td>
-										<td className="border px-6 py-3">
-											{furnitureData.sizes.map((size) => size.label).join(", ")}
-										</td>
-									</tr>
-								</tbody>
-							</table>
-						</div>
-						<div className="mt-8 flex justify-between space-x-6">
-							<button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-md transition-colors duration-300 flex items-center justify-center">
-								<MdOutlineArchive className="mr-2 text-white" />{" "}
-								{/* Archive icon color */}
-								Archive
-							</button>
-							<Link
-								to={`/furnitures/edit/${furnitureData._id}`}
-								className="w-full text-center bg-yellow-600 hover:bg-yellow-700 text-white py-3 rounded-md transition-colors duration-300 flex items-center justify-center"
-							>
-								<FaRegEdit className="mr-2 text-white" />{" "}
-								{/* Edit icon color */}
-								Edit
-							</Link>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	);
+    const toggleAccordion = () => {
+      setIsOpen(!isOpen);
+    };
+
+    return (
+      <div className="border-b border-green-700">
+        <button
+          onClick={toggleAccordion}
+          className="flex justify-between items-center w-full py-4 text-left focus:outline-none overflow-hidden"
+        >
+          <h3 className="text-xl font-medium text-black font-sans">
+            {question}
+          </h3>
+          <span className="text-lg text-black">
+            {isOpen ? <FaChevronUp /> : <FaChevronDown />}
+          </span>
+        </button>
+        {isOpen && (
+          <div className="py-4 text-black font-sans text-lg">{answer}</div>
+        )}
+      </div>
+    );
+  };
+
+  const faqItems = [
+    {
+      question: "Description?",
+      answer: furnitureData.description,
+    },
+    {
+      question: "Specification",
+      answer: "None",
+    },
+    {
+      question: "Warranty",
+      answer: "None",
+    },
+    {
+      question: "Care Guide",
+      answer: "None",
+    },
+  ];
+
+  return (
+    <section>
+      <Header />
+      <div className="flex justify-center items-start p-5 border-2">
+        {/* Left: Product Image */}
+        <div className="w-[639px] h-[639px] p-5 flex justify-center items-center border-2">
+          <img
+            src={`data:image/jpeg;base64,${furnitureData.image}`}
+            alt={furnitureData.name}
+            className="w-full h-full object-contain"
+          />
+        </div>
+
+        {/* Right: Product Details */}
+        <div className="w-[462px] h-[1057px] p-5 flex flex-col justify-between border-2">
+          <div>
+            <h1 className="text-3xl font-bold">{furnitureData.name}</h1>
+            <div className="mt-2">
+              <h2 className="text-lg font-semibold">Price</h2>
+              <p className="border-b-2 border-black">₱ {furnitureData.price}</p>
+            </div>
+
+            {/* Color Selection */}
+            <div className="mb-4 rounded-md p-2">
+              <label className="block font-semibold">
+                Colors: {selectedColor || "None"}
+              </label>
+              <div className="flex flex-wrap gap-4">
+                {furnitureData.colors?.map((color) => (
+                  <div
+                    key={color._id}
+                    onClick={() => handleColorClick(color)}
+                    className={`w-10 h-10 rounded-full border cursor-pointer ${
+                      selectedColor === color.name
+                        ? "border-blue-600"
+                        : "border-gray-400"
+                    }`}
+                    style={{ backgroundColor: color.hex }}
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* Furniture Materials */}
+            <div className="mt-4">
+              <h2 className="text-lg font-semibold">Materials</h2>
+              <div className="flex space-x-2">
+                {furnitureData.materials?.map((material) => (
+                  <span
+                    key={material.id}
+                    onClick={() => handleMaterialClick(material)}
+                    className={`border px-2 py-1 rounded-md cursor-pointer ${
+                      selectedMaterial === material.name
+                        ? "bg-blue-600 text-white"
+                        : ""
+                    }`}
+                  >
+                    {material.name}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* Furniture Sizes */}
+            <div className="mt-4">
+              <h2 className="text-lg font-semibold">Sizes</h2>
+              <div className="flex space-x-2">
+                {furnitureData.sizes?.map((size) => (
+                  <span
+                    key={size.id}
+                    onClick={() => handleSizeClick(size)}
+                    className={`border px-2 py-1 rounded-md cursor-pointer ${
+                      selectedSize === size.label
+                        ? "bg-blue-600 text-white"
+                        : ""
+                    }`}
+                  >
+                    {size.label}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* FAQ Section */}
+            {faqItems.map((item, index) => (
+              <FAQAccordion
+                key={index}
+                question={item.question}
+                answer={item.answer}
+              />
+            ))}
+            <div className="mt-5">
+              <h1 className="text-2xl font-bold">Question?</h1>
+              <p className="text-lg mt-2">
+                We're here to help! Available Monday - Saturday, 7:00 AM - 5:00
+                PM.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+
+      <Footer />
+    </section>
+  );
 }
 
 export default ProductDetails;

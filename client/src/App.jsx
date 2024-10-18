@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route} from "react-router-dom";
 import LandingPage from "./pages/LandingPage";
 import SignUp from "./pages/SignUp";
 import Login from "./pages/Login";
@@ -14,15 +14,16 @@ import UserManagement from "./pages/UserManagement";
 import OrderManagement from "./pages/OrderManagement";
 import ProductManagement from "./pages/ProductManagement";
 import ProductCustomization from "./pages/ProductCustomization";
-import FurnitureList from "./components/FurnitureList";
+import FurnitureList from './components/FurnitureList'
 import EmailVerification from "./pages/EmailVerification";
 import AdminSignUp from "./pages/AdminSignUp";
-import AdminVerify from "./pages/AdminVerify";
-import About from "./pages/About";
+import AdminVerify from "./pages/AdminVerify"
+import About from './pages/About';
 import ServicePage from "./pages/ServicePage";
 import ProductTable from "./components/ProductTable";
 import ProductDetails from "./components/ProductDetails";
 import EditProduct from "./components/EditProduct";
+import Delivery from "./components/Delivery";
 import AdminPendingPage from "./pages/AdminPendingPage";
 import  Profile from "../src/components/Profile";
 import Delivery from "./components/Delivery";
@@ -31,11 +32,9 @@ export default function App() {
 	return (
 		<BrowserRouter>
 			<Routes>
-				{/* user */}
 				<Route path="/" element={<LandingPage />} />
 				<Route path="/about" element={<About />} />
 				<Route path="/signup" element={<SignUp />} />
-				<Route path="/login" element={<Login />} />
 				<Route path="/verify-email/:userId" element={<EmailVerification />} />
 				<Route path="/setting/my-profile/view" element={<Profile />} />
 
@@ -83,3 +82,4 @@ export default function App() {
 		</BrowserRouter>
 	);
 }
+
