@@ -53,7 +53,7 @@ function ProductDetails() {
         <div className="w-full max-w-7xl h-full flex items-center justify-center bg-gray-200 mx-5 mb-2">
           {/* Left Side: Product Image (Centered in 3/4 height) */}
           <div className="flex justify-center items-center h-3/4  m-5">
-            <div className="aspect-square w-3/4 border rounded-lg overflow-hidden">
+            <div className="aspect-square w-3/4 border  overflow-hidden">
               <img
                 src={`data:image/jpeg;base64,${furnitureData.image}`}
                 alt={furnitureData.name}
