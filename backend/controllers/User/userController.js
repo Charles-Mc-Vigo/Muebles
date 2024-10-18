@@ -118,6 +118,7 @@ exports.SignUp = async (req, res) => {
 			password: hashedPassword,
 			verificationCode,
 			verificationCodeExpires,
+			role:"User"
 		});
 
 		await newUser.save();

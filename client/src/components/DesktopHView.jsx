@@ -41,14 +41,14 @@ const DesktopHeader = () => {
           <div className="flex items-center space-x-2 text-sm font-semibold text-gray-700">
             <Link to="/login" className="cursor-pointer">Login</Link>
             <span>|</span>
-            <Link to="/signup" className="cursor-pointer">Register</Link>
+            <Link to="/signup" className="cursor-pointer">Sign Up</Link>
           </div>
           {/* Cart Icon */}
           <Link to="/cart" className="relative cursor-pointer">
             <FaShoppingCart className="text-gray-600 text-2xl" />
             {/* Cart item count */}
             <span className="absolute -top-2 -right-2 bg-teal-600 text-white text-xs rounded-full px-1">
-              1
+              0
             </span>
           </Link>
         </div>

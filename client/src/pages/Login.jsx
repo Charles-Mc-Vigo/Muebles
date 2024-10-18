@@ -37,8 +37,9 @@ export default function Login() {
 				});
 				toast.success("Logged in successfully");
 				setTimeout(() => {
-					navigate('/home');
-				}, 3000);			} else {
+					navigate("/home");
+				}, 3000);
+			} else {
 				toast.error("Login unsuccessful");
 			}
 		} catch (error) {

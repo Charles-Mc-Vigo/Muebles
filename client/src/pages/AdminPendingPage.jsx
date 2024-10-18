@@ -28,7 +28,7 @@ const AdminPendingPage = () => {
                 } else if (adminData.adminApproval === "Accepted") {
                     toast.success("Your Admin request is accepted successfully!")
                     setTimeout(()=>{
-                        navigate(`/${adminId}/dashboard`, { replace: true });
+                        navigate(`/dashboard`, { replace: true });
                     },3000)
                 } else {
                     toast.info("Admin approval is still pending or was rejected.");

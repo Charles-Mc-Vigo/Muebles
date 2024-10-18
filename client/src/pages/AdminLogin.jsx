@@ -37,32 +37,23 @@ const AdminLogin = () => {
       }
 
       const data = await response.json();
-      if (!data || !data._id) {
-        throw new Error("No admin ID received from server");
-      }
 
-      const adminId = data._id;
-
-      console.log(adminId)
-      // console.log('check if user has token', data.token) // debugging
-
-      // // Check if the user is an admin
-      // if (data.token) {
-      //   // Store the token and navigate to the admin dashboard
-      //   Cookies.set('adminToken', data.token, {
-      //     expires: 3, // Token expiration in days
-      //     secure: process.env.NODE_ENV === 'production' // Use HTTPS in production
-      //   });
-      //   toast.success('Admin Logged in successfully');
-      //   navigate(`/${data.adminId}/dashboard`); // Assuming adminId is part of the response
-      // } else {
-      //   toast.error('You do not have admin privileges.');
-      // }
-
+      // Check if the user is an admin
+      if (data.token) {
+        // Store the token and navigate to the admin dashboard
+        Cookies.set('adminToken', data.token, {
+          expires: 3, // Token expiration in days
+          secure: process.env.NODE_ENV === 'production' // Use HTTPS in production
+        });
         toast.success('Admin Logged in successfully');
         setTimeout(()=> {
-          navigate(`/${adminId}/dashboard`);
+          navigate(`/dashboard`);
         },3000)
+      } else {
+        toast.error('You do not have admin privileges.');
+      }
+
+
     } catch (error) {
       console.error("Admin Login error", error.message);
       toast.error(error.message || "Admin Login failed");

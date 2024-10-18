@@ -55,9 +55,9 @@ const MobileHeader = () => {
           <ul className="flex flex-col items-start p-4">
             <div className="flex items-center justify-between w-full text-sm text-black py-2">
               <div className="flex items-start">
-                <Link to="/login" onClick={toggleMenu} className="mr-2">Login</Link>
+                <Link to="/login" onClick={toggleMenu} className="mr-2">Login</Link>1
                 <span className="mx-1">|</span>
-                <Link to="/signup" onClick={toggleMenu} className="ml-2">Register</Link>
+                <Link to="/signup" onClick={toggleMenu} className="ml-2">Sign Up</Link>
               </div>
               <button onClick={toggleMenu} className="text-xl text-gray-600">
                 X
