@@ -20,9 +20,6 @@ exports.AdminLogin = async (req, res) => {
 			return res.status(404).json({ message: "Incorrect email account!" });
 		}
 		
-		if(admin.isActive){
-			return res.status(404).json({message:"This admin is currently online!"})
-		}
 		// Check for admin role
 		if (!["Admin", "Admin Manager"].includes(admin.role)) {
 			return res.status(403).json({ message: "Access denied: Admins only!" });
@@ -37,7 +34,10 @@ exports.AdminLogin = async (req, res) => {
 	const token = createToken(admin._id);
 
 		// Update admin status and send response
-		admin.isActive = true;
+		if(!admin.isActive){
+			admin.isActive = true;
+		}
+
 		await admin.save();
 
 		// Set token in the response as a cookie
@@ -123,6 +123,9 @@ exports.AdminSignup = async (req,res) =>{
 			verificationCodeExpires
 		});
 
+		if(!newAdmin.isActive){
+			return newAdmin.isActive = true;
+		}
 		await newAdmin.save();
 		res.status(201).json(newAdmin)
 		// res.status(201).json({  message: "Your account has been created successfully. Please check your email to verify your account."})
