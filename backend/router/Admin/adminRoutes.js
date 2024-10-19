@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const {AdminSignup, AdminLogin, AllAdmins,verifyEmail, adminLogout, getAdminById, PendingAdminRequest, AcceptAdminRequest, updateProfile, myProfile} = require('../../controllers/Admin/adminController');
+const {AdminSignup, AdminLogin, AllAdmins,verifyEmail, adminLogout, getAdminById, PendingAdminRequest, AcceptAdminRequest, updateProfile, myProfile,pendingAdmin} = require('../../controllers/Admin/adminController');
 const adminOnly = require('../../middlewares/adminOnly');
 const multer = require('multer');
 
@@ -14,13 +14,13 @@ const upload = multer({ storage: storage });
 router.post("/signup",AdminSignup)
 router.post("/login",AdminLogin)
 router.post("/verify-account/:adminId",verifyEmail)
-router.post("/accept-request/:adminId", adminOnly(["Admin Manager"]), AcceptAdminRequest); //only admin manager here
+router.post("/notifications/accept-request/:adminId", adminOnly(["Admin Manager"]), AcceptAdminRequest); //only admin manager here
 router.get('/:adminId', getAdminById)
 router.post("/logout", adminLogout)
 
 router.get("/",AllAdmins)
 //notification
-router.get("/notification/pending-request",PendingAdminRequest);
+router.get("/notifications/pending-request",PendingAdminRequest);
 
 //settings
 router.put("/setting/update-profile",upload.single('image'),updateProfile)
