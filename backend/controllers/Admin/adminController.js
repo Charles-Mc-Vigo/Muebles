@@ -122,13 +122,9 @@ exports.AdminSignup = async (req,res) =>{
 			verificationCode,
 			verificationCodeExpires
 		});
-
-		if(!newAdmin.isActive){
-			return newAdmin.isActive = true;
-		}
+		
 		await newAdmin.save();
-		res.status(201).json(newAdmin)
-		// res.status(201).json({  message: "Your account has been created successfully. Please check your email to verify your account."})
+		res.status(201).json({  message: "Your account has been created successfully. Please check your email to verify your account.",newAdmin})
 		// console.log("New admin created: ",newAdmin)
 
 	} catch (error) {
