@@ -84,7 +84,7 @@ const Home = () => {
   return (
     <div className="bg-white text-gray-800 flex flex-col min-h-screen">
       {/* Header */}
-      <Header showLogout={true} />
+      <Header isLogin={true} />
 
       {/* Shop Hero Section */}
       <section className="relative">
