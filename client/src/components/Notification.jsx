@@ -17,7 +17,11 @@ const Notification = () => {
 		const fetchNotifications = async () => {
 			try {
 				const response = await fetch(
-					"http://localhost:3000/api/admin/notifications/pending-request"
+					"http://localhost:3000/api/admin/notifications/pending-request",
+					{
+						method: "GET",
+						credentials: "include",
+					}
 				);
 				if (!response.ok) {
 					throw new Error("Network response was not ok");

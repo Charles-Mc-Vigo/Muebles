@@ -133,6 +133,20 @@ exports.AdminSignup = async (req,res) =>{
 	}
 }
 
+exports.unconfirmedAdmin = async( req,res ) =>{
+	try {
+		const { adminId } = req.params;
+    const admin = await Admin.findById(adminId);
+
+    if (!admin) return res.status(404).json({ message: "Admin not found!" });
+
+    res.status(200).json(admin);
+	} catch (error) {
+		console.log("Error the unconfirmed admin: ",error);
+		res.status(500).json({message:"Server error!"});
+	}
+}
+
 //admin account verification
 exports.verifyEmail = async (req, res) => {
 	try {
@@ -183,10 +197,6 @@ exports.getAdminById = async (req, res) => {
 
     if (!admin) return res.status(404).json({ message: "Admin not found!" });
 
-		// if(admin.adminApproval === "Pending"){
-		// 	return res.status(400).json({message:"Your request is still on process"})
-		// }
-
     res.status(200).json(admin);
 		// console.log(admin)
   } catch (error) {
@@ -199,8 +209,12 @@ exports.getAdminById = async (req, res) => {
 // Manager power
 exports.AcceptAdminRequest = async (req, res) => {
   try {
+		const admin = await Admin.findById(req.admin._id);
+
+		if(!admin) return res.status(404).json({message:"Admin not found!"});
+
     // Check if the current admin is a Manager
-    if (req.admin.role !== "Manager") {
+    if (admin.role !== "Manager") {
       return res.status(403).json({ message: "Action denied: Admin Manager only!" });
     }
 
@@ -375,14 +389,7 @@ exports.updateProfile = async (req, res) => {
 //myprofile
 exports.myProfile = async (req,res) => {
 	try {
-		const token = req.cookies.adminToken; // Get token from cookies
-    if (!token) return res.status(401).json({ message: "No token, authorization denied!" });
-
-    // Verify and decode the token to extract the admin's ID
-    const decoded = jwt.verify(token, process.env.SECRET);
-    const adminId = decoded._id;
-
-    const admin = await Admin.findById(adminId);
+    const admin = await Admin.findById(req.admin._id);
     if (!admin) {
       return res.status(404).json({ message: "Admin not found!" });
     }
