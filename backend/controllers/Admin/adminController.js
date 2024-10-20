@@ -49,7 +49,7 @@ exports.AdminLogin = async (req, res) => {
 		});
 
 		// Send response
-		return res.status(200).json({ message: "Login successful!", token});
+		return res.status(200).json({ message: "Login successful!"});
 
 	} catch (error) {
 		console.error("Error during admin login:", error);
@@ -196,45 +196,29 @@ exports.getAdminById = async (req, res) => {
 };
 
 
-// Admin Manager power
+// Manager power
 exports.AcceptAdminRequest = async (req, res) => {
   try {
-    // Get the admin token from the request cookies
-    const adminToken = req.cookies.adminToken;
-    
-    // Verify the token
-    if (!adminToken) {
-      return res.status(401).json({ message: "No access token!" });
-    }
-
-    let decoded;
-    try {
-      decoded = jwt.verify(adminToken, process.env.SECRET);
-    } catch (error) {
-      return res.status(401).json({ message: "Invalid token!" });
-    }
-
-    // Fetch the admin from the token to check their role
-    const adminManager = await Admin.findById(decoded._id);
-    if (!adminManager || adminManager.role !== "Manager") {
+    // Check if the current admin is a Manager
+    if (req.admin.role !== "Manager") {
       return res.status(403).json({ message: "Action denied: Admin Manager only!" });
     }
 
     const { adminId } = req.params; // Get adminId from URL parameters
 
     // Fetch the admin who is requesting to be accepted
-    const admin = await Admin.findById(adminId);
-    if (!admin || admin.adminApproval === "Accepted") {
+    const adminToAccept = await Admin.findById(adminId);
+    if (!adminToAccept || adminToAccept.adminApproval === "Accepted") {
       return res.status(400).json({ message: "Admin already accepted or not found!" });
     }
 
     // Update the admin's approval and role
-    admin.adminApproval = "Accepted";
-    admin.role = "Admin";
-    admin.isActive = true;
+    adminToAccept.adminApproval = "Accepted";
+    adminToAccept.role = "Admin";
+    adminToAccept.isActive = true;
 
     // Create token after the admin is approved
-    const token = createToken(admin._id);
+    const token = createToken(adminToAccept._id);
 
     // Set token in the response as a cookie
     res.cookie("adminToken", token, {
@@ -244,16 +228,14 @@ exports.AcceptAdminRequest = async (req, res) => {
       sameSite: "strict",
     });
 
-    await admin.save();
+    await adminToAccept.save();
 
-    // Send a success response with the token
-    res.status(200).json({ message: "Admin request accepted successfully!", token });
+    res.status(200).json({ message: "Admin request accepted successfully!" });
   } catch (error) {
     console.error("Error accepting admin request:", error);
     res.status(500).json({ message: "Server error!" });
   }
 };
-
 
 
 //pending admin request
@@ -293,16 +275,10 @@ exports.AllAdmins = async(req,res)=>{
 	}
 }
 
+
 exports.adminLogout = async (req, res) => {
   try {
-    const token = req.cookies.adminToken; // Get token from cookies
-    if (!token) return res.status(401).json({ message: "No token, authorization denied!" });
-
-    // Verify and decode the token to extract the admin's ID
-    const decoded = jwt.verify(token, process.env.SECRET);
-    const adminId = decoded._id;
-
-    const admin = await Admin.findById(adminId);
+    const admin = await Admin.findById(req.admin._id);
     if (!admin) {
       return res.status(404).json({ message: "Admin not found!" });
     }
@@ -333,21 +309,14 @@ exports.adminLogout = async (req, res) => {
 // Update profile
 exports.updateProfile = async (req, res) => {
   try {
-    const token = req.cookies.adminToken; // Get token from cookies
-    if (!token) return res.status(401).json({ message: "No token, authorization denied!" });
-
-    // Verify and decode the token to extract the admin's ID
-    const decoded = jwt.verify(token, process.env.SECRET);
-    const adminId = decoded._id;
-
-    // Find the admin by ID
-    const admin = await Admin.findById(adminId);
+    // Find the admin by ID (adminId is now available from the middleware)
+    const admin = await Admin.findById(req.admin._id);
     if (!admin) {
       return res.status(404).json({ message: "Admin not found!" });
     }
 
     // Fields to be updated
-    const { firstname, lastname, phoneNumber, gender, image } = req.body;
+    const { firstname, lastname, phoneNumber, gender } = req.body;
     let isChanged = false; // To track if any changes are made
     const updatedFields = {};
 
@@ -370,8 +339,8 @@ exports.updateProfile = async (req, res) => {
     }
 
     // Handle image URL if provided and different from current
-    if (image && image !== admin.image) {
-      updatedFields.image = image;
+    if (req.body.image && req.body.image !== admin.image) {
+      updatedFields.image = req.body.image;
       isChanged = true;
     }
 
@@ -394,7 +363,7 @@ exports.updateProfile = async (req, res) => {
     }
 
     // Update the admin document with the new fields
-    const updatedAdmin = await Admin.findByIdAndUpdate(adminId, updatedFields, { new: true });
+    const updatedAdmin = await Admin.findByIdAndUpdate(req.admin._id, updatedFields, { new: true });
 
     res.status(200).json({ message: "Profile updated successfully!", admin: updatedAdmin });
   } catch (error) {
