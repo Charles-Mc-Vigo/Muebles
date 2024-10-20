@@ -1,9 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const {AdminSignup, AdminLogin, AllAdmins, verifyEmail, adminLogout, getAdminById, PendingAdminRequest, AcceptAdminRequest, updateProfile, myProfile, unconfirmedAdmin} = require('../../controllers/Admin/adminController');
-const multer = require('multer');
 const { checkAdminAuth } = require('../../middlewares/checkAuth'); // Import the checkAdminAuth middleware
 
+const multer = require('multer');
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 

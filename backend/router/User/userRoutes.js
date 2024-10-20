@@ -7,17 +7,23 @@ const {
   verifyEmail,
   resendVerificationCode,
   UpdateUserInformation,
-  unconfirmedUser
+  unconfirmedUser,
+  ViewProfile
 } = require("../../controllers/User/userController")
 const {checkUserAuth} = require('../../middlewares/checkAuth');
+
+const multer = require('multer');
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
 
 router.post("/signup", SignUp);
 router.post("/login", LogIn);
-router.get('/unconfirmed/:userId',unconfirmedUser)
+router.get('/unconfirmed/:userId',unconfirmedUser);
 router.post('/verify-email/:userId', verifyEmail);
-router.post('/resend-verification/:userId',resendVerificationCode)
-router.put('/settings/update/:userId', checkUserAuth,UpdateUserInformation);
+router.post('/resend-verification/:userId',resendVerificationCode);
+router.get('/setting/my-profile/view',checkUserAuth,ViewProfile);
+router.put('/setting/my-profile/update', checkUserAuth,upload.single('image'),UpdateUserInformation);
 router.post("/logout", checkUserAuth, Logout);
 
 module.exports = router;
