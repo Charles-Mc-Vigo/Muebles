@@ -34,7 +34,7 @@ export default function App() {
                 <Route path="/about" element={<About />} />
                 <Route path="/signup" element={<SignUp />} />
                 <Route path="/login" element={<Login />} />
-                <Route path="/verify-email/:userId" element={<EmailVerification />} />
+                <Route path="/verify-account/:userId" element={<EmailVerification />} />
                 <Route path="/home" element={<ProtectedRoute element={Home} />} />
                 {/* Admin routes */}
                 <Route path="/admin-login" element={<AdminLogin />} />

@@ -114,18 +114,31 @@ exports.SignUp = async (req, res) => {
 			agreeToTerms,
 			password: hashedPassword,
 			verificationCode,
-			verificationCodeExpires,
-			role:"User"
+			verificationCodeExpires
 		});
 
 		await newUser.save();
-		res.status(201).json(newUser);
-		// res.send("We’ve sent a verification email to your inbox. Please check your email to verify your account."); //this causing trouble, kailangan kita icomment haha
+		console.log(newUser)
+		res.status(201).json({message:"We’ve sent a verification email to your inbox. Please check your email to verify your account.", newUser});
 	} catch (err) {
 		console.error(err);
 		res.status(500).json({ message: "Server error!" });
 	}
 };
+
+exports.unconfirmedUser = async (req,res) => {
+	try {
+	const {userId} = req.params;
+	const user = await User.findById(userId);
+
+	if(!user) return res.status(404).json({message:"User not found!"});
+		
+	res.status(200).json(user);
+	} catch (error) {
+		console.error("Unconfirmed user error: ",error);
+		res.status(500).json({message:"Server error!"});
+	}
+}
 
 //for verifying user account
 exports.verifyEmail = async (req, res) => {
@@ -158,6 +171,7 @@ exports.verifyEmail = async (req, res) => {
 		}
 
 		user.isVerified = true;
+		user.role = "User";
 		user.verificationCode = undefined;
 		user.verificationCodeExpires = undefined;
 
@@ -173,7 +187,7 @@ exports.verifyEmail = async (req, res) => {
 		});
 		// console.log(token);
 
-		res.status(200).json({ message: "Email verified successfully!", token });
+		res.status(200).json({ message: "Signed up successfully!" });
 	} catch (err) {
 		console.error(err);
 		res.status(500).json({ message: "Server error!" });
@@ -207,41 +221,13 @@ exports.resendVerificationCode = async (req, res) => {
 			user.verificationCodeExpires = verificationCodeExpires;
 			await user.save();
 
-			res.status(200).json({ message: "A new verification code has been sent to your email." },user);
+			res.status(200).json({ message: "A new verification code has been sent to your email." }, user);
 
 	} catch (error) {
 			console.log("Error resending Verification code: ", error);
 			res.status(500).json({ message: "Server error!" });
 	}
 };
-
-//get user by id
-exports.getUserById = async(req,res) =>{
-	try {
-		const {userId} = req.params;
-		const user = await User.findById(userId);
-
-		if(!user) return res.status(404).json({message: "User not found!"})
-		
-			res.status(200).json(user)
-	} catch (error) {
-		console.log("Error fetching the user by its id: ",error);
-		res.status(500).json({message:"Server error!"})
-	}
-}//get user by id
-
-exports.GetAllUsers = async(req,res) =>{
-	try {
-		const users = await User.find();
-
-		if(users.length === 0) return res.status(404).json({message: "No users found!"})
-		
-			res.status(200).json(users)
-	} catch (error) {
-		console.log("Error fetching users : ",error);
-		res.status(500).json({message:"Server error!"})
-	}
-}
 
 //login
 exports.LogIn = async (req, res) => {
@@ -273,30 +259,10 @@ exports.LogIn = async (req, res) => {
 	}
 };
 
-//view all furnitures
-exports.viewFurnitures = async (req, res) => {
-	try {
-		const furnitures = await Furniture.find(req.query);
-
-		if (furnitures.length === 0) {
-			return res.status(404).json({ message: "No furniture found!" });
-		}
-		res.status(200).json(furnitures);
-	} catch (error) {
-		console.log("Failed to view products:", error);
-		res.status(500).json({ message: "Server error!" });
-	}
-};
-
 //logout
 exports.Logout = async (req, res) => {
 	try {
-		const token = req.cookies.authToken
-		if(!token) return res.status(401).json({message:"No token found!"})
-
-		const decoded = jwt.verify(token,process.env.SECRET);
-		const userId = decoded._id;
-
+		const userId = req.user._id;
 		const user = await User.findById(userId)
 
 		if (!user) {

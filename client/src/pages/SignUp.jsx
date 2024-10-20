@@ -77,13 +77,15 @@ export default function SignUp() {
       });
 
       const data = await response.json();
-      if (!data || !data._id) {
+      console.log(data)
+      if (!data || !data.newUser._id) {
         throw new Error("No user ID received from server");
       }
 
-      const userId = data._id;
+      const userId = data.newUser._id;
+      console.log(userId)
       toast.success("Sign up successful! Redirecting...");
-      navigate(`/verify-email/${userId}`);
+      navigate(`/verify-account/${userId}`);
     } catch (error) {
       console.error("Sign up error:", error.message);
       toast.error(error.message || "Sign up failed");
