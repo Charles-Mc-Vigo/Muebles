@@ -4,10 +4,6 @@ import { FaCheck, FaEye, FaTimes } from "react-icons/fa";
 const Dashboard = () => {
   return (
     <div className="container mx-auto p-4">
-      {/* Dashboard Title */}
-      <div className='text-5xl font-semibold mb-5 text-center'>
-        <h1>Dashboard</h1>
-      </div>
       {/* Top Stats Section */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         {/* Total Sales */}

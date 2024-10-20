@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Cookies from 'js-cookie';
 import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css'; // Import toast styles
+import 'react-toastify/dist/ReactToastify.css';
 
 const AdminLogin = () => {
   const [admin, setAdmin] = useState({
@@ -28,9 +27,9 @@ const AdminLogin = () => {
           email: admin.email,
           password: admin.password
         }),
+        credentials: 'include' // This is important for including cookies in the request/response
       });
 
-      // Check if the response is OK (status in the range 200-299)
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || "Admin Login failed");
@@ -38,32 +37,19 @@ const AdminLogin = () => {
 
       const data = await response.json();
 
-      // Check if the user is an admin
-      if (data.token) {
-        // Store the token and navigate to the admin dashboard
-        Cookies.set('adminToken', data.token, {
-          expires: 3, // Token expiration in days
-          secure: process.env.NODE_ENV === 'production' // Use HTTPS in production
-        });
-        toast.success('Admin Logged in successfully');
-        setTimeout(()=> {
-          navigate(`/dashboard`);
-        },3000)
-      } else {
-        toast.error('You do not have admin privileges.');
-      }
-
-
+      toast.success('Admin Logged in successfully');
+      setTimeout(() => {
+        navigate('/dashboard');
+      }, 1000);
     } catch (error) {
       console.error("Admin Login error", error.message);
       toast.error(error.message || "Admin Login failed");
     }
-    // console.log(admin);
   };
 
   return (
     <div className="p-3 max-w-lg mx-auto">
-      <ToastContainer /> {/* Add ToastContainer to render toasts */}
+      <ToastContainer />
       <h1 className="text-center font-semibold my-7 text-3xl">Admin Login</h1>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <input

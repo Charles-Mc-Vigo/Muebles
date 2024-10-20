@@ -16,6 +16,9 @@ import ViewProduct from "../components/ViewProduct";
 import DashboardContent from "../components/DashboardContent";
 import Maintenance from "../components/Maintenance";
 import Logout from "../components/Logout";
+import Profile from "../../src/components/Profile";
+import HamburgerMenu from "../components/HamburgerMenu";
+import Notification from "../components/Notification";
 
 const Dashboard = () => {
 	// State management for dropdowns
@@ -26,7 +29,7 @@ const Dashboard = () => {
 		maintenance: false,
 	});
 
-	const [activeSection, setActiveSection] = useState("dashboard");
+	const [activeSection, setActiveSection] = useState("");
 
 	// Load active section from localStorage
 	useEffect(() => {
@@ -86,7 +89,7 @@ const Dashboard = () => {
 
 	// Content mapping
 	const contentMap = {
-		dashboard: <DashboardContent />,
+		dashboard: <DashboardContent/>,
 		"view-products": <ViewProduct />,
 		"modify-product": <ProductManagement />,
 		inventory: <Inventory />,
@@ -109,8 +112,10 @@ const Dashboard = () => {
 	return (
 		<div className="flex h-screen bg-gray-100">
 			{/* Sidebar */}
-			<aside className="w-64 bg-oliveGreen text-white flex flex-col items-center py-5 rounded-l-3xl ml-1 h-50 mt-2 mb-2">
-				<h1 className="text-2xl font-bold mb-6">JCKAME</h1>
+			<aside className="w-64 bg-oliveGreen text-white flex flex-col items-center rounded-l-3xl ml-1 h-50 mt-2 mb-2">
+				<div>
+					<Profile showNameAndImage={true} />
+				</div>
 				<nav className="w-full flex-grow">
 					<ul className="space-y-4">
 						<NavItem
@@ -119,7 +124,6 @@ const Dashboard = () => {
 							isActive={activeSection === "dashboard"}
 							onClick={() => setActiveSection("dashboard")}
 						/>
-
 						{/* Product Management Section */}
 						<NavItem
 							icon={faBox}
@@ -243,13 +247,20 @@ const Dashboard = () => {
 			</aside>
 
 			{/* Main Content */}
-			<main className="flex-1 p-6 overflow-y-auto">
+			<main className="flex-1 p-10 overflow-y-auto">
+				<div className="flex justify-between items-center mb-4">
+					<h1 className="text-2xl font-bold mx-10">Dashboard</h1>
+
+					{/* Wrap Notification and HamburgerMenu in a flex container with justify-end */}
+					<div className="flex items-center justify-end flex-grow gap-5 mx-10">
+						<Notification />
+						<HamburgerMenu />
+					</div>
+				</div>
+
+				{/* Rest of the content */}
 				<div className="h-100 max-h-[calc(50vh-50px)]">
-					<div
-						className={`h-full overflow-y-auto ${
-							activeSection !== "inventory" ? "" : ""
-						}`}
-					>
+					<div className={`h-full overflow-y-auto`}>
 						{contentMap[activeSection]}
 					</div>
 				</div>
