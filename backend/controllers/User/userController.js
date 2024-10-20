@@ -252,7 +252,7 @@ exports.LogIn = async (req, res) => {
 		await user.save();
 		console.log(user)
 
-		res.status(200).json({ message: "Login successful!",user});
+		res.status(200).json({ message: "Login successful!"});
 	} catch (error) {
 		console.error("Login error: ",error.message)
 		res.status(500).json({ message: "Server error!" });
@@ -268,18 +268,15 @@ exports.Logout = async (req, res) => {
 		if (!user) {
 			return res.status(404).json({ message: "User not found!" });
 		}
-		if(user.isActive){
-			return res.status(400).json({message:"This user is currently online"});
-		}
 
+		user.isActive = false;
+
+		await user.save();
 		res.clearCookie("authToken", {
 			httpOnly: true,
 			secure: process.env.NODE_ENV === "production",
 			sameSite: "strict",
 		});
-		
-		user.isActive = false;
-		await user.save();
 
 		res.status(200).json({ message: "Logout successful!" });
 		console.log("Logout successful!");

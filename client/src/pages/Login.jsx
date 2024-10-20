@@ -1,10 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
-import Cookies from "js-cookie";
-import { FaFingerprint } from "react-icons/fa"; 
-import Header from '../components/Header'; // Assuming you have this component
-import Footer from '../components/Footer'; // Assuming you have a Footer component
+import { FaFingerprint } from "react-icons/fa";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css"; // Import Toastify CSS
 
@@ -23,30 +19,28 @@ export default function Login() {
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 		try {
-			const response = await axios.post(
-				"http://localhost:3000/api/users/login",
-				{
-					...formData,
-					headers: { "Content-Type": "application/json" },
-				}
-			);
-			if (response.data.token) {
-				Cookies.set("authToken", response.data.token, {
-					expires: 3,
-					secure: process.env.NODE_ENV === "production",
-				});
-				toast.success("Logged in successfully");
-				setTimeout(() => {
-					navigate("/home");
-				}, 3000);
-			} else {
-				toast.error("Login unsuccessful");
+			const response = await fetch("http://localhost:3000/api/users/login", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				credentials:'include',
+				body: JSON.stringify(formData),
+			});
+
+			if(!response.ok){
+				toast.error("Something went wrong!")
 			}
+
+			const data = await response.json();
+
+			toast.success("Logged in successfully");
+			setTimeout(() => {
+				navigate("/home");
+			}, 2000);
 		} catch (error) {
-			console.error("Log in error", error.response?.data || error.message);
-			toast.error(
-				error.response?.data?.message || error.message || "Log in failed"
-			);
+			console.error("Log in error", error);
+			toast.error(error.message || "Log in failed");
 		}
 	};
 
