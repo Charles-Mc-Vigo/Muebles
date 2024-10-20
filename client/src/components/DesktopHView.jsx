@@ -1,8 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import { FaSearch, FaTruck, FaShoppingCart } from "react-icons/fa";
+import { CgProfile } from "react-icons/cg";
 import { Link } from "react-router-dom";
 
 const DesktopHeader = () => {
+   // Replace this with actual auth state
+  const [isLoggedIn, setIsLoggedIn] = useState(true); 
   return (
     <>
       {/* Main Header */}
@@ -37,12 +40,18 @@ const DesktopHeader = () => {
               </div>
             </Link>
           </div>
-          {/* Login / Register */}
-          <div className="flex items-center space-x-2 text-sm font-semibold text-gray-700">
-            <Link to="/login" className="cursor-pointer">Login</Link>
-            <span>|</span>
-            <Link to="/signup" className="cursor-pointer">Sign Up</Link>
-          </div>
+          {/* Conditional Login / Register or User Icon */}
+          {!isLoggedIn ? (
+            <div className="flex items-center space-x-2 text-sm font-semibold text-gray-700">
+              <Link to="/login" className="cursor-pointer">Login</Link>
+              <span>|</span>
+              <Link to="/signup" className="cursor-pointer">Sign Up</Link>
+            </div>
+          ) : (
+            <Link to="/profile" className="cursor-pointer">
+              <CgProfile className="text-gray-600 text-3xl" />
+            </Link>
+          )}
           {/* Cart Icon */}
           <Link to="/cart" className="relative cursor-pointer">
             <FaShoppingCart className="text-gray-600 text-2xl" />
