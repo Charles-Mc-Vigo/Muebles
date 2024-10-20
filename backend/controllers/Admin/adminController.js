@@ -21,7 +21,7 @@ exports.AdminLogin = async (req, res) => {
 		}
 		
 		// Check for admin role
-		if (!["Admin", "Admin Manager"].includes(admin.role)) {
+		if (!["Admin", "Manager"].includes(admin.role)) {
 			return res.status(403).json({ message: "Access denied: Admins only!" });
 		}
 
@@ -216,7 +216,7 @@ exports.AcceptAdminRequest = async (req, res) => {
 
     // Fetch the admin from the token to check their role
     const adminManager = await Admin.findById(decoded._id);
-    if (!adminManager || adminManager.role !== "Admin Manager") {
+    if (!adminManager || adminManager.role !== "Manager") {
       return res.status(403).json({ message: "Action denied: Admin Manager only!" });
     }
 

@@ -14,7 +14,7 @@ const upload = multer({ storage: storage });
 router.post("/signup",AdminSignup)
 router.post("/login",AdminLogin)
 router.post("/verify-account/:adminId",verifyEmail)
-router.post("/notifications/accept-request/:adminId", adminOnly(["Admin Manager"]), AcceptAdminRequest); //only admin manager here
+router.post("/notifications/accept-request/:adminId", adminOnly(["Manager"]), AcceptAdminRequest); //only admin manager here
 router.get('/:adminId', getAdminById)
 router.post("/logout", adminLogout)
 
