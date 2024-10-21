@@ -13,7 +13,6 @@ const ProtectedRoute = ({ element: Element, adminOnly = false }) => {
           method: 'GET',
           credentials: 'include',
         });
-
         if (response.ok) {
           const data = await response.json();
           setIsAuthenticated(data.isAuthenticated);
@@ -30,7 +29,6 @@ const ProtectedRoute = ({ element: Element, adminOnly = false }) => {
         setIsLoading(false);
       }
     };
-
     checkAuth();
   }, [adminOnly]);
 
@@ -39,8 +37,12 @@ const ProtectedRoute = ({ element: Element, adminOnly = false }) => {
   }
 
   if (!isAuthenticated) {
-    // Redirect to login page, but save the location they tried to access
-    return <Navigate to="/admin-login" state={{ from: location }} replace />;
+    // Redirect based on whether it's an admin-only route or not
+    if (adminOnly) {
+      return <Navigate to="/admin-login" state={{ from: location }} replace />;
+    } else {
+      return <Navigate to="/login" state={{ from: location }} replace />;
+    }
   }
 
   return <Element />;
