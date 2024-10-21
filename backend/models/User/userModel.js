@@ -51,6 +51,10 @@ const userSchema = new mongoose.Schema({
     type:Boolean,
     default:false
   },
+  pswdResetOk:{
+    type:Boolean,
+    default:false
+  },
   verificationCode: {
     type: String
   },

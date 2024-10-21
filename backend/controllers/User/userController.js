@@ -8,6 +8,7 @@ const {
 const {
 	sendVerificationEmail,
 	generateVerificationCode,
+	sendPasswordResetVerificationCode
 } = require("../../utils/EmailVerification");
 const createToken = require('../../utils/tokenUtils');
 
@@ -118,6 +119,91 @@ exports.SignUp = async (req, res) => {
 		res.status(500).json({ message: "Server error!" });
 	}
 };
+
+exports.passwordReset = async (req, res) => {
+	try {
+		const userId = req.user._id;
+		const user = await User.findById(userId);
+		if(!user) return res.status(404).json({message:"User is not found!"});
+
+		const email = user.email;
+		const verificationCode = generateVerificationCode();
+		const verificationCodeExpires = Date.now() + 15 * 60 * 1000;		
+
+		await sendPasswordResetVerificationCode(email, verificationCode);
+
+		// Add properties dynamically
+		user.verificationCode = verificationCode;
+		user.verificationCodeExpires = verificationCodeExpires;
+
+		await user.save();
+		res.status(200).json({message:"We've sent you a verification code for your password reset. Please check your email."});
+	} catch (error) {
+		console.error("Error in password reset: ",error);
+		res.status(500).json({message:"Server error!"});
+	}
+}
+
+exports.verifyPRCode = async (req,res) => {
+	try {
+		const userId = req.user._id;
+		const user = await User.findById(userId);
+		if(!user) return res.status(404).json({message:"User is not found!"});
+
+		const email = req.user._id;
+
+		const {code} = req.body;
+
+		if(!email || !code) {
+			res.status(400).json({message:"Email and Verification Code is required!"});
+		}
+
+		if (
+			user.verificationCode !== code ||
+			new Date(user.verificationCodeExpires) < new Date()
+		) {
+			return res
+				.status(400)
+				.json({ message: "Invalid or expired verification code!" });
+		}
+
+		user.pswdResetOk = true;
+		user.verificationCode = undefined;
+		user.verificationCodeExpires = undefined;
+
+		await user.save();
+		res.status(200).json({message:"Verification completed! Please proceed to password reset"});
+
+	} catch (error) {
+		console.error("Error in creating new password: ", error);
+		res.status(500).json({message:"Server error!"});
+	}
+}
+
+exports.createNewPswd = async (req,res) => {
+	try {
+		const userId = req.user._id;
+		const user = await User.findById(userId);
+		if(!user) return res.status(404).json({message:"User is not found!"});
+
+		if(!user.pswdResetOk) return res.status(400).json({message:"Please verify your password-reset code"});
+
+
+		const {newPassword} = req.body;
+
+		if(!newPassword) return res.status(400).json({message:"Your new password is required!"});
+
+		const hashedNewPassword  = await bcrypt.hash(newPassword, 10);
+
+		user.password = hashedNewPassword;
+
+		await user.save();
+		res.status(200).json({message:"You have successfully created a new password!"});
+	} catch (error) {
+		console.error("Error in creating new password: ",error);
+		res.status(500).json({message:"Server error!"});
+	}
+}
 
 exports.unconfirmedUser = async (req,res) => {
 	try {
