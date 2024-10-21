@@ -1,12 +1,49 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FaSearch, FaTruck, FaShoppingCart } from "react-icons/fa";
 import { CgProfile } from "react-icons/cg";
 import { Link } from "react-router-dom";
+import axios from "axios"; // To make API calls
 
 const DesktopHeader = () => {
-  // paltan ng token ng actual login
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [loading, setLoading] = useState(true); // To handle loading state
   const cartItemCount = 0;
+
+  useEffect(() => {
+    const checkLoginStatus = async () => {
+      try {
+        // Make an API call to check if the user is logged in
+        const response = await axios.get("/api/auth/status", {
+          withCredentials: true, // Send cookies (if using cookies for authentication)
+        });
+        
+        if (response.data.loggedIn) {
+          setIsLoggedIn(true); // Set the logged-in state if user is authenticated
+        }
+      } catch (error) {
+        console.error("Error checking login status:", error);
+        setIsLoggedIn(false); // Ensure the user is logged out on error
+      } finally {
+        setLoading(false); // Stop loading once request is complete
+      }
+    };
+
+    checkLoginStatus(); // Check login status on component mount
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      await axios.post("/api/auth/logout", {}, { withCredentials: true });
+      setIsLoggedIn(false); // Update state to reflect logged out status
+    } catch (error) {
+      console.error("Error logging out:", error);
+    }
+  };
+
+  if (loading) {
+    // Show loading spinner or placeholder while checking login status
+    return <div>Loading...</div>;
+  }
 
   return (
     <>
@@ -42,7 +79,8 @@ const DesktopHeader = () => {
               </div>
             </Link>
           </div>
-          {/* Login / Register */}
+
+          {/* Login / Register or Profile */}
           {!isLoggedIn ? (
             <div className="flex items-center space-x-2 text-sm font-semibold text-gray-700">
               <Link to="/login" className="cursor-pointer">
@@ -54,12 +92,19 @@ const DesktopHeader = () => {
               </Link>
             </div>
           ) : (
-            <Link
-              to="/userprofile-view"className="flex items-center space-x-2 text-sm font-semibold text-gray-700"
-            >
-              <CgProfile className="text-gray-600 text-4xl cursor-pointer" />
-            </Link>
+            <div className="flex items-center space-x-4">
+              <Link to="/userprofile-view" className="flex items-center space-x-2">
+                <CgProfile className="text-gray-600 text-4xl cursor-pointer" />
+              </Link>
+              <button
+                onClick={handleLogout}
+                className="text-sm font-semibold text-gray-700"
+              >
+                Logout
+              </button>
+            </div>
           )}
+
           {/* Cart Icon */}
           <Link to="/cart" className="relative cursor-pointer">
             <FaShoppingCart className="text-gray-600 text-2xl" />
@@ -72,6 +117,7 @@ const DesktopHeader = () => {
           </Link>
         </div>
       </header>
+
       {/* Second Navigation Bar */}
       <nav className="flex justify-center space-x-8 py-0 bg-white text-lg">
         <Link className="text-black py-2 hover:underline m-2" to="/home">
@@ -83,10 +129,7 @@ const DesktopHeader = () => {
         <Link className="text-black py-2 hover:underline m-2" to="/featured">
           Featured
         </Link>
-        <Link
-          className="text-black py-2 hover:underline m-2"
-          to="/service-page"
-        >
+        <Link className="text-black py-2 hover:underline m-2" to="/service-page">
           Services
         </Link>
         <div className="flex items-center space-x-2 text-sm text-black py-2 m-2">

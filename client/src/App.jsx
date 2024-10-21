@@ -38,7 +38,6 @@ export default function App() {
                 <Route path="/verify-email/:userId" element={<EmailVerification />} />
                 <Route path="/home" element={<ProtectedRoute element={Home} />} />
                 <Route path="/userprofile-view" element={<UserProfile />} />
-                
                 {/* Admin routes */}
                 <Route path="/admin-login" element={<AdminLogin />} />
                 <Route path="/admin-signup" element={<AdminSignUp />} />
