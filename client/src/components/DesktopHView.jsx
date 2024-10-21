@@ -13,7 +13,7 @@ const DesktopHeader = () => {
     const checkLoginStatus = async () => {
       try {
         // Make an API call to check if the user is logged in
-        const response = await axios.get("/api/auth/status", {
+        const response = await axios.get("/api/check-auth ", {
           withCredentials: true, // Send cookies (if using cookies for authentication)
         });
         
@@ -30,15 +30,6 @@ const DesktopHeader = () => {
 
     checkLoginStatus(); // Check login status on component mount
   }, []);
-
-  const handleLogout = async () => {
-    try {
-      await axios.post("/api/auth/logout", {}, { withCredentials: true });
-      setIsLoggedIn(false); // Update state to reflect logged out status
-    } catch (error) {
-      console.error("Error logging out:", error);
-    }
-  };
 
   if (loading) {
     // Show loading spinner or placeholder while checking login status
