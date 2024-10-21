@@ -4,6 +4,8 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const cookieParser = require('cookie-parser');
 
+const authCheckRouter = require('./router/authCheck');
+
 
 //furnitures
 const furnitureRoutes = require("./router/FurnitureRoutes/furnitureRoutes");
@@ -70,6 +72,7 @@ app.use(bodyParser.json());
 // 	res.json({message:"Welcome to Muebles!"})
 // })
 
+app.use(authCheckRouter);
 app.use("/api/users", userRoutes);
 
 //Furnitures maintainance

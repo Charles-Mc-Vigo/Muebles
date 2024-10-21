@@ -12,14 +12,11 @@ const {
 	sendVerificationEmail,
 	generateVerificationCode,
 } = require("../../utils/EmailVerification");
-
+const createToken = require('../../utils/tokenUtils');
 //task
 //user could,login, signup, request account deletion, request password reset, view products, add to cart, make payment, direct order, view order or purchase, view purchase history
 
-//token for creation of user and logging in their account
-const createToken = (_id) => {
-	return jwt.sign({ _id }, process.env.SECRET, { expiresIn: "3d" });
-};
+
 
 //sign up and some validation
 exports.SignUp = async (req, res) => {
@@ -294,12 +291,19 @@ exports.viewFurnitures = async (req, res) => {
 //logout
 exports.Logout = async (req, res) => {
 	try {
-		const userId = req.user._id;
+		const token = req.cookies.authToken
+		if(!token) return res.status(401).json({message:"No token found!"})
 
-		const user = await User.findById(userId);
+		const decoded = jwt.verify(token,process.env.SECRET);
+		const userId = decoded._id;
+
+		const user = await User.findById(userId)
 
 		if (!user) {
 			return res.status(404).json({ message: "User not found!" });
+		}
+		if(user.isActive){
+			return res.status(400).json({message:"This user is currently online"});
 		}
 
 		res.clearCookie("authToken", {
@@ -307,6 +311,9 @@ exports.Logout = async (req, res) => {
 			secure: process.env.NODE_ENV === "production",
 			sameSite: "strict",
 		});
+		
+		user.isActive = false;
+		await user.save();
 
 		res.status(200).json({ message: "Logout successful!" });
 		console.log("Logout successful!");
