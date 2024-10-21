@@ -4,8 +4,9 @@ import { CgProfile } from "react-icons/cg";
 import { Link } from "react-router-dom";
 
 const DesktopHeader = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(true); 
-  const cartItemCount = 0; 
+  // paltan ng token ng actual login
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const cartItemCount = 0;
 
   return (
     <>
@@ -44,18 +45,24 @@ const DesktopHeader = () => {
           {/* Login / Register */}
           {!isLoggedIn ? (
             <div className="flex items-center space-x-2 text-sm font-semibold text-gray-700">
-              <Link to="/login" className="cursor-pointer">Login</Link>
+              <Link to="/login" className="cursor-pointer">
+                Login
+              </Link>
               <span>|</span>
-              <Link to="/signup" className="cursor-pointer">Sign Up</Link>
+              <Link to="/signup" className="cursor-pointer">
+                Sign Up
+              </Link>
             </div>
           ) : (
-            <div className="flex items-center space-x-1 text-sm font-semibold text-gray-700">
+            <Link
+              to="/userprofile-view"className="flex items-center space-x-2 text-sm font-semibold text-gray-700"
+            >
               <CgProfile className="text-gray-600 text-4xl cursor-pointer" />
-            </div>
+            </Link>
           )}
           {/* Cart Icon */}
           <Link to="/cart" className="relative cursor-pointer">
-            <FaShoppingCart className="text-gray-600 text-4xl" />
+            <FaShoppingCart className="text-gray-600 text-2xl" />
             {/* Cart item count */}
             {cartItemCount > 0 && (
               <span className="absolute -top-2 -right-2 bg-teal-600 text-white text-xs rounded-full px-1">
@@ -76,7 +83,10 @@ const DesktopHeader = () => {
         <Link className="text-black py-2 hover:underline m-2" to="/featured">
           Featured
         </Link>
-        <Link className="text-black py-2 hover:underline m-2" to="/service-page">
+        <Link
+          className="text-black py-2 hover:underline m-2"
+          to="/service-page"
+        >
           Services
         </Link>
         <div className="flex items-center space-x-2 text-sm text-black py-2 m-2">

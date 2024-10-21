@@ -24,7 +24,8 @@ import ProductDetails from "./components/ProductDetails";
 import EditProduct from "./components/EditProduct";
 import Delivery from "./components/Delivery";
 import AdminPendingPage from "./pages/AdminPendingPage";
-import Profile from "../src/components/Profile";
+import Profile from "./components/Profile";
+import UserProfile from "./components/UserProfile";
 
 export default function App() {
     return (
@@ -36,6 +37,8 @@ export default function App() {
                 <Route path="/login" element={<Login />} />
                 <Route path="/verify-email/:userId" element={<EmailVerification />} />
                 <Route path="/home" element={<ProtectedRoute element={Home} />} />
+                <Route path="/userprofile-view" element={<UserProfile />} />
+                
                 {/* Admin routes */}
                 <Route path="/admin-login" element={<AdminLogin />} />
                 <Route path="/admin-signup" element={<AdminSignUp />} />
