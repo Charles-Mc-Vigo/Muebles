@@ -33,11 +33,7 @@ exports.AdminLogin = async (req, res) => {
 
 	const token = createToken(admin._id);
 
-		// Update admin status and send response
-		if(!admin.isActive){
-			admin.isActive = true;
-		}
-
+		admin.isActive = true;
 		await admin.save();
 
 		// Set token in the response as a cookie
@@ -295,10 +291,6 @@ exports.adminLogout = async (req, res) => {
     const admin = await Admin.findById(req.admin._id);
     if (!admin) {
       return res.status(404).json({ message: "Admin not found!" });
-    }
-
-    if (!admin.isActive) {
-      return res.status(400).json({ message: "This admin is currently offline" });
     }
 
     // Clear the token from cookies

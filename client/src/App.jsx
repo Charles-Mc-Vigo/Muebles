@@ -39,8 +39,8 @@ export default function App() {
                 {/* Admin routes */}
                 <Route path="/admin-login" element={<AdminLogin />} />
                 <Route path="/admin-signup" element={<AdminSignUp />} />
-                <Route path="/verify-account/:adminId" element={<AdminVerify />} />
-                <Route path="/verify-account/:adminId/pending" element={<AdminPendingPage />} />
+                <Route path="/admin-signup/verify-account/:adminId" element={<AdminVerify />} />
+                <Route path="/admin-signup/verify-account/:adminId/pending" element={<AdminPendingPage />} />
                 <Route path="/dashboard" element={<ProtectedRoute element={DashBoard} adminOnly={true} />} />
                 <Route path="/dashboard/setting/my-profile/view" element={<ProtectedRoute element={Profile} adminOnly={true} />} />
                 <Route path="/table" element={<ProtectedRoute element={ProductTable} adminOnly={true} />} />
