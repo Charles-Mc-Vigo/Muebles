@@ -4,8 +4,9 @@ import { CgProfile } from "react-icons/cg";
 import { Link } from "react-router-dom";
 
 const DesktopHeader = () => {
-   // Replace this with actual auth state
   const [isLoggedIn, setIsLoggedIn] = useState(true); 
+  const cartItemCount = 0; 
+
   return (
     <>
       {/* Main Header */}
@@ -31,7 +32,7 @@ const DesktopHeader = () => {
         <div className="flex items-center space-x-10 m-2">
           <div className="flex items-center space-x-2 cursor-pointer">
             <Link to="/delivery-info" className="flex items-center space-x-2">
-              <FaTruck className="text-gray-600 text-5xl" />
+              <FaTruck className="text-gray-600 text-4xl" />
               <div>
                 <p className="text-sm font-semibold text-gray-700">
                   Shipping Info.
@@ -40,7 +41,7 @@ const DesktopHeader = () => {
               </div>
             </Link>
           </div>
-          {/* Conditional Login / Register or User Icon */}
+          {/* Login / Register */}
           {!isLoggedIn ? (
             <div className="flex items-center space-x-2 text-sm font-semibold text-gray-700">
               <Link to="/login" className="cursor-pointer">Login</Link>
@@ -48,17 +49,19 @@ const DesktopHeader = () => {
               <Link to="/signup" className="cursor-pointer">Sign Up</Link>
             </div>
           ) : (
-            <Link to="/profile" className="cursor-pointer">
-              <CgProfile className="text-gray-600 text-3xl" />
-            </Link>
+            <div className="flex items-center space-x-1 text-sm font-semibold text-gray-700">
+              <CgProfile className="text-gray-600 text-4xl cursor-pointer" />
+            </div>
           )}
           {/* Cart Icon */}
           <Link to="/cart" className="relative cursor-pointer">
-            <FaShoppingCart className="text-gray-600 text-2xl" />
+            <FaShoppingCart className="text-gray-600 text-4xl" />
             {/* Cart item count */}
-            <span className="absolute -top-2 -right-2 bg-teal-600 text-white text-xs rounded-full px-1">
-              0
-            </span>
+            {cartItemCount > 0 && (
+              <span className="absolute -top-2 -right-2 bg-teal-600 text-white text-xs rounded-full px-1">
+                {cartItemCount}
+              </span>
+            )}
           </Link>
         </div>
       </header>
