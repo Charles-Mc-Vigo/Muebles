@@ -2,15 +2,11 @@ import React, { useState } from "react";
 import { FaSearch, FaTruck, FaShoppingCart } from "react-icons/fa";
 import { CgProfile } from "react-icons/cg";
 import { Link } from "react-router-dom";
-import Logout from "./Logout";
 
-const DesktopHeader = ({isLogin}) => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
-  const cartItemCount = 0; 
+const DesktopHeader = () => {
+  // paltan ng token ng actual login
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const cartItemCount = 0;
 
   return (
     <>
@@ -37,7 +33,7 @@ const DesktopHeader = ({isLogin}) => {
         <div className="flex items-center space-x-10 m-2">
           <div className="flex items-center space-x-2 cursor-pointer">
             <Link to="/delivery-info" className="flex items-center space-x-2">
-              <FaTruck className="text-gray-600 text-5xl" />
+              <FaTruck className="text-gray-600 text-4xl" />
               <div>
                 <p className="text-sm font-semibold text-gray-700">
                   Shipping Info.
@@ -49,14 +45,20 @@ const DesktopHeader = ({isLogin}) => {
           {/* Login / Register */}
           {!isLoggedIn ? (
             <div className="flex items-center space-x-2 text-sm font-semibold text-gray-700">
-              <Link to="/login" className="cursor-pointer">Login</Link>
+              <Link to="/login" className="cursor-pointer">
+                Login
+              </Link>
               <span>|</span>
-              <Link to="/signup" className="cursor-pointer">Sign Up</Link>
+              <Link to="/signup" className="cursor-pointer">
+                Sign Up
+              </Link>
             </div>
           ) : (
-            <div className="flex items-center space-x-2 text-sm font-semibold text-gray-700">
-              <CgProfile className="text-gray-600 text-2xl cursor-pointer" />
-            </div>
+            <Link
+              to="/userprofile-view"className="flex items-center space-x-2 text-sm font-semibold text-gray-700"
+            >
+              <CgProfile className="text-gray-600 text-4xl cursor-pointer" />
+            </Link>
           )}
           {/* Cart Icon */}
           <Link to="/cart" className="relative cursor-pointer">
@@ -81,7 +83,10 @@ const DesktopHeader = ({isLogin}) => {
         <Link className="text-black py-2 hover:underline m-2" to="/featured">
           Featured
         </Link>
-        <Link className="text-black py-2 hover:underline m-2" to="/service-page">
+        <Link
+          className="text-black py-2 hover:underline m-2"
+          to="/service-page"
+        >
           Services
         </Link>
         <div className="flex items-center space-x-2 text-sm text-black py-2 m-2">
