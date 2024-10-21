@@ -14,7 +14,7 @@ const Stocks = require("../../models/Furniture/stocksModel");
 const upload = multer({ 
   storage: multer.memoryStorage(),
   limits: {
-    fileSize: 5 * 1024 * 1024, // 5MB file size limit
+    fileSize: 50 * 1024 * 1024, // 50MB file size limit
   },
   fileFilter: (req, file, cb) => {
     if (file.mimetype.startsWith('image/')) {
@@ -109,8 +109,8 @@ exports.createFurniture = async (req, res) => {
         images = req.body.images;
       }
 
-      if (images.length < 3) {
-        return res.status(400).json({ message: "At least 3 images are required!" });
+      if (images.length < 5) {
+        return res.status(400).json({ message: "At least 5 images are required!" });
       }
 
       const {
