@@ -55,6 +55,7 @@ export default function SignUp() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
     if (formData.password !== formData.confirmPassword) {
       toast.error("Passwords do not match");
       return;
@@ -77,18 +78,20 @@ export default function SignUp() {
       });
 
       const data = await response.json();
-      console.log(data)
-      if (!data || !data.newUser._id) {
-        throw new Error("No user ID received from server");
+
+      if (!response.ok) {
+        throw new Error(data.message || "Sign up failed");
       }
 
-      const userId = data.newUser._id;
-      console.log(userId)
-      toast.success("Sign up successful! Redirecting...");
-      navigate(`/verify-account/${userId}`);
+      if (!data.newUser || !data.newUser._id) {
+        throw new Error("Invalid response from server");
+      }
+
+      toast.success(data.message || "Sign up successful! Please check your email to verify your account.");
+      navigate(`/verify-account/${data.newUser._id}`);
     } catch (error) {
       console.error("Sign up error:", error.message);
-      toast.error(error.message || "Sign up failed");
+      toast.error(error.message || "An unexpected error occurred. Please try again.");
     }
   };
 
@@ -222,6 +225,7 @@ export default function SignUp() {
               onChange={handleChange}
               value={formData.password}
             />
+            <label className="italic text-xs">Password must contain at least 8 characters, including 1 uppercase letter, 1 lowercase letter, 1 number, and 1 symbol.</label>
             <input
               type="password"
               placeholder="Confirm password"

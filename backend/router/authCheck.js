@@ -25,8 +25,7 @@ router.get('/api/check-auth', async (req, res) => {
       return res.json({ 
         isAuthenticated: true, 
         isAdmin: admin.role === 'Admin' || admin.role === 'Manager',
-        userType: 'admin',
-        userId: admin._id
+        adminId: admin._id
       });
     }
 
@@ -41,7 +40,6 @@ router.get('/api/check-auth', async (req, res) => {
       return res.json({ 
         isAuthenticated: true, 
         isAdmin: false,
-        userType: 'user',
         userId: user._id
       });
     }

@@ -8,7 +8,7 @@ const {
   resendVerificationCode,
   UpdateUserInformation,
   unconfirmedUser,
-  ViewProfile
+  ViewProfile,
 } = require("../../controllers/User/userController")
 const {checkUserAuth} = require('../../middlewares/checkAuth');
 
