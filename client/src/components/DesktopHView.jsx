@@ -1,20 +1,10 @@
-<<<<<<< HEAD
-import React, { useState } from "react";
-=======
 import React, { useState, useEffect } from "react";
->>>>>>> HOME
 import { FaSearch, FaTruck, FaShoppingCart } from "react-icons/fa";
 import { CgProfile } from "react-icons/cg";
 import { Link } from "react-router-dom";
 import axios from "axios"; // To make API calls
 
 const DesktopHeader = () => {
-<<<<<<< HEAD
-  // paltan ng token ng actual login
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
-  const cartItemCount = 0;
-
-=======
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loading, setLoading] = useState(true); // To handle loading state
   const cartItemCount = 0;
@@ -55,7 +45,6 @@ const DesktopHeader = () => {
     return <div>Loading...</div>;
   }
 
->>>>>>> HOME
   return (
     <>
       {/* Main Header */}
@@ -90,12 +79,8 @@ const DesktopHeader = () => {
               </div>
             </Link>
           </div>
-<<<<<<< HEAD
-          {/* Login / Register */}
-=======
 
           {/* Login / Register or Profile */}
->>>>>>> HOME
           {!isLoggedIn ? (
             <div className="flex items-center space-x-2 text-sm font-semibold text-gray-700">
               <Link to="/login" className="cursor-pointer">
@@ -107,14 +92,6 @@ const DesktopHeader = () => {
               </Link>
             </div>
           ) : (
-<<<<<<< HEAD
-            <Link
-              to="/userprofile-view"className="flex items-center space-x-2 text-sm font-semibold text-gray-700"
-            >
-              <CgProfile className="text-gray-600 text-4xl cursor-pointer" />
-            </Link>
-          )}
-=======
             <div className="flex items-center space-x-4">
               <Link to="/userprofile-view" className="flex items-center space-x-2">
                 <CgProfile className="text-gray-600 text-4xl cursor-pointer" />
@@ -128,7 +105,6 @@ const DesktopHeader = () => {
             </div>
           )}
 
->>>>>>> HOME
           {/* Cart Icon */}
           <Link to="/cart" className="relative cursor-pointer">
             <FaShoppingCart className="text-gray-600 text-2xl" />
