@@ -39,8 +39,13 @@ const userSchema = new mongoose.Schema({
   type: String, 
   required: true
   },
+  isActive:{
+    type:Boolean,
+    default:false
+  },
   role:{
-    type:String
+    type:String,
+    default:"Guest"
   },
   isVerified:{
     type:Boolean,
@@ -64,7 +69,7 @@ const userSchema = new mongoose.Schema({
   cart:[{
     type:mongoose.Schema.ObjectId,
     ref:"Cart",
-    default:null
+    default:[]
   }]
 },{
   timestamps:true

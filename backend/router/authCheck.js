@@ -1,28 +1,48 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const Admin = require('../models/Admin/adminModel');
+const User = require('../models/User/userModel'); 
 
 const router = express.Router();
 
 router.get('/api/check-auth', async (req, res) => {
-  const token = req.cookies.adminToken;
+  const adminToken = req.cookies.adminToken;
+  const userToken = req.cookies.authToken;
 
-  if (!token) {
+  if (!adminToken && !userToken) {
     return res.status(401).json({ isAuthenticated: false });
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.SECRET);
-    const admin = await Admin.findById(decoded._id);
+    if (adminToken) {
+      const decoded = jwt.verify(adminToken, process.env.SECRET);
+      const admin = await Admin.findById(decoded._id);
 
-    if (!admin) {
-      return res.status(401).json({ isAuthenticated: false });
+      if (!admin) {
+        return res.status(401).json({ isAuthenticated: false });
+      }
+
+      return res.json({ 
+        isAuthenticated: true, 
+        isAdmin: admin.role === 'Admin' || admin.role === 'Manager',
+        adminId: admin._id
+      });
     }
 
-    res.json({ 
-      isAuthenticated: true, 
-      isAdmin: admin.role === 'Admin' || admin.role === 'Manager'
-    });
+    if (userToken) {
+      const decoded = jwt.verify(userToken, process.env.SECRET);
+      const user = await User.findById(decoded._id);
+
+      if (!user) {
+        return res.status(401).json({ isAuthenticated: false });
+      }
+
+      return res.json({ 
+        isAuthenticated: true, 
+        isAdmin: false,
+        userId: user._id
+      });
+    }
   } catch (error) {
     console.error('Auth check error:', error);
     res.status(401).json({ isAuthenticated: false });

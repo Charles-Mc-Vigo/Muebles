@@ -1,22 +1,15 @@
 const User = require("../../models/User/userModel");
-const Furniture = require("../../models/Furniture/furnitureModel");
 const Cart = require("../../models/Cart/cartModel");
 const bcrypt = require("bcrypt");
-const mongoose = require("mongoose");
 const validator = require("validator");
 const {
 	UserSchemaValidator,
 } = require("../../middlewares/JoiSchemaValidation");
-const jwt = require("jsonwebtoken");
 const {
 	sendVerificationEmail,
 	generateVerificationCode,
 } = require("../../utils/EmailVerification");
 const createToken = require('../../utils/tokenUtils');
-//task
-//user could,login, signup, request account deletion, request password reset, view products, add to cart, make payment, direct order, view order or purchase, view purchase history
-
-
 
 //sign up and some validation
 exports.SignUp = async (req, res) => {
@@ -114,18 +107,31 @@ exports.SignUp = async (req, res) => {
 			agreeToTerms,
 			password: hashedPassword,
 			verificationCode,
-			verificationCodeExpires,
-			role:"User"
+			verificationCodeExpires
 		});
 
 		await newUser.save();
-		res.status(201).json(newUser);
-		// res.send("We’ve sent a verification email to your inbox. Please check your email to verify your account."); //this causing trouble, kailangan kita icomment haha
+		console.log(newUser)
+		res.status(201).json({message:"We’ve sent a verification email to your inbox. Please check your email to verify your account.", newUser});
 	} catch (err) {
 		console.error(err);
 		res.status(500).json({ message: "Server error!" });
 	}
 };
+
+exports.unconfirmedUser = async (req,res) => {
+	try {
+	const {userId} = req.params;
+	const user = await User.findById(userId);
+
+	if(!user) return res.status(404).json({message:"User not found!"});
+		
+	res.status(200).json(user);
+	} catch (error) {
+		console.error("Unconfirmed user error: ",error);
+		res.status(500).json({message:"Server error!"});
+	}
+}
 
 //for verifying user account
 exports.verifyEmail = async (req, res) => {
@@ -158,6 +164,8 @@ exports.verifyEmail = async (req, res) => {
 		}
 
 		user.isVerified = true;
+		user.role = "User";
+		user.isActive = true;
 		user.verificationCode = undefined;
 		user.verificationCodeExpires = undefined;
 
@@ -173,7 +181,7 @@ exports.verifyEmail = async (req, res) => {
 		});
 		// console.log(token);
 
-		res.status(200).json({ message: "Email verified successfully!", token });
+		res.status(200).json({ message: "Signed up successfully!" });
 	} catch (err) {
 		console.error(err);
 		res.status(500).json({ message: "Server error!" });
@@ -207,41 +215,13 @@ exports.resendVerificationCode = async (req, res) => {
 			user.verificationCodeExpires = verificationCodeExpires;
 			await user.save();
 
-			res.status(200).json({ message: "A new verification code has been sent to your email." },user);
+			res.status(200).json({ message: "A new verification code has been sent to your email." }, user);
 
 	} catch (error) {
 			console.log("Error resending Verification code: ", error);
 			res.status(500).json({ message: "Server error!" });
 	}
 };
-
-//get user by id
-exports.getUserById = async(req,res) =>{
-	try {
-		const {userId} = req.params;
-		const user = await User.findById(userId);
-
-		if(!user) return res.status(404).json({message: "User not found!"})
-		
-			res.status(200).json(user)
-	} catch (error) {
-		console.log("Error fetching the user by its id: ",error);
-		res.status(500).json({message:"Server error!"})
-	}
-}//get user by id
-
-exports.GetAllUsers = async(req,res) =>{
-	try {
-		const users = await User.find();
-
-		if(users.length === 0) return res.status(404).json({message: "No users found!"})
-		
-			res.status(200).json(users)
-	} catch (error) {
-		console.log("Error fetching users : ",error);
-		res.status(500).json({message:"Server error!"})
-	}
-}
 
 //login
 exports.LogIn = async (req, res) => {
@@ -254,6 +234,7 @@ exports.LogIn = async (req, res) => {
 		}
 
 		const isMatch = await bcrypt.compare(password, user.password);
+		
 		if (!isMatch) {
 			return res.status(400).json({ message: "Incorrect password!" });
 		}
@@ -267,23 +248,13 @@ exports.LogIn = async (req, res) => {
 			sameSite: "strict",
 		});
 
-		res.status(200).json({ message: "Login successful!", token });
-	} catch (error) {
-		res.status(500).json({ message: "Server error!" });
-	}
-};
+		user.isActive=true;
+		await user.save();
+		console.log(user)
 
-//view all furnitures
-exports.viewFurnitures = async (req, res) => {
-	try {
-		const furnitures = await Furniture.find(req.query);
-
-		if (furnitures.length === 0) {
-			return res.status(404).json({ message: "No furniture found!" });
-		}
-		res.status(200).json(furnitures);
+		res.status(200).json({ message: "Login successful!"});
 	} catch (error) {
-		console.log("Failed to view products:", error);
+		console.error("Login error: ",error.message)
 		res.status(500).json({ message: "Server error!" });
 	}
 };
@@ -291,29 +262,21 @@ exports.viewFurnitures = async (req, res) => {
 //logout
 exports.Logout = async (req, res) => {
 	try {
-		const token = req.cookies.authToken
-		if(!token) return res.status(401).json({message:"No token found!"})
-
-		const decoded = jwt.verify(token,process.env.SECRET);
-		const userId = decoded._id;
-
+		const userId = req.user._id;
 		const user = await User.findById(userId)
 
 		if (!user) {
 			return res.status(404).json({ message: "User not found!" });
 		}
-		if(user.isActive){
-			return res.status(400).json({message:"This user is currently online"});
-		}
 
+		user.isActive = false;
+
+		await user.save();
 		res.clearCookie("authToken", {
 			httpOnly: true,
 			secure: process.env.NODE_ENV === "production",
 			sameSite: "strict",
 		});
-		
-		user.isActive = false;
-		await user.save();
 
 		res.status(200).json({ message: "Logout successful!" });
 		console.log("Logout successful!");
@@ -338,17 +301,10 @@ exports.viewCart = async (req, res) => {
 
 exports.UpdateUserInformation = async (req, res) => {
   try {
-    const { userId } = req.params;
+		const user = await User.findById(req.user._id);
+		if(!user) return res.status(404).json({message:"User not found!"});
 
-    // Find the user by ID
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
-    }
-
-    // Initialize an updates object
-    const updates = {};
-
+		const updates = {}
     // Update fields if they are provided in the request body
     if (req.body.firstname && req.body.firstname !== user.firstname) updates.firstname = req.body.firstname;
     if (req.body.lastname && req.body.lastname !== user.lastname) updates.lastname = req.body.lastname;
@@ -360,16 +316,21 @@ exports.UpdateUserInformation = async (req, res) => {
     if (req.body.zipCode && req.body.zipCode !== user.zipCode) updates.zipCode = req.body.zipCode;
     if (req.body.email && req.body.email !== user.email) updates.email = req.body.email;
 
-    // Handle image upload from a file
-    if (req.file) {
-      const imageBuffer = req.file.buffer; // Assuming you're using multer
-      const base64Image = imageBuffer.toString('base64');
-      updates.image = `data:${req.file.mimetype};base64,${base64Image}`;
-    }
+   // Handle image URL if provided and different from current
+		if (req.body.image && req.body.image !== user.image) {
+		updates.image = req.body.image;
+	}
 
-    // Handle image URL
-    if (req.body.image) {
-      updates.image = req.body.image; // Set the image to the provided URL
+    // Handle uploaded image file (convert to base64 and compare)
+    if (req.file) {
+      const imageBuffer = req.file.buffer; // Get the file buffer
+      const imageBase64 = imageBuffer.toString('base64'); // Convert to base64
+      const mimeType = req.file.mimetype;
+      const base64Image = `data:${mimeType};base64,${imageBase64}`;
+
+      if (base64Image !== user.image) {
+        updates.image = base64Image;
+      }
     }
 
     // Check if there are no changes
@@ -378,7 +339,7 @@ exports.UpdateUserInformation = async (req, res) => {
     }
 
     // Update the user in the database
-    await User.findByIdAndUpdate(userId, updates, { new: true });
+    await User.findByIdAndUpdate(user, updates, { new: true });
 
     return res.status(200).json({ message: 'User information updated successfully', user: updates });
   } catch (error) {
@@ -386,3 +347,16 @@ exports.UpdateUserInformation = async (req, res) => {
     return res.status(500).json({ message: 'An error occurred while updating user information', error });
   }
 };
+
+exports.ViewProfile = async (req,res) => {
+	try {
+		const user = await User.findById(req.user._id);
+
+		if(!user) return res.status(404).json({message:"User not found!"});
+
+		res.status(200).json(user);
+	} catch (error) {
+		console.error("Error in viewwing profile: ",error);
+		res.status(500).json({message:"Server error!"});
+	}
+}

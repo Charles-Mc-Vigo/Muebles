@@ -6,24 +6,24 @@ const {
   Logout,
   verifyEmail,
   resendVerificationCode,
-  getUserById,
-  GetAllUsers,
-  UpdateUserInformation
+  UpdateUserInformation,
+  unconfirmedUser,
+  ViewProfile,
 } = require("../../controllers/User/userController")
+const {checkUserAuth} = require('../../middlewares/checkAuth');
 
-// const authRoutes = require("../../middlewares/authRoutes");
+const multer = require('multer');
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
-router.get("/",GetAllUsers);
+
 router.post("/signup", SignUp);
 router.post("/login", LogIn);
-router.get('/user/:userId', getUserById);
+router.get('/unconfirmed/:userId',unconfirmedUser);
 router.post('/verify-email/:userId', verifyEmail);
-router.post('/resend-verification/:userId',resendVerificationCode)
-router.put('/settings/update/:userId',UpdateUserInformation);
-
-
-// router.use(authRoutes);
-
-router.post("/logout", Logout);
+router.post('/resend-verification/:userId',resendVerificationCode);
+router.get('/setting/my-profile/view',checkUserAuth,ViewProfile);
+router.put('/setting/my-profile/update', checkUserAuth,upload.single('image'),UpdateUserInformation);
+router.post("/logout", checkUserAuth, Logout);
 
 module.exports = router;
