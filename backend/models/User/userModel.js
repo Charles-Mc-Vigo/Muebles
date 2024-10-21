@@ -69,7 +69,7 @@ const userSchema = new mongoose.Schema({
   cart:[{
     type:mongoose.Schema.ObjectId,
     ref:"Cart",
-    default:null
+    default:[]
   }]
 },{
   timestamps:true

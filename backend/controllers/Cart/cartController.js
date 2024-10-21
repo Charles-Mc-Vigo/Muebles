@@ -16,18 +16,18 @@ const calculateTotalAmount = async (cart) => {
 };
 
 // Add one or multiple items to the cart
-exports.addItemsToCart = async (req, res) => {
+exports.addToCart = async (req, res) => {
   try {
-    const { userId } = req.params;
+    const user = await User.findById(req.user._id);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found.' });
+    }
+
     let items = req.body.items;
 
     if (!Array.isArray(items)) {
       items = [items];
-    }
-
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({ message: 'User not found.' });
     }
 
     let cart = await Cart.findOne({ userId: user._id });
@@ -147,14 +147,26 @@ exports.updateItemQuantities = async (req, res) => {
 };
 
 // Get cart by userId
+// Get cart by userId
 exports.getCart = async (req, res) => {
   try {
-    const { userId } = req.params;
+    // Find the user by their ID and populate the cart field with its details
+    const user = await User.findById(req.user._id).populate({
+      path: 'cart',
+      populate: {
+        path: 'items.furnitureId', // Assuming `furnitureId` is part of the Cart schema's items array
+        model: 'Furniture'         // Assuming 'Furniture' is the referenced model
+      }
+    });
+    
+    if (!user) {
+      return res.status(404).json({ message: 'User not found.' });
+    }
 
-    const cart = await Cart.findOne({ userId }).populate('items.furnitureId');
-
-    if (!cart) {
-      return res.status(404).json({ message: 'Cart not found.' });
+    // Check if user has a cart
+    const cart = user.cart;
+    if (!cart || cart.length === 0) {
+      return res.status(404).json({ message: 'Cart is empty.' });
     }
 
     res.status(200).json(cart);
@@ -162,6 +174,7 @@ exports.getCart = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
 
 // Checkout
 exports.checkout = async (req, res) => {
