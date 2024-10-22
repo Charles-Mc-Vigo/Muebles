@@ -70,11 +70,11 @@ const userSchema = new mongoose.Schema({
     type:mongoose.Schema.ObjectId,
     ref:"Order"
   }],
-  cart:[{
+  cart:{
     type:mongoose.Schema.ObjectId,
     ref:"Cart",
-    default:[]
-  }]
+    default:null
+  }
 },{
   timestamps:true
 });
