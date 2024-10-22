@@ -196,6 +196,7 @@ exports.createNewPswd = async (req,res) => {
 		const hashedNewPassword  = await bcrypt.hash(newPassword, 10);
 
 		user.password = hashedNewPassword;
+		user.pswdResetOk = undefined;
 
 		await user.save();
 		res.status(200).json({message:"You have successfully created a new password!"});

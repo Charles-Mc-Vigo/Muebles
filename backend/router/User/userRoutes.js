@@ -29,7 +29,7 @@ router.post('/resend-verification/:userId',resendVerificationCode);
 // password reset
 router.post('/password-reset/request', checkUserAuth, passwordReset)
 router.post('/password-reset/verify', checkUserAuth, verifyPRCode);
-router.post('/password-reset/new', checkUserAuth, createNewPswd);
+router.post('/password-reset/new-password', checkUserAuth, createNewPswd);
 router.get('/setting/my-profile/view',checkUserAuth,ViewProfile);
 router.put('/setting/my-profile/update', checkUserAuth,upload.single('image'),UpdateUserInformation);
 router.post("/logout", checkUserAuth, Logout);
