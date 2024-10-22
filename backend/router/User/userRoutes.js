@@ -11,7 +11,8 @@ const {
   ViewProfile,
   passwordReset,
   verifyPRCode,
-  createNewPswd
+  createNewPswd,
+  getUserId
 } = require("../../controllers/User/userController")
 const {checkUserAuth} = require('../../middlewares/checkAuth');
 
@@ -20,6 +21,7 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
 
+router.get('/:userId',getUserId);
 router.post("/signup", SignUp);
 router.post("/login", LogIn);
 router.get('/unconfirmed/:userId',unconfirmedUser);
@@ -27,9 +29,9 @@ router.post('/verify-email/:userId', verifyEmail);
 router.post('/resend-verification/:userId',resendVerificationCode);
 
 // password reset
-router.post('/password-reset/request', checkUserAuth, passwordReset)
-router.post('/password-reset/verify', checkUserAuth, verifyPRCode);
-router.post('/password-reset/new-password', checkUserAuth, createNewPswd);
+router.post('/password-reset/request', passwordReset)
+router.post('/password-reset/verify/:userId', verifyPRCode);
+router.post('/password-reset/new-password/:userId', createNewPswd);
 router.get('/setting/my-profile/view',checkUserAuth,ViewProfile);
 router.put('/setting/my-profile/update', checkUserAuth,upload.single('image'),UpdateUserInformation);
 router.post("/logout", checkUserAuth, Logout);

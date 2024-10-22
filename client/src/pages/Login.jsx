@@ -93,7 +93,7 @@ export default function Login() {
 				</p>
 				<p className="text-white text-sm text-center mt-2">
 					Forgot password?{" "}
-					<Link to="/login" className="underline">
+					<Link to="/password-reset/request" className="underline">
 						Click here
 					</Link>
 					.

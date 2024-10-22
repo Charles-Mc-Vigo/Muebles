@@ -25,6 +25,10 @@ import EditProduct from "./components/EditProduct";
 import Delivery from "./components/Delivery";
 import AdminPendingPage from "./pages/AdminPendingPage";
 import Profile from "../src/components/Profile";
+import PasswordResetRequest from "./pages/PasswordResetRequest";
+import PasswordResetVerify from "./pages/PasswordResetVerify";
+import PasswordResetCreateNew from "./pages/PasswordResetCreateNew";
+
 
 export default function App() {
     return (
@@ -36,6 +40,9 @@ export default function App() {
                 <Route path="/login" element={<Login />} />
                 <Route path="/verify-account/:userId" element={<EmailVerification />} />
                 <Route path="/home" element={<ProtectedRoute element={Home} />} />
+                <Route path="/password-reset/request"  element={<PasswordResetRequest/>} />
+                <Route path="/password-reset/verify/:userId"  element={<PasswordResetVerify/>} />
+                <Route path="/password-reset/new-password/:userId"  element={<PasswordResetCreateNew/>} />
                 {/* Admin routes */}
                 <Route path="/admin-login" element={<AdminLogin />} />
                 <Route path="/admin-signup" element={<AdminSignUp />} />

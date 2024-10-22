@@ -122,35 +122,55 @@ exports.SignUp = async (req, res) => {
 
 exports.passwordReset = async (req, res) => {
 	try {
-		const userId = req.user._id;
-		const user = await User.findById(userId);
-		if(!user) return res.status(404).json({message:"User is not found!"});
+			const { email } = req.body;
 
-		const email = user.email;
-		const verificationCode = generateVerificationCode();
-		const verificationCodeExpires = Date.now() + 15 * 60 * 1000;		
+			// Check if the email exists in the database
+			const user = await User.findOne({ email });
+			if (!user) return res.status(404).json({ message: "Account not found!" });
 
-		await sendPasswordResetVerificationCode(email, verificationCode);
+			// Generate a verification code and set its expiration
+			const verificationCode = generateVerificationCode();
+			const verificationCodeExpires = Date.now() + 15 * 60 * 1000;
 
-		// Add properties dynamically
-		user.verificationCode = verificationCode;
-		user.verificationCodeExpires = verificationCodeExpires;
+			// Send the verification code to the user's email
+			await sendPasswordResetVerificationCode(email, verificationCode); // Use email instead of userEmail
 
-		await user.save();
-		res.status(200).json({message:"We've sent you a verification code for your password reset. Please check your email."});
+			// Add properties dynamically to the user object
+			user.verificationCode = verificationCode;
+			user.verificationCodeExpires = verificationCodeExpires;
+
+			// Save the updated user object
+			await user.save();
+
+			// Send a success response
+			res.status(200).json({ message: "We've sent you a verification code for your password reset. Please check your email.", user});
 	} catch (error) {
-		console.error("Error in password reset: ",error);
+			console.error("Error in password reset: ", error);
+			res.status(500).json({ message: "Server error!" });
+	}
+}
+exports.getUserId = async (req,res) => {
+	try {
+		const {userId} = req.params;
+		const user = await User.findById(userId);
+
+		if(!user) return res.status(404).json({message:"User not found!"});
+
+		res.status(200).json(user);
+	} catch (error) {
+		console.error("Error fetching the user's id: ",error);
 		res.status(500).json({message:"Server error!"});
 	}
 }
-
 exports.verifyPRCode = async (req,res) => {
 	try {
-		const userId = req.user._id;
-		const user = await User.findById(userId);
-		if(!user) return res.status(404).json({message:"User is not found!"});
+		const {userId} = req.params;
 
-		const email = req.user._id;
+		const user = await User.findById(userId);
+
+		if(!user) return res.status(404).json({message:"User not found!"});
+
+		const email = user.email;
 
 		const {code} = req.body;
 
@@ -182,16 +202,32 @@ exports.verifyPRCode = async (req,res) => {
 
 exports.createNewPswd = async (req,res) => {
 	try {
-		const userId = req.user._id;
+		const {userId} = req.params;
 		const user = await User.findById(userId);
 		if(!user) return res.status(404).json({message:"User is not found!"});
 
 		if(!user.pswdResetOk) return res.status(400).json({message:"Please verify your password-reset code"});
 
 
-		const {newPassword} = req.body;
+		const {newPassword,confirmNewPassword} = req.body;
 
-		if(!newPassword) return res.status(400).json({message:"Your new password is required!"});
+		if(!newPassword || !confirmNewPassword) return res.status(400).json({message:"New password and confirm password is required!"});
+
+		if (
+			!validator.isStrongPassword(newPassword, {
+				minLength: 8,
+				minLowercase: 1,
+				minUppercase: 1,
+				minNumbers: 1,
+				minSymbols: 1,
+			})
+		) {
+			return res.status(400).json({ message: "Password is weak!" });
+		}
+
+		if (newPassword !== confirmNewPassword) {
+			return res.status(400).json({ message: "Passwords do not match!" });
+		}
 
 		const hashedNewPassword  = await bcrypt.hash(newPassword, 10);
 
@@ -199,7 +235,7 @@ exports.createNewPswd = async (req,res) => {
 		user.pswdResetOk = undefined;
 
 		await user.save();
-		res.status(200).json({message:"You have successfully created a new password!"});
+		res.status(200).json({message:"You have successfully created a new password!",user});
 	} catch (error) {
 		console.error("Error in creating new password: ",error);
 		res.status(500).json({message:"Server error!"});
