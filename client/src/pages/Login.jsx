@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { FaFingerprint } from "react-icons/fa";
+import { FaFingerprint, FaArrowLeft } from "react-icons/fa";
 import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css"; // Import Toastify CSS
+import "react-toastify/dist/ReactToastify.css";
 
 export default function Login() {
 	const [formData, setFormData] = useState({
@@ -24,12 +24,13 @@ export default function Login() {
 				headers: {
 					"Content-Type": "application/json",
 				},
-				credentials:'include',
+				credentials: "include",
 				body: JSON.stringify(formData),
 			});
 
-			if(!response.ok){
-				toast.error("Something went wrong!")
+			if (!response.ok) {
+				toast.error("Something went wrong!");
+				return;
 			}
 
 			const data = await response.json();
@@ -53,13 +54,23 @@ export default function Login() {
 				backgroundPosition: "center",
 			}}
 		>
-			<div className="bg-teal-800 bg-opacity-90 p-6 md:p-10 rounded-lg max-w-md w-full">
+			<div className="bg-teal-800 bg-opacity-90 p-6 md:p-10 rounded-lg max-w-md w-full relative">
+				{/* Back Button */}
+				<button
+					onClick={() => navigate(-1)}
+					className="absolute top-4 left-4 text-white hover:text-gray-300"
+				>
+					<FaArrowLeft className="text-xl" />
+				</button>
+
 				<div className="flex justify-center mb-6">
 					<FaFingerprint className="text-white text-4xl" />
 				</div>
-				<h1 className="text-center text-white text-2xl font-semibold mb-6">
+
+				<h1 className="text-center text-white text-3xl font-semibold mb-6">
 					Log In
 				</h1>
+
 				<form onSubmit={handleSubmit} className="space-y-4">
 					<input
 						type="email"
@@ -67,7 +78,7 @@ export default function Login() {
 						placeholder="E-mail address"
 						required
 						onChange={handleChange}
-						className="w-full px-4 py-2 text-white bg-transparent border-b-2 border-gray-300 placeholder-gray-300 focus:outline-none focus:border-white"
+						className="w-full px-4 py-2 text-white bg-transparent border-b-2 border-gray-300 placeholder-gray-300 focus:outline-none focus:border-white transition duration-200"
 					/>
 					<input
 						type="password"
@@ -75,31 +86,34 @@ export default function Login() {
 						placeholder="Password"
 						required
 						onChange={handleChange}
-						className="w-full px-4 py-2 text-white bg-transparent border-b-2 border-gray-300 placeholder-gray-300 focus:outline-none focus:border-white"
+						className="w-full px-4 py-2 text-white bg-transparent border-b-2 border-gray-300 placeholder-gray-300 focus:outline-none focus:border-white transition duration-200"
 					/>
 					<button
 						type="submit"
-						className="w-full py-3 mt-6 bg-white text-teal-800 font-bold rounded-full hover:bg-gray-100 transition-colors"
+						className="w-full py-3 mt-6 bg-white text-teal-800 font-bold rounded-full hover:bg-gray-100 transition-colors duration-300"
 					>
 						Log In
 					</button>
 				</form>
+
 				<p className="text-white text-sm text-center mt-4">
 					Don't have an account?{" "}
-					<Link to="/SignUp" className="underline">
+					<Link to="/SignUp" className="underline hover:text-gray-300">
 						Sign up Now
 					</Link>
 					.
 				</p>
+
 				<p className="text-white text-sm text-center mt-2">
 					Forgot password?{" "}
-					<Link to="/password-reset/request" className="underline">
+					<Link to="/password-reset/request" className="underline hover:text-gray-300">
 						Click here
 					</Link>
 					.
 				</p>
 			</div>
-			<ToastContainer />
+
+			<ToastContainer/>
 		</div>
 	);
 }

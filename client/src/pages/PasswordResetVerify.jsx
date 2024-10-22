@@ -3,17 +3,19 @@ import { useParams } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from 'react-router-dom';
+import { ClipLoader } from 'react-spinners'; // Import a spinner component
 
 const PasswordResetVerify = () => {
   const { userId } = useParams();
   const [user, setUser] = useState(null);
   const [code, setVerificationCode] = useState('');
-  const [isLoading, setIsLoading] = useState(false); // Loading state for the button
-
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(''); // State for error messages
   const navigate = useNavigate();
 
   const handleCodeChange = (e) => {
     setVerificationCode(e.target.value);
+    setErrorMessage(''); // Clear error message on input change
   };
 
   const fetchUser = async () => {
@@ -23,7 +25,7 @@ const PasswordResetVerify = () => {
         throw new Error("User not found");
       }
       const userData = await response.json();
-      setUser(userData); // Set the entire user object
+      setUser(userData);
     } catch (error) {
       console.error("Error fetching user:", error);
       toast.error("Could not fetch user data. Please try again.");
@@ -36,60 +38,66 @@ const PasswordResetVerify = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    toast.dismiss(); // Dismiss any existing toast messages
-    setIsLoading(true); // Set loading state to true
+    toast.dismiss();
+    setIsLoading(true);
+    setErrorMessage(''); // Reset error message
+
     try {
       const response = await fetch(`http://localhost:3000/api/users/password-reset/verify/${userId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ code }), // Send both email and verification code
+        body: JSON.stringify({ code }),
       });
       const data = await response.json();
+
       if (response.ok) {
-        toast.success(data.message); // Show success toast
-        // You may want to redirect or perform other actions here
+        toast.success(data.message);
+        setTimeout(() => {
+          navigate(`/password-reset/new-password/${userId}`);
+        }, 2000);
       } else {
-        toast.error(data.message); // Show error toast
+        toast.error(data.message);
+        setErrorMessage(data.message); // Set error message for display
       }
-      setTimeout(()=>{
-        navigate(`/password-reset/new-password/${userId}`);
-      },2000)
     } catch (error) {
       console.error("Error:", error);
-      toast.error('Server error! Please try again later.'); // Show error toast
+      toast.error('Server error! Please try again later.');
+      setErrorMessage('Server error! Please try again later.'); // Set error message for display
     } finally {
-      setIsLoading(false); // Set loading state back to false
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-      <h1 className="text-2xl font-bold mb-4">Verify Your Code</h1>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
+      <h1 className="text-3xl font-bold mb-4">Verify Your Code</h1>
       {user ? (
-        <p className="mb-6">We've sent a Password-reset code to {user.email}</p>
+        <p className="mb-6 text-gray-600">We've sent a password reset code to <strong>{user.email}</strong>.</p>
       ) : (
-        <p className="mb-6">Loading user data...</p>
+        <p className="mb-6 text-gray-600">Loading user data...</p>
       )}
-      <form onSubmit={handleSubmit} className="flex flex-col items-center">
+      <form onSubmit={handleSubmit} className="flex flex-col items-center w-full max-w-sm">
         <input
           type="text"
-          placeholder="Verification Code"
+          placeholder="Enter Verification Code"
           value={code}
           onChange={handleCodeChange}
-          className="border border-gray-300 rounded-md p-2 mb-4 w-80"
+          className={`border border-gray-300 rounded-md p-2 mb-4 w-full ${errorMessage ? 'border-red-500' : ''}`}
           required
+          aria-describedby="code-error"
         />
+        {errorMessage && <span id="code-error" className="text-red-500 mb-2">{errorMessage}</span>}
         <button
           type="submit"
           className={`bg-blue-500 text-white font-semibold py-2 px-4 rounded-md hover:bg-blue-600 transition duration-200 ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
-          disabled={isLoading} // Disable the button while loading
+          disabled={isLoading}
         >
-          {isLoading ? 'Verifying...' : 'Verify Code'}
+          {isLoading ? <ClipLoader size={20} color="#fff" /> : 'Verify Code'}
         </button>
       </form>
-      <ToastContainer /> {/* Add ToastContainer to render the toasts */}
+      <ToastContainer aria-live="polite" /> {/* Improved accessibility */}
     </div>
   );
 };
