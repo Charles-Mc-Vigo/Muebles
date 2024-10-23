@@ -39,10 +39,19 @@ const userSchema = new mongoose.Schema({
   type: String, 
   required: true
   },
+  isActive:{
+    type:Boolean,
+    default:false
+  },
   role:{
-    type:String
+    type:String,
+    default:"Guest"
   },
   isVerified:{
+    type:Boolean,
+    default:false
+  },
+  pswdResetOk:{
     type:Boolean,
     default:false
   },
@@ -61,11 +70,11 @@ const userSchema = new mongoose.Schema({
     type:mongoose.Schema.ObjectId,
     ref:"Order"
   }],
-  cart:[{
+  cart:{
     type:mongoose.Schema.ObjectId,
     ref:"Cart",
     default:null
-  }]
+  }
 },{
   timestamps:true
 });

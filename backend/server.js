@@ -85,7 +85,7 @@ app.use("/api/sizes",sizeRoutes)
 app.use("/api/stocks",stocksRoutes)
 
 // Cart
-app.use('/api/carts', cartRoutes);
+app.use('/api/cart', cartRoutes);
 
 
 app.use("/api/admin", adminRoutes);

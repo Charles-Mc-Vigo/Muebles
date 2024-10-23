@@ -1,11 +1,19 @@
 const express = require('express');
-const { addItemsToCart, removeItemFromCart, updateItemQuantities, getCart, checkout} = require('../../controllers/Cart/cartController');
+const { viewCart, addToCart, updateCartItem, removeFromCart, clearCart} = require('../../controllers/Cart/cartController');
 const router = express.Router();
+const {checkUserAuth} = require('../../middlewares/checkAuth');
 
-router.get('/cart/:userId', getCart);
-router.post('/cart/:userId/checkout', checkout);
-router.post('/cart/:userId/add', addItemsToCart);
-router.put('/cart/:userId/update', updateItemQuantities);
-router.delete('/cart/:userId/remove', removeItemFromCart);
+router.get('/', checkUserAuth, viewCart);
+router.post('/', checkUserAuth, addToCart);
+router.put('/', checkUserAuth,  updateCartItem);
+router.delete('/:furnitureId', checkUserAuth, removeFromCart);
+router.delete('/', checkUserAuth, clearCart);
 
 module.exports = router;
+
+
+  // GET (http://localhost:3000/api/cart) view cart
+  // POST (http://localhost:3000/api/cart) add items to cart
+  // PUT (http://localhost:3000/api/cart) update the cart item quantity
+  // DELETE (http://localhost:3000/api/cart/:furnitureId) remove item in the cart
+  // DELETE (http://localhost:3000/api/cart) clear the cart

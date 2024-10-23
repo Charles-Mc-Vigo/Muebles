@@ -2,30 +2,31 @@ import React, { useEffect, useState } from "react";
 import ProductCard from "../components/ProductCard";
 import Footer from "../components/Footer";
 import Header from "../components/Header";
+import { FaFilter, FaTimes } from "react-icons/fa";
 
 const Home = () => {
   const [furnitureData, setFurnitureData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [categories, setCategories] = useState([]);
-  const [visibleCount, setVisibleCount] = useState(6); // Initial number of visible items
-  const [selectedCategories, setSelectedCategories] = useState(new Set()); // State to manage selected categories
-  const [priceRange, setPriceRange] = useState([0, 1000]); // Default price range
+  const [visibleCount, setVisibleCount] = useState(8);
+  const [selectedCategories, setSelectedCategories] = useState(new Set());
+  const [priceRange, setPriceRange] = useState([0, 1000]);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
-  // Fetch the furniture data from API
   useEffect(() => {
     const fetchFurnitureData = async () => {
       try {
-        const response = await fetch("http://localhost:3000/api/furnitures");
-        if (!response.ok) {
-          throw new Error("Failed to fetch furniture sets");
-        }
+        const response = await fetch("http://localhost:3000/api/furnitures",{
+          method:'GET',
+          credentials:'include'
+        });
+        if (!response.ok) throw new Error("Failed to fetch furniture sets");
         const data = await response.json();
-        console.log("Fetched Data:", data); // Log to check the structure of data
-
+        
         if (Array.isArray(data)) {
           setFurnitureData(data);
-        } else if (data && Array.isArray(data.furnitures)) {
+        } else if (data?.furnitures) {
           setFurnitureData(data.furnitures);
         } else {
           throw new Error("Invalid data format received");
@@ -48,16 +49,28 @@ const Home = () => {
     };
 
     fetchFurnitureData();
-    fetchCategories(); // Call to fetch categories
+    fetchCategories();
   }, []);
 
+  useEffect(() => {
+    // Handle body scroll when filter is open on mobile
+    if (isFilterOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isFilterOpen]);
+
   const loadMore = () => {
-    setVisibleCount((prevCount) => prevCount + 6); // Increase the visible count
+    setVisibleCount(prevCount => prevCount + 8);
   };
 
   const handleCheckboxChange = (event) => {
     const { value, checked } = event.target;
-    setSelectedCategories((prev) => {
+    setSelectedCategories(prev => {
       const newSelection = new Set(prev);
       if (checked) {
         newSelection.add(value);
@@ -73,107 +86,163 @@ const Home = () => {
     setPriceRange(value);
   };
 
+  const toggleFilter = () => {
+    setIsFilterOpen(!isFilterOpen);
+  };
+
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-teal-600"></div>
+      </div>
+    );
   }
 
   if (error) {
-    return <div>Error: {error}</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center text-red-600">
+        <p>Error: {error}</p>
+      </div>
+    );
   }
+
+  const FilterContent = () => (
+    <div className="space-y-6">
+      <h1 className="text-xl font-bold">Filters</h1>
+      
+      <div>
+        <h2 className="text-lg font-semibold mb-3">Categories</h2>
+        <ul className="space-y-2">
+          {categories.map((category) => (
+            <li key={category._id} className="flex items-center">
+              <input
+                type="checkbox"
+                id={`category-${category._id}`}
+                value={category.name}
+                checked={selectedCategories.has(category.name)}
+                onChange={handleCheckboxChange}
+                className="w-4 h-4 rounded border-gray-300 text-teal-600 focus:ring-teal-500"
+              />
+              <label htmlFor={`category-${category._id}`} className="ml-2 text-sm">
+                {category.name}
+              </label>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div>
+        <h2 className="text-lg font-semibold mb-3">Price Range</h2>
+        <input
+          type="range"
+          min="0"
+          max="50000"
+          step="10"
+          value={priceRange.join(",")}
+          onChange={handlePriceRangeChange}
+          className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+        />
+        <div className="flex justify-between mt-2 text-sm">
+          <span>₱{priceRange[0].toLocaleString()}</span>
+          <span>₱{priceRange[1].toLocaleString()}</span>
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <div className="bg-white text-gray-800 flex flex-col min-h-screen">
-      {/* Header */}
       <Header isLogin={true} />
 
-      {/* Shop Hero Section */}
-      <section className="relative">
+      {/* Hero Section */}
+      <section className="relative w-full h-48 sm:h-64 md:h-80">
         <img
           src="https://images.pexels.com/photos/245219/pexels-photo-245219.jpeg?auto=compress&cs=tinysrgb&w=600"
           alt="Shop Hero"
-          className="w-full h-80 object-cover"
+          className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 text-white text-center">
-          <h1 className="text-5xl font-bold"style={{ fontFamily: "Playfair Display, serif" }} >Browse Our Collection</h1>
+        <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <h1 className="text-white text-3xl sm:text-4xl md:text-5xl font-bold text-center px-4">
+            Browse Our Collection
+          </h1>
         </div>
       </section>
 
-      {/* Main Content Area */}
-      <div className="flex flex-1">
-        {/* Left Section - Vertical Filter */}
-        <section className="w-1/5 border p-4 mb-2 mr-2 mt-2 flex flex-col" >
-          <h1 className="text-2xl font-bold mb-4"style={{ fontFamily: "Playfair Display, serif" }} >ALL FURNITURES</h1>
-          <h2 className="text-lg font-bold mb-2"style={{ fontFamily: "Playfair Display, serif" }} >Categories</h2>
-          <ul className="space-y-2 flex-col">
-            {categories.map((category) => (
-              <li key={category._id} className="flex items-center">
-                <input
-                  type="checkbox"
-                  value={category.name} // Use category name as the value
-                  checked={selectedCategories.has(category.name)}
-                  onChange={handleCheckboxChange}
-                  className="mr-2"
-                />
-                <label>{category.name}</label>
-              </li>
-            ))}
-          </ul>
+      {/* Main Content */}
+      <div className="flex flex-col md:flex-row flex-1 max-w-7xl mx-auto w-full px-4 py-6 gap-6">
+        {/* Filter Button (Mobile) */}
+        <button
+          onClick={toggleFilter}
+          className="md:hidden fixed bottom-4 right-4 z-30 bg-teal-600 text-white p-4 rounded-full shadow-lg"
+          aria-label="Toggle filters"
+        >
+          <FaFilter className="text-xl" />
+        </button>
 
-          {/* Price Range Filter */}
-          <h2 className="text-lg font-bold mb-2 mt-4">Price Range</h2>
-          <input
-            type="range"
-            min="0"
-            max="50000"
-            step="10"
-            value={priceRange.join(",")}
-            onChange={handlePriceRangeChange}
-            className="w-full"
-          />
-          <div className="flex justify-between"style={{ fontFamily: "Lato, sans-serif font-weight:400 font-style:normal" }}>
-            <span>₱{priceRange[0]}</span>
-            <span>₱{priceRange[1]}</span>
+        {/* Filter Sidebar */}
+        <aside className={`
+          fixed md:static inset-0 z-40 
+          ${isFilterOpen ? 'block' : 'hidden'} 
+          md:block w-full md:w-64 lg:w-72
+        `}>
+          {/* Mobile Filter Overlay */}
+          <div className="md:hidden fixed inset-0 bg-black bg-opacity-50" onClick={toggleFilter} />
+          
+          {/* Filter Content */}
+          <div className={`
+            fixed md:static right-0 top-0 h-full w-72
+            bg-white p-6 overflow-y-auto
+            transform transition-transform duration-300
+            ${isFilterOpen ? 'translate-x-0' : 'translate-x-full'}
+            md:transform-none
+          `}>
+            {/* Close Button (Mobile) */}
+            <button
+              onClick={toggleFilter}
+              className="md:hidden absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+            >
+              <FaTimes className="text-xl" />
+            </button>
+            
+            <FilterContent />
           </div>
-        </section>
+        </aside>
 
-        <section className="w-full">
+        {/* Products Grid */}
+        <main className="flex-1">
+          <h2 className="text-2xl md:text-3xl font-bold text-center mb-8">
+            Furniture Sets
+          </h2>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+            {furnitureData.slice(0, visibleCount).map((furniture) => (
+              <ProductCard
+                key={furniture._id}
+                id={furniture._id}
+                images={furniture.images}
+                name={furniture.name}
+                price={furniture.price}
+                description={furniture.description}
+                showViewDetails={true}
+                showAddToCart={true}
+                showUpdateButton={false}
+              />
+            ))}
+          </div>
 
-          {/* Furniture Sets Section */}
-          <section className="py-16 px-8  flex-grow m-2" >
-            <h2 className="text-4xl font-bold text-center mb-10"style={{ fontFamily: "Playfair Display, serif" }}>
-              Furniture Sets
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-              {furnitureData.slice(0, visibleCount).map((furniture) => (
-                <ProductCard
-                  key={furniture._id} // Ensure this id is unique for each furniture item
-                  id={furniture._id}
-                  image={furniture.image}
-                  name={furniture.name}
-                  price={furniture.price}
-                  description={furniture.description}
-                  showViewDetails={true}
-                  showAddToCart={true}
-                  showUpdateButton={false}
-                />
-              ))}
+          {visibleCount < furnitureData.length && (
+            <div className="text-center mt-8">
+              <button
+                onClick={loadMore}
+                className="bg-teal-600 text-white px-6 py-2 rounded-md hover:bg-teal-700 transition-colors"
+              >
+                Load More
+              </button>
             </div>
-
-            {visibleCount < furnitureData.length && ( // Check if there are more items to load
-              <div className="text-center mt-8">
-                <button
-                  onClick={loadMore}
-                  className="bg-green-600 text-white px-4 py-2  hover:bg-green-700"
-                >
-                  Load More
-                </button>
-              </div>
-            )}
-          </section>
-        </section>
+          )}
+        </main>
       </div>
 
-      {/* Footer */}
       <Footer />
     </div>
   );

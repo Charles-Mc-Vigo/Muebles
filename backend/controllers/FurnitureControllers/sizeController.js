@@ -5,14 +5,14 @@ const FurnitureType = require("../../models/Furniture/furnitureTypeModel");
 // Add a new size
 exports.addSize = async (req, res) => {
 	try {
-		const { label, width, height, depth,length, furnitureTypeId } = req.body;
+		const { label, height, width, depth, furnitureTypeId } = req.body;
 
-		if (!label || !width || !height || !length || !depth || !furnitureTypeId) {
+		if (!label || !height || !width || !depth || !furnitureTypeId) {
 			return res
 				.status(400)
 				.json({
 					message:
-						"All fields are required: label, width, height, depth, and furnitureTypeId.",
+						"All fields are required: label, width, depth, and furnitureTypeId.",
 				});
 		}
 
@@ -40,11 +40,11 @@ exports.addSize = async (req, res) => {
 				});
 		}
 
-		const newSize = new Size({ label, width, height, length, depth, furnitureTypeId });
+		const newSize = new Size({ label, width, height, depth, furnitureTypeId });
 		await newSize.save();
 		res
 			.status(201)
-			.json({ message: `New size has been added ${furnitureType.name}!` });
+			.json({ message: `New size has been added ${furnitureType.name}!`,newSize });
 	} catch (error) {
 		console.error("Error adding size:", error);
 		res.status(500).json({ message: "Server error!" });

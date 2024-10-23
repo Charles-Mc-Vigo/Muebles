@@ -14,7 +14,7 @@ const Stocks = require("../../models/Furniture/stocksModel");
 const upload = multer({ 
   storage: multer.memoryStorage(),
   limits: {
-    fileSize: 5 * 1024 * 1024, // 5MB file size limit
+    fileSize: 50 * 1024 * 1024, // 50MB file size limit
   },
   fileFilter: (req, file, cb) => {
     if (file.mimetype.startsWith('image/')) {
@@ -33,13 +33,13 @@ exports.getAllFurnitures = async (req, res) => {
 					{ path: "category", select: "name -_id" },
 					{ path: "furnitureType", select: "name -_id" },
 					{ path: "materials", select: "name -_id" },
-					{ path: "colors", select: "name -_id" },
+					{ path: "colors", select: "name hex -_id" },
 					{ path: "stocks", select: "stocks -_id" },
-					{ path: "sizes", select: "label -_id" },
+					{ path: "sizes", select: "label height width depth -_id" },
 			]);
 			
 			// Return the fetched furnitures
-			res.status(200).json({ furnitures }); // Changed here
+			res.status(200).json( furnitures ); // Changed here
 	} catch (error) {
 			console.error(error);
 			res.status(500).json({ message: "Server error!" });
@@ -77,7 +77,7 @@ exports.getFurnitureById = async (req, res) => {
 			{ path: "category", select: "name -_id" },
 			{ path: "furnitureType", select: "name -_id" },
 			{ path: "materials", select: "name -_id" },
-			{ path: "colors", select: "name -_id" },
+			{ path: "colors", select: "name hex -_id" },
 			{ path: "stocks", select: "stocks -_id" },
 			{ path: "sizes", select: "label -_id" },
 		]);
@@ -109,8 +109,8 @@ exports.createFurniture = async (req, res) => {
         images = req.body.images;
       }
 
-      if (images.length < 3) {
-        return res.status(400).json({ message: "At least 3 images are required!" });
+      if (images.length < 5) {
+        return res.status(400).json({ message: "At least 5 images are required!" });
       }
 
       const {

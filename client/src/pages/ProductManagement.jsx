@@ -28,73 +28,60 @@ const ProductManagement = () => {
     price: "",
   });
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const [
-          furnitureResponse,
-          furnitureTypesResponse,
-          categoriesResponse,
-          materialsResponse,
-          colorsResponse,
-          sizesResponse,
-        ] = await Promise.all([
-          fetch("http://localhost:3000/api/furnitures"),
-          fetch("http://localhost:3000/api/furniture-types"),
-          fetch("http://localhost:3000/api/categories"),
-          fetch("http://localhost:3000/api/materials"),
-          fetch("http://localhost:3000/api/colors"),
-          fetch("http://localhost:3000/api/sizes"),
-        ]);
+	const fetchData = async () => {
+		setLoading(true);
+		try {
+			const [
+				furnitureResponse,
+				furnitureTypesResponse,
+				categoriesResponse,
+				materialsResponse,
+				colorsResponse,
+				sizesResponse,
+			] = await Promise.all([
+				fetch("http://localhost:3000/api/furnitures"),
+				fetch("http://localhost:3000/api/furniture-types"),
+				fetch("http://localhost:3000/api/categories"),
+				fetch("http://localhost:3000/api/materials"),
+				fetch("http://localhost:3000/api/colors"),
+				fetch("http://localhost:3000/api/sizes"),
+			]);
 
-        if (
-          !furnitureResponse.ok ||
-          !furnitureTypesResponse.ok ||
-          !categoriesResponse.ok ||
-          !materialsResponse.ok ||
-          !colorsResponse.ok ||
-          !sizesResponse.ok
-        ) {
-          throw new Error("Failed to fetch some data");
-        }
+			if (
+				!furnitureResponse.ok ||
+				!furnitureTypesResponse.ok ||
+				!categoriesResponse.ok ||
+				!materialsResponse.ok ||
+				!colorsResponse.ok ||
+				!sizesResponse.ok
+			) {
+				throw new Error("Failed to fetch some data");
+			}
 
-        const furnitureData = await furnitureResponse.json();
-        const furnitureTypesData = await furnitureTypesResponse.json();
-        const categoriesData = await categoriesResponse.json();
-        const materialsData = await materialsResponse.json();
-        const colorsData = await colorsResponse.json();
-        const sizesData = await sizesResponse.json();
+			const furnitureData = await furnitureResponse.json();
+			const furnitureTypesData = await furnitureTypesResponse.json();
+			const categoriesData = await categoriesResponse.json();
+			const materialsData = await materialsResponse.json();
+			const colorsData = await colorsResponse.json();
+			const sizesData = await sizesResponse.json();
 
-        setFurnitureData(furnitureData.furnitures || []);
-        setCategories(categoriesData || []);
-        setMaterials(materialsData || []);
-        setColors(colorsData || []);
-        setSizes(sizesData || []);
-        setFurnitureTypes(furnitureTypesData || []);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        toast.error("Error fetching data");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
+			setFurnitureData(furnitureData || []);
+			setCategories(categoriesData || []);
+			setMaterials(materialsData || []);
+			setColors(colorsData || []);
+			setSizes(sizesData || []);
+			setFurnitureTypes(furnitureTypesData || []);
+		} catch (error) {
+			console.error("Error fetching data:", error);
+			toast.error("Error fetching data");
+		} finally {
+			setLoading(false);
+		}
+	};
 
-  const fetchFurnitureData = async () => {
-    try {
-      const response = await fetch("http://localhost:3000/api/furnitures");
-      if (!response.ok) {
-        throw new Error("Failed to fetch furniture data");
-      }
-      const data = await response.json();
-      setFurnitureData(data.furnitures || []);
-    } catch (error) {
-      console.error("Error fetching furniture data:", error);
-      toast.error("Error fetching furniture data");
-    }
-  };
+	useEffect(() => {
+		fetchData();
+	}, []);
 
   const handleCategoryChange = (e) => {
     const categoryId = e.target.value;
@@ -161,37 +148,37 @@ const ProductManagement = () => {
     }
   };
 
-  const handleFileChange = (e) => {
-    const files = Array.from(e.target.files);
+	const handleFileChange = (e) => {
+		const files = Array.from(e.target.files);
 
-    if (files.length > 5) {
-      toast.error("You can only upload a maximum of 5 images.");
-      return;
-    }
+		if (files.length > 5) {
+			toast.error("You can only upload a maximum of 5 images.");
+			return;
+		}
 
-    const readFileAsDataURL = (file) => {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          resolve(reader.result.split(",")[1]); // Get base64 data
-        };
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-      });
-    };
+		const readFileAsDataURL = (file) => {
+			return new Promise((resolve, reject) => {
+				const reader = new FileReader();
+				reader.onloadend = () => {
+					resolve(reader.result.split(",")[1]); // Get base64 data
+				};
+				reader.onerror = reject;
+				reader.readAsDataURL(file);
+			});
+		};
 
-    Promise.all(files.map(readFileAsDataURL))
-      .then((base64Images) => {
-        setNewFurniture((prev) => ({
-          ...prev,
-          images: base64Images,
-        }));
-      })
-      .catch((error) => {
-        console.error("Error reading files:", error);
-        toast.error("Failed to read files");
-      });
-  };
+		Promise.all(files.map(readFileAsDataURL))
+			.then((base64Images) => {
+				setNewFurniture((prev) => ({
+					...prev,
+					images: base64Images,
+				}));
+			})
+			.catch((error) => {
+				console.error("Error reading files:", error);
+				toast.error("Failed to read files");
+			});
+	};
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -216,31 +203,31 @@ const ProductManagement = () => {
         }),
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        toast.success(data.message);
-        setNewFurniture({
-          images: [],
-          name: "",
-          category: "",
-          furnitureType: "",
-          description: "",
-          materials: [],
-          colors: [],
-          sizes: [],
-          stocks: "",
-          price: "",
-        });
-        fetchFurnitureData(); // Refresh the furniture list
-      } else {
-        const errorData = await response.json(); // Make sure the server returns JSON even on error
-        toast.error(errorData.message || "Failed to add furniture");
-      }
-    } catch (error) {
-      console.error("Error adding new Furniture:", error);
-      toast.error("Failed to add new Furniture");
-    }
-  };
+			if (response.ok) {
+				const data = await response.json();
+				toast.success(data.message);
+				setNewFurniture({
+					images: [],
+					name: "",
+					category: "",
+					furnitureType: "",
+					description: "",
+					materials: [],
+					colors: [],
+					sizes: [],
+					stocks: "",
+					price: "",
+				});
+				fetchData(); // Refresh the furniture list
+			} else {
+				const errorData = await response.json(); // Make sure the server returns JSON even on error
+				toast.error(errorData.message || "Failed to add furniture");
+			}
+		} catch (error) {
+			console.error("Error adding new Furniture:", error);
+			toast.error("Failed to add new Furniture");
+		}
+	};
 
   return (
     <div className="container mx-auto p-4">
@@ -379,171 +366,184 @@ const ProductManagement = () => {
               </div>
             </div>
 
-            {/* Sizes */}
-            <div className="mb-4 bg-slate-200 rounded-md p-2">
-              <label className="block font-semibold my-2 mb-2">
-                Sizes: (Height X Width X Length X Depth)
-              </label>
-              <div className="flex flex-wrap">
-                {filteredSizes.length > 0 ? (
-                  filteredSizes.map((size) => (
-                    <label
-                      key={size._id}
-                      className="flex items-center w-1/3 p-2"
-                    >
-                      <input
-                        type="checkbox"
-                        name="sizes"
-                        value={size.label}
-                        checked={newFurniture.sizes.includes(size.label)}
-                        onChange={handleInputChange}
-                        className="mr-2 h-4 w-4 border rounded text-blue-600 focus:ring-blue-500"
-                      />
-                      <span className="text-gray-700">
-                        {size.label.charAt(0).toUpperCase() +
-                          size.label.slice(1)}{" "}
-                        <span className="text-gray-500 italic">
-                          ( {size.height} X {size.width} X {size.length} X{" "}
-                          {size.depth} )
-                        </span>
-                      </span>
-                    </label>
-                  ))
-                ) : (
-                  <p className="text-gray-500">No sizes available</p>
-                )}
-              </div>
-            </div>
-            {/* IMAGE INPUT  */}
-            <div className="mt-4">
-              <label className="block font-semibold">Selected Images:</label>
-              <div className="flex flex-wrap gap-4">
-                {Array.isArray(newFurniture.images) &&
-                  newFurniture.images.length > 0 &&
-                  newFurniture.images.map((image, index) => (
-                    <img
-                      key={index}
-                      src={`data:image/jpeg;base64,${image}`}
-                      alt={`Selected image ${index + 1}`}
-                      className="w-16 h-16 object-contain"
-                    />
-                  ))}
-              </div>
-            </div>
-            <input
-              id="images"
-              type="file"
-              name="images"
-              onChange={handleFileChange}
-              required
-              className="border rounded p-2 w-full"
-              multiple
-              accept="image/*"
-            />
-            <button
-              type="submit"
-              className="bg-blue-500 text-white p-2 rounded w-full"
-            >
-              Add Product
-            </button>
-          </form>
-        </div>
-      )}
-      {/* Table to display furniture data */}
-      <div className="mt-8">
-        <h2 className="text-2xl font-bold mb-4">Furniture List</h2>
-        <table className="min-w-full border-collapse border border-gray-200">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="border border-gray-300 p-2">Furniture Id</th>
-              <th className="border border-gray-300 p-2">Images</th>
-              <th className="border border-gray-300 p-2">Name</th>
-              <th className="border border-gray-300 p-2">Category</th>
-              <th className="border border-gray-300 p-2">Description</th>
-              <th className="border border-gray-300 p-2">Type</th>
-              <th className="border border-gray-300 p-2">Colors</th>
-              <th className="border border-gray-300 p-2">Sizes</th>
-              <th className="border border-gray-300 p-2">Materials</th>
-              <th className="border border-gray-300 p-2">Price</th>
-              <th className="border border-gray-300 p-2">Stocks</th>
-            </tr>
-          </thead>
-          <tbody>
-            {furnitureData.length > 0 ? (
-              furnitureData.map((furniture) => (
-                <tr key={furniture._id}>
-                  <td className="border border-gray-300 p-2">
-                    {furniture._id}
-                  </td>
-                  {furniture.images.map((img, index) => (
-                    <img
-                      key={`image-${furniture._id}-${index}`}
-                      src={`data:image/jpeg;base64,${img}`}
-                      alt={furniture.name}
-                      className="w-16 h-16 object-cover"
-                    />
-                  ))}
-                  <td className="border border-gray-300 p-2">
-                    {furniture.name}
-                  </td>
-                  <td className="border border-gray-300 p-2">
-                    {furniture.category?.name || "N/A"}
-                  </td>
-                  <td className="border border-gray-300 p-2">
-                    {furniture.description}
-                  </td>
-                  <td className="border border-gray-300 p-2">
-                    {furniture.furnitureType?.name}
-                  </td>
-                  <td className="border border-gray-300 p-2">
-                    {furniture.colors && furniture.colors.length > 0
-                      ? furniture.colors.map((color) => (
-                          <span key={color._id} className="block">
-                            {color.name}
-                          </span>
-                        ))
-                      : "N/A"}
-                  </td>
-                  <td className="border border-gray-300 p-2">
-                    {furniture.sizes && furniture.sizes.length > 0
-                      ? furniture.sizes.map((size) => (
-                          <span key={size._id} className="block">
-                            {size.label} ( {size.height} X {size.width} X{" "}
-                            {size.length} X {size.depth} )
-                          </span>
-                        ))
-                      : "N/A"}
-                  </td>
-                  <td className="border border-gray-300 p-2">
-                    {furniture.materials && furniture.materials.length > 0
-                      ? furniture.materials.map((material) => (
-                          <span key={material._id} className="block">
-                            {material.name}
-                          </span>
-                        ))
-                      : "N/A"}
-                  </td>
-                  <td className="border border-gray-300 p-2">
-                    {furniture.price}
-                  </td>
-                  <td className="border border-gray-300 p-2">
-                    {furniture.stocks.stocks || "N/A"}
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="10" className="text-center p-4">
-                  No furniture available
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-      <ToastContainer />
-    </div>
-  );
+						{/* Sizes */}
+						<div className="mb-4 bg-slate-200 rounded-md p-2">
+							<label className="block font-semibold my-2 mb-2">
+								Sizes: (Height X Width X Length X Depth)
+							</label>
+							<div className="flex flex-wrap">
+								{filteredSizes.length > 0 ? (
+									filteredSizes.map((size) => (
+										<label
+											key={size._id}
+											className="flex items-center w-1/3 p-2"
+										>
+											<input
+												type="checkbox"
+												name="sizes"
+												value={size.label}
+												checked={newFurniture.sizes.includes(size.label)}
+												onChange={handleInputChange}
+												className="mr-2 h-4 w-4 border rounded text-blue-600 focus:ring-blue-500"
+											/>
+											<span className="text-gray-700">
+												{size.label.charAt(0).toUpperCase() +
+													size.label.slice(1)}{" "}
+												<span className="text-gray-500 italic">
+													( {size.height} X {size.width} X {size.length} X{" "}
+													{size.depth} )
+												</span>
+											</span>
+										</label>
+									))
+								) : (
+									<p className="text-gray-500">No sizes available</p>
+								)}
+							</div>
+						</div>
+						{/* IMAGE INPUT  */}
+						<div className="mt-4">
+							<label className="block font-semibold">Selected Images:</label>
+							<div className="flex flex-wrap gap-4">
+								{Array.isArray(newFurniture.images) &&
+									newFurniture.images.length > 0 &&
+									newFurniture.images.map((image, index) => (
+										<img
+											key={index}
+											src={`data:image/jpeg;base64,${image}`}
+											alt={`Selected image ${index + 1}`}
+											className="w-16 h-16 object-contain"
+										/>
+									))}
+							</div>
+						</div>
+						<input
+							id="images"
+							type="file"
+							name="images"
+							onChange={handleFileChange}
+							required
+							className="border rounded p-2 w-full"
+							multiple
+							accept="image/*"
+						/>
+						<button
+							type="submit"
+							className="bg-blue-500 text-white p-2 rounded w-full"
+						>
+							Add Product
+						</button>
+					</form>
+				</div>
+			)}
+			{/* Table to display furniture data */}
+			<div className="mt-8 overflow-x-auto">
+				<h2 className="text-2xl font-bold mb-4">Furniture List</h2>
+				<table className="min-w-full border-collapse border border-gray-200">
+					<thead>
+						<tr className="bg-gray-100">
+							<th className="border border-gray-300 p-2">Furniture Id</th>
+							<th className="border border-gray-300 p-2">Image</th>
+							<th className="border border-gray-300 p-2">Name</th>
+							<th className="border border-gray-300 p-2">Category</th>
+							<th className="border border-gray-300 p-2">Description</th>
+							<th className="border border-gray-300 p-2">Type</th>
+							<th className="border border-gray-300 p-2">Colors</th>
+							<th className="border border-gray-300 p-2">Sizes <br /> (Height X Width X Depth)</th>
+							<th className="border border-gray-300 p-2">Materials</th>
+							<th className="border border-gray-300 p-2">Price</th>
+							<th className="border border-gray-300 p-2">Stocks</th>
+						</tr>
+					</thead>
+					<tbody>
+						{furnitureData.length > 0 ? (
+							furnitureData.map((furniture) => (
+								<tr
+									key={furniture._id}
+									className="hover:bg-gray-50 transition-colors"
+								>
+									<td className="border border-gray-300 p-2">
+										{furniture._id}
+									</td>
+									<td className="border border-gray-300 p-2 flex justify-center">
+										{furniture.images.length > 0 ? (
+											<img
+												src={`data:image/jpeg;base64,${furniture.images[0]}`} // Display only the first image
+												alt={furniture.name}
+												className="w-16 h-16 object-cover rounded-md"
+											/>
+										) : (
+											<span className="text-gray-500">No Image</span>
+										)}
+									</td>
+									<td className="border border-gray-300 p-2">
+										{furniture.name}
+									</td>
+									<td className="border border-gray-300 p-2">
+										{furniture.category?.name || "N/A"}
+									</td>
+									<td
+										className="border border-gray-300 p-2"
+										title={furniture.description}
+									>
+										{furniture.description.length > 50
+											? `${furniture.description.substring(0, 50)}...`
+											: furniture.description}
+									</td>
+									<td className="border border-gray-300 p-2">
+										{furniture.furnitureType?.name || "N/A"}
+									</td>
+									<td className="border border-gray-300 p-2">
+										{furniture.colors && furniture.colors.length > 0
+											? furniture.colors.map((color) => (
+													<span key={color._id} className="block">
+														{color.name}
+													</span>
+											  ))
+											: "N/A"}
+									</td>
+									<td className="border border-gray-300 p-2">
+										{furniture.sizes && furniture.sizes.length > 0
+											? furniture.sizes.map((size) => (
+													<span key={size._id} className="block">
+														{size.label} <br /> ({size.height} X {size.width} X {size.depth} )
+													</span>
+											  ))
+											: "N/A"}
+									</td>
+									<td className="border border-gray-300 p-2">
+										{furniture.materials && furniture.materials.length > 0
+											? furniture.materials.map((material) => (
+													<span key={material._id} className="block">
+														{material.name}
+													</span>
+											  ))
+											: "N/A"}
+									</td>
+									<td className="border border-gray-300 p-2">
+										{furniture.price}
+									</td>
+									<td className="border border-gray-300 p-2">
+										{furniture.stocks.stocks || "N/A"}
+									</td>
+								</tr>
+							))
+						) : (
+							<tr>
+								<td
+									colSpan="11"
+									className="text-center p-4 text-gray-500 font-semibold"
+								>
+									No furniture available
+								</td>
+							</tr>
+						)}
+					</tbody>
+				</table>
+			</div>
+			<ToastContainer />
+		</div>
+	);
 };
 
 export default ProductManagement;

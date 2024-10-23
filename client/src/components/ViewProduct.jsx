@@ -9,7 +9,10 @@ function ViewProduct() {
 	useEffect(() => {
 		const fetchFurniture = async () => {
 			try {
-				const response = await fetch(`http://localhost:3000/api/furnitures`);
+				const response = await fetch(`http://localhost:3000/api/furnitures`,{
+					method:'GET',
+					credentials:'include'
+				});
 				if (!response.ok) {
 					throw new Error("Failed to fetch furniture details");
 				}
@@ -43,7 +46,7 @@ function ViewProduct() {
 					<ProductCard
 						key={furniture._id} // Ensure this id is unique for each furniture item
 						id={furniture._id}
-						image={furniture.image}
+						images={furniture.images}
 						name={furniture.name}
 						price={`$${furniture.price}`} // Format price as needed
 						description={furniture.description}

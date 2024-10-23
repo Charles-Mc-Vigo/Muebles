@@ -42,7 +42,7 @@ export default function AdminSignUp() {
 			const adminId = data.newAdmin._id;
 			console.log(adminId)
 			toast.success(data.message); // Notify success
-			navigate(`/verify-account/${adminId}`);
+			navigate(`/admin-signup/verify-account/${adminId}`);
 		} catch (error) {
 			console.error("Sign up error", error.message);
 			toast.error(error.message || "Sign up failed"); // Notify error
