@@ -203,12 +203,6 @@ const Dashboard = () => {
             {dropdowns.delivery && (
               <ul className="ml-8 space-y-2">
                 <DropdownItem
-                  label="Track Delivery"
-                  section="track-delivery"
-                  currentSection={activeSection}
-                  onClick={setActiveSection}
-                />
-                <DropdownItem
                   label="Manage Delivery"
                   section="manage-delivery"
                   currentSection={activeSection}
