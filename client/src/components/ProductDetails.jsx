@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { FaChevronUp, FaChevronDown } from "react-icons/fa";
-import { FaLongArrowAltLeft } from "react-icons/fa";
+import { FaLongArrowAltLeft, FaLongArrowAltRight } from "react-icons/fa";
 
 function ProductDetails() {
 	const { id } = useParams();
@@ -104,17 +104,17 @@ function ProductDetails() {
 	return (
 		<section className="bg-gray-50">
 			<div className="container mx-auto p-5 flex flex-col lg:flex-row">
-				{/* Back Button */}
-				<button
-					onClick={() => navigate(-1)}
-					className="text-gray-500 mb-4 lg:mb-0 lg:mr-5"
-				>
-					<FaLongArrowAltLeft size={30} />
-				</button>
 				{/* Combined: Product Image and Details */}
 				<div className="flex flex-col lg:flex-row lg:w-full justify-center mt-10">
 					{/* Left: Product Image */}
 					<div className="flex flex-col lg:w-[800px] lg:h-[800px] p-5 border-2 border-gray-300 bg-white rounded-lg shadow-md relative">
+						{/* Back Button */}
+						<button
+							onClick={() => navigate(-1)}
+							className="text-gray-500 mb-4 lg:mb-0 lg:mr-5"
+						>
+							<FaLongArrowAltLeft size={30} />
+						</button>
 						{/* Main container with gray background */}
 						<div className="flex-grow flex flex-col items-center p-4">
 							{/* Main furniture image */}
@@ -131,11 +131,8 @@ function ProductDetails() {
 							{/* Thumbnail navigation */}
 							<div className="flex items-center justify-center mt-4 space-x-4">
 								{/* Left button for image navigation */}
-								<button
-									className="bg-gray-800 text-white p-2 rounded"
-									onClick={handlePreviousImage}
-								>
-									&larr;
+								<button onClick={handlePreviousImage}>
+									<FaLongArrowAltLeft size={30} />
 								</button>
 
 								{/* Thumbnails */}
@@ -156,11 +153,8 @@ function ProductDetails() {
 								</div>
 
 								{/* Right button for image navigation */}
-								<button
-									className="bg-gray-800 text-white p-2 rounded"
-									onClick={handleNextImage}
-								>
-									&rarr;
+								<button onClick={handleNextImage}>
+									<FaLongArrowAltRight size={30} />
 								</button>
 							</div>
 						</div>
@@ -191,8 +185,7 @@ function ProductDetails() {
 												: "border-gray-400"
 										}`}
 										style={{ backgroundColor: color.hex }}
-									>
-									</div>
+									></div>
 								))}
 							</div>
 						</div>
@@ -237,9 +230,6 @@ function ProductDetails() {
 						</div>
 						{/* FAQ Section */}
 						<div className="mt-4">
-							<h2 className="text-lg font-semibold">
-								Frequently Asked Questions
-							</h2>
 							{faqItems.map((item, index) => (
 								<FAQAccordion
 									key={index}

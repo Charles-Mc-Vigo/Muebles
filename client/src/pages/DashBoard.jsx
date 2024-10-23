@@ -261,7 +261,7 @@ const Dashboard = () => {
 				{/* Rest of the content */}
 				<div className="h-100 max-h-[calc(50vh-50px)]">
 					<div className={`h-full overflow-y-auto`}>
-						{contentMap[activeSection]}
+						{contentMap[activeSection] || "dashboard"}
 					</div>
 				</div>
 			</main>

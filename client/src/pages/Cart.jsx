@@ -157,10 +157,16 @@ const Cart = () => {
 										className="flex items-center justify-between py-6 px-4"
 									>
 										<img
-											src={`data:image/jpeg;base64,${item.furnitureId.image}`} // Base64 image handling
+											src={
+												item.furnitureId.images &&
+												item.furnitureId.images.length > 0
+													? `data:image/jpeg;base64,${item.furnitureId.images[0]}`
+													: "fallback-image-url.jpg"
+											}
 											alt={item.furnitureId.name}
 											className="w-32 h-32 object-cover mr-4"
 										/>
+
 										<div className="flex-1">
 											<h3 className="text-lg font-medium">
 												{item.furnitureId.name}
