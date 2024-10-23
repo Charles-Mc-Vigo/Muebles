@@ -9,9 +9,9 @@ function ViewProduct() {
 	useEffect(() => {
 		const fetchFurniture = async () => {
 			try {
-				const response = await fetch(`http://localhost:3000/api/furnitures`,{
-					method:'GET',
-					credentials:'include'
+				const response = await fetch(`http://localhost:3000/api/furnitures`, {
+					method: "GET",
+					credentials: "include",
 				});
 				if (!response.ok) {
 					throw new Error("Failed to fetch furniture details");
@@ -19,12 +19,7 @@ function ViewProduct() {
 				const data = await response.json();
 				console.log(data); // Log the data to see the response
 
-				// Assuming the furniture array is under the 'furnitures' key
-				if (data.furnitures && Array.isArray(data.furnitures)) {
-					setFurnitureData(data.furnitures); // Set state to the array of furnitures
-				} else {
-					throw new Error("Data does not contain a valid array of furnitures");
-				}
+				setFurnitureData(data)
 			} catch (error) {
 				setError(error.message);
 			} finally {
@@ -48,7 +43,7 @@ function ViewProduct() {
 						id={furniture._id}
 						images={furniture.images}
 						name={furniture.name}
-						price={`$${furniture.price}`} // Format price as needed
+						price={`Php ${furniture.price}`} // Format price as needed
 						description={furniture.description}
 						showViewDetails={true}
 						showAddToCart={false}
