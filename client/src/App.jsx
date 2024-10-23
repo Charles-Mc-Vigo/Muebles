@@ -43,6 +43,8 @@ export default function App() {
                 <Route path="/password-reset/request"  element={<PasswordResetRequest/>} />
                 <Route path="/password-reset/verify/:userId"  element={<PasswordResetVerify/>} />
                 <Route path="/password-reset/new-password/:userId"  element={<PasswordResetCreateNew/>} />
+                <Route path={`/furnitures/:id`} element={<ProtectedRoute element={ProductDetails} />} />
+
                 {/* Admin routes */}
                 <Route path="/admin-login" element={<AdminLogin />} />
                 <Route path="/admin-signup" element={<AdminSignUp />} />

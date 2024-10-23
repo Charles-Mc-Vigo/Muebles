@@ -3,14 +3,13 @@ import { Link } from "react-router-dom";
 
 const ProductCard = ({
 	id,
-	image,
+	images,
 	name,
 	price,
 	description,
 	showAddToCart,
 	showUpdateButton,
 }) => {
-
 	// Function to truncate the description
 	const truncateDescription = (desc, maxLength) => {
 		if (desc.length > maxLength) {
@@ -23,26 +22,22 @@ const ProductCard = ({
 	// Function to handle adding item to the cart
 	const addToCart = async (e) => {
 		e.preventDefault(); // Prevents navigating when clicking the button
-
 		const item = {
 			furnitureId: id,  // The server expects the ID of the furniture
 			quantity: 1,  // Default quantity to 1
 		};
-
 		try {
 			const response = await fetch('http://localhost:3000/api/cart', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
 				},
-				credentials:'include',
+				credentials: 'include',
 				body: JSON.stringify(item),  // Send the furnitureId and quantity to the server
 			});
-
 			if (!response.ok) {
 				throw new Error('Failed to add item to cart');
 			}
-
 			const data = await response.json();
 			console.log('Item added to cart successfully:', data);  // Optionally handle success (e.g., show a toast or update cart state)
 			alert('Item added to cart successfully!');
@@ -57,11 +52,14 @@ const ProductCard = ({
 			to={`/furnitures/${id}`}
 			className="bg-white border-2 rounded-md shadow-lg transition-transform transform hover:scale-105 p-6 flex flex-col justify-between w-auto"
 		>
-			<img
-				src={`data:image/jpeg;base64,${image}`}
-				alt={name}
-				className="w-full h-40 object-contain rounded-md mb-4"
-			/>
+			{/* Render only the first image from the images array */}
+			{images && images.length > 0 && (
+				<img
+					src={`data:image/jpeg;base64,${images[0]}`} // Accessing the first image
+					alt={name}
+					className="w-full h-40 object-contain rounded-md mb-4"
+				/>
+			)}
 			<div className="flex-grow">
 				<h3 className="text-xl font-bold text-gray-800">{name}</h3>
 				<p className="mt-2 text-lg text-green-600">₱ {price}</p>
@@ -78,7 +76,6 @@ const ProductCard = ({
 						Add to Cart
 					</button>
 				)}
-
 				{showUpdateButton && (
 					<Link
 						to={`/furnitures/edit/${id}`}

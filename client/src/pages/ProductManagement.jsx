@@ -84,7 +84,10 @@ const ProductManagement = () => {
 
 	const fetchFurnitureData = async () => {
 		try {
-			const response = await fetch("http://localhost:3000/api/furnitures");
+			const response = await fetch("http://localhost:3000/api/furnitures",{
+				method:'GET',
+				credentials:'include'
+			});
 			if (!response.ok) {
 				throw new Error("Failed to fetch furniture data");
 			}
@@ -198,6 +201,7 @@ const ProductManagement = () => {
 		try {
 			const response = await fetch("http://localhost:3000/api/furnitures/add", {
 				method: "POST",
+				credentials:'include',
 				headers: {
 					"Content-Type": "application/json",
 					credentials: "include",

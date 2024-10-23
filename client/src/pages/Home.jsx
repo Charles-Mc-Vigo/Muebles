@@ -17,7 +17,10 @@ const Home = () => {
   useEffect(() => {
     const fetchFurnitureData = async () => {
       try {
-        const response = await fetch("http://localhost:3000/api/furnitures");
+        const response = await fetch("http://localhost:3000/api/furnitures",{
+          method:'GET',
+          credentials:'include'
+        });
         if (!response.ok) throw new Error("Failed to fetch furniture sets");
         const data = await response.json();
         
@@ -216,7 +219,7 @@ const Home = () => {
               <ProductCard
                 key={furniture._id}
                 id={furniture._id}
-                image={furniture.image}
+                images={furniture.images}
                 name={furniture.name}
                 price={furniture.price}
                 description={furniture.description}
