@@ -20,6 +20,38 @@ const ProductCard = ({
 	};
 	const maxDescriptionLength = 60; // Set the max length for the description
 
+	// Function to handle adding item to the cart
+	const addToCart = async (e) => {
+		e.preventDefault(); // Prevents navigating when clicking the button
+
+		const item = {
+			furnitureId: id,  // The server expects the ID of the furniture
+			quantity: 1,  // Default quantity to 1
+		};
+
+		try {
+			const response = await fetch('http://localhost:3000/api/cart', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				credentials:'include',
+				body: JSON.stringify(item),  // Send the furnitureId and quantity to the server
+			});
+
+			if (!response.ok) {
+				throw new Error('Failed to add item to cart');
+			}
+
+			const data = await response.json();
+			console.log('Item added to cart successfully:', data);  // Optionally handle success (e.g., show a toast or update cart state)
+			alert('Item added to cart successfully!');
+		} catch (error) {
+			console.error('Error adding item to cart:', error);  // Optionally handle error (e.g., show an error message)
+			alert('Error adding item to cart. Please try again.');
+		}
+	};
+
 	return (
 		<Link
 			to={`/furnitures/${id}`}
@@ -40,10 +72,7 @@ const ProductCard = ({
 			<div className="mt-4 flex flex-col">
 				{showAddToCart && (
 					<button
-						onClick={(e) => {
-							e.preventDefault(); // Prevents navigating when clicking the button
-							// Handle add to cart action here
-						}}
+						onClick={addToCart}
 						className="bg-green-600 hover:bg-green-700 text-white py-2 rounded-md transition-colors duration-300"
 					>
 						Add to Cart

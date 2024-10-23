@@ -6,6 +6,8 @@ import Logout from "./Logout";
 const Header = ({ isLogin }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+  
+
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
@@ -41,7 +43,7 @@ const Header = ({ isLogin }) => {
           {/* Login / Register or Logout */}
           <div className="flex items-center space-x-2 text-sm font-semibold text-gray-700">
             {isLogin ? (
-              <Logout isUser={true}/>
+              <Logout isUser={true} />
             ) : (
               <>
                 <Link to="/login" className="cursor-pointer">Login</Link>
@@ -50,11 +52,13 @@ const Header = ({ isLogin }) => {
               </>
             )}
           </div>
-          {/* Cart Icon */}
-          <Link to="/cart" className="relative cursor-pointer">
-            <FaShoppingCart className="text-gray-600 text-2xl" />
-            <span className="absolute -top-2 -right-2 bg-teal-600 text-white text-xs rounded-full px-1">0</span>
-          </Link>
+          {/* Cart Icon (only if logged in) */}
+          {isLogin && (
+            <Link to="/cart" className="relative cursor-pointer">
+              <FaShoppingCart className="text-gray-600 text-2xl" />
+              <span className="absolute -top-2 -right-2 bg-teal-600 text-white text-xs rounded-full px-1">0</span>
+            </Link>
+          )}
         </div>
       </div>
 
@@ -66,10 +70,12 @@ const Header = ({ isLogin }) => {
             {isMenuOpen ? <FaTimes /> : <FaBars />}
           </button>
           <Link to="/" className="text-3xl font-bold text-teal-600">MUEBLES</Link>
-          <Link to="/cart" className="relative cursor-pointer mx-1">
-            <FaShoppingCart className="text-gray-600 text-2xl" />
-            <span className="absolute -top-2 -right-2 bg-teal-600 text-white text-xs rounded-full px-1">1</span>
-          </Link>
+          {isLogin && (
+            <Link to="/cart" className="relative cursor-pointer mx-1">
+              <FaShoppingCart className="text-gray-600 text-2xl" />
+              <span className="absolute -top-2 -right-2 bg-teal-600 text-white text-xs rounded-full px-1">1</span>
+            </Link>
+          )}
         </div>
 
         {/* Search Bar */}
