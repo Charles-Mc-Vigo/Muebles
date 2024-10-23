@@ -11,6 +11,7 @@ import AdminLogin from "./pages/AdminLogin";
 import DashBoard from "./pages/DashBoard";
 import UserManagement from "./pages/UserManagement";
 import OrderManagement from "./pages/OrderManagement";
+import TransactionHistory from "./pages/TransactionHistory";
 import ProductManagement from "./pages/ProductManagement";
 import ProductCustomization from "./pages/ProductCustomization";
 import FurnitureList from './components/FurnitureList';
@@ -26,6 +27,8 @@ import Delivery from "./components/Delivery";
 import AdminPendingPage from "./pages/AdminPendingPage";
 import Profile from "./components/Profile";
 import UserProfile from "./components/UserProfile";
+
+
 
 export default function App() {
     return (
@@ -53,6 +56,7 @@ export default function App() {
                 <Route path="/furniture-list" element={<ProtectedRoute element={FurnitureList} />} />
                 <Route path="/user-management" element={<ProtectedRoute element={UserManagement} adminOnly={true} />} />
                 <Route path="/order-management" element={<ProtectedRoute element={OrderManagement} adminOnly={true} />} />
+                <Route path="/view-transaction" element={<ProtectedRoute element={TransactionHistory} adminOnly={true} />} />
                 <Route path="/product-management" element={<ProtectedRoute element={ProductManagement} adminOnly={true} />} />
                 <Route path="/product-customization" element={<ProtectedRoute element={ProductCustomization} adminOnly={true} />} />
                 <Route path="/logout" element={<ProtectedRoute element={Logout} />} />
