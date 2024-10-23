@@ -11,7 +11,7 @@ const {
 	ArchivedFurnitures,
 } = require("../../controllers/FurnitureControllers/furnitureController");
 
-const {checkUserAuth, checkAdminAuth} = require('../../middlewares/checkAuth');
+const {checkAdminAuth} = require('../../middlewares/checkAuth');
 
 // Multer setup for handling image uploads in memory
 const upload = multer({

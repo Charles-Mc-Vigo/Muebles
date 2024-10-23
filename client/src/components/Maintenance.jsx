@@ -39,7 +39,6 @@ const Maintenance = () => {
 	const initialSizeState = {
 		label: "",
 		height: "",
-		length: "",
 		width: "",
 		depth: "",
 		furnitureTypeId: "",
@@ -76,7 +75,10 @@ const Maintenance = () => {
 
 	const fetchMaterials = async () => {
 		try {
-			const response = await fetch("http://localhost:3000/api/materials");
+			const response = await fetch("http://localhost:3000/api/materials",{
+				method:'GET',
+				credentials:'include'
+			});
 			const data = await response.json();
 			setMaterials(data);
 		} catch (error) {
@@ -87,7 +89,10 @@ const Maintenance = () => {
 
 	const fetchFurnitureTypes = async () => {
 		try {
-			const response = await fetch("http://localhost:3000/api/furniture-types");
+			const response = await fetch("http://localhost:3000/api/furniture-types",{
+				method:'GET',
+				credentials:'include'
+			});
 			const data = await response.json();
 			setFurnitureTypes(data);
 		} catch (error) {
@@ -97,7 +102,10 @@ const Maintenance = () => {
 
 	const fetchCategories = async () => {
 		try {
-			const response = await fetch("http://localhost:3000/api/categories");
+			const response = await fetch("http://localhost:3000/api/categories",{
+				method:'GET',
+				credentials:'include'
+			});
 			const data = await response.json();
 			setCategories(data);
 		} catch (error) {
@@ -107,7 +115,10 @@ const Maintenance = () => {
 
 	const fetchColors = async () => {
 		try {
-			const response = await fetch("http://localhost:3000/api/colors");
+			const response = await fetch("http://localhost:3000/api/colors",{
+				method:'GET',
+				credentials:'include'
+			});
 			const data = await response.json();
 			setColors(data);
 		} catch (error) {
@@ -117,7 +128,10 @@ const Maintenance = () => {
 
 	const fetchSizes = async () => {
 		try {
-			const response = await fetch("http://localhost:3000/api/sizes");
+			const response = await fetch("http://localhost:3000/api/sizes",{
+				method:'GET',
+				credentials:'include'
+			});
 			const data = await response.json();
 			setSizes(data);
 		} catch (error) {
@@ -137,8 +151,10 @@ const Maintenance = () => {
 				headers: {
 					"Content-Type": "application/json",
 				},
+				credentials:'include',
 				body: JSON.stringify({ name, quantity }),
 			});
+
 			if (response.ok) {
 				const data = await response.json();
 				toast.success("Material added successfully.");
@@ -167,6 +183,7 @@ const Maintenance = () => {
 				headers: {
 					"Content-Type": "application/json",
 				},
+				credentials:'include',
 				body: JSON.stringify({
 					label: newSize.label,
 					height: newSize.height,
@@ -207,6 +224,7 @@ const Maintenance = () => {
 				headers: {
 					"Content-Type": "application/json",
 				},
+				credentials:'include',
 				body: JSON.stringify({
 					name: newColor.name,
 					rgb: newColor.rgb,
@@ -245,6 +263,7 @@ const Maintenance = () => {
 						headers: {
 							"Content-Type": "application/json",
 						},
+						credentials:'include',
 						body: JSON.stringify({ name: newItemName }),
 					}
 				);
@@ -266,6 +285,7 @@ const Maintenance = () => {
 						headers: {
 							"Content-Type": "application/json",
 						},
+						credentials:'include',
 						body: JSON.stringify({
 							name: newItemName,
 							categoryId: selectedCategory,
@@ -407,13 +427,6 @@ const Maintenance = () => {
 									"number"
 								)}
 								{renderInputField(
-									"Length",
-									"length",
-									newSize.length,
-									(e) => setNewSize({ ...newSize, length: e.target.value }),
-									"number"
-								)}
-								{renderInputField(
 									"Width",
 									"width",
 									newSize.width,
@@ -541,8 +554,6 @@ const Maintenance = () => {
 									headers={[
 										"ID",
 										"Label",
-										"Height",
-										"Length",
 										"Width",
 										"Depth",
 										"Furniture Type",
@@ -551,7 +562,6 @@ const Maintenance = () => {
 										id: size._id,
 										label: size.label,
 										height: size.height,
-										length: size.length,
 										width: size.width,
 										depth: size.depth,
 										furnitureType:

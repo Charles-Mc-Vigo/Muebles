@@ -28,76 +28,60 @@ const ProductManagement = () => {
 		price: "",
 	});
 
-	useEffect(() => {
-		const fetchData = async () => {
-			setLoading(true);
-			try {
-				const [
-					furnitureResponse,
-					furnitureTypesResponse,
-					categoriesResponse,
-					materialsResponse,
-					colorsResponse,
-					sizesResponse,
-				] = await Promise.all([
-					fetch("http://localhost:3000/api/furnitures"),
-					fetch("http://localhost:3000/api/furniture-types"),
-					fetch("http://localhost:3000/api/categories"),
-					fetch("http://localhost:3000/api/materials"),
-					fetch("http://localhost:3000/api/colors"),
-					fetch("http://localhost:3000/api/sizes"),
-				]);
-
-				if (
-					!furnitureResponse.ok ||
-					!furnitureTypesResponse.ok ||
-					!categoriesResponse.ok ||
-					!materialsResponse.ok ||
-					!colorsResponse.ok ||
-					!sizesResponse.ok
-				) {
-					throw new Error("Failed to fetch some data");
-				}
-
-				const furnitureData = await furnitureResponse.json();
-				const furnitureTypesData = await furnitureTypesResponse.json();
-				const categoriesData = await categoriesResponse.json();
-				const materialsData = await materialsResponse.json();
-				const colorsData = await colorsResponse.json();
-				const sizesData = await sizesResponse.json();
-
-				setFurnitureData(furnitureData.furnitures || []);
-				setCategories(categoriesData || []);
-				setMaterials(materialsData || []);
-				setColors(colorsData || []);
-				setSizes(sizesData || []);
-				setFurnitureTypes(furnitureTypesData || []);
-			} catch (error) {
-				console.error("Error fetching data:", error);
-				toast.error("Error fetching data");
-			} finally {
-				setLoading(false);
-			}
-		};
-		fetchData();
-	}, []);
-
-	const fetchFurnitureData = async () => {
+	const fetchData = async () => {
+		setLoading(true);
 		try {
-			const response = await fetch("http://localhost:3000/api/furnitures",{
-				method:'GET',
-				credentials:'include'
-			});
-			if (!response.ok) {
-				throw new Error("Failed to fetch furniture data");
+			const [
+				furnitureResponse,
+				furnitureTypesResponse,
+				categoriesResponse,
+				materialsResponse,
+				colorsResponse,
+				sizesResponse,
+			] = await Promise.all([
+				fetch("http://localhost:3000/api/furnitures"),
+				fetch("http://localhost:3000/api/furniture-types"),
+				fetch("http://localhost:3000/api/categories"),
+				fetch("http://localhost:3000/api/materials"),
+				fetch("http://localhost:3000/api/colors"),
+				fetch("http://localhost:3000/api/sizes"),
+			]);
+
+			if (
+				!furnitureResponse.ok ||
+				!furnitureTypesResponse.ok ||
+				!categoriesResponse.ok ||
+				!materialsResponse.ok ||
+				!colorsResponse.ok ||
+				!sizesResponse.ok
+			) {
+				throw new Error("Failed to fetch some data");
 			}
-			const data = await response.json();
-			setFurnitureData(data.furnitures || []);
+
+			const furnitureData = await furnitureResponse.json();
+			const furnitureTypesData = await furnitureTypesResponse.json();
+			const categoriesData = await categoriesResponse.json();
+			const materialsData = await materialsResponse.json();
+			const colorsData = await colorsResponse.json();
+			const sizesData = await sizesResponse.json();
+
+			setFurnitureData(furnitureData || []);
+			setCategories(categoriesData || []);
+			setMaterials(materialsData || []);
+			setColors(colorsData || []);
+			setSizes(sizesData || []);
+			setFurnitureTypes(furnitureTypesData || []);
 		} catch (error) {
-			console.error("Error fetching furniture data:", error);
-			toast.error("Error fetching furniture data");
+			console.error("Error fetching data:", error);
+			toast.error("Error fetching data");
+		} finally {
+			setLoading(false);
 		}
 	};
+
+	useEffect(() => {
+		fetchData();
+	}, []);
 
 	const handleCategoryChange = (e) => {
 		const categoryId = e.target.value;
@@ -164,44 +148,43 @@ const ProductManagement = () => {
 		}
 	};
 
-  const handleFileChange = (e) => {
-    const files = Array.from(e.target.files);
+	const handleFileChange = (e) => {
+		const files = Array.from(e.target.files);
 
-    if (files.length > 5) {
-      toast.error("You can only upload a maximum of 5 images.");
-      return;
-    }
+		if (files.length > 5) {
+			toast.error("You can only upload a maximum of 5 images.");
+			return;
+		}
 
-    const readFileAsDataURL = (file) => {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          resolve(reader.result.split(",")[1]); // Get base64 data
-        };
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-      });
-    };
+		const readFileAsDataURL = (file) => {
+			return new Promise((resolve, reject) => {
+				const reader = new FileReader();
+				reader.onloadend = () => {
+					resolve(reader.result.split(",")[1]); // Get base64 data
+				};
+				reader.onerror = reject;
+				reader.readAsDataURL(file);
+			});
+		};
 
-    Promise.all(files.map(readFileAsDataURL))
-      .then((base64Images) => {
-        setNewFurniture((prev) => ({
-          ...prev,
-          images: base64Images,
-        }));
-      })
-      .catch((error) => {
-        console.error("Error reading files:", error);
-        toast.error("Failed to read files");
-      });
-  };
+		Promise.all(files.map(readFileAsDataURL))
+			.then((base64Images) => {
+				setNewFurniture((prev) => ({
+					...prev,
+					images: base64Images,
+				}));
+			})
+			.catch((error) => {
+				console.error("Error reading files:", error);
+				toast.error("Failed to read files");
+			});
+	};
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 		try {
 			const response = await fetch("http://localhost:3000/api/furnitures/add", {
 				method: "POST",
-				credentials:'include',
 				headers: {
 					"Content-Type": "application/json",
 					credentials: "include",
@@ -224,20 +207,19 @@ const ProductManagement = () => {
 				const data = await response.json();
 				toast.success(data.message);
 				setNewFurniture({
-						images: [],
-						name: "",
-						category: "",
-						furnitureType: "",
-						description: "",
-						materials: [],
-						colors: [],
-						sizes: [],
-						stocks: "",
-						price: "",
+					images: [],
+					name: "",
+					category: "",
+					furnitureType: "",
+					description: "",
+					materials: [],
+					colors: [],
+					sizes: [],
+					stocks: "",
+					price: "",
 				});
-				fetchFurnitureData(); // Refresh the furniture list
-		}
-		else {
+				fetchData(); // Refresh the furniture list
+			} else {
 				const errorData = await response.json(); // Make sure the server returns JSON even on error
 				toast.error(errorData.message || "Failed to add furniture");
 			}
@@ -421,30 +403,30 @@ const ProductManagement = () => {
 						</div>
 						{/* IMAGE INPUT  */}
 						<div className="mt-4">
-          <label className="block font-semibold">Selected Images:</label>
-          <div className="flex flex-wrap gap-4">
-            {Array.isArray(newFurniture.images) &&
-              newFurniture.images.length > 0 &&
-              newFurniture.images.map((image, index) => (
-                <img
-                  key={index}
-                  src={`data:image/jpeg;base64,${image}`}
-                  alt={`Selected image ${index + 1}`}
-                  className="w-16 h-16 object-contain"
-                />
-              ))}
-          </div>
-        </div>
-        <input
-          id="images"
-          type="file"
-          name="images"
-          onChange={handleFileChange}
-          required
-          className="border rounded p-2 w-full"
-          multiple
-          accept="image/*"
-        />
+							<label className="block font-semibold">Selected Images:</label>
+							<div className="flex flex-wrap gap-4">
+								{Array.isArray(newFurniture.images) &&
+									newFurniture.images.length > 0 &&
+									newFurniture.images.map((image, index) => (
+										<img
+											key={index}
+											src={`data:image/jpeg;base64,${image}`}
+											alt={`Selected image ${index + 1}`}
+											className="w-16 h-16 object-contain"
+										/>
+									))}
+							</div>
+						</div>
+						<input
+							id="images"
+							type="file"
+							name="images"
+							onChange={handleFileChange}
+							required
+							className="border rounded p-2 w-full"
+							multiple
+							accept="image/*"
+						/>
 						<button
 							type="submit"
 							className="bg-blue-500 text-white p-2 rounded w-full"
@@ -455,19 +437,19 @@ const ProductManagement = () => {
 				</div>
 			)}
 			{/* Table to display furniture data */}
-			<div className="mt-8">
+			<div className="mt-8 overflow-x-auto">
 				<h2 className="text-2xl font-bold mb-4">Furniture List</h2>
 				<table className="min-w-full border-collapse border border-gray-200">
 					<thead>
 						<tr className="bg-gray-100">
 							<th className="border border-gray-300 p-2">Furniture Id</th>
-							<th className="border border-gray-300 p-2">Images</th>
+							<th className="border border-gray-300 p-2">Image</th>
 							<th className="border border-gray-300 p-2">Name</th>
 							<th className="border border-gray-300 p-2">Category</th>
 							<th className="border border-gray-300 p-2">Description</th>
 							<th className="border border-gray-300 p-2">Type</th>
 							<th className="border border-gray-300 p-2">Colors</th>
-							<th className="border border-gray-300 p-2">Sizes</th>
+							<th className="border border-gray-300 p-2">Sizes <br /> (Height X Width X Depth)</th>
 							<th className="border border-gray-300 p-2">Materials</th>
 							<th className="border border-gray-300 p-2">Price</th>
 							<th className="border border-gray-300 p-2">Stocks</th>
@@ -476,29 +458,40 @@ const ProductManagement = () => {
 					<tbody>
 						{furnitureData.length > 0 ? (
 							furnitureData.map((furniture) => (
-								<tr key={furniture._id}>
+								<tr
+									key={furniture._id}
+									className="hover:bg-gray-50 transition-colors"
+								>
 									<td className="border border-gray-300 p-2">
 										{furniture._id}
 									</td>
-									{furniture.images.map((img, index) => (
-										<img
-											key={`image-${furniture._id}-${index}`}
-											src={`data:image/jpeg;base64,${img}`}
-											alt={furniture.name}
-											className="w-16 h-16 object-cover"
-										/>
-									))}
+									<td className="border border-gray-300 p-2 flex justify-center">
+										{furniture.images.length > 0 ? (
+											<img
+												src={`data:image/jpeg;base64,${furniture.images[0]}`} // Display only the first image
+												alt={furniture.name}
+												className="w-16 h-16 object-cover rounded-md"
+											/>
+										) : (
+											<span className="text-gray-500">No Image</span>
+										)}
+									</td>
 									<td className="border border-gray-300 p-2">
 										{furniture.name}
 									</td>
 									<td className="border border-gray-300 p-2">
 										{furniture.category?.name || "N/A"}
 									</td>
-									<td className="border border-gray-300 p-2">
-										{furniture.description}
+									<td
+										className="border border-gray-300 p-2"
+										title={furniture.description}
+									>
+										{furniture.description.length > 50
+											? `${furniture.description.substring(0, 50)}...`
+											: furniture.description}
 									</td>
 									<td className="border border-gray-300 p-2">
-										{furniture.furnitureType?.name}
+										{furniture.furnitureType?.name || "N/A"}
 									</td>
 									<td className="border border-gray-300 p-2">
 										{furniture.colors && furniture.colors.length > 0
@@ -513,8 +506,7 @@ const ProductManagement = () => {
 										{furniture.sizes && furniture.sizes.length > 0
 											? furniture.sizes.map((size) => (
 													<span key={size._id} className="block">
-														{size.label} ( {size.height} X {size.width} X{" "}
-														{size.length} X {size.depth} )
+														{size.label} <br /> ({size.height} X {size.width} X {size.depth} )
 													</span>
 											  ))
 											: "N/A"}
@@ -538,7 +530,10 @@ const ProductManagement = () => {
 							))
 						) : (
 							<tr>
-								<td colSpan="10" className="text-center p-4">
+								<td
+									colSpan="11"
+									className="text-center p-4 text-gray-500 font-semibold"
+								>
 									No furniture available
 								</td>
 							</tr>

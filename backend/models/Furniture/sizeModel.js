@@ -13,10 +13,6 @@ const sizeSchema = new mongoose.Schema({
     type: Number,
     required: true 
   },
-  length:{
-    type:Number,
-    required:true
-  },
   depth: {
     type: Number,
     required: true

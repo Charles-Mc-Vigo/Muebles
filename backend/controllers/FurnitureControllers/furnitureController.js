@@ -33,13 +33,13 @@ exports.getAllFurnitures = async (req, res) => {
 					{ path: "category", select: "name -_id" },
 					{ path: "furnitureType", select: "name -_id" },
 					{ path: "materials", select: "name -_id" },
-					{ path: "colors", select: "name -_id" },
+					{ path: "colors", select: "name hex -_id" },
 					{ path: "stocks", select: "stocks -_id" },
-					{ path: "sizes", select: "label -_id" },
+					{ path: "sizes", select: "label height width depth -_id" },
 			]);
 			
 			// Return the fetched furnitures
-			res.status(200).json({ furnitures }); // Changed here
+			res.status(200).json( furnitures ); // Changed here
 	} catch (error) {
 			console.error(error);
 			res.status(500).json({ message: "Server error!" });
@@ -77,7 +77,7 @@ exports.getFurnitureById = async (req, res) => {
 			{ path: "category", select: "name -_id" },
 			{ path: "furnitureType", select: "name -_id" },
 			{ path: "materials", select: "name -_id" },
-			{ path: "colors", select: "name -_id" },
+			{ path: "colors", select: "name hex -_id" },
 			{ path: "stocks", select: "stocks -_id" },
 			{ path: "sizes", select: "label -_id" },
 		]);
