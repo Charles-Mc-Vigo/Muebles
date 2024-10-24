@@ -251,7 +251,7 @@ export default function SignUp() {
               </label>
               <p className="pl-3 text-xs sm:text-sm">
                 I accept the&nbsp;
-                <Link to="/terms-and-conditions" className="text-blue-600 hover:underline">
+                <Link to="/terms&condition" className="text-blue-600 hover:underline">
                   Terms and Conditions
                 </Link>
               </p>

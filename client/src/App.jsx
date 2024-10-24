@@ -25,10 +25,10 @@ import ProductDetails from "./components/ProductDetails";
 import EditProduct from "./components/EditProduct";
 import Delivery from "./components/Delivery";
 import AdminPendingPage from "./pages/AdminPendingPage";
-import Profile from "../src/components/Profile";
-import PasswordResetRequest from "./pages/PasswordResetRequest";
-import PasswordResetVerify from "./pages/PasswordResetVerify";
-import PasswordResetCreateNew from "./pages/PasswordResetCreateNew";
+import Profile from "./components/Profile";
+import UserProfile from "./components/UserProfile";
+import TermsAndConditions from "./pages/TermsandCondition";
+
 
 
 export default function App() {
@@ -39,6 +39,7 @@ export default function App() {
                 <Route path="/about" element={<About />} />
                 <Route path="/signup" element={<SignUp />} />
                 <Route path="/login" element={<Login />} />
+                <Route path="/terms&condition" element={<TermsAndConditions />} />
                 <Route path="/verify-account/:userId" element={<EmailVerification />} />
                 <Route path="/home" element={<ProtectedRoute element={Home} />} />
                 <Route path="/password-reset/request"  element={<PasswordResetRequest/>} />
