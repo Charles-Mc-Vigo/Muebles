@@ -35,12 +35,13 @@ const EditProduct = () => {
           throw new Error('Failed to fetch furniture data');
         }
         const data = await response.json();
+        console.log(data)
         // Transform the data to match the form structure
         const transformedData = {
           name: data.name,
           description: data.description,
           price: data.price,
-          stocks: data.stocks,
+          stocks: data.stocks.stocks,
           category: data.category?.name || '',
           furnitureType: data.furnitureType?.name || '',
           materials: data.materials?.map(material => material.name) || [],
