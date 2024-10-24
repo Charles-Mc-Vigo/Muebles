@@ -23,7 +23,7 @@ import ServicePage from "./pages/ServicePage";
 import ProductTable from "./components/ProductTable";
 import ProductDetails from "./components/ProductDetails";
 import EditProduct from "./components/EditProduct";
-import Delivery from "./components/Delivery";
+import DeliveryInfo from "./components/DeliveryInfo";
 import AdminPendingPage from "./pages/AdminPendingPage";
 import Profile from "./components/Profile";
 import UserProfile from "./components/UserProfile";
@@ -52,6 +52,7 @@ export default function App() {
                 <Route path="/password-reset/verify/:userId"  element={<PasswordResetVerify/>} />
                 <Route path="/password-reset/new-password/:userId"  element={<PasswordResetCreateNew/>} />
                 <Route path={`/furnitures/:id`} element={<ProtectedRoute element={ProductDetails} />} />
+                <Route path="/delivery-info" element={<DeliveryInfo />} />
 
                 {/* Admin routes */}
                 <Route path="/admin-login" element={<AdminLogin />} />
@@ -64,7 +65,6 @@ export default function App() {
                 <Route path={`/furnitures/:id`} element={<ProtectedRoute element={ProductDetails} adminOnly={true} />} />
                 <Route path={`/furnitures/edit/:id`} element={<ProtectedRoute element={EditProduct} adminOnly={true} />} />
                 <Route path="/service-page" element={<ServicePage />} />
-                <Route path="/delivery-info" element={<Delivery />} />
                 <Route path="/inventory-management" element={<InventoryPage />} />
                 <Route path="/furniture-list" element={<ProtectedRoute element={FurnitureList} />} />
                 <Route path="/manage-delivery" element={<DeliveryManagement />} />
