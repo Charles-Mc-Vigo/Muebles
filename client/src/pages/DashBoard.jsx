@@ -21,6 +21,7 @@ import HamburgerMenu from "../components/HamburgerMenu";
 import Notification from "../components/Notification";
 import OrderManagement from "./OrderManagement";
 import TransactionHistory from "./TransactionHistory";
+import DeliveryManagement from "../DeliveryManagement";
 
 const Dashboard = () => {
   // State management for dropdowns
@@ -103,10 +104,10 @@ const Dashboard = () => {
     "track-delivery": (
       <h2 className="text-2xl font-semibold">Track Delivery Content</h2>
     ),
-    "manage-delivery": (
-      <h2 className="text-2xl font-semibold">Manage Delivery Content</h2>
-    ),
+    "manage-delivery": <DeliveryManagement/> ,
+
     Category: <Maintenance />,
+	
     Services: <ServiceSection />,
     "repair-hardware": (
       <h2 className="text-2xl font-semibold">Repair Hardware Content</h2>

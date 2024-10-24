@@ -28,6 +28,12 @@ import AdminPendingPage from "./pages/AdminPendingPage";
 import Profile from "./components/Profile";
 import UserProfile from "./components/UserProfile";
 import TermsAndConditions from "./pages/TermsandCondition";
+import DeliveryManagement from "./DeliveryManagement";
+import PasswordResetRequest from "./pages/PasswordResetRequest";
+import PasswordResetVerify from "./pages/PasswordResetVerify";
+import PasswordResetCreateNew from "./pages/PasswordResetCreateNew";
+import InventoryPage from "./pages/InventoryPage";
+
 
 
 
@@ -59,7 +65,9 @@ export default function App() {
                 <Route path={`/furnitures/edit/:id`} element={<ProtectedRoute element={EditProduct} adminOnly={true} />} />
                 <Route path="/service-page" element={<ServicePage />} />
                 <Route path="/delivery-info" element={<Delivery />} />
+                <Route path="/inventory-management" element={<InventoryPage />} />
                 <Route path="/furniture-list" element={<ProtectedRoute element={FurnitureList} />} />
+                <Route path="/manage-delivery" element={<DeliveryManagement />} />
                 <Route path="/user-management" element={<ProtectedRoute element={UserManagement} adminOnly={true} />} />
                 <Route path="/order-management" element={<ProtectedRoute element={OrderManagement} adminOnly={true} />} />
                 <Route path="/view-transaction" element={<ProtectedRoute element={TransactionHistory} adminOnly={true} />} />

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { FaArrowLeft } from "react-icons/fa"; // Import the arrow icon
-import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
+import { FaArrowLeft } from "react-icons/fa"; 
+import { useNavigate } from "react-router-dom"; 
 import Footer from "../components/Footer";
 import Header from "../components/Header";
 
@@ -19,9 +19,9 @@ const TermsAndConditions = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen ">
       <Header />
-      <main className="flex-grow max-w-4xl mx-auto p-6">
+      <main className="flex-grow max-w-4xl mx-auto p-6 text-justify ">
         <h1 className="text-3xl font-bold mb-4">Terms of Service</h1>
         <h2 className="text-2xl font-semibold mt-6">INTRODUCTION</h2>
         <p className="mb-4">
