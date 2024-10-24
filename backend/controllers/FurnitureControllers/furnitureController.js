@@ -233,8 +233,8 @@ exports.updateFurniture = async (req, res) => {
         }
       }
 
-      if (images.length < 3) {
-        return res.status(400).json({ message: "At least 3 images are required!" });
+      if (images.length < 5) {
+        return res.status(400).json({ message: "At least 5 images are required!" });
       }
 
       const {
