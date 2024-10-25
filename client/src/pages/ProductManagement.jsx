@@ -187,8 +187,8 @@ const ProductManagement = () => {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
-					credentials: "include",
 				},
+                credentials: "include",
 				body: JSON.stringify({
 					images: newFurniture.images,
 					name: newFurniture.name,

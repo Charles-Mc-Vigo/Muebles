@@ -554,6 +554,7 @@ const Maintenance = () => {
 									headers={[
 										"ID",
 										"Label",
+										"Height",
 										"Width",
 										"Depth",
 										"Furniture Type",

@@ -190,7 +190,7 @@ exports.createFurniture = async (req, res) => {
         price,
       });
 
-      console.log('New Furniture has been added!', newFurniture);
+      console.log('New Furniture has been added!');
       await newFurniture.save();
       res.status(201).json({
         message: "New furniture added successfully!",
