@@ -54,7 +54,7 @@ export default function App() {
                 <Route path="/dashboard/setting/my-profile/view" element={<ProtectedRoute element={Profile} adminOnly={true} />} />
                 <Route path="/table" element={<ProtectedRoute element={ProductTable} adminOnly={true} />} />
                 <Route path={`/furnitures/:id`} element={<ProtectedRoute element={ProductDetails} adminOnly={true} />} />
-                <Route path={`/furnitures/edit/:id`} element={<ProtectedRoute element={EditProduct} adminOnly={true} />} />
+                <Route path={`/furnitures/edit/:furnitureId`} element={<ProtectedRoute element={EditProduct} adminOnly={true} />} />
                 <Route path="/service-page" element={<ServicePage />} />
                 <Route path="/delivery-info" element={<Delivery />} />
                 <Route path="/furniture-list" element={<ProtectedRoute element={FurnitureList} />} />

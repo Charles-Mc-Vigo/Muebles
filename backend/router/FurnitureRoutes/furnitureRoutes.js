@@ -46,10 +46,10 @@ router.put("/edit/:furnitureId", upload.array("images", 5), checkAdminAuth, upda
 
 // Archive furniture
 // DELETE - /api/furnitures/archived/:furnitureId
-router.delete("/archived/:furnitureId", checkAdminAuth, Archived);
+router.delete("/archive/:furnitureId", checkAdminAuth, Archived);
 
 // UnArchiving the furniture
-router.post("/unarchived/:furnitureId", checkAdminAuth, UnArchived);
+router.post("/unarchive/:furnitureId", checkAdminAuth, UnArchived);
 
 // Get furniture by ID
 // GET - /api/furnitures/:furnitureId

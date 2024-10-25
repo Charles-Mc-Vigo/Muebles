@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBars, faUser, faCog, faTimes } from "@fortawesome/free-solid-svg-icons";  // Import necessary icons
+import Profile from "./Profile";
 
 const HamburgerMenu = () => {
     const [isOpen, setIsOpen] = useState(false);  // State to toggle the sidebar
@@ -38,6 +39,9 @@ const HamburgerMenu = () => {
                 onKeyDown={handleKeyDown} // Handle keydown events
             >
                 <ul className="space-y-4 mt-8 p-4">
+                    <li>
+                        <Profile showNameAndImage={true}/>
+                    </li>
                     {/* Profile */}
                     <li>
                         <button className="focus:outline-none flex items-center hover:bg-gray-100 rounded-md p-2 transition">

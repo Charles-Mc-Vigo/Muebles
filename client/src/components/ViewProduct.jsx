@@ -99,8 +99,7 @@ function ViewProduct() {
 									price={`Php ${furniture.price}`}
 									description={furniture.description}
 									showViewDetails={true}
-									showAddToCart={false}
-									showUpdateButton={false} // Archived items might not have update functionality
+									showUnArchivedButton={true}
 								/>
 							))
 					  ) : (
@@ -118,8 +117,8 @@ function ViewProduct() {
 									price={`Php ${furniture.price}`}
 									description={furniture.description}
 									showViewDetails={true}
-									showAddToCart={false}
 									showUpdateButton={true}
+									showArchiveButton={true}
 								/>
 							))
 					  ) : (
