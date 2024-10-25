@@ -120,6 +120,7 @@ function ViewProduct() {
 									showViewDetails={true}
 									showAddToCart={false}
 									showUpdateButton={true}
+									showArchiveButton={true}
 								/>
 							))
 					  ) : (

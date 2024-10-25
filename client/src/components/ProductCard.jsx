@@ -9,6 +9,7 @@ const ProductCard = ({
 	description,
 	showAddToCart,
 	showUpdateButton,
+	showArchiveButton,
 }) => {
 	// Function to truncate the description
 	const truncateDescription = (desc, maxLength) => {
@@ -44,6 +45,29 @@ const ProductCard = ({
 		} catch (error) {
 			console.error('Error adding item to cart:', error);  // Optionally handle error (e.g., show an error message)
 			alert('Error adding item to cart. Please try again.');
+		}
+	};
+
+	// Function to handle archiving the item
+	const archiveItem = async (e) => {
+		e.preventDefault(); // Prevents navigating when clicking the button
+		try {
+			const response = await fetch(`http://localhost:3000/api/furnitures/${id}/archive`, {
+				method: 'PUT',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				credentials: 'include',
+			});
+			if (!response.ok) {
+				throw new Error('Failed to archive item');
+			}
+			const data = await response.json();
+			console.log('Item archived successfully:', data); // Optionally handle success
+			alert('Item archived successfully!');
+		} catch (error) {
+			console.error('Error archiving item:', error); // Optionally handle error
+			alert('Error archiving item. Please try again.');
 		}
 	};
 
@@ -84,6 +108,14 @@ const ProductCard = ({
 					>
 						Update Furniture
 					</Link>
+				)}
+				{showArchiveButton && (
+					<button
+						onClick={archiveItem}
+						className="bg-red-600 hover:bg-red-700 text-white py-2 rounded-md transition-colors duration-300 mt-2"
+					>
+						Archive
+					</button>
 				)}
 			</div>
 		</Link>
