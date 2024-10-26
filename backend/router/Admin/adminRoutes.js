@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const {AdminSignup, AdminLogin, AllAdmins, verifyEmail, adminLogout, getAdminById, PendingAdminRequest, AcceptAdminRequest, updateProfile, myProfile, unconfirmedAdmin} = require('../../controllers/Admin/adminController');
+const orderController = require('../../controllers/Order/orderController')
 const { checkAdminAuth } = require('../../middlewares/checkAuth');
 const multer = require('multer');
 const storage = multer.memoryStorage();
@@ -20,5 +21,9 @@ router.get('/verified/:adminId', checkAdminAuth, getAdminById);
 router.get("/notifications/pending-request", checkAdminAuth, PendingAdminRequest);
 router.put("/setting/update-profile", checkAdminAuth, upload.single('image'), updateProfile);
 router.get("/setting/my-profile/view", checkAdminAuth, myProfile);
+
+// Admin routes - protected with checkAdminAuth
+router.get('/order/all', checkAdminAuth, orderController.getAllOrders);
+router.put('/order/status/:orderId', checkAdminAuth, orderController.updateOrderStatus);
 
 module.exports = router;
