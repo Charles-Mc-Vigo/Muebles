@@ -11,6 +11,9 @@ const ProductCard = ({
 	showUpdateButton,
 	showArchiveButton,
 	showUnArchivedButton,
+	onArchiveSuccess,
+	onUnArchiveSuccess
+
 }) => {
 	// Function to truncate the description
 	const truncateDescription = (desc, maxLength) => {
@@ -51,23 +54,18 @@ const ProductCard = ({
 
 	// Function to handle archiving the item
 	const archiveItem = async (e) => {
-		e.preventDefault(); // Prevents navigating when clicking the button
+		e.preventDefault();
 		try {
 			const response = await fetch(`http://localhost:3000/api/furnitures/archive/${id}`, {
 				method: 'DELETE',
-				headers: {
-					'Content-Type': 'application/json',
-				},
+				headers: { 'Content-Type': 'application/json' },
 				credentials: 'include',
 			});
-			if (!response.ok) {
-				throw new Error('Failed to archive item');
-			}
-			const data = await response.json();
-			console.log('Item archived successfully:', data); // Optionally handle success
+			if (!response.ok) throw new Error('Failed to archive item');
 			alert('Item archived successfully!');
+			onArchiveSuccess(); // Trigger update in parent component
 		} catch (error) {
-			console.error('Error archiving item:', error); // Optionally handle error
+			console.error('Error archiving item:', error);
 			alert('Error archiving item. Please try again.');
 		}
 	};
@@ -89,6 +87,7 @@ const ProductCard = ({
 			const data = await response.json();
 			console.log('Item unarchived successfully:', data); // Optionally handle success
 			alert('Item unarchived successfully!');
+			onUnArchiveSuccess();
 		} catch (error) {
 			console.error('Error unarchiving item:', error); // Optionally handle error
 			alert('Error unarchiving item. Please try again.');

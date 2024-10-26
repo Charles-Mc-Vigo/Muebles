@@ -11,89 +11,123 @@ function ViewProduct() {
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
 	const [showArchived, setShowArchived] = useState(false);
+	const [showArchivedCategories, setShowArchivedCategories] = useState(false); // New state for categories
 	const [showDropdown, setShowDropdown] = useState(false);
 
+
+	const fetchFurniture = async () => {
+		try {
+			const response = await fetch(`http://localhost:3000/api/furnitures`, {
+				method: "GET",
+				credentials: "include",
+			});
+			if (!response.ok) {
+				throw new Error("Failed to fetch furniture details");
+			}
+			const data = await response.json();
+			setFurnitureData(data);
+		} catch (error) {
+			setError(error.message);
+		} finally {
+			setLoading(false);
+		}
+	};
+
+	const fetchArchivedFurnitures = async () => {
+		try {
+			const response = await fetch(
+				`http://localhost:3000/api/furnitures/archived`,
+				{
+					method: "GET",
+					credentials: "include",
+				}
+			);
+			if (!response.ok) {
+				throw new Error("Failed to fetch archived furniture");
+			}
+			const data = await response.json();
+			setArchivedFurnitures(data);
+		} catch (error) {
+			setError(error.message);
+		} finally {
+			setLoading(false);
+		}
+	};
+
+	const fetchArchivedCategories = async () => {
+		try {
+			const response = await fetch(
+				`http://localhost:3000/api/categories/archived`,
+				{
+					method: "GET",
+					credentials: "include",
+				}
+			);
+			if (!response.ok) {
+				throw new Error("Failed to fetch archived categories");
+			}
+			const data = await response.json();
+			setArchivedCategories(data);
+		} catch (error) {
+			setError(error.message);
+		} finally {
+			setLoading(false);
+		}
+	};
+
 	useEffect(() => {
-		// Fetch active furniture
-		const fetchFurniture = async () => {
-			try {
-				const response = await fetch(`http://localhost:3000/api/furnitures`, {
-					method: "GET",
-					credentials: "include",
-				});
-				if (!response.ok) {
-					throw new Error("Failed to fetch furniture details");
-				}
-				const data = await response.json();
-				setFurnitureData(data);
-			} catch (error) {
-				setError(error.message);
-			} finally {
-				setLoading(false);
-			}
-		};
-
-		// Fetch archived furniture
-		const fetchArchivedFurnitures = async () => {
-			try {
-				const response = await fetch(`http://localhost:3000/api/furnitures/archived`, {
-					method: "GET",
-					credentials: "include",
-				});
-				if (!response.ok) {
-					throw new Error("Failed to fetch archived furniture");
-				}
-				const data = await response.json();
-				setArchivedFurnitures(data);
-			} catch (error) {
-				setError(error.message);
-			} finally {
-				setLoading(false);
-			}
-		};
-
-		// Fetch archived categories
-		const fetchArchivedCategories = async () => {
-			try {
-				const response = await fetch(`http://localhost:3000/api/categories/archived`, {
-					method: "GET",
-					credentials: "include",
-				});
-				if (!response.ok) {
-					throw new Error("Failed to fetch archived categories");
-				}
-				const data = await response.json();
-				setArchivedCategories(data);
-			} catch (error) {
-				setError(error.message);
-			} finally {
-				setLoading(false);
-			}
-		};
-
 		fetchFurniture();
 		fetchArchivedFurnitures();
 		fetchArchivedCategories();
 	}, []);
 
-	// Toggle dropdown menu
+	// Function to refresh the furniture list
+	const refreshFurnitureList = () => {
+		fetchFurniture();
+	};
+	const refreshArchiveFurnitureList = () => {
+		fetchArchivedFurnitures();
+	};
+
 	const toggleDropdown = () => {
 		setShowDropdown(!showDropdown);
 	};
 
-	// Unarchive a category
+	const showActiveFurniture = () => {
+		setShowArchived(false);
+		setShowArchivedCategories(false); // Reset to show active furniture
+		setShowDropdown(false);
+	};
+
+	const showArchivedFurniture = () => {
+		setShowArchived(true);
+		setShowArchivedCategories(false); // Ensure only archived furniture shows
+		setShowDropdown(false);
+	};
+
+	const showArchivedCategoryList = () => {
+		setShowArchived(false);
+		setShowArchivedCategories(true); // Show archived categories only
+		setShowDropdown(false);
+	};
+
 	const unarchiveCategory = async (categoryId) => {
 		try {
-			const response = await fetch(`http://localhost:3000/api/categories/unarchive/${categoryId}`, {
-				method: "POST",
-				credentials: "include",
-			});
+			const response = await fetch(
+				`http://localhost:3000/api/categories/unarchive/${categoryId}`,
+				{
+					method: "POST",
+					credentials: "include",
+				}
+			);
 			if (!response.ok) {
 				throw new Error("Failed to unarchive category");
 			}
-			// Update the list after successful unarchiving
 			toast.success("Category unarchived successfully!");
-			setArchivedCategories(archivedCategories.filter(category => category._id !== categoryId));
+			setArchivedCategories(
+				archivedCategories.filter((category) => category._id !== categoryId)
+			);
+			await fetchArchivedCategories();
 		} catch (error) {
 			setError(error.message);
 		}
@@ -104,12 +138,14 @@ function ViewProduct() {
 
 	return (
 		<div className="container mx-auto px-4 py-8">
-			{/* Page Title */}
 			<div className="flex items-center justify-between mb-6">
 				<h1 className="text-3xl font-bold">
-					{showArchived ? "Archived Furniture" : "Active Furniture"}
+					{showArchived
+						? "Archived Furniture"
+						: showArchivedCategories
+						? "Archived Categories"
+						: "Active Furniture"}
 				</h1>
-				{/* Toggle Button */}
 				<div className="relative">
 					<button
 						className="flex items-center bg-blue-500 text-white px-4 py-2 rounded-md transition-all hover:bg-blue-600 focus:outline-none"
@@ -123,12 +159,21 @@ function ViewProduct() {
 							<ul className="py-1">
 								<li
 									className="block px-4 py-2 text-gray-700 hover:bg-gray-100 cursor-pointer"
-									onClick={() => setShowArchived(true)}
+									onClick={showActiveFurniture} // Reset view to active furniture
 								>
-									Furniture
+									Active Furniture
 								</li>
-								<li className="block px-4 py-2 text-gray-700 hover:bg-gray-100 cursor-pointer">
-									Categories
+								<li
+									className="block px-4 py-2 text-gray-700 hover:bg-gray-100 cursor-pointer"
+									onClick={showArchivedFurniture}
+								>
+									Archived Furniture
+								</li>
+								<li
+									className="block px-4 py-2 text-gray-700 hover:bg-gray-100 cursor-pointer"
+									onClick={showArchivedCategoryList}
+								>
+									Archived Categories
 								</li>
 							</ul>
 						</div>
@@ -136,7 +181,6 @@ function ViewProduct() {
 				</div>
 			</div>
 
-			{/* Display archived categories */}
 			{showArchived ? (
 				<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 transition-opacity">
 					{archivedFurnitures.length > 0 ? (
@@ -150,6 +194,7 @@ function ViewProduct() {
 								description={furniture.description}
 								showViewDetails={true}
 								showUnArchivedButton={true}
+								onUnArchiveSuccess={refreshArchiveFurnitureList}
 							/>
 						))
 					) : (
@@ -158,8 +203,7 @@ function ViewProduct() {
 						</p>
 					)}
 				</div>
-			) : (
-				// Categories Table
+			) : showArchivedCategories ? (
 				<table className="min-w-full bg-white">
 					<thead>
 						<tr>
@@ -195,8 +239,31 @@ function ViewProduct() {
 						))}
 					</tbody>
 				</table>
+			) : (
+				<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 transition-opacity">
+					{furnitureData.length > 0 ? (
+						furnitureData.map((furniture) => (
+							<ProductCard
+								key={furniture._id}
+								id={furniture._id}
+								images={furniture.images}
+								name={furniture.name}
+								price={`Php ${furniture.price}`}
+								description={furniture.description}
+								showViewDetails={true}
+								showUpdateButton={true}
+								showArchiveButton={true}
+								onArchiveSuccess={refreshFurnitureList} // Pass the refresh function
+							/>
+						))
+					) : (
+						<p className="text-center text-gray-500 col-span-full">
+							No active furniture available.
+						</p>
+					)}
+				</div>
 			)}
-			<ToastContainer/>
+			<ToastContainer />
 		</div>
 	);
 }
