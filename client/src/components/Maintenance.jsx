@@ -2,36 +2,76 @@ import React, { useState, useEffect } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-const Table = ({ headers, data }) => {
+const Table = ({ headers, data, onEdit, onSave }) => {
+	const [editIndex, setEditIndex] = useState(null); // Track the index of the row being edited
+
+	const handleEditClick = (index) => {
+			setEditIndex(index); // Set the index of the row to be edited
+	};
+
+	const handleSaveClick = (row) => {
+			onSave(row); // Call the save function passed as a prop
+			setEditIndex(null); // Reset the edit index after saving
+	};
+
 	return (
-		<table className="min-w-full border-collapse border border-gray-300 mb-6">
-			<thead className="bg-gray-200">
-				<tr>
-					{headers.map((header, index) => (
-						<th
-							key={index}
-							className="border border-gray-300 p-2 text-left font-semibold text-gray-700"
-						>
-							{header}
-						</th>
-					))}
-				</tr>
-			</thead>
-			<tbody>
-				{data.map((row, index) => (
-					<tr
-						key={index}
-						className="hover:bg-gray-100 transition-colors duration-200"
-					>
-						{Object.values(row).map((cell, cellIndex) => (
-							<td key={cellIndex} className="border border-gray-300 p-2">
-								{cell}
-							</td>
-						))}
-					</tr>
-				))}
-			</tbody>
-		</table>
+			<table className="min-w-full border-collapse border border-gray-300 mb-6">
+					<thead className="bg-gray-200">
+							<tr>
+									{headers.map((header, index) => (
+											<th
+													key={index}
+													className="border border-gray-300 p-2 text-left font-semibold text-gray-700"
+											>
+													{header}
+											</th>
+									))}
+									<th className="border border-gray-300 p-2 text-left font-semibold text-gray-700">
+											Actions
+									</th>
+							</tr>
+					</thead>
+					<tbody>
+							{data.map((row, rowIndex) => (
+									<tr
+											key={rowIndex}
+											className="hover:bg-gray-100 transition-colors duration-200"
+									>
+											{Object.keys(row).map((key, cellIndex) => (
+													<td key={cellIndex} className="border border-gray-300 p-2">
+															{editIndex === rowIndex ? (
+																	<input
+																			type="text"
+																			value={row[key]}
+																			onChange={(e) => onEdit(rowIndex, key, e.target.value)}
+																			className="w-full border rounded-lg p-1"
+																	/>
+															) : (
+																	row[key] // Display the value when not editing
+															)}
+													</td>
+											))}
+											<td className="border border-gray-300 p-2">
+													{editIndex === rowIndex ? (
+															<button
+																	onClick={() => handleSaveClick(row)}
+																	className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
+															>
+																	Save
+															</button>
+													) : (
+															<button
+																	onClick={() => handleEditClick(rowIndex)}
+																	className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+															>
+																	Edit
+															</button>
+													)}
+											</td>
+									</tr>
+							))}
+					</tbody>
+			</table>
 	);
 };
 
@@ -62,14 +102,14 @@ const Maintenance = () => {
 	const [newSize, setNewSize] = useState(initialSizeState);
 	const [newColor, setNewColor] = useState(initialColorState);
 
+	const fetchData = async () => {
+		await fetchCategories();
+		await fetchFurnitureTypes();
+		await fetchColors();
+		await fetchSizes();
+		await fetchMaterials();
+	};
 	useEffect(() => {
-		const fetchData = async () => {
-			await fetchCategories(); // Fetch categories
-			await fetchFurnitureTypes(); // Fetch furniture types
-			await fetchColors(); // Fetch colors
-			await fetchSizes(); // Fetch sizes
-			await fetchMaterials();
-		};
 		fetchData();
 	}, []);
 
@@ -306,6 +346,65 @@ const Maintenance = () => {
 			toast.error(error.message);
 		}
 	};
+	const handleEditItem = (rowIndex, key, value) => {
+		if (selectedFilter === "Categories") {
+			const updatedCategories = [...categories];
+			updatedCategories[rowIndex][key] = value;
+			setCategories(updatedCategories);
+		} else if (selectedFilter === "Furniture Types") {
+			const updatedFurnitureTypes = [...furnitureTypes];
+			updatedFurnitureTypes[rowIndex][key] = value;
+			setFurnitureTypes(updatedFurnitureTypes);
+		} else if (selectedFilter === "Furniture Size") {
+			const updatedSizes = [...sizes];
+			updatedSizes[rowIndex][key] = value;
+			setSizes(updatedSizes);
+		} else if (selectedFilter === "Colors") {
+			const updatedColors = [...colors];
+			updatedColors[rowIndex][key] = value;
+			setColors(updatedColors);
+		} else if (selectedFilter === "Furniture Materials") {
+			const updatedMaterials = [...materials];
+			updatedMaterials[rowIndex][key] = value;
+			setMaterials(updatedMaterials);
+		}
+	};
+
+	const handleSaveItem = async (item) => {
+		let url = "";
+		if (selectedFilter === "Categories") {
+			url = `http://localhost:3000/api/categories/${item.id}`;
+		} else if (selectedFilter === "Furniture Types") {
+			url = `http://localhost:3000/api/furniture-types/${item.id}`;
+		} else if (selectedFilter === "Furniture Size") {
+			url = `http://localhost:3000/api/sizes/${item.id}`;
+		} else if (selectedFilter === "Colors") {
+			url = `http://localhost:3000/api/colors/edit-color/${item.id}`;
+		} else if (selectedFilter === "Furniture Materials") {
+			url = `http://localhost:3000/api/materials/edit/${item.id}`;
+		}
+
+		try {
+			const response = await fetch(url, {
+				method: "PUT",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				credentials: "include",
+				body: JSON.stringify(item),
+			});
+			if (response.ok) {
+				toast.success("Item updated successfully.");
+				await fetchData(); // Refresh data
+			} else {
+				const errorData = await response.json();
+				toast.error(errorData.message);
+			}
+		} catch (error) {
+			console.error("Error updating item:", error);
+			toast.error("Failed to update item");
+		}
+	};
 
 	const resetInputFields = () => {
 		setNewItemName("");
@@ -512,9 +611,8 @@ const Maintenance = () => {
 					</form>
 				</div>
 				{/* Right Side for Tables */}
-				<div className="w-4/5  pl-4 border-2">
-					{" "}
-					{/* Set width to 60% */}
+				{/* Right Side for Tables */}
+				<div className="w-4/5 pl-4 border-2">
 					{selectedFilter === "Categories" && (
 						<div className="space-y-4">
 							<h2 className="text-2xl font-bold mb-4">Categories</h2>
@@ -525,6 +623,8 @@ const Maintenance = () => {
 										id: category._id,
 										name: category.name,
 									}))}
+									onEdit={handleEditItem}
+									onSave={handleSaveItem}
 								/>
 							</div>
 						</div>
@@ -542,6 +642,8 @@ const Maintenance = () => {
 											categories.find((cat) => cat._id === type.categoryId)
 												?.name || "N/A",
 									}))}
+									onEdit={handleEditItem}
+									onSave={handleSaveItem}
 								/>
 							</div>
 						</div>
@@ -570,6 +672,8 @@ const Maintenance = () => {
 												(type) => type._id === size.furnitureTypeId
 											)?.name || "N/A",
 									}))}
+									onEdit={handleEditItem}
+									onSave={handleSaveItem}
 								/>
 							</div>
 						</div>
@@ -586,11 +690,12 @@ const Maintenance = () => {
 										rgb: color.rgb,
 										hex: color.hex,
 									}))}
+									onEdit={handleEditItem}
+									onSave={handleSaveItem}
 								/>
 							</div>
 						</div>
 					)}
-					{/* Right Side for Furniture Materials */}
 					{selectedFilter === "Furniture Materials" && (
 						<div className="space-y-4 mt-8">
 							<h2 className="text-2xl font-bold mb-4">Furniture Materials</h2>
@@ -602,6 +707,8 @@ const Maintenance = () => {
 										name: material.name,
 										quantity: material.quantity,
 									}))}
+									onEdit={handleEditItem}
+									onSave={handleSaveItem}
 								/>
 							</div>
 						</div>
