@@ -1,13 +1,12 @@
 const Order = require("../../models/Order/orderModel");
 const User = require("../../models/User/userModel");
 const Furniture = require("../../models/Furniture/furnitureModel");
-const {OrderSchemaValidator} = require("../../middlewares/JoiSchemaValidation")
 
 
 // Getting all the orders
 exports.getAllOrders = async (req, res) => {
   try {
-    const orders = await Order.find({})
+    const orders = await Order.find()
 
     if (orders.length === 0) {
       return res.status(404).json({ message: "No orders found!" });

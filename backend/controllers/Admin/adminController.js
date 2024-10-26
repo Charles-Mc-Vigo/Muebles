@@ -188,18 +188,24 @@ exports.verifyEmail = async (req, res) => {
 //routes ("/admin/:adminId",getAdminById)
 exports.getAdminById = async (req, res) => {
   try {
-    const { adminId } = req.params;
-    const admin = await Admin.findById(adminId);
+    const { adminId } = req.params; // Get adminId from the URL parameters
+    const filters = req.query; // Get any additional query parameters
+
+    // Add the adminId as part of the filter criteria
+    filters._id = adminId;
+
+    // Use findOne with the combined filters
+    const admin = await Admin.findOne(filters);
 
     if (!admin) return res.status(404).json({ message: "Admin not found!" });
 
     res.status(200).json(admin);
-		// console.log(admin)
   } catch (error) {
-    console.log("Error fetching admin by id: ", error);
+    console.log("Error fetching admin by ID:", error);
     res.status(500).json({ message: "Server error!" });
   }
 };
+
 
 
 // Manager power
@@ -263,21 +269,9 @@ exports.PendingAdminRequest = async (req,res) => {
 //get all admins
 exports.AllAdmins = async(req,res)=>{
 	try {
-		//get admin by id query
-		const {id} = req.query;
-		if(id){
-			const admin = await Admin.findById(id);
-			if(!admin){
-				return res.status(404).json({message:"Admin not found!"})
-			}
-			return res.status(200).json(admin)
-		}
-
-		//get All admin
-		const admins = await Admin.find();
-		if(admins.length === 0){
-			return res.status(404).json({message:"No admins found!"})
-		}
+		const admins = await Admin.find(req.query);
+		if(admins.length === 0 ) return res.status(200).json({message:"No admin found!"});
+		
 		res.status(200).json(admins)
 	} catch (error) {
 		console.log(error);

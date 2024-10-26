@@ -83,7 +83,11 @@ exports.getCategory = async (req, res) => {
 exports.getCategoryById = async (req, res) => {
 	try {
 		const { id } = req.params;
-		const category = await Category.findById(id);
+
+		// Prepare the filters object with the ID and any additional query parameters
+		const filters = { _id: id, ...req.query };
+
+		const category = await Category.findOne(filters); // Use findOne instead of findById
 
 		if (!category) {
 			return res.status(404).json({ message: "Category not found!" });
@@ -94,6 +98,7 @@ exports.getCategoryById = async (req, res) => {
 		res.status(500).json({ message: "Server error!" });
 	}
 };
+
 
 exports.getAllTypesInCategory = async (req, res) => {
 	try {

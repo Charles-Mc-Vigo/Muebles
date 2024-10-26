@@ -13,8 +13,8 @@ router.post("/verify-account/:adminId", verifyEmail);
 router.get('/unconfirmed/:adminId',unconfirmedAdmin)
 
 // Protected routes
-router.post("/logout", checkAdminAuth, adminLogout);
 router.get("/", checkAdminAuth, AllAdmins);
+router.post("/logout", checkAdminAuth, adminLogout);
 router.post("/notifications/accept-request/:adminId", checkAdminAuth, AcceptAdminRequest);
 router.get('/verified/:adminId', checkAdminAuth, getAdminById);
 router.get("/notifications/pending-request", checkAdminAuth, PendingAdminRequest);

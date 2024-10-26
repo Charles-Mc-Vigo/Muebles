@@ -12,14 +12,14 @@ const {
   passwordReset,
   verifyPRCode,
   createNewPswd,
-  getUserId
+  getUserId,
+  getAllUsers
 } = require("../../controllers/User/userController")
-const {checkUserAuth} = require('../../middlewares/checkAuth');
+const {checkUserAuth, checkAdminAuth} = require('../../middlewares/checkAuth');
 
 const multer = require('multer');
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
-
 
 router.get('/:userId',getUserId);
 router.post("/signup", SignUp);
@@ -29,6 +29,7 @@ router.post('/verify-email/:userId', verifyEmail);
 router.post('/resend-verification/:userId',resendVerificationCode);
 
 // password reset
+router.get('/', checkAdminAuth, getAllUsers)
 router.post('/password-reset/request', passwordReset)
 router.post('/password-reset/verify/:userId', verifyPRCode);
 router.post('/password-reset/new-password/:userId', createNewPswd);
