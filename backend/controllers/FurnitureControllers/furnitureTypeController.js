@@ -6,10 +6,6 @@ exports.AddFurnitureType = async (req, res) => {
   try {
     const { name, categoryId } = req.body;
 
-    if (!name || !categoryId) {
-      return res.status(400).json({ message: "All fields are required: name, category name!" });
-    }
-
     // Check if the category exists by name
     const existingCategory = await Category.findById(categoryId);
     if (!existingCategory) {
@@ -36,7 +32,7 @@ exports.AddFurnitureType = async (req, res) => {
 // Get All Furniture Types
 exports.GetFurnitureType = async (req, res) => {
   try {
-    const furnitureType = await FurnitureType.find();
+    const furnitureType = await FurnitureType.find({isArchived:false});
     if (furnitureType.length === 0) {
       return res.status(404).json({ message: "No furniture type found!" });
     }
@@ -47,6 +43,47 @@ exports.GetFurnitureType = async (req, res) => {
     return res.status(500).json({ message: "Server error!" });
   }
 };
+
+exports.ArchiveFurnitype = async (req,res) => {
+  try {
+    const {furnitypeId} = req.params;
+    const exisitingFurnitype = await FurnitureType.findById(furnitypeId)
+    if(!exisitingFurnitype) return res.status(404).json({message:"Furniture type not found!"});
+
+    exisitingFurnitype.isArchived = true;
+    await exisitingFurnitype.save();
+    res.status(200).json({message:"Furniture types archived successfully!"})
+  } catch (error) {
+    console.error("ERror in archiving the furniture types: ",error);
+    res.status(500).json({message:"Server error!"});
+  }
+}
+
+exports.UnarchiveFurnitype = async (req,res) => {
+  try {
+    const {furnitypeId} = req.params;
+    const exisitingFurnitype = await FurnitureType.findById(furnitypeId)
+    if(!exisitingFurnitype) return res.status(404).json({message:"Furniture type not found!"});
+
+    exisitingFurnitype.isArchived = false;
+    await exisitingFurnitype.save();
+    res.status(200).json({message:"Furniture types unarchived successfully!"})
+  } catch (error) {
+    console.error("ERror in archiving the furniture types: ",error);
+    res.status(500).json({message:"Server error!"});
+  }
+}
+
+exports.viewArchivedFurnitypes = async (req,res) => {
+  try {
+    const archiveFurnitureTypes = await FurnitureType.find({isArchived:true})
+    if(archiveFurnitureTypes.length === 0) return res.status(404).json({message:"No furniture type found in the archive!"});
+    res.status(200).json(archiveFurnitureTypes)
+  } catch (error) {
+    console.error("ERror in archiving the furniture types: ",error);
+    res.status(500).json({message:"Server error!"});
+  }
+}
 
 // Get Furniture Types by Category ID
 exports.getFurniTypesbyCategoryId = async (req, res) => {

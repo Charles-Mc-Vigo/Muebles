@@ -183,10 +183,10 @@ const Maintenance = () => {
 			console.error("Error fetching furniture types:", error);
 		}
 	};
-	const handleArchive = async (categoryId) => {
+	const handleArchive = async (entityType, entityId) => {
 		try {
 			const response = await fetch(
-				`http://localhost:3000/api/categories/archive/${categoryId}`,
+				`http://localhost:3000/api/${entityType}/archive/${entityId}`, // Use entityType to determine the endpoint
 				{
 					method: "POST",
 					headers: {
@@ -197,17 +197,40 @@ const Maintenance = () => {
 			);
 
 			if (!response.ok) {
-				throw new Error(`Failed to archive category with ID: ${categoryId}`);
+				throw new Error(`Failed to archive ${entityType} with ID: ${entityId}`);
 			}
-			toast.success("Successfully archived");
-			console.log(`Category with ID ${categoryId} archived successfully`);
 
-			// Optionally, update the UI by removing or updating the category in `categories` state
-			setCategories((prevCategories) =>
-				prevCategories.filter((category) => category._id !== categoryId)
-			);
+			toast.success(`Successfully archived ${entityType}`);
+			console.log(`${entityType} with ID ${entityId} archived successfully`);
+
+			// Optionally, update the UI by removing or updating the entity in the respective state
+			switch (entityType) {
+				case "categories":
+					setCategories((prevCategories) =>
+						prevCategories.filter((category) => category._id !== entityId)
+					);
+					break;
+				case "furniture-types":
+					setFurnitureTypes((prevTypes) =>
+						prevTypes.filter((type) => type._id !== entityId)
+					);
+					break;
+				case "colors":
+					setColors((prevColors) =>
+						prevColors.filter((color) => color._id !== entityId)
+					);
+					break;
+				case "materials":
+					setMaterials((prevMaterials) =>
+						prevMaterials.filter((material) => material._id !== entityId)
+					);
+					break;
+				// Add more cases as necessary
+				default:
+					break;
+			}
 		} catch (error) {
-			console.error("Error archiving category:", error);
+			console.error("Error archiving:", error);
 		}
 	};
 
@@ -701,15 +724,17 @@ const Maintenance = () => {
 							<div className="max-h-96 overflow-y-auto">
 								<Table
 									headers={["ID", "Category Name"]}
-									data={(Array.isArray(categories) ? categories : []).map(
-										(category) => ({
-											id: category._id,
-											name: category.name,
-										})
-									)}
+									data={
+										Array.isArray(categories)
+											? categories.map((category) => ({
+													id: category._id,
+													name: category.name,
+											  }))
+											: []
+									}
 									onEdit={handleEditItem}
 									onSave={handleSaveItem}
-									onArchive={handleArchive} // Include this if needed
+									onArchive={(id) => handleArchive("categories", id)} // Pass entity type and ID
 								/>
 							</div>
 						</div>
@@ -720,84 +745,70 @@ const Maintenance = () => {
 							<h2 className="text-2xl font-bold mb-4">Furniture Types</h2>
 							<div className="max-h-96 overflow-y-auto">
 								<Table
-									headers={["ID", "Furniture Type", "Category ID", "Category"]} // Added "Category ID" to the headers
-									data={furnitureTypes.map((type) => ({
-										id: type._id,
-										name: type.name,
-										categoryId: type.categoryId, // Keep the categoryId here
-										category:
-											categories.find((cat) => cat._id === type.categoryId)
-												?.name || "N/A", // Display the category name
-									}))}
+									headers={["ID", "Furniture Type", "Category ID", "Category"]}
+									data={
+										Array.isArray(furnitureTypes)
+											? furnitureTypes.map((type) => ({
+													id: type._id,
+													name: type.name,
+													categoryId: type.categoryId,
+													category:
+														categories.find(
+															(cat) => cat._id === type.categoryId
+														)?.name || "N/A",
+											  }))
+											: []
+									}
 									onEdit={handleEditItem}
 									onSave={handleSaveItem}
-									categoriesList={categories} // Pass categories here
+									onArchive={(id) => handleArchive("furniture-types", id)} // Pass entity type and ID
 								/>
 							</div>
 						</div>
 					)}
 
-					{selectedFilter === "Furniture Size" && (
-						<div className="space-y-4">
-							<h2 className="text-2xl font-bold mb-4">Furniture Sizes</h2>
-							<div className="max-h-96 overflow-y-auto">
-								<Table
-									headers={[
-										"ID",
-										"Label",
-										"Height",
-										"Width",
-										"Depth",
-										"Furniture Type",
-									]}
-									data={sizes.map((size) => ({
-										id: size._id,
-										label: size.label,
-										height: size.height,
-										width: size.width,
-										depth: size.depth,
-										furnitureType:
-											furnitureTypes.find(
-												(type) => type._id === size.furnitureTypeId
-											)?.name || "N/A",
-									}))}
-									onEdit={handleEditItem}
-									onSave={handleSaveItem}
-								/>
-							</div>
-						</div>
-					)}
 					{selectedFilter === "Colors" && (
 						<div className="space-y-4">
 							<h2 className="text-2xl font-bold mb-4">Furniture Colors</h2>
 							<div className="max-h-96 overflow-y-auto">
 								<Table
 									headers={["ID", "Color Name", "RGB", "Hex"]}
-									data={colors.map((color) => ({
-										id: color._id,
-										name: color.name,
-										rgb: color.rgb,
-										hex: color.hex,
-									}))}
+									data={
+										Array.isArray(colors)
+											? colors.map((color) => ({
+													id: color._id,
+													name: color.name,
+													rgb: color.rgb,
+													hex: color.hex,
+											  }))
+											: []
+									}
 									onEdit={handleEditItem}
 									onSave={handleSaveItem}
+									onArchive={(id) => handleArchive("colors", id)} // Pass entity type and ID
 								/>
 							</div>
 						</div>
 					)}
+
 					{selectedFilter === "Furniture Materials" && (
 						<div className="space-y-4 mt-8">
 							<h2 className="text-2xl font-bold mb-4">Furniture Materials</h2>
 							<div className="max-h-96 overflow-y-auto">
 								<Table
 									headers={["ID", "Material Name", "Quantity"]}
-									data={materials.map((material) => ({
-										id: material._id,
-										name: material.name,
-										quantity: material.quantity,
-									}))}
+									data={
+										Array.isArray(materials)
+											? materials.map((material) => ({
+													id: material._id,
+													name: material.name,
+													quantity: material.quantity,
+											  }))
+											: []
+									}
 									onEdit={handleEditItem}
 									onSave={handleSaveItem}
+									onArchive={(id) => handleArchive("materials", id)} // Pass entity type and ID
 								/>
 							</div>
 						</div>
