@@ -28,6 +28,7 @@ import Profile from "../src/components/Profile";
 import PasswordResetRequest from "./pages/PasswordResetRequest";
 import PasswordResetVerify from "./pages/PasswordResetVerify";
 import PasswordResetCreateNew from "./pages/PasswordResetCreateNew";
+import OrderDetails from "./pages/OrderDetails";
 
 
 export default function App() {
@@ -44,6 +45,7 @@ export default function App() {
                 <Route path="/password-reset/verify/:userId"  element={<PasswordResetVerify/>} />
                 <Route path="/password-reset/new-password/:userId"  element={<PasswordResetCreateNew/>} />
                 <Route path={`/furnitures/:id`} element={<ProtectedRoute element={ProductDetails} />} />
+                <Route path={`/order-details/:orderId`} element={<ProtectedRoute element={OrderDetails} />} />
 
                 {/* Admin routes */}
                 <Route path="/admin-login" element={<AdminLogin />} />

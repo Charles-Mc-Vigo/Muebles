@@ -15,6 +15,8 @@ const orderController = {
         return res.status(400).json({ message: "Cart is empty" });
       }
 
+      if(!paymentMethod) return res.status(400).json({message:"Please select payment method to proceed"});
+
       // Create order from cart
       const order = await Order.createFromCart(cart._id, paymentMethod);
 
@@ -36,6 +38,7 @@ const orderController = {
         order
       });
     } catch (error) {
+      console.error("Error creating an order: ",error)
       res.status(500).json({
         success: false,
         message: "Error creating order",
@@ -68,8 +71,9 @@ const orderController = {
   // Get single order details
   getOrderDetails: async (req, res) => {
     try {
+      const {orderId} = req.params;
       const userId = req.user._id;
-      const order = await Order.findById(req.params.orderId)
+      const order = await Order.findById(orderId)
         .populate('items.furniture')
         .populate('user', 'firstname lastname email');
 
