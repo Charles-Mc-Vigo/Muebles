@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { FaChevronUp, FaChevronDown } from "react-icons/fa";
-import {FaLongArrowAltRight,FaLongArrowAltLeft } from "react-icons/fa";
+import {FaArrowRight,FaArrowLeft} from "react-icons/fa";
 import { IoReturnUpBack } from "react-icons/io5";
 import Header from "./Header";
 import Footer from "./Footer";
@@ -111,7 +111,7 @@ function ProductDetails() {
         {/* Combined: Product Image and Details */}
         <div className="flex flex-col lg:flex-row lg:w-full justify-center mt-10">
           {/* Left: Product Image */}
-          <div className="flex flex-col lg:w-[800px] lg:h-[800px] p-2 border-2 border-black bg-white rounded-lg shadow-md relative">
+          <div className="flex flex-col lg:w-[800px] lg:h-[800px] p-2   bg-white rounded-xl shadow-xl shadow-gray-300 relative">
 			
             {/* Back Button */}
             <button
@@ -121,7 +121,7 @@ function ProductDetails() {
               <IoReturnUpBack size={50} />
             </button>
             {/* Main container with gray background */}
-            <div className="flex-grow flex flex-col items-center p-4 border-2">
+            <div className="flex-grow flex flex-col items-center p-4 ">
               {/* Main furniture image */}
               <div className="flex-grow flex items-center justify-center ">
                 {furnitureData.images && furnitureData.images.length > 0 && (
@@ -137,7 +137,7 @@ function ProductDetails() {
               <div className="flex items-center justify-center  space-x-4">
                 {/* Left button for image navigation */}
                 <button onClick={handlePreviousImage}>
-                  <FaLongArrowAltLeft size={30} />
+                  <FaArrowLeft size={30} />
                 </button>
 
                 {/* Thumbnails */}
@@ -147,7 +147,7 @@ function ProductDetails() {
                       key={index}
                       src={`data:image/jpeg;base64,${image}`}
                       alt={`Image ${index + 1} of ${furnitureData.name}`}
-                      className={`w-20 h-20 object-contain border-2 rounded cursor-pointer transition ${
+                      className={`w-20 h-20 object-contain  rounded cursor-pointer transition ${
                         currentImageIndex === index
                           ? "border-blue-500"
                           : "border-gray-300"
@@ -159,14 +159,14 @@ function ProductDetails() {
 
                 {/* Right button for image navigation */}
                 <button onClick={handleNextImage}>
-                  <FaLongArrowAltRight size={30} />
+                  <FaArrowRight size={30} />
                 </button>
               </div>
             </div>
           </div>
 
           {/* Right: Product Details */}
-          <div className="flex-1 lg:max-w-[400px] lg:h-[800px] p-5 bg-white border-2 border-gray-300 rounded-lg shadow-md ml-0 lg:ml-5">
+          <div className="flex-1 lg:max-w-[400px] lg:h-[800px] p-5 bg-white  border-gray-300 rounded-lg shadow-lg ml-0 lg:ml-5">
             <h1 className="text-3xl font-bold">{furnitureData.name}</h1>
             <div className="mt-2">
               <h2 className="text-lg font-semibold">Price</h2>

@@ -127,7 +127,7 @@ const Header = ({ isLogin }) => {
             </Link>
             <span className="text-gray-400">•</span>
             <Link
-              to="/store-location"
+              to="https://tinyurl.com/5avjxzav"
               className="text-gray-700 hover:underline"
             >
               Store Location

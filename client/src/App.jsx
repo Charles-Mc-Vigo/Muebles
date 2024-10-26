@@ -33,6 +33,7 @@ import PasswordResetRequest from "./pages/PasswordResetRequest";
 import PasswordResetVerify from "./pages/PasswordResetVerify";
 import PasswordResetCreateNew from "./pages/PasswordResetCreateNew";
 import InventoryPage from "./pages/InventoryPage";
+import PaymentMethod from "./components/PaymentMethod";
 
 
 
@@ -46,6 +47,7 @@ export default function App() {
                 <Route path="/signup" element={<SignUp />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/terms&condition" element={<TermsAndConditions />} />
+                <Route path="/payment-method" element={<PaymentMethod />} />
                 <Route path="/verify-account/:userId" element={<EmailVerification />} />
                 <Route path="/home" element={<ProtectedRoute element={Home} />} />
                 <Route path="/password-reset/request"  element={<PasswordResetRequest/>} />
