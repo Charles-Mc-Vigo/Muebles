@@ -2,8 +2,14 @@ import React, { useState, useEffect } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-// Table Component
-const Table = ({ headers, data, onEdit, onSave, categoriesList }) => {
+const Table = ({
+	headers,
+	data,
+	onEdit,
+	onSave,
+	onArchive,
+	categoriesList,
+}) => {
 	const [editIndex, setEditIndex] = useState(null); // Track the index of the row being edited
 
 	const handleEditClick = (index) => {
@@ -71,7 +77,9 @@ const Table = ({ headers, data, onEdit, onSave, categoriesList }) => {
 								)}
 							</td>
 						))}
-						<td className="border border-gray-300 p-2">
+						<td className="border border-gray-300 p-2 flex space-x-2">
+							{" "}
+							{/* Flex container for buttons */}
 							{editIndex === rowIndex ? (
 								<button
 									onClick={() => handleSaveClick(row)}
@@ -87,6 +95,19 @@ const Table = ({ headers, data, onEdit, onSave, categoriesList }) => {
 									Edit
 								</button>
 							)}
+							<button
+								onClick={() => {
+									const confirmArchive = window.confirm(
+										"Are you sure you want to archive this category?"
+									);
+									if (confirmArchive) {
+										onArchive(row.id); // Only call onArchive if confirmed
+									}
+								}}
+								className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
+							>
+								Archive
+							</button>
 						</td>
 					</tr>
 				))}
@@ -162,6 +183,33 @@ const Maintenance = () => {
 			console.error("Error fetching furniture types:", error);
 		}
 	};
+	const handleArchive = async (categoryId) => {
+		try {
+			const response = await fetch(
+				`http://localhost:3000/api/categories/archive/${categoryId}`,
+				{
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					credentials: "include",
+				}
+			);
+
+			if (!response.ok) {
+				throw new Error(`Failed to archive category with ID: ${categoryId}`);
+			}
+			toast.success("Successfully archived");
+			console.log(`Category with ID ${categoryId} archived successfully`);
+
+			// Optionally, update the UI by removing or updating the category in `categories` state
+			setCategories((prevCategories) =>
+				prevCategories.filter((category) => category._id !== categoryId)
+			);
+		} catch (error) {
+			console.error("Error archiving category:", error);
+		}
+	};
 
 	const fetchCategories = async () => {
 		try {
@@ -171,7 +219,9 @@ const Maintenance = () => {
 			});
 			const data = await response.json();
 			setCategories(data);
+			console.log(data);
 		} catch (error) {
+			setCategories([]);
 			console.error("Failed to fetch categories:", error);
 		}
 	};
@@ -651,22 +701,26 @@ const Maintenance = () => {
 							<div className="max-h-96 overflow-y-auto">
 								<Table
 									headers={["ID", "Category Name"]}
-									data={categories.map((category) => ({
-										id: category._id,
-										name: category.name,
-									}))}
+									data={(Array.isArray(categories) ? categories : []).map(
+										(category) => ({
+											id: category._id,
+											name: category.name,
+										})
+									)}
 									onEdit={handleEditItem}
 									onSave={handleSaveItem}
+									onArchive={handleArchive} // Include this if needed
 								/>
 							</div>
 						</div>
 					)}
+
 					{selectedFilter === "Furniture Types" && (
 						<div className="space-y-4">
 							<h2 className="text-2xl font-bold mb-4">Furniture Types</h2>
 							<div className="max-h-96 overflow-y-auto">
 								<Table
-									headers={["ID", "Furniture Type", "Category ID","Category"]} // Added "Category ID" to the headers
+									headers={["ID", "Furniture Type", "Category ID", "Category"]} // Added "Category ID" to the headers
 									data={furnitureTypes.map((type) => ({
 										id: type._id,
 										name: type.name,
