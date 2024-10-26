@@ -37,6 +37,22 @@ exports.ArchiveCategory = async (req, res) => {
 	}
 };
 
+exports.unArchiveCategory = async (req, res) => {
+	try {
+		const {categoryId} = req.params;
+		const existingCategory = await Category.findById(categoryId);
+
+		if(!existingCategory) return res.status(404).json({message:"Category not found!"});
+
+		existingCategory.isArchived = false;
+		await existingCategory.save();
+		res.status(200).json({message:`${existingCategory.name} has been archived!`})
+	} catch (error) {
+		console.error("Error in archiving category: ", error);
+		res.status(500).json({message:"Server error!"});
+	}
+};
+
 exports.viewArchivedCategory = async (req,res) => {
 	try {
 		const archivedCategory = await Category.find({isArchived:true});
