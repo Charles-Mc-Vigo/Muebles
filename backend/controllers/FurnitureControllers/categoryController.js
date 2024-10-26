@@ -6,11 +6,14 @@ exports.AddCategory = async (req, res) => {
 	try {
 		const { name } = req.body;
 
+		const existingCategory = await Category.findOne({name});
+		if(existingCategory) return res.status(400).json({message:`${name} is already existing!`})
+
 		const newCategory = new Category({ name });
 		await newCategory.save();
-		res.json({ message: "Category added successfully", category: newCategory });
+		res.status(200).json({ message: "Category added successfully", category: newCategory });
 	} catch (error) {
-		console.log("Error adding new category: ", error);
+		console.error("Error adding new category: ", error);
 		res.status(500).send("Server error!");
 	}
 };

@@ -2,76 +2,96 @@ import React, { useState, useEffect } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-const Table = ({ headers, data, onEdit, onSave }) => {
+// Table Component
+const Table = ({ headers, data, onEdit, onSave, categoriesList }) => {
 	const [editIndex, setEditIndex] = useState(null); // Track the index of the row being edited
 
 	const handleEditClick = (index) => {
-			setEditIndex(index); // Set the index of the row to be edited
+		setEditIndex(index); // Set the index of the row to be edited
 	};
 
 	const handleSaveClick = (row) => {
-			onSave(row); // Call the save function passed as a prop
-			setEditIndex(null); // Reset the edit index after saving
+		onSave(row); // Call the save function passed as a prop
+		setEditIndex(null); // Reset the edit index after saving
 	};
 
 	return (
-			<table className="min-w-full border-collapse border border-gray-300 mb-6">
-					<thead className="bg-gray-200">
-							<tr>
-									{headers.map((header, index) => (
-											<th
-													key={index}
-													className="border border-gray-300 p-2 text-left font-semibold text-gray-700"
-											>
-													{header}
-											</th>
-									))}
-									<th className="border border-gray-300 p-2 text-left font-semibold text-gray-700">
-											Actions
-									</th>
-							</tr>
-					</thead>
-					<tbody>
-							{data.map((row, rowIndex) => (
-									<tr
-											key={rowIndex}
-											className="hover:bg-gray-100 transition-colors duration-200"
-									>
-											{Object.keys(row).map((key, cellIndex) => (
-													<td key={cellIndex} className="border border-gray-300 p-2">
-															{editIndex === rowIndex ? (
-																	<input
-																			type="text"
-																			value={row[key]}
-																			onChange={(e) => onEdit(rowIndex, key, e.target.value)}
-																			className="w-full border rounded-lg p-1"
-																	/>
-															) : (
-																	row[key] // Display the value when not editing
-															)}
-													</td>
+		<table className="min-w-full border-collapse border border-gray-300 mb-6">
+			<thead className="bg-gray-200">
+				<tr>
+					{headers.map((header, index) => (
+						<th
+							key={index}
+							className="border border-gray-300 p-2 text-left font-semibold text-gray-700"
+						>
+							{header}
+						</th>
+					))}
+					<th className="border border-gray-300 p-2 text-left font-semibold text-gray-700">
+						Actions
+					</th>
+				</tr>
+			</thead>
+			<tbody>
+				{data.map((row, rowIndex) => (
+					<tr
+						key={rowIndex}
+						className="hover:bg-gray-100 transition-colors duration-200"
+					>
+						{Object.keys(row).map((key, cellIndex) => (
+							<td key={cellIndex} className="border border-gray-300 p-2">
+								{editIndex === rowIndex ? (
+									key === "category" ? (
+										// Render a dropdown for category when in edit mode
+										<select
+											value={row.categoryId} // Use categoryId for the select
+											onChange={(e) =>
+												onEdit(rowIndex, "categoryId", e.target.value)
+											}
+											className="w-full border rounded-lg p-1"
+										>
+											<option value="">Select a Category</option>
+											{categoriesList.map((category) => (
+												<option key={category._id} value={category._id}>
+													{category.name}
+												</option>
 											))}
-											<td className="border border-gray-300 p-2">
-													{editIndex === rowIndex ? (
-															<button
-																	onClick={() => handleSaveClick(row)}
-																	className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
-															>
-																	Save
-															</button>
-													) : (
-															<button
-																	onClick={() => handleEditClick(rowIndex)}
-																	className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-															>
-																	Edit
-															</button>
-													)}
-											</td>
-									</tr>
-							))}
-					</tbody>
-			</table>
+										</select>
+									) : (
+										// Render a text input for other fields
+										<input
+											type="text"
+											value={row[key]}
+											onChange={(e) => onEdit(rowIndex, key, e.target.value)}
+											className="w-full border rounded-lg p-1"
+										/>
+									)
+								) : (
+									row[key] // Display the value when not editing
+								)}
+							</td>
+						))}
+						<td className="border border-gray-300 p-2">
+							{editIndex === rowIndex ? (
+								<button
+									onClick={() => handleSaveClick(row)}
+									className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
+								>
+									Save
+								</button>
+							) : (
+								<button
+									onClick={() => handleEditClick(rowIndex)}
+									className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+								>
+									Edit
+								</button>
+							)}
+						</td>
+					</tr>
+				))}
+			</tbody>
+		</table>
 	);
 };
 
@@ -115,9 +135,9 @@ const Maintenance = () => {
 
 	const fetchMaterials = async () => {
 		try {
-			const response = await fetch("http://localhost:3000/api/materials",{
-				method:'GET',
-				credentials:'include'
+			const response = await fetch("http://localhost:3000/api/materials", {
+				method: "GET",
+				credentials: "include",
 			});
 			const data = await response.json();
 			setMaterials(data);
@@ -129,10 +149,13 @@ const Maintenance = () => {
 
 	const fetchFurnitureTypes = async () => {
 		try {
-			const response = await fetch("http://localhost:3000/api/furniture-types",{
-				method:'GET',
-				credentials:'include'
-			});
+			const response = await fetch(
+				"http://localhost:3000/api/furniture-types",
+				{
+					method: "GET",
+					credentials: "include",
+				}
+			);
 			const data = await response.json();
 			setFurnitureTypes(data);
 		} catch (error) {
@@ -142,9 +165,9 @@ const Maintenance = () => {
 
 	const fetchCategories = async () => {
 		try {
-			const response = await fetch("http://localhost:3000/api/categories",{
-				method:'GET',
-				credentials:'include'
+			const response = await fetch("http://localhost:3000/api/categories", {
+				method: "GET",
+				credentials: "include",
 			});
 			const data = await response.json();
 			setCategories(data);
@@ -155,9 +178,9 @@ const Maintenance = () => {
 
 	const fetchColors = async () => {
 		try {
-			const response = await fetch("http://localhost:3000/api/colors",{
-				method:'GET',
-				credentials:'include'
+			const response = await fetch("http://localhost:3000/api/colors", {
+				method: "GET",
+				credentials: "include",
 			});
 			const data = await response.json();
 			setColors(data);
@@ -168,9 +191,9 @@ const Maintenance = () => {
 
 	const fetchSizes = async () => {
 		try {
-			const response = await fetch("http://localhost:3000/api/sizes",{
-				method:'GET',
-				credentials:'include'
+			const response = await fetch("http://localhost:3000/api/sizes", {
+				method: "GET",
+				credentials: "include",
 			});
 			const data = await response.json();
 			setSizes(data);
@@ -191,7 +214,7 @@ const Maintenance = () => {
 				headers: {
 					"Content-Type": "application/json",
 				},
-				credentials:'include',
+				credentials: "include",
 				body: JSON.stringify({ name, quantity }),
 			});
 
@@ -223,7 +246,7 @@ const Maintenance = () => {
 				headers: {
 					"Content-Type": "application/json",
 				},
-				credentials:'include',
+				credentials: "include",
 				body: JSON.stringify({
 					label: newSize.label,
 					height: newSize.height,
@@ -264,7 +287,7 @@ const Maintenance = () => {
 				headers: {
 					"Content-Type": "application/json",
 				},
-				credentials:'include',
+				credentials: "include",
 				body: JSON.stringify({
 					name: newColor.name,
 					rgb: newColor.rgb,
@@ -303,12 +326,12 @@ const Maintenance = () => {
 						headers: {
 							"Content-Type": "application/json",
 						},
-						credentials:'include',
+						credentials: "include",
 						body: JSON.stringify({ name: newItemName }),
 					}
 				);
 				if (!response.ok) {
-					throw new Error("Failed to add category.");
+					throw new Error(response.message);
 				}
 				toast.success("Category added successfully.");
 				await fetchCategories(); // Refresh categories list
@@ -325,7 +348,7 @@ const Maintenance = () => {
 						headers: {
 							"Content-Type": "application/json",
 						},
-						credentials:'include',
+						credentials: "include",
 						body: JSON.stringify({
 							name: newItemName,
 							categoryId: selectedCategory,
@@ -347,26 +370,36 @@ const Maintenance = () => {
 		}
 	};
 	const handleEditItem = (rowIndex, key, value) => {
-		if (selectedFilter === "Categories") {
-			const updatedCategories = [...categories];
-			updatedCategories[rowIndex][key] = value;
-			setCategories(updatedCategories);
-		} else if (selectedFilter === "Furniture Types") {
-			const updatedFurnitureTypes = [...furnitureTypes];
-			updatedFurnitureTypes[rowIndex][key] = value;
-			setFurnitureTypes(updatedFurnitureTypes);
-		} else if (selectedFilter === "Furniture Size") {
-			const updatedSizes = [...sizes];
-			updatedSizes[rowIndex][key] = value;
-			setSizes(updatedSizes);
-		} else if (selectedFilter === "Colors") {
-			const updatedColors = [...colors];
-			updatedColors[rowIndex][key] = value;
-			setColors(updatedColors);
-		} else if (selectedFilter === "Furniture Materials") {
-			const updatedMaterials = [...materials];
-			updatedMaterials[rowIndex][key] = value;
-			setMaterials(updatedMaterials);
+		const updateItem = (items, setItems) => {
+			const updatedItems = [...items];
+			// Check if we are editing "Furniture Types"
+			if (selectedFilter === "Furniture Types" && key === "categoryId") {
+				updatedItems[rowIndex].categoryId = value;
+			} else {
+				updatedItems[rowIndex][key] = value;
+			}
+			console.log("Updated Item:", updatedItems[rowIndex]); // Log the updated item
+			setItems(updatedItems);
+		};
+
+		switch (selectedFilter) {
+			case "Categories":
+				updateItem(categories, setCategories);
+				break;
+			case "Furniture Types":
+				updateItem(furnitureTypes, setFurnitureTypes);
+				break;
+			case "Furniture Size":
+				updateItem(sizes, setSizes);
+				break;
+			case "Colors":
+				updateItem(colors, setColors);
+				break;
+			case "Furniture Materials":
+				updateItem(materials, setMaterials);
+				break;
+			default:
+				console.error("Unknown filter selected:", selectedFilter);
 		}
 	};
 
@@ -611,7 +644,6 @@ const Maintenance = () => {
 					</form>
 				</div>
 				{/* Right Side for Tables */}
-				{/* Right Side for Tables */}
 				<div className="w-4/5 pl-4 border-2">
 					{selectedFilter === "Categories" && (
 						<div className="space-y-4">
@@ -634,20 +666,23 @@ const Maintenance = () => {
 							<h2 className="text-2xl font-bold mb-4">Furniture Types</h2>
 							<div className="max-h-96 overflow-y-auto">
 								<Table
-									headers={["ID", "Furniture Type", "Category"]}
+									headers={["ID", "Furniture Type", "Category ID","Category"]} // Added "Category ID" to the headers
 									data={furnitureTypes.map((type) => ({
 										id: type._id,
 										name: type.name,
+										categoryId: type.categoryId, // Keep the categoryId here
 										category:
 											categories.find((cat) => cat._id === type.categoryId)
-												?.name || "N/A",
+												?.name || "N/A", // Display the category name
 									}))}
 									onEdit={handleEditItem}
 									onSave={handleSaveItem}
+									categoriesList={categories} // Pass categories here
 								/>
 							</div>
 						</div>
 					)}
+
 					{selectedFilter === "Furniture Size" && (
 						<div className="space-y-4">
 							<h2 className="text-2xl font-bold mb-4">Furniture Sizes</h2>

@@ -2,21 +2,15 @@ const mongoose = require("mongoose");
 const FurnitureType = require("../../models/Furniture/furnitureTypeModel");
 const Category = require("../../models/Furniture/categoryModel");
 
-// Add Furniture Type
 exports.AddFurnitureType = async (req, res) => {
   try {
     const { name, categoryId } = req.body;
 
     if (!name || !categoryId) {
-      return res.status(400).json({ message: "All fields are required: name, category!" });
+      return res.status(400).json({ message: "All fields are required: name, category name!" });
     }
 
-    // Validate categoryId
-    if (!mongoose.Types.ObjectId.isValid(categoryId)) {
-      return res.status(400).json({ message: "Invalid category ID. Must be a 24-character hex string." });
-    }
-
-    // Check if the category exists
+    // Check if the category exists by name
     const existingCategory = await Category.findById(categoryId);
     if (!existingCategory) {
       return res.status(404).json({ message: "Category not found!" });
@@ -28,11 +22,11 @@ exports.AddFurnitureType = async (req, res) => {
       return res.status(400).json({ message: "Furniture type already exists!" });
     }
 
-    // Create a new furniture type
-    const newFurnitureType = new FurnitureType({ name, categoryId});
+    // Create a new furniture type with the category ID
+    const newFurnitureType = new FurnitureType({ name, categoryId: existingCategory._id });
     await newFurnitureType.save();
 
-    return res.status(201).json({ message: `${newFurnitureType.name} added successfully!` });
+    return res.status(201).json({ message:`${newFurnitureType.name} added successfully`, newFurnitureType});
   } catch (error) {
     console.log("Error adding furniture type:", error);
     return res.status(500).json({ message: "Server error!" });
@@ -105,5 +99,39 @@ exports.getFurTypeById = async (req, res) => {
   } catch (error) {
     console.log("Error fetching furniture type:", error);
     return res.status(500).json({ message: "Server error!" });
+  }
+};
+
+// Update Furniture Type with Category Name
+exports.UpdateFurnitype = async (req, res) => {
+  try {
+    const { furnitypeId } = req.params;
+    const { name, categoryId } = req.body;
+
+    // Find the furniture type by ID
+    const exisitingFurnitype = await FurnitureType.findById(furnitypeId);
+    if (!exisitingFurnitype) {
+      return res.status(404).json({ message: "Furniture type not found!" });
+    }
+
+    // Check if the category exists by name
+    const existingCategory = await Category.findById(categoryId);
+    if (!existingCategory) {
+      return res.status(404).json({ message: "Category not found!" });
+    }
+    
+
+    // Update furniture type fields with the new name and category ID
+    exisitingFurnitype.name = name;
+    exisitingFurnitype.categoryId = existingCategory._id;
+
+    // Save the updated furniture type
+    const updatedFurnitype = await exisitingFurnitype.save();
+
+    // Return the updated furniture type and category ID
+    res.status(200).json({message:"Furniture type updated successfully!", updatedFurnitype});
+  } catch (error) {
+    console.error("Error in updating furniture type: ", error);
+    res.status(500).json({ message: "Server error!" });
   }
 };
