@@ -33,7 +33,7 @@ import PasswordResetRequest from "./pages/PasswordResetRequest";
 import PasswordResetVerify from "./pages/PasswordResetVerify";
 import PasswordResetCreateNew from "./pages/PasswordResetCreateNew";
 import OrderDetails from "./pages/OrderDetails";
-import UserProfile from "./components/UserProfile";import InventoryPage from "./pages/InventoryPage";
+import InventoryPage from "./pages/InventoryPage";
 import PaymentMethod from "./components/PaymentMethod";
 
 
