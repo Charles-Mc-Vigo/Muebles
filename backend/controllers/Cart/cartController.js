@@ -3,20 +3,6 @@ const User = require('../../models/User/userModel');
 const Cart = require('../../models/Cart/cartModel');
 const Furniture = require('../../models/Furniture/furnitureModel');
 
-exports.getCartId = async (req,res) => {
-  try {
-    const {cartId} = req.params;
-    const cart = await Cart.findById(cartId);
-
-    if(!cart) return res.status(400).json({message:"Cart not found!"});
-
-    res.status(200).json(cart)
-  } catch (error) {
-    console.error("Error get cart by id: ",error);
-    res.status(500).json({message:"Server error!"});
-  }
-}
-
 // View Cart
 exports.viewCart = async (req, res) => {
   try {
@@ -38,7 +24,7 @@ exports.viewCart = async (req, res) => {
       });
     }
 
-    res.status(200).json({ cart });
+    res.status(200).json( {cart} );
   } catch (error) {
     console.error("Error in viewing the cart", error);
     res.status(500).json({ message: "Server error!" });

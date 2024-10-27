@@ -75,13 +75,8 @@ const Cart = () => {
 			if (!response.ok) {
 				toast.error("Please select payment method");
 			} else {
-				toast.success("Checkout successful!");
-			}
-
-			setTimeout(()=>{
 				navigate('/order-details/:orderId');
-			})
-
+			}
 			await fetchCartItems();
 		} catch (error) {
 			setError(error.message);

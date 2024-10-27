@@ -12,7 +12,9 @@ const ProductCard = ({
 	showArchiveButton,
 	showUnArchivedButton,
 	onArchiveSuccess,
-	onUnArchiveSuccess
+	onUnArchiveSuccess,
+	showToast,
+	onAddToCart
 
 }) => {
 	// Function to truncate the description
@@ -44,10 +46,14 @@ const ProductCard = ({
 				throw new Error('Failed to add item to cart');
 			}
 			const data = await response.json();
-			console.log('Item added to cart successfully:', data); // Optionally handle success (e.g., show a toast or update cart state)
-			alert('Item added to cart successfully!');
+			console.log('Item added to cart successfully:', data);
+			showToast("Item added to cart successfully!", "success");
+			if (onAddToCart) {
+				onAddToCart(); // Increment cart count
+			}
 		} catch (error) {
-			console.error('Error adding item to cart:', error); // Optionally handle error (e.g., show an error message)
+			console.error('Error adding item to cart:', error);
+			showToast("Error adding item to cart. Please try again.", "error");
 			alert('Error adding item to cart. Please try again.');
 		}
 	};
