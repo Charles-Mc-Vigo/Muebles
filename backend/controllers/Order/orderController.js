@@ -1,177 +1,216 @@
-const Order = require("../../models/Order/orderModel");
-const User = require("../../models/User/userModel");
-const Furniture = require("../../models/Furniture/furnitureModel");
-const {OrderSchemaValidator} = require("../../middlewares/JoiSchemaValidation")
+const Order = require('../../models/Order/orderModel');
+const Cart = require('../../models/Cart/cartModel');
+const User = require('../../models/User/userModel');
 
+const orderController = {
+  // Create new order from cart
+  createOrder: async (req, res) => {
+    try {
+      const { paymentMethod } = req.body;
+      const userId = req.user._id; // Using ID from cookie token
 
-// Getting all the orders
-exports.getAllOrders = async (req, res) => {
-  try {
-    const orders = await Order.find({})
+      // Find user's cart
+      const cart = await Cart.findOne({userId : userId} );
+      if (!cart || cart.items.length === 0) {
+        return res.status(400).json({ message: "Cart is empty" });
+      }
 
-    if (orders.length === 0) {
-      return res.status(404).json({ message: "No orders found!" });
+      if(!paymentMethod) return res.status(400).json({message:"Please select payment method to proceed"});
+
+      // Create order from cart
+      const order = await Order.createFromCart(cart._id, paymentMethod);
+
+      // Clear the cart
+      await Cart.findByIdAndUpdate(cart._id, {
+        items: [],
+        count: 0,
+        totalAmount: 0
+      });
+
+      // Add order to user's orders array
+      await User.findByIdAndUpdate(userId, {
+        $push: { orders: order._id }
+      });
+
+      res.status(201).json({
+        success: true,
+        message: "Order created successfully",
+        order
+      });
+    } catch (error) {
+      console.error("Error creating an order: ",error)
+      res.status(500).json({
+        success: false,
+        message: "Error creating order",
+        error: error.message
+      });
     }
+  },
 
-    res.status(200).json({ orders });
-  } catch (error) {
-    console.error("Error fetching orders:", error);
-    res.status(500).json({ message: "Server error!" });
+  // Get user's orders
+  getUserOrders: async (req, res) => {
+    try {
+      const userId = req.user._id;
+      const orders = await Order.find({ user: userId })
+        .populate('items.furniture')
+        .sort({ createdAt: -1 });
+
+      res.status(200).json({
+        success: true,
+        orders
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: "Error fetching orders",
+        error: error.message
+      });
+    }
+  },
+
+  // Get single order details
+  getOrderDetails: async (req, res) => {
+    try {
+      const {orderId} = req.params;
+      const userId = req.user._id;
+      const order = await Order.findById(orderId)
+        .populate('items.furniture')
+        .populate('user', 'firstname lastname email');
+
+      if (!order) {
+        return res.status(404).json({
+          success: false,
+          message: "Order not found"
+        });
+      }
+
+      // Check if order belongs to user (for non-admin users)
+      if (!req.admin && order.user._id.toString() !== userId) {
+        return res.status(403).json({
+          success: false,
+          message: "Not authorized to view this order"
+        });
+      }
+
+      res.status(200).json({
+        success: true,
+        order
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: "Error fetching order details",
+        error: error.message
+      });
+    }
+  },
+
+  // Cancel order (user)
+  cancelOrder: async (req, res) => {
+    try {
+      const userId = req.user._id;
+      const order = await Order.findById(req.params.orderId);
+
+      if (!order) {
+        return res.status(404).json({
+          success: false,
+          message: "Order not found"
+        });
+      }
+
+      // Check if order belongs to user
+      if (order.user.toString() !== userId) {
+        return res.status(403).json({
+          success: false,
+          message: "Not authorized to cancel this order"
+        });
+      }
+
+      // Only allow cancellation of pending orders
+      if (order.orderStatus !== 'pending') {
+        return res.status(400).json({
+          success: false,
+          message: "Order cannot be cancelled at this stage"
+        });
+      }
+
+      order.orderStatus = 'cancelled';
+      await order.save();
+
+      res.status(200).json({
+        success: true,
+        message: "Order cancelled successfully",
+        order
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: "Error cancelling order",
+        error: error.message
+      });
+    }
+  },
+
+  // Admin: Get all orders
+  getAllOrders: async (req, res) => {
+    try {
+      const orders = await Order.find(req.query)
+        .populate('user', 'firstname lastname email phoneNumber')
+        .populate('items.furniture')
+        .sort({ createdAt: -1 });
+
+      res.status(200).json({
+        success: true,
+        orders
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: "Error fetching all orders",
+        error: error.message
+      });
+    }
+  },
+
+  // Admin: Update order status
+  updateOrderStatus: async (req, res) => {
+    try {
+      const { orderStatus } = req.body;
+      
+      if (!orderStatus) {
+        return res.status(400).json({
+          success: false,
+          message: "Order status is required"
+        });
+      }
+
+      const order = await Order.findByIdAndUpdate(
+        req.params.orderId,
+        { orderStatus },
+        { new: true }
+      ).populate('items.furniture')
+        .populate('user', 'firstname lastname email phoneNumber');
+
+      if (!order) {
+        return res.status(404).json({
+          success: false,
+          message: "Order not found"
+        });
+      }
+
+      res.status(200).json({
+        success: true,
+        message: "Order status updated successfully",
+        order
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: "Error updating order status",
+        error: error.message
+      });
+    }
   }
 };
 
-
-
-
-//creating an order
-exports.createOrders = async (req, res) => {
-  try {
-    const { userId, furnituresId} = req.body;
-
-    if (!userId || !furnituresId) {
-      return res.status(400).json({ message: "All fields are required!" });
-    }
-
-    const existingUser = await User.findById(userId);
-    if (!existingUser) {
-      return res.status(404).json({ message: "User not found!" });
-    }
-
-    const existingFurnitures = await Furniture.find({ '_id': { $in: furnituresId } });
-    if (existingFurnitures.length !== furnituresId.length) {
-      return res.status(404).json({ message: "One or more furniture items not found!" });
-    }
-
-    const newOrder = new Order({
-      userId,
-      furnituresId
-    });
-
-    const order = await newOrder.save();
-    existingUser.orders.push(order._id);
-    await existingUser.save();
-
-    const orderedFurniture = existingFurnitures.map(furniture => ({
-      furnitureId: furniture._id,
-      furnitureCategory: furniture.category,
-      orderFurniture: furniture.furnitureType
-    }));
-
-
-    res.status(201).json({
-      message: "Order created successfully!",
-      order,
-      user: {
-        id: existingUser._id,
-        email: existingUser.email
-      },
-      orderedFurniture
-    });
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Server error!" });
-  }
-}
-
-// modify order by id
-exports.editOrder = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { userId, furnituresId, orderStatus } = req.body;
-
-    const existingOrder = await Order.findById(id);
-    if (!existingOrder) {
-      return res.status(404).json({ message: "Order not found!" });
-    }
-
-    if (userId) {
-      const existingUser = await User.findById(userId);
-      if (!existingUser) {
-        return res.status(404).json({ message: "User not found!" });
-      }
-      existingOrder.userId = userId;
-    }
-
-    if (furnituresId) {
-      const existingFurnitures = await Furniture.find({ '_id': { $in: furnituresId } });
-      if (existingFurnitures.length !== furnituresId.length) {
-        return res.status(404).json({ message: "One or more furniture items not found!" });
-      }
-      existingOrder.furnituresId = furnituresId;
-    }
-
-    const {error} = OrderSchemaValidator.validate({orderStatus})
-    if (error) {
-      return res.status(400).json({ message: error.details[0].message });
-    }
-    existingOrder.orderStatus = orderStatus;
-
-
-    const updatedOrder = await existingOrder.save();
-
-    res.status(200).json({
-      message: "Order updated successfully!",
-      updatedOrder
-    });
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Server error!" });
-  }
-}
-
-//find order by id
-exports.getOrderById = async (req,res) =>{
-  try {
-    const {id} = req.params;
-    const order = await Order.findById(id)
-
-    if (!order) {
-      return res.status(404).json({ message: "Order not found!" });
-    }
-
-    res.status(200).json({message: "Order details",orderDetails:order});
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({message: "Server error!"})
-  }
-}
-
-
-//delete request for specific order
-exports.deleteOrderById = async (req,res) =>{
-  try {
-    const {id} = req.params;
-    const order = await Order.findById(id);
-
-    if(!order){
-      return res.status(404).json({message:"Order not found!"});
-    }
-
-    await Order.deleteOne(id)
-    res.status(200).json({message:"Order deleted successfully!"});
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({message:"Server error!"});
-  }
-}
-
-// get orders by orderStatus
-exports.getOrdersByStatus = async (req, res) => {
-  try {
-    const { orderStatus } = req.params;
-
-    if (!["Pending", "Delivered", "Shipped", "Cancelled"].includes(orderStatus)) {
-      return res.status(400).json({ message: "Invalid order status!" });
-    }
-
-    const orders = await Order.find({ orderStatus });
-    if(orders.length === 0){
-      return res.status(404).json({message:`No orders found on ${orderStatus} status`})
-    }
-
-    res.status(200).json(orders);
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Server error!" });
-  }
-};
+module.exports = orderController;

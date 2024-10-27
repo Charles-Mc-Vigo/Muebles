@@ -29,22 +29,31 @@ const upload = multer({
 // Get all furnitures or furniture by ID
 exports.getAllFurnitures = async (req, res) => {
 	try {
-			const furnitures = await Furniture.find({ isArchived: false }).populate([
-					{ path: "category", select: "name -_id" },
-					{ path: "furnitureType", select: "name -_id" },
-					{ path: "materials", select: "name -_id" },
-					{ path: "colors", select: "name hex -_id" },
-					{ path: "stocks", select: "stocks -_id" },
-					{ path: "sizes", select: "label height width depth -_id" },
-			]);
-			
-			// Return the fetched furnitures
-			res.status(200).json( furnitures ); // Changed here
+		// Initialize filters with the isArchived flag
+		const filters = { isArchived: false };
+
+		// Add any additional query parameters to filters
+		for (const key in req.query) {
+			filters[key] = req.query[key]; // Add each query parameter to filters
+		}
+
+		const furnitures = await Furniture.find(filters).populate([
+			{ path: "category", select: "name -_id" },
+			{ path: "furnitureType", select: "name -_id" },
+			{ path: "materials", select: "name -_id" },
+			{ path: "colors", select: "name hex -_id" },
+			{ path: "stocks", select: "stocks -_id" },
+			{ path: "sizes", select: "label height width depth -_id" },
+		]);
+		
+		// Return the fetched furnitures
+		res.status(200).json(furnitures);
 	} catch (error) {
-			console.error(error);
-			res.status(500).json({ message: "Server error!" });
+		console.error(error);
+		res.status(500).json({ message: "Server error!" });
 	}
 };
+
 
 
 exports.ArchivedFurnitures = async (req, res) => {
@@ -59,7 +68,7 @@ exports.ArchivedFurnitures = async (req, res) => {
 			]);
 
 			if (archivedFurnitures.length === 0) {
-					return res.status(404).json({ message: "No archived furnitures found!" });
+					return res.status(200).json({ message: "No archived furnitures found!" });
 			}
 
 			res.status(200).json(archivedFurnitures);
@@ -190,7 +199,7 @@ exports.createFurniture = async (req, res) => {
         price,
       });
 
-      console.log('New Furniture has been added!', newFurniture);
+      console.log('New Furniture has been added!');
       await newFurniture.save();
       res.status(201).json({
         message: "New furniture added successfully!",
@@ -233,8 +242,8 @@ exports.updateFurniture = async (req, res) => {
         }
       }
 
-      if (images.length < 3) {
-        return res.status(400).json({ message: "At least 3 images are required!" });
+      if (images.length < 5) {
+        return res.status(400).json({ message: "At least 5 images are required!" });
       }
 
       const {

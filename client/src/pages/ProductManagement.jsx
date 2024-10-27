@@ -180,28 +180,28 @@ const ProductManagement = () => {
 			});
 	};
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const response = await fetch("http://localhost:3000/api/furnitures/add", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          credentials: "include",
-        },
-        body: JSON.stringify({
-          images: newFurniture.images,
-          name: newFurniture.name,
-          category: newFurniture.category,
-          furnitureType: newFurniture.furnitureType,
-          description: newFurniture.description,
-          materials: newFurniture.materials,
-          colors: newFurniture.colors,
-          sizes: newFurniture.sizes,
-          stocks: newFurniture.stocks,
-          price: newFurniture.price,
-        }),
-      });
+	const handleSubmit = async (e) => {
+		e.preventDefault();
+		try {
+			const response = await fetch("http://localhost:3000/api/furnitures/add", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+                credentials: "include",
+				body: JSON.stringify({
+					images: newFurniture.images,
+					name: newFurniture.name,
+					category: newFurniture.category,
+					furnitureType: newFurniture.furnitureType,
+					description: newFurniture.description,
+					materials: newFurniture.materials,
+					colors: newFurniture.colors,
+					sizes: newFurniture.sizes,
+					stocks: newFurniture.stocks,
+					price: newFurniture.price,
+				}),
+			});
 
 			if (response.ok) {
 				const data = await response.json();

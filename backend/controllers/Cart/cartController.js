@@ -24,7 +24,7 @@ exports.viewCart = async (req, res) => {
       });
     }
 
-    res.status(200).json({ cart });
+    res.status(200).json( {cart} );
   } catch (error) {
     console.error("Error in viewing the cart", error);
     res.status(500).json({ message: "Server error!" });

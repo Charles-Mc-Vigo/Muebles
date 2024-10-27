@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { IoMdArrowRoundBack } from "react-icons/io";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Cart = () => {
 	const [items, setItems] = useState([]);
@@ -8,6 +10,7 @@ const Cart = () => {
 	const [totalAmount, setTotalAmount] = useState(0);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
+	const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
 
 	const navigate = useNavigate(); // Hook to navigate
 
@@ -51,6 +54,35 @@ const Cart = () => {
 
 	// Calculate total price
 	const totalPrice = totalAmount.toFixed(2);
+
+	const handlePaymentMethodClick = (method) => {
+		setSelectedPaymentMethod(method);
+	};
+
+	const checkout = async () => {
+		try {
+			const response = await fetch("http://localhost:3000/api/orders/create", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				credentials: "include",
+				body: JSON.stringify({
+					paymentMethod: selectedPaymentMethod,
+				}),
+			});
+
+			if (!response.ok) {
+				toast.error("Please select payment method");
+			} else {
+				navigate('/order-details/:orderId');
+			}
+			await fetchCartItems();
+		} catch (error) {
+			setError(error.message);
+			setLoading(false);
+		}
+	};
 
 	// Handle updating the quantity of an item in the cart
 	const updateQuantity = async (furnitureId, newQuantity) => {
@@ -143,6 +175,12 @@ const Cart = () => {
 						<IoMdArrowRoundBack size={30} />
 					</button>
 					<h2 className="text-2xl font-semibold">Your Cart</h2>
+					<button
+						onClick={clearCart}
+						className="text-red-600 text-lg px-4 py-2 rounded ml-auto"
+					>
+						Clear Cart
+					</button>
 				</div>
 
 				{items.length === 0 ? (
@@ -218,26 +256,76 @@ const Cart = () => {
 							</ul>
 						</div>
 
-						<div className="border-t border-gray-300 pt-4">
+						{/* Payment Methods Section */}
+						<div className="border-t border-gray-300 pt-4 mt-5">
+							<h3 className="text-lg font-semibold mb-2">Payment Methods:</h3>
+							<div className="flex gap-4">
+								<button
+									value="GCash"
+									onClick={() => handlePaymentMethodClick("GCash")}
+									className={`px-4 py-2 rounded ${
+										selectedPaymentMethod === "GCash"
+											? "bg-blue-700"
+											: "bg-blue-500"
+									} text-white`}
+								>
+									GCash
+								</button>
+								<button
+									value="COD"
+									onClick={() => handlePaymentMethodClick("COD")}
+									className={`px-4 py-2 rounded ${
+										selectedPaymentMethod === "COD"
+											? "bg-yellow-700"
+											: "bg-yellow-500"
+									} text-white`}
+								>
+									COD
+								</button>
+								<button
+									value="Maya"
+									onClick={() => handlePaymentMethodClick("Maya")}
+									className={`px-4 py-2 rounded ${
+										selectedPaymentMethod === "Maya"
+											? "bg-green-700"
+											: "bg-green-500"
+									} text-white`}
+								>
+									Maya
+								</button>
+							</div>
+							{selectedPaymentMethod && (
+								<p className="mt-5 text-gray-600">
+									Selected Payment Method:{" "}
+									<strong>{selectedPaymentMethod}</strong>
+								</p>
+							)}
+						</div>
+
+						<div className="border-t border-gray-300 pt-4 mt-5">
 							<div className="flex justify-between items-center mb-4">
 								<h3 className="text-lg font-semibold">Subtotal:</h3>
 								<p className="text-lg font-semibold">₱{totalPrice}</p>
 							</div>
 							<div className="flex justify-between mb-4">
-								<button className="bg-blue-500 text-white px-4 py-2 rounded">
+								<button
+									onClick={() => navigate(-1)}
+									className="bg-blue-500 text-white px-4 py-2 rounded"
+								>
 									Continue Shopping
 								</button>
 								<button
 									className="bg-green-500 text-white px-4 py-2 rounded"
-									onClick={clearCart}
+									onClick={checkout}
 								>
-									Clear Cart
+									Checkout
 								</button>
 							</div>
 						</div>
 					</>
 				)}
 			</main>
+			<ToastContainer />
 		</div>
 	);
 };

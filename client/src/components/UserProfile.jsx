@@ -1,161 +1,565 @@
-import React, { useState } from "react";
-import Header from "./Header";
-import Footer from "./Footer";
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-const UserProfileView = () => {
-  const [userData, setUserData] = useState({
-    name: "John Doe",
-    email: "john@example.com",
-    address: "1234 Elm Street",
-    phoneNumber: "123-456-7890",
-    password: "",
-    profilePicture: "https://www.pngarts.com/files/10/Default-Profile-Picture-Transparent-Image.png", // Default profile picture
-  });
+const UserProfile = ({ showNameAndImage }) => {
+	const [profile, setProfile] = useState(null);
+	const [loading, setLoading] = useState(true);
+	const [error, setError] = useState(null);
+	const [isEditing, setIsEditing] = useState(false);
+	const [formData, setFormData] = useState({});
+	const [zipCode, setZipCode] = useState("");
+	const [availableBarangays, setAvailableBarangays] = useState([]);
+	const navigate = useNavigate();
+	const [selectedImage, setSelectedImage] = useState(null);
 
-  // Handle input changes for text fields
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setUserData((prevData) => ({ ...prevData, [name]: value }));
-  };
+	const zipCodes = {
+		Boac: 4900,
+		Mogpog: 4901,
+		Santa_Cruz: 4902,
+		Gasan: 4905,
+		Buenavista: 4904,
+		Torrijos: 4903,
+	};
 
-  // Handle profile picture change
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setUserData((prevData) => ({
-          ...prevData,
-          profilePicture: reader.result,
-        }));
-      };
-      reader.readAsDataURL(file);
-    }
-  };
+	const barangays = {
+		Boac: [
+			"Agot",
+			"Agumaymayan",
+			"Amoingon",
+			"Apitong",
+			"Balagasan",
+			"Balaring",
+			"Balimbing",
+			"Balogo",
+			"Bamban",
+			"Bangbangalon",
+			"Bantad",
+			"Bantay",
+			"Bayuti",
+			"Binunga",
+			"Boi",
+			"Boton",
+			"Buliasnin",
+			"Bunganay",
+			"Caganhao",
+			"Canat",
+			"Catubugan",
+			"Cawit",
+			"Daig",
+			"Daypay",
+			"Duyay",
+			"Hinapulan",
+			"Ihatub",
+			"Isok I",
+			"Isok II Poblacion",
+			"Laylay",
+			"Lupac",
+			"Mahinhin",
+			"Mainit",
+			"Malbog",
+			"Maligaya",
+			"Malusak",
+			"Mansiwat",
+			"Mataas na Bayan",
+			"Maybo",
+			"Mercado",
+			"Murallon",
+			"Ogbac",
+			"Pawa",
+			"Pili",
+			"Poctoy",
+			"Poras",
+			"Puting Buhangin",
+			"Puyog",
+			"Sabong",
+			"San Miguel",
+			"Santol",
+			"Sawi",
+			"Tabi",
+			"Tabigue",
+			"Tagwak",
+			"Tambunan",
+			"Tampus",
+			"Tanza",
+			"Tugos",
+			"Tumagabok",
+			"Tumapon",
+		],
+		Mogpog: [
+			"Anapog-Sibucao",
+			"Argao",
+			"Balanacan",
+			"Banto",
+			"Bintakay",
+			"Bocboc",
+			"Butansapa",
+			"Candahon",
+			"Capayang",
+			"Danao",
+			"Dulong Bayan",
+			"Gitnang Bayan",
+			"Guisian",
+			"Hinadharan",
+			"Hinanggayon",
+			"Ino",
+			"Janagdong",
+			"Lamesa",
+			"Laon",
+			"Magapua",
+			"Malayak",
+			"Malusak",
+			"Mampaitan",
+			"Mangyan-Mababad",
+			"Market Site",
+			"Mataas na Bayan",
+			"Mendez",
+			"Nangka I",
+			"Nangka II",
+			"Paye",
+			"Pili",
+			"Puting Buhangin",
+			"Sayao",
+			"Silangan",
+			"Sumangga",
+			"Tarug",
+			"Villa Mendez",
+		],
+		Santa_Cruz: [
+			"Alobo",
+			"Angas",
+			"Aturan",
+			"Bagong Silang Poblacion",
+			"Baguidbirin",
+			"Baliis",
+			"Balogo",
+			"Banahaw Poblacion",
+			"Bangcuangan",
+			"Banogbog",
+			"Biga",
+			"Botilao",
+			"Buyabod",
+			"Dating Bayan",
+			"Devilla",
+			"Dolores",
+			"Haguimit",
+			"Hupi",
+			"Ipil",
+			"Jolo",
+			"Kaganhao",
+			"Kalangkang",
+			"Kamandugan",
+			"Kasily",
+			"Kilo-kilo",
+			"Kiñaman",
+			"Labo",
+			"Lamesa",
+			"Landy",
+			"Lapu-lapu Poblacion",
+			"Libjo",
+			"Lipa",
+			"Lusok",
+			"Maharlika Poblacion",
+			"Makulapnit",
+			"Maniwaya",
+			"Manlibunan",
+			"Masaguisi",
+			"Masalukot",
+			"Matalaba",
+			"Mongpong",
+			"Morales",
+			"Napo",
+			"Pag-asa Poblacion",
+			"Pantayin",
+			"Polo",
+			"Pulong-Parang",
+			"Punong",
+			"San Antonio",
+			"San Isidro",
+			"Tagum",
+			"Tamayo",
+			"Tambangan",
+			"Tawiran",
+			"Taytay",
+		],
+		Gasan: [
+			"Antipolo",
+			"Bachao Ibaba",
+			"Bachao Ilaya",
+			"Bacongbacong",
+			"Bahi",
+			"Bangbang",
+			"Banot",
+			"Banuyo",
+			"Barangay I",
+			"Barangay II",
+			"Barangay III",
+			"Bognuyan",
+			"Cabugao",
+			"Dawis",
+			"Dili",
+			"Libtangin",
+			"Mahunig",
+			"Mangiliol",
+			"Masiga",
+			"Matandang Gasan",
+			"Pangi",
+			"Pingan",
+			"Tabionan",
+			"Tapuyan",
+			"Tiguion",
+		],
+		Buenavista: [
+			"Bagacay",
+			"Bagtingon",
+			"Barangay I",
+			"Barangay II",
+			"Barangay III",
+			"Barangay IV",
+			"Bicas-bicas",
+			"Caigangan",
+			"Daykitin",
+			"Libas",
+			"Malbog",
+			"Sihi",
+			"Timbo",
+			"Tungib-Lipata",
+			"Yook",
+		],
+		Torrijos: [
+			"Bangwayin",
+			"Bayakbakin",
+			"Bolo",
+			"Bonliw",
+			"Buangan",
+			"Cabuyo",
+			"Cagpo",
+			"Dampulan",
+			"Kay Duke",
+			"Mabuhay",
+			"Makawayan",
+			"Malibago",
+			"Malinao",
+			"Maranlig",
+			"Marlangga",
+			"Matuyatuya",
+			"Nangka",
+			"Pakaskasan",
+			"Payanas",
+			"Poblacion",
+			"Poctoy",
+			"Sibuyao",
+			"Suha",
+			"Talawan",
+			"Tigwi",
+		],
+	};
 
-  // Handle form submission
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Logic to save updated data (e.g., send to a server)
-    console.log("Updated user data:", userData);
-  };
+	useEffect(() => {
+		fetchProfile();
+	}, []);
 
-  return (
-    <div className="flex flex-col min-h-screen">
-      {/* Header - Full width */}
-      <header className="w-full">
-        <Header />
-      </header>
+	const fetchProfile = async () => {
+		try {
+			const response = await fetch(
+				"http://localhost:3000/api/users/setting/my-profile/view",
+				{
+					method: "GET",
+					credentials: "include",
+				}
+			);
+			if (!response.ok) {
+				throw new Error("Unable to load profile. Please try again later.");
+			}
+			const data = await response.json();
+			setProfile(data);
+			setFormData(data); // Initialize form data with fetched profile
+		} catch (err) {
+			setError(err.message);
+		} finally {
+			setLoading(false);
+		}
+	};
 
-      {/* Main content - Centered form */}
-      <main className="flex-grow flex justify-center items-center p-4 bg-gray-100">
-        <div className="max-w-lg w-full bg-white shadow-md rounded-lg p-8">
-          <h2 className="text-2xl font-bold mb-6 text-center">My Profile</h2>
+	const handleImageChange = (e) => {
+		if (e.target.files && e.target.files.length > 0) {
+			setSelectedImage(e.target.files[0]);
+		}
+	};
 
-          {/* Form to edit user profile */}
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Profile Picture */}
-            <div className="flex flex-col items-center">
-              <img
-                src={userData.profilePicture}
-                alt="Profile"
-                className="w-28 h-28 rounded-full object-cover mb-4"
-              />
-              <input
-                type="file"
-                onChange={handleFileChange}
-                className="block text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:border-0 file:text-sm file:font-semibold file:bg-gray-50 file:text-gray-700 hover:file:bg-gray-100"
-              />
-            </div>
+	const handleChange = (e) => {
+		const { id, value } = e.target;
+		setFormData((prev) => ({
+			...prev,
+			[id]: value,
+		}));
+		if (id === "municipality") {
+			setZipCode(zipCodes[value] || "");
+			setAvailableBarangays(barangays[value] || []);
+			setFormData((prev) => ({ ...prev, barangay: "" }));
+		}
+	};
 
-            {/* Name */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Name
-              </label>
-              <input
-                type="text"
-                name="name"
-                value={userData.name}
-                onChange={handleChange}
-                className="w-full border border-gray-300 rounded-md p-2 focus:ring-teal-500 focus:border-teal-500"
-              />
-            </div>
+	const handleEditToggle = () => {
+		setIsEditing(!isEditing);
+	};
 
-            {/* Email */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Email
-              </label>
-              <input
-                type="email"
-                name="email"
-                value={userData.email}
-                onChange={handleChange}
-                className="w-full border border-gray-300 rounded-md p-2 focus:ring-teal-500 focus:border-teal-500"
-              />
-            </div>
+	const handleSave = async (e) => {
+		e.preventDefault();
+		try {
+			// Prepare the data to be sent to the server
+			const dataToUpdate = {
+				firstname: formData.firstname,
+				lastname: formData.lastname,
+				gender: formData.gender,
+				phoneNumber: formData.phoneNumber,
+				streetAddress: formData.streetAddress,
+				municipality: formData.municipality,
+				barangay: formData.barangay,
+				zipCode: zipCode,
+				email: formData.email,
+			};
 
-            {/* Address */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Address
-              </label>
-              <input
-                type="text"
-                name="address"
-                value={userData.address}
-                onChange={handleChange}
-                className="w-full border border-gray-300 rounded-md p-2 focus:ring-teal-500 focus:border-teal-500"
-              />
-            </div>
+			// Optional: Handle image file upload if applicable
+			if (selectedImage) {
+				const formData = new FormData();
+				formData.append("image", selectedImage);
+				Object.keys(dataToUpdate).forEach((key) => {
+					formData.append(key, dataToUpdate[key]);
+				});
 
-            {/* Phone Number */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Phone Number
-              </label>
-              <input
-                type="tel"
-                name="phoneNumber"
-                value={userData.phoneNumber}
-                onChange={handleChange}
-                className="w-full border border-gray-300 rounded-md p-2 focus:ring-teal-500 focus:border-teal-500"
-              />
-            </div>
+				const response = await fetch(
+					"http://localhost:3000/api/users/setting/my-profile/update",
+					{
+						method: "PUT",
+						body: formData,
+						credentials: "include", // Include credentials if needed
+					}
+				);
 
-            {/* Password */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Password
-              </label>
-              <input
-                type="password"
-                name="password"
-                value={userData.password}
-                onChange={handleChange}
-                className="w-full border border-gray-300 rounded-md p-2 focus:ring-teal-500 focus:border-teal-500"
-                placeholder="Enter new password"
-              />
-            </div>
+				const responseData = await response.json();
+				if (!response.ok) {
+					throw new Error(responseData.message || "Update failed");
+				}
 
-            {/* Submit Button */}
-            <button
-              type="submit"
-              className="w-full bg-teal-600 text-white py-2 rounded-md hover:bg-teal-700 transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
-            >
-              Save Changes
-            </button>
-          </form>
-        </div>
-      </main>
+				setProfile(responseData.user); // Update the profile state with the new user data
+				toast.success("Profile updated successfully!");
+			} else {
+				const response = await fetch(
+					"http://localhost:3000/api/users/setting/my-profile/update",
+					{
+						method: "PUT",
+						headers: {
+							"Content-Type": "application/json",
+						},
+						body: JSON.stringify(dataToUpdate),
+						credentials: "include", // Include credentials if needed
+					}
+				);
 
-      {/* Footer - Full width */}
-      <footer className="w-full mt-auto">
-        <Footer />
-      </footer>
-    </div>
-  );
+				const responseData = await response.json();
+				if (!response.ok) {
+					throw new Error(responseData.message || "Update failed");
+				}
+
+				setProfile(responseData.user); // Update the profile state with the new user data
+				toast.success("Profile updated successfully!");
+				await fetchProfile();
+			}
+
+			setIsEditing(false);
+		} catch (error) {
+			console.error("Update error:", error.message);
+			toast.error(
+				error.message || "An unexpected error occurred. Please try again."
+			);
+		}
+	};
+
+	if (loading)
+		return <p className="text-center text-lg">Loading your profile...</p>;
+	if (error) return <p className="text-center text-red-500">{error}</p>;
+
+	// Check if profile is defined before rendering
+	if (!profile) {
+		return (
+			<p className="text-center text-red-500">Profile data not available.</p>
+		);
+	}
+
+	return (
+		<div className="max-w-3xl mx-auto m-4 p-6 bg-white shadow-md rounded-lg">
+			{isEditing ? (
+				<form onSubmit={handleSave} className="flex flex-col gap-4">
+					<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+						<input
+							type="text"
+							placeholder="Firstname"
+							id="firstname"
+							required
+							className="bg-slate-100 p-3 rounded-lg"
+							onChange={handleChange}
+							value={formData.firstname}
+						/>
+						<input
+							type="text"
+							placeholder="Lastname"
+							id="lastname"
+							required
+							className="bg-slate-100 p-3 rounded-lg"
+							onChange={handleChange}
+							value={formData.lastname}
+						/>
+					</div>
+					<select
+						id="gender"
+						value={formData.gender}
+						onChange={handleChange}
+						required
+						className="bg-slate-100 p-3 rounded-lg"
+					>
+						<option value="" disabled hidden>
+							Gender
+						</option>
+						<option value="Male">Male</option>
+						<option value="Female">Female</option>
+					</select>
+					<input
+						type="tel"
+						placeholder="+639XXXXXXXXX"
+						id="phoneNumber"
+						required
+						className="bg-slate-100 p-3 rounded-lg"
+						onChange={handleChange}
+						value={formData.phoneNumber}
+					/>
+					<select
+						name="municipality"
+						id="municipality"
+						required
+						onChange={handleChange}
+						value={formData.municipality}
+						className="bg-slate-100 p-3 rounded-lg"
+					>
+						<option value="" disabled hidden>
+							Select Municipality
+						</option>
+						{Object.keys(zipCodes).map((municipality) => (
+							<option key={municipality} value={municipality}>
+								{municipality}
+							</option>
+						))}
+					</select>
+					{formData.municipality && (
+						<>
+							<input
+								type="text"
+								value={zipCode}
+								readOnly
+								className="bg-slate-100 p-3 rounded-lg"
+								placeholder="Zip Code"
+							/>
+							<select
+								id="barangay"
+								required
+								onChange={handleChange}
+								value={formData.barangay}
+								className="bg-slate-100 p-3 rounded-lg "
+							>
+								<option value="" disabled hidden>
+									Select Barangay
+								</option>
+								{availableBarangays.map((barangay) => (
+									<option key={barangay} value={barangay}>
+										{barangay}
+									</option>
+								))}
+							</select>
+						</>
+					)}
+					<input
+						type="text"
+						placeholder="Street Address"
+						id="streetAddress"
+						required
+						className="bg-slate-100 p-3 rounded-lg"
+						onChange={handleChange}
+						value={formData.streetAddress}
+					/>
+					<input
+						type="email"
+						placeholder="Email"
+						id="email"
+						required
+						className="bg-slate-100 p-3 rounded-lg"
+						onChange={handleChange}
+						value={formData.email}
+					/>
+					<input type="file" accept="image/*" onChange={handleImageChange} />
+
+					<button
+						type="submit"
+						className="w-full bg-green-800 hover:bg-green-600 text-white p-3 rounded-lg font-semibold"
+					>
+						Save Changes
+					</button>
+					<button
+						type="button"
+						onClick={handleEditToggle}
+						className="w-full bg-gray-300 hover:bg-gray-200 text-black p-3 rounded-lg font-semibold"
+					>
+						Cancel
+					</button>
+				</form>
+			) : (
+				<div>
+					<h1 className="text-3xl font-bold text-center mb-6 text-gray-900">
+						Profile Details
+					</h1>
+					<div className="flex flex-col items-center">
+						<Link
+							to="/dashboard/setting/my-profile/view"
+							className="group mt-4"
+						>
+							<img
+								src={
+									profile && profile.image && profile.image.startsWith("data:")
+										? profile.image
+										: profile?.image || "default-profile-image.jpg" // Use a default image if profile.image is undefined
+								}
+								alt={`${profile?.firstname || ""} ${
+									profile?.lastname || ""
+								}'s Profile Picture`}
+								className="w-24 h-24 rounded-full object-cover mb-4 shadow-lg transition-transform group-hover:scale-105"
+							/>
+						</Link>
+						<h2 className="text-xl font-semibold text-gray-800 mb-1">
+							{profile.firstname} {profile.lastname}
+						</h2>
+						<p className="text-sm font-medium text-gray-600 mb-2">
+							{profile.role}
+						</p>
+						<div className="text-center text-gray-700 space-y-1">
+							<p>Email: {profile.email}</p>
+							<p>Phone: {profile.phoneNumber}</p>
+							<p>
+								Address:{" "}
+								{`${profile.streetAddress}, ${profile.barangay}, ${profile.municipality}, ${profile.zipCode}`}
+							</p>
+						</div>
+						<button
+							onClick={handleEditToggle}
+							className="bg-yellow-500 text-white px-4 py-2 rounded mt-4"
+						>
+							Edit Profile
+						</button>
+					</div>
+				</div>
+			)}
+			<ToastContainer />
+		</div>
+	);
 };
 
-export default UserProfileView;
+export default UserProfile;

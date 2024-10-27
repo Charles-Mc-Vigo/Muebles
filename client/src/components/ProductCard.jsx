@@ -9,6 +9,13 @@ const ProductCard = ({
 	description,
 	showAddToCart,
 	showUpdateButton,
+	showArchiveButton,
+	showUnArchivedButton,
+	onArchiveSuccess,
+	onUnArchiveSuccess,
+	showToast,
+	onAddToCart
+
 }) => {
 	// Function to truncate the description
 	const truncateDescription = (desc, maxLength) => {
@@ -23,8 +30,8 @@ const ProductCard = ({
 	const addToCart = async (e) => {
 		e.preventDefault(); // Prevents navigating when clicking the button
 		const item = {
-			furnitureId: id,  // The server expects the ID of the furniture
-			quantity: 1,  // Default quantity to 1
+			furnitureId: id, // The server expects the ID of the furniture
+			quantity: 1, // Default quantity to 1
 		};
 		try {
 			const response = await fetch('http://localhost:3000/api/cart', {
@@ -33,17 +40,63 @@ const ProductCard = ({
 					'Content-Type': 'application/json',
 				},
 				credentials: 'include',
-				body: JSON.stringify(item),  // Send the furnitureId and quantity to the server
+				body: JSON.stringify(item), // Send the furnitureId and quantity to the server
 			});
 			if (!response.ok) {
 				throw new Error('Failed to add item to cart');
 			}
 			const data = await response.json();
-			console.log('Item added to cart successfully:', data);  // Optionally handle success (e.g., show a toast or update cart state)
-			alert('Item added to cart successfully!');
+			console.log('Item added to cart successfully:', data);
+			showToast("Item added to cart successfully!", "success");
+			if (onAddToCart) {
+				onAddToCart(); // Increment cart count
+			}
 		} catch (error) {
-			console.error('Error adding item to cart:', error);  // Optionally handle error (e.g., show an error message)
+			console.error('Error adding item to cart:', error);
+			showToast("Error adding item to cart. Please try again.", "error");
 			alert('Error adding item to cart. Please try again.');
+		}
+	};
+
+	// Function to handle archiving the item
+	const archiveItem = async (e) => {
+		e.preventDefault();
+		try {
+			const response = await fetch(`http://localhost:3000/api/furnitures/archive/${id}`, {
+				method: 'DELETE',
+				headers: { 'Content-Type': 'application/json' },
+				credentials: 'include',
+			});
+			if (!response.ok) throw new Error('Failed to archive item');
+			alert('Item archived successfully!');
+			onArchiveSuccess(); // Trigger update in parent component
+		} catch (error) {
+			console.error('Error archiving item:', error);
+			alert('Error archiving item. Please try again.');
+		}
+	};
+
+	// Function to handle unarchiving the item
+	const unarchiveItem = async (e) => {
+		e.preventDefault(); // Prevents navigating when clicking the button
+		try {
+			const response = await fetch(`http://localhost:3000/api/furnitures/unarchive/${id}`, {
+				method: 'POST', // Assuming POST for unarchiving
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				credentials: 'include',
+			});
+			if (!response.ok) {
+				throw new Error('Failed to unarchive item');
+			}
+			const data = await response.json();
+			console.log('Item unarchived successfully:', data); // Optionally handle success
+			alert('Item unarchived successfully!');
+			onUnArchiveSuccess();
+		} catch (error) {
+			console.error('Error unarchiving item:', error); // Optionally handle error
+			alert('Error unarchiving item. Please try again.');
 		}
 	};
 
@@ -84,6 +137,22 @@ const ProductCard = ({
 					>
 						Update Furniture
 					</Link>
+				)}
+				{showArchiveButton && (
+					<button
+						onClick={archiveItem}
+						className="bg-red-600 hover:bg-red-700 text-white py-2 rounded-md transition-colors duration-300 mt-2"
+					>
+						Archive
+					</button>
+				)}
+				{showUnArchivedButton && (
+					<button
+						onClick={unarchiveItem}
+						className="bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-md transition-colors duration-300 mt-2"
+					>
+						Unarchive
+					</button>
 				)}
 			</div>
 		</Link>

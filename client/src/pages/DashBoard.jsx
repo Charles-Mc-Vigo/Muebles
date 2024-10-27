@@ -90,6 +90,7 @@ const Dashboard = () => {
     </li>
   );
 
+<<<<<<< HEAD
   // Content mapping
   const contentMap = {
     dashboard: <DashboardContent />,
@@ -98,6 +99,76 @@ const Dashboard = () => {
     inventory: <Inventory />,
 
     "view-transaction": <TransactionHistory />,
+=======
+	// Content mapping
+	const contentMap = {
+		dashboard: <DashboardContent />,
+		"view-products": <ViewProduct />,
+		"modify-product": <ProductManagement />,
+		inventory: <Inventory />,
+		"order-management": (
+			<h2 className="text-2xl font-semibold">Order Management Content</h2>
+		),
+		"track-delivery": (
+			<h2 className="text-2xl font-semibold">Track Delivery Content</h2>
+		),
+		"manage-delivery": (
+			<h2 className="text-2xl font-semibold">Manage Delivery Content</h2>
+		),
+		Category: <Maintenance />,
+		Services: <ServiceSection />,
+		"repair-hardware": (
+			<h2 className="text-2xl font-semibold">Repair Hardware Content</h2>
+		),
+	};
+
+	return (
+		<div className="flex h-screen bg-gray-100">
+			{/* Sidebar */}
+			<aside className="w-64 bg-oliveGreen text-white flex flex-col items-center rounded-l-3xl ml-1 h-50 mt-2 mb-2">
+				<div class="flex flex-col items-center p-5 m-5">
+					<img
+						src="/landingimage/LOGO.jpg"
+						alt="LOGO"
+						class="w-12 h-12 rounded-full"
+					/>
+					<h1 class="mt-3">JCKAME</h1>
+				</div>
+
+				<nav className="w-full flex-grow">
+					<ul className="space-y-4">
+						<NavItem
+							icon={faBox}
+							label="Dashboard"
+							isActive={activeSection === "dashboard"}
+							onClick={() => setActiveSection("dashboard")}
+						/>
+						{/* Product Management Section */}
+						<NavItem
+							icon={faBox}
+							label="Product Management"
+							isActive={activeSection.startsWith("product")}
+							onClick={() => toggleDropdown("product")}
+							hasDropdown
+							isOpen={dropdowns.product}
+						/>
+						{dropdowns.product && (
+							<ul className="ml-8 space-y-2">
+								<DropdownItem
+									label="View Products"
+									section="view-products"
+									currentSection={activeSection}
+									onClick={setActiveSection}
+								/>
+								<DropdownItem
+									label="Modify Product"
+									section="modify-product"
+									currentSection={activeSection}
+									onClick={setActiveSection}
+								/>
+							</ul>
+						)}
+>>>>>>> eef4f899e1004ed830dbd8f72b9515d47e059f87
 
     "order-management": <OrderManagement />,
 
