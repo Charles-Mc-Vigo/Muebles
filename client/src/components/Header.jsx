@@ -124,7 +124,7 @@ const Header = ({ isLogin, cartCount }) => {
 											<div className="absolute right-0 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-50 transition-transform transform opacity-100 text-center">
 												<nav className="py-2">
 													<Link
-														to="/my-profile/view/:userId" // Ensure to replace :userId dynamically
+														to="/my-profile/view" // Ensure to replace :userId dynamically
 														className="block py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
 														onClick={() => setIsUserMenuOpen(false)} // Close menu on click
 													>

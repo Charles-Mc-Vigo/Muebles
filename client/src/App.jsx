@@ -29,6 +29,7 @@ import PasswordResetRequest from "./pages/PasswordResetRequest";
 import PasswordResetVerify from "./pages/PasswordResetVerify";
 import PasswordResetCreateNew from "./pages/PasswordResetCreateNew";
 import OrderDetails from "./pages/OrderDetails";
+import UserProfile from "./components/UserProfile";
 
 export default function App() {
 	return (
@@ -40,7 +41,7 @@ export default function App() {
 				<Route path="/login" element={<Login />} />
 				<Route path="/verify-account/:userId" element={<EmailVerification />} />
 				<Route path="/home" element={<ProtectedRoute element={Home} />} />
-				<Route path = "/my-profile/view/:userId" element={Profile} />
+				<Route path ="/my-profile/view" element={<ProtectedRoute element={UserProfile}/>} />
 				<Route
 					path="/password-reset/request"
 					element={<PasswordResetRequest />}
