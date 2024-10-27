@@ -5,13 +5,15 @@ import {
 	FaShoppingCart,
 	FaBars,
 	FaTimes,
+	FaUser,
 } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import Logout from "./Logout";
 
-const Header = ({ isLogin, cartCount}) => {
+const Header = ({ isLogin, cartCount }) => {
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
 	const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
+	const [isUserMenuOpen, setIsUserMenuOpen] = useState(false); // New state for user menu
 
 	// Close menu when clicking outside
 	useEffect(() => {
@@ -44,10 +46,15 @@ const Header = ({ isLogin, cartCount}) => {
 	const toggleMenu = () => {
 		setIsMenuOpen(!isMenuOpen);
 		setIsMobileSearchOpen(false);
+		setIsUserMenuOpen(false); // Close user menu when main menu is opened
 	};
 
 	const toggleMobileSearch = () => {
 		setIsMobileSearchOpen(!isMobileSearchOpen);
+	};
+
+	const toggleUserMenu = () => {
+		setIsUserMenuOpen(!isUserMenuOpen);
 	};
 
 	return (
@@ -91,9 +98,44 @@ const Header = ({ isLogin, cartCount}) => {
 								</div>
 							</Link>
 
-							<div className="flex items-center gap-4">
+							{isLogin && (
+								<Link to="/cart" className="relative">
+									<FaShoppingCart className="text-2xl hover:text-teal-600 transition-colors" />
+									{cartCount > 0 && (
+										<span className="absolute -top-2 -right-2 bg-teal-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+											{cartCount}
+										</span>
+									)}
+								</Link>
+							)}
+
+							{/* User Icon with Collapsible Menu */}
+							<div className="relative">
 								{isLogin ? (
-									<Logout isUser={true} />
+									<>
+										<button
+											onClick={toggleUserMenu}
+											className="flex items-center hover:text-teal-600 transition-colors"
+										>
+											<FaUser className="text-2xl" />
+										</button>
+										{/* Collapsible User Menu */}
+										{isUserMenuOpen && (
+											<div className="absolute right-0 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-50 transition-transform transform opacity-100 text-center">
+												<nav className="py-2">
+													<Link
+														to="/my-profile/view/:userId" // Ensure to replace :userId dynamically
+														className="block py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+														onClick={() => setIsUserMenuOpen(false)} // Close menu on click
+													>
+														View Profile
+													</Link>
+													<hr className="border-gray-200 py-2" />
+													<Logout isUser={true} />
+												</nav>
+											</div>
+										)}
+									</>
 								) : (
 									<div className="flex items-center gap-2 text-sm">
 										<Link
@@ -112,17 +154,6 @@ const Header = ({ isLogin, cartCount}) => {
 									</div>
 								)}
 							</div>
-
-							{isLogin && (
-								<Link to="/cart" className="relative">
-									<FaShoppingCart className="text-2xl hover:text-teal-600 transition-colors" />
-									{cartCount > 0 && (
-										<span className="absolute -top-2 -right-2 bg-teal-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-											{cartCount}
-										</span>
-									)}
-								</Link>
-							)}
 						</div>
 					</div>
 				</div>

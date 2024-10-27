@@ -40,6 +40,7 @@ export default function App() {
 				<Route path="/login" element={<Login />} />
 				<Route path="/verify-account/:userId" element={<EmailVerification />} />
 				<Route path="/home" element={<ProtectedRoute element={Home} />} />
+				<Route path = "/my-profile/view/:userId" element={Profile} />
 				<Route
 					path="/password-reset/request"
 					element={<PasswordResetRequest />}
