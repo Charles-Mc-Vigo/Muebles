@@ -1,212 +1,241 @@
-const Order = require('../../models/Order/orderModel');
-const Cart = require('../../models/Cart/cartModel');
-const User = require('../../models/User/userModel');
+const Order = require("../../models/Order/orderModel");
+const Cart = require("../../models/Cart/cartModel");
+const User = require("../../models/User/userModel");
 
 const orderController = {
-  // Create new order from cart
-  createOrder: async (req, res) => {
-    try {
-      const { paymentMethod } = req.body;
-      const userId = req.user._id; // Using ID from cookie token
+	// Create new order from cart
+	createOrder: async (req, res) => {
+		try {
+			const { paymentMethod } = req.body;
+			const userId = req.user._id; // Using ID from cookie token
 
-      // Find user's cart
-      const cart = await Cart.findOne({userId : userId} );
-      if (!cart || cart.items.length === 0) {
-        return res.status(400).json({ message: "Cart is empty" });
-      }
+			// Validate that payment method is provided
+			if (!paymentMethod) {
+				return res.status(400).json({
+					message: "Please select a payment method to proceed.",
+				});
+			}
 
-      if(!paymentMethod) return res.status(400).json({message:"Please select payment method to proceed"});
+			// For specific payment methods (e.g., GCash, Maya, COD), ensure proof of payment is provided
+			if (["GCash", "Maya", "COD"].includes(paymentMethod)) {
+				if (!req.file) {
+					return res.status(400).json({
+						success: false,
+						message: "Please upload proof of payment for the selected method.",
+					});
+				}
+			}
 
-      // Create order from cart
-      const order = await Order.createFromCart(cart._id, paymentMethod);
+			// Check if payment method requires proof of payment
+			let proofOfPayment;
+			if (req.file) {
+				// Convert the uploaded image to a base64-encoded string
+				proofOfPayment = `data:${
+					req.file.mimetype
+				};base64,${req.file.buffer.toString("base64")}`;
+			}
 
-      // Clear the cart
-      await Cart.findByIdAndUpdate(cart._id, {
-        items: [],
-        count: 0,
-        totalAmount: 0
-      });
-      // Add order to user's orders array
-      await User.findByIdAndUpdate(userId, {
-        $push: { orders: order._id }
-      });
+			// Find user's cart
+			const cart = await Cart.findOne({ userId });
+			if (!cart || cart.items.length === 0) {
+				return res.status(400).json({ message: "Cart is empty" });
+			}
 
-      res.status(201).json({
-        success: true,
-        message: "Order was place successfully!",
-        order
-      });
-    } catch (error) {
-      console.error("Error creating an order: ",error)
-      res.status(500).json({
-        success: false,
-        message: "Error creating order",
-        error: error.message
-      });
-    }
-  },
+			// Create the order with the proof of payment as base64
+			const order = await Order.createFromCart(
+				cart._id,
+				paymentMethod,
+				proofOfPayment
+			);
 
-  // Get user's orders
-  getUserOrders: async (req, res) => {
-    try {
-      const userId = req.user._id;
-      const orders = await Order.find({ user: userId })
-        .populate('items.furniture user.firstname')
-        .sort({ createdAt: -1 });
+			// Clear the cart
+			await Cart.findByIdAndUpdate(cart._id, {
+				items: [],
+				count: 0,
+				totalAmount: 0,
+			});
 
-      res.status(200).json(orders);
-    } catch (error) {
-      res.status(500).json({
-        success: false,
-        message: "Error fetching orders",
-        error: error.message
-      });
-    }
-  },
+			// Add the order to the user's orders array
+			await User.findByIdAndUpdate(userId, {
+				$push: { orders: order._id, proofOfPayment },
+			});
 
-  // Get single order details
-  getOrderDetails: async (req, res) => {
-    try {
-      const {orderId} = req.params;
-      const userId = req.user._id;
-      const order = await Order.findById(orderId)
-        .populate('items.furniture')
-        .populate('user', 'firstname lastname email');
+			res.status(201).json({
+				success: true,
+				message: "Order placed successfully!",
+				order,
+			});
+		} catch (error) {
+			console.error("Error creating order:", error);
+			res.status(500).json({
+				success: false,
+				message: "Error creating order",
+				error: error.message,
+			});
+		}
+	},
+	// Get user's orders
+	getUserOrders: async (req, res) => {
+		try {
+			const userId = req.user._id;
+			const orders = await Order.find({ user: userId })
+				.populate("items.furniture user.firstname")
+				.sort({ createdAt: -1 });
 
-      if (!order) {
-        return res.status(404).json({
-          success: false,
-          message: "Order not found"
-        });
-      }
+			res.status(200).json(orders);
+		} catch (error) {
+			res.status(500).json({
+				success: false,
+				message: "Error fetching orders",
+				error: error.message,
+			});
+		}
+	},
 
-      // Check if order belongs to user (for non-admin users)
-      if (!req.admin && order.user._id.toString() !== userId) {
-        return res.status(403).json({
-          success: false,
-          message: "Not authorized to view this order"
-        });
-      }
+	// Get single order details
+	getOrderDetails: async (req, res) => {
+		try {
+			const { orderId } = req.params;
+			const userId = req.user._id;
+			const order = await Order.findById(orderId)
+				.populate("items.furniture")
+				.populate("user", "firstname lastname email");
 
-      res.status(200).json({
-        success: true,
-        order
-      });
-    } catch (error) {
-      res.status(500).json({
-        success: false,
-        message: "Error fetching order details",
-        error: error.message
-      });
-    }
-  },
+			if (!order) {
+				return res.status(404).json({
+					success: false,
+					message: "Order not found",
+				});
+			}
 
-  // Cancel order (user)
-  cancelOrder: async (req, res) => {
-    try {
-      const userId = req.user._id;
-      const order = await Order.findById(req.params.orderId);
+			// Check if order belongs to user (for non-admin users)
+			if (!req.admin && order.user._id.toString() !== userId) {
+				return res.status(403).json({
+					success: false,
+					message: "Not authorized to view this order",
+				});
+			}
 
-      if (!order) {
-        return res.status(404).json({
-          success: false,
-          message: "Order not found"
-        });
-      }
+			res.status(200).json({
+				success: true,
+				order,
+			});
+		} catch (error) {
+			res.status(500).json({
+				success: false,
+				message: "Error fetching order details",
+				error: error.message,
+			});
+		}
+	},
 
-      // Check if order belongs to user
-      if (order.user.toString() !== userId) {
-        return res.status(403).json({
-          success: false,
-          message: "Not authorized to cancel this order"
-        });
-      }
+	// Cancel order (user)
+	cancelOrder: async (req, res) => {
+		try {
+			const userId = req.user._id;
+			const order = await Order.findById(req.params.orderId);
 
-      // Only allow cancellation of pending orders
-      if (order.orderStatus !== 'pending') {
-        return res.status(400).json({
-          success: false,
-          message: "Order cannot be cancelled at this stage"
-        });
-      }
+			if (!order) {
+				return res.status(404).json({
+					success: false,
+					message: "Order not found",
+				});
+			}
 
-      order.orderStatus = 'cancelled';
-      await order.save();
+			// Check if order belongs to user
+			if (order.user.toString() !== userId) {
+				return res.status(403).json({
+					success: false,
+					message: "Not authorized to cancel this order",
+				});
+			}
 
-      res.status(200).json({
-        success: true,
-        message: "Order cancelled successfully",
-        order
-      });
-    } catch (error) {
-      res.status(500).json({
-        success: false,
-        message: "Error cancelling order",
-        error: error.message
-      });
-    }
-  },
+			// Only allow cancellation of pending orders
+			if (order.orderStatus !== "pending") {
+				return res.status(400).json({
+					success: false,
+					message: "Order cannot be cancelled at this stage",
+				});
+			}
 
-  // Admin: Get all orders
-  getAllOrders: async (req, res) => {
-    try {
-      const orders = await Order.find(req.query)
-        .populate('user', 'firstname lastname email phoneNumber')
-        .populate('items.furniture')
-        .sort({ createdAt: -1 });
+			order.orderStatus = "cancelled";
+			await order.save();
 
-      res.status(200).json({
-        success: true,
-        orders
-      });
-    } catch (error) {
-      res.status(500).json({
-        success: false,
-        message: "Error fetching all orders",
-        error: error.message
-      });
-    }
-  },
+			res.status(200).json({
+				success: true,
+				message: "Order cancelled successfully",
+				order,
+			});
+		} catch (error) {
+			res.status(500).json({
+				success: false,
+				message: "Error cancelling order",
+				error: error.message,
+			});
+		}
+	},
 
-  // Admin: Update order status
-  updateOrderStatus: async (req, res) => {
-    try {
-      const { orderStatus } = req.body;
-      
-      if (!orderStatus) {
-        return res.status(400).json({
-          success: false,
-          message: "Order status is required"
-        });
-      }
+	// Admin: Get all orders
+	getAllOrders: async (req, res) => {
+		try {
+			const orders = await Order.find(req.query)
+				.populate("user", "firstname lastname email phoneNumber")
+				.populate("items.furniture")
+				.sort({ createdAt: -1 });
 
-      const order = await Order.findByIdAndUpdate(
-        req.params.orderId,
-        { orderStatus },
-        { new: true }
-      ).populate('items.furniture')
-        .populate('user', 'firstname lastname email phoneNumber');
+			res.status(200).json({
+				success: true,
+				orders,
+			});
+		} catch (error) {
+			res.status(500).json({
+				success: false,
+				message: "Error fetching all orders",
+				error: error.message,
+			});
+		}
+	},
 
-      if (!order) {
-        return res.status(404).json({
-          success: false,
-          message: "Order not found"
-        });
-      }
+	// Admin: Update order status
+	updateOrderStatus: async (req, res) => {
+		try {
+			const { orderStatus } = req.body;
 
-      res.status(200).json({
-        success: true,
-        message: "Order status updated successfully",
-        order
-      });
-    } catch (error) {
-      res.status(500).json({
-        success: false,
-        message: "Error updating order status",
-        error: error.message
-      });
-    }
-  }
+			if (!orderStatus) {
+				return res.status(400).json({
+					success: false,
+					message: "Order status is required",
+				});
+			}
+
+			const order = await Order.findByIdAndUpdate(
+				req.params.orderId,
+				{ orderStatus },
+				{ new: true }
+			)
+				.populate("items.furniture")
+				.populate("user", "firstname lastname email phoneNumber");
+
+			if (!order) {
+				return res.status(404).json({
+					success: false,
+					message: "Order not found",
+				});
+			}
+
+			res.status(200).json({
+				success: true,
+				message: "Order status updated successfully",
+				order,
+			});
+		} catch (error) {
+			res.status(500).json({
+				success: false,
+				message: "Error updating order status",
+				error: error.message,
+			});
+		}
+	},
 };
 
 module.exports = orderController;

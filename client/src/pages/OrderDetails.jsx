@@ -1,142 +1,137 @@
-// OrderDetails.jsx
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { IoMdArrowRoundBack } from "react-icons/io";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 const OrderDetails = () => {
-	const [proofOfPayment, setProofOfPayment] = useState(null);
-	const [uploadMessage, setUploadMessage] = useState("");
-
+  const { orderId } = useParams();
+  const [order, setOrder] = useState(null);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-	// Dummy data for order details
-	const order = {
-		id: "12345",
-		date: "2023-10-10",
-		items: [
-			{
-				name: "Wooden Chair",
-				price: 1200,
-				quantity: 2,
-			},
-			{
-				name: "Glass Coffee Table",
-				price: 3500,
-				quantity: 1,
-			},
-		],
-		totalAmount: 5900,
-		paymentMethod: "GCash",
-		status: "Pending",
-	};
+  const fetchOrder = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(`http://localhost:3000/api/orders/details/${orderId}`, {
+        method: "GET",
+        credentials: "include",
+      });
+      if (!response.ok) {
+        throw new Error("Failed to fetch order details");
+      }
+      const orderData = await response.json();
+      console.log(orderData); // Log the order data
+      setOrder(orderData.order);
+    } catch (error) {
+      console.log("Error fetching order", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  
 
-	const handleFileUpload = (event) => {
-		const file = event.target.files[0];
-		setProofOfPayment(file);
-		setUploadMessage(`Selected file: ${file.name}`);
-	};
+  useEffect(() => {
+    fetchOrder();
+  }, [orderId]);
 
-	const handleProofSubmission = () => {
-		if (proofOfPayment) {
-			alert("Proof of payment uploaded successfully!");
-			setUploadMessage("Proof of payment uploaded successfully!");
-		} else {
-			alert("Please select a file before submitting.");
-		}
-	};
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <p className="text-lg text-gray-600">Loading order details...</p>
+      </div>
+    );
+  }
 
+  if (!order) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <p className="text-lg text-gray-600">Order not found</p>
+      </div>
+    );
+  }
+
+  const orderItems = Array.isArray(order.items) ? order.items : [];
+  
   return (
     <div className="max-w-4xl mx-auto p-8 bg-white shadow-md rounded-md mt-10">
-      {/* Header Section */}
       <div className="flex items-center justify-between mb-6">
-        <button
-          onClick={() => navigate(-2)} // Navigate to the previous page
-          className="text-gray-500"
-        >
+        <button onClick={() => navigate(-1)} className="text-gray-500">
           <IoMdArrowRoundBack size={30} />
         </button>
-        <h1 className="text-3xl font-bold text-gray-800 text-center flex-grow">
+        <h1 className="text-3xl font-bold text-green-700 text-center flex-grow">
           Order Details
         </h1>
       </div>
-  
-      {/* Order Summary Section */}
       <div className="border-b pb-6 mb-6">
-        <h2 className="text-2xl font-semibold text-gray-700 mb-4">Order Summary</h2>
+        <h2 className="text-2xl font-semibold text-green-700 mb-4">Order Summary</h2>
         <div className="grid grid-cols-2 gap-4 text-lg text-gray-600">
           <div>
             <p>
-              <span className="font-semibold">Order ID:</span> {order.id}
+              <span className="font-semibold text-gray-800">Order ID:</span> {order._id}
             </p>
             <p>
-              <span className="font-semibold">Date:</span> {order.date}
+              <span className="font-semibold text-gray-800">Date:</span> {new Date(order.createdAt).toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' })}
             </p>
           </div>
           <div>
             <p>
-              <span className="font-semibold">Payment Method:</span> {order.paymentMethod}
+              <span className="font-semibold text-gray-800">Payment Method:</span> {order.paymentMethod || "N/A"}
             </p>
             <p>
-              <span className="font-semibold">Status:</span>{" "}
-              <span
-                className={`${
-                  order.status === "Pending" ? "text-yellow-600" : "text-green-600"
-                } font-semibold`}
-              >
-                {order.status}
+              <span className="font-semibold text-gray-800">Status:</span>{" "}
+              <span className={`${order.orderStatus === "pending" ? "text-yellow-600" : "text-green-700"} font-semibold`}>
+                {order.orderStatus}
               </span>
             </p>
           </div>
         </div>
       </div>
-  
-      {/* Order Items Section */}
       <div className="border-b pb-6 mb-6">
-        <h2 className="text-2xl font-semibold text-gray-700 mb-4">Items</h2>
+        <h2 className="text-2xl font-semibold text-green-700 mb-4">Items</h2>
         <ul>
-          {order.items.map((item, index) => (
-            <li
-              key={index}
-              className="flex justify-between items-center py-4 border-b border-gray-200"
-            >
-              <div>
-                <p className="font-semibold text-gray-800">{item.name}</p>
-                <p className="text-gray-600">
-                  Quantity: {item.quantity} x ₱{item.price.toFixed(2)}
+          {orderItems.length > 0 ? (
+            orderItems.map((item) => (
+              <li key={item._id} className="flex justify-between items-center py-4 border-b border-gray-200">
+                <div className="flex items-center">
+                  {item.furniture.images.length > 0 && (
+                    <img
+                      src={`data:image/jpeg;base64,${item.furniture.images[0]}`}
+                      alt={item.furniture.name}
+                      className="w-20 h-20 object-cover mr-4 rounded-md"
+                    />
+                  )}
+                  <div>
+                    <p className="font-semibold text-gray-800">{item.furniture.name}</p>
+                    <p className="text-gray-600">
+                      Quantity: {item.quantity} x ₱{item.price.toFixed(2)}
+                    </p>
+                  </div>
+                </div>
+                <p className="text-lg font-medium text-green-700">
+                  ₱{(item.price * item.quantity).toFixed(2)}
                 </p>
-              </div>
-              <p className="text-lg font-medium text-gray-800">
-                ₱{(item.price * item.quantity).toFixed(2)}
-              </p>
-            </li>
-          ))}
+              </li>
+            ))
+          ) : (
+            <li className="py-4 text-gray-600">No items found for this order.</li>
+          )}
         </ul>
-        <p className="text-right text-xl font-semibold mt-4">
-          Total: ₱{order.totalAmount.toFixed(2)}
+        <p className="text-right text-xl font-semibold mt-4 text-green-700">
+          Total: ₱{order.totalAmount ? order.totalAmount.toFixed(2) : "0.00"}
         </p>
       </div>
-  
-      {/* Proof of Payment Section */}
-      <div>
-        <h2 className="text-2xl font-semibold text-gray-700 mb-4">Upload Proof of Payment</h2>
-        <div className="flex flex-col items-center">
-          <input
-            type="file"
-            onChange={handleFileUpload}
-            className="mb-4 w-full max-w-md border border-gray-300 rounded-md px-3 py-2 text-gray-600"
+      {/* Display the proof of payment */}
+      {order.proofOfPayment && (
+        <div className="border-b pb-6 mb-6">
+          <h2 className="text-2xl font-semibold text-green-700 mb-4">Proof of Payment</h2>
+          <img
+            src={`data:image/jpeg;base64,${order.proofOfPayment}`}
+            alt="Proof of Payment"
+            className="max-w-full h-auto border rounded-md"
           />
-          <button
-            onClick={handleProofSubmission}
-            className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-md"
-          >
-            Submit Proof of Payment
-          </button>
-          {uploadMessage && <p className="mt-4 text-gray-600">{uploadMessage}</p>}
         </div>
-      </div>
+      )}
     </div>
   );
-  
 };
 
 export default OrderDetails;
