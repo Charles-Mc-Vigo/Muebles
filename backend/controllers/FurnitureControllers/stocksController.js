@@ -87,7 +87,7 @@ exports.checkAllMaterialStocks = async (req, res) => {
   try {
     const materials = await Materials.find({ isArchived: false });
     if (materials.length === 0) {
-      return res.status(404).json({ message: "No materials found!" });
+      return res.status(200).json({ message: "No materials found!" });
     }
 
     return res.status(200).json(materials);

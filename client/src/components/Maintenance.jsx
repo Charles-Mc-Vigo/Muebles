@@ -433,8 +433,9 @@ const Maintenance = () => {
 					throw new Error("Failed to add furniture type.");
 				}
 				const newFurnitureType = await response.json();
-				setFurnitureTypes((prevTypes) => [...prevTypes, newFurnitureType]);
+				setFurnitureTypes((prevTypes) => (Array.isArray(prevTypes) ? [...prevTypes, newFurnitureType] : [newFurnitureType]));
 				toast.success("Furniture type added successfully.");
+				await fetchFurnitureTypes();
 			}
 
 			resetInputFields();
@@ -610,11 +611,12 @@ const Maintenance = () => {
 										className="w-full border rounded-lg p-2 shadow-sm focus:ring focus:ring-blue-300"
 									>
 										<option value="">-- Select --</option>
-										{categories.map((category) => (
-											<option key={category._id} value={category._id}>
-												{category.name}
-											</option>
-										))}
+										{Array.isArray(categories) &&
+											categories.map((category) => (
+												<option key={category._id} value={category._id}>
+													{category.name}
+												</option>
+											))}
 									</select>
 								</div>
 							</>
@@ -655,11 +657,12 @@ const Maintenance = () => {
 										className="w-full border rounded-lg p-2 shadow-sm focus:ring focus:ring-blue-300"
 									>
 										<option value="">-- Select --</option>
-										{furnitureTypes.map((type) => (
-											<option key={type._id} value={type._id}>
-												{type.name}
-											</option>
-										))}
+										{Array.isArray(furnitureTypes) &&
+											furnitureTypes.map((type) => (
+												<option key={type._id} value={type._id}>
+													{type.name}
+												</option>
+											))}
 									</select>
 								</div>
 							</>
@@ -774,12 +777,15 @@ const Maintenance = () => {
 								<Table
 									headers={["ID", "Color Name", "RGB", "Hex"]}
 									data={
-										Array.isArray(colors)
-											? colors.map((color) => ({
-													id: color._id,
-													name: color.name,
-													rgb: color.rgb,
-													hex: color.hex,
+										Array.isArray(furnitureTypes)
+											? furnitureTypes.map((type) => ({
+													id: type._id,
+													name: type.name,
+													categoryId: type.categoryId,
+													category:
+														categories.find(
+															(cat) => cat._id === type.categoryId
+														)?.name || "N/A",
 											  }))
 											: []
 									}

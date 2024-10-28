@@ -68,7 +68,7 @@ exports.ArchivedFurnitures = async (req, res) => {
 			]);
 
 			if (archivedFurnitures.length === 0) {
-					return res.status(404).json({ message: "No archived furnitures found!" });
+					return res.status(200).json({ message: "No archived furnitures found!" });
 			}
 
 			res.status(200).json(archivedFurnitures);

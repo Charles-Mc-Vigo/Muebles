@@ -73,7 +73,7 @@ exports.getSizes = async (req, res) => {
 
     const avalableSizes = await Size.find({furnitureTypeId:furnitureType});
     if(avalableSizes.length===0){
-      return res.status(404).json({message:`No sizes available for ${furnitureType.name}`})
+      return res.status(200).json({message:`No sizes available for ${furnitureType.name}`})
     }
 
 		res.status(200).json(avalableSizes);
@@ -104,7 +104,7 @@ exports.GetAllSizes = async (req,res) =>{
   try {
     const allSizes = await Size.find();
     if(allSizes.length === 0){
-      return res.status(404).json({message:"No sizes found! Please create one"})
+      return res.status(200).json({message:"No sizes found! Please create one"})
     }
     res.status(200).json(allSizes)
   } catch (error) {

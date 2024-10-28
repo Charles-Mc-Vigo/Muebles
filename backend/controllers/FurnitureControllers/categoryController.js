@@ -71,7 +71,7 @@ exports.getCategory = async (req, res) => {
 		const category = await Category.find({isArchived:false});
 
 		if (category.length === 0) {
-			return res.status(404).json({ message: "No category found!" });
+			return res.status(200).json({ message: "No category found!" });
 		}
 		res.status(200).json(category);
 	} catch (error) {
@@ -114,7 +114,7 @@ exports.getAllTypesInCategory = async (req, res) => {
 		});
 		if (furnitureType.length === 0) {
 			return res
-				.status(404)
+				.status(200)
 				.json({ message: `No furniture types found in ${category.name}` });
 		}
 		res.status(200).json(furnitureType);

@@ -34,7 +34,7 @@ exports.GetFurnitureType = async (req, res) => {
   try {
     const furnitureType = await FurnitureType.find({isArchived:false});
     if (furnitureType.length === 0) {
-      return res.status(404).json({ message: "No furniture type found!" });
+      return res.status(200).json({ message: "No furniture type found!" });
     }
 
     return res.status(200).json(furnitureType);
@@ -77,7 +77,7 @@ exports.UnarchiveFurnitype = async (req,res) => {
 exports.viewArchivedFurnitypes = async (req,res) => {
   try {
     const archiveFurnitureTypes = await FurnitureType.find({isArchived:true})
-    if(archiveFurnitureTypes.length === 0) return res.status(404).json({message:"No furniture type found in the archive!"});
+    if(archiveFurnitureTypes.length === 0) return res.status(200).json({message:"No furniture type found in the archive!"});
     res.status(200).json(archiveFurnitureTypes)
   } catch (error) {
     console.error("ERror in archiving the furniture types: ",error);
