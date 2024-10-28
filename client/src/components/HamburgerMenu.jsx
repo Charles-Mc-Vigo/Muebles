@@ -56,33 +56,36 @@ const HamburgerMenu = () => {
             <button onClick={toggleMenu} className="p-2 focus:outline-none" aria-label="Toggle menu">
                 <FontAwesomeIcon icon={isOpen ? faTimes : faBars} size="lg" />
             </button>
-
             <div
                 className={`fixed top-0 right-0 h-full w-64 bg-white shadow-lg z-50 transform ${isOpen ? "translate-x-0" : "translate-x-full"} transition-transform duration-300 ease-in-out`}
                 tabIndex="-1"
                 ref={menuRef}
+                onKeyDown={handleKeyDown}
             >
                 <ul className="space-y-4 mt-8 p-4">
                     <li>
-                        <Profile showNameAndImage={true}/>
+                        <Profile showNameAndImage={true} />
                     </li>
                     {/* Profile */}
                     <li>
-                        <button className="focus:outline-none flex items-center hover:bg-gray-100 rounded-md p-2 transition">
-                            <FontAwesomeIcon icon={faUser} className="mr-2" /> Profile
-                        </button>
+                        <Link to="/profile">
+                            <button className="focus:outline-none flex items-center hover:bg-gray-100 rounded-md p-2 transition">
+                                <FontAwesomeIcon icon={faUser} className="mr-2" /> Profile
+                            </button>
+                        </Link>
                     </li>
                     {/* Settings */}
                     <li>
-                        <button className="focus:outline-none flex items-center hover:bg-gray-100 rounded-md p-2 transition">
+                        <Link to="/settings">
+                            <button className="focus:outline-none flex items-center hover:bg-gray-100 rounded-md p-2 transition">
                                 <FontAwesomeIcon icon={faCog} className="mr-2" /> Settings
                             </button>
                         </Link>
-                       
-                    </ul>
-                )}
+                    </li>
+                </ul>
+                {loading && <div>Loading...</div>}
+                {error && <div className="text-red-500">{error}</div>}
             </div>
-
             {isOpen && (
                 <div
                     className="fixed inset-0 bg-black opacity-50 z-40"
