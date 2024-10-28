@@ -38,6 +38,7 @@ import PaymentMethod from "./components/PaymentMethod";
 
 
 
+import ViewOrder from "./components/ViewOrder";
 
 export default function App() {
 	return (
@@ -74,6 +75,7 @@ export default function App() {
 				/>
 				<Route path="/cart" element={<ProtectedRoute element={Cart} />} />
                 <Route path="/delivery-info" element={<DeliveryInfo />} />
+				<Route path = "/orders" element={<ProtectedRoute element={ViewOrder}/>} />
 
 				{/* Admin routes */}
 				<Route path="/admin-login" element={<AdminLogin />} />

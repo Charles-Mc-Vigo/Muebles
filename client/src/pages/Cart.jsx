@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { IoMdArrowRoundBack } from "react-icons/io";
+import { FaTruck } from "react-icons/fa";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -8,10 +9,11 @@ const Cart = () => {
 	const [items, setItems] = useState([]);
 	const [count, setCount] = useState(0);
 	const [totalAmount, setTotalAmount] = useState(0);
+	const [proofOfPayment, setProofOfPayment] = useState(null);
+	const [uploadMessage, setUploadMessage] = useState("");
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
 	const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
-
 	const navigate = useNavigate(); // Hook to navigate
 
 	// Fetch cart items from the API
@@ -24,13 +26,10 @@ const Cart = () => {
 				},
 				credentials: "include",
 			});
-
 			if (!response.ok) {
 				throw new Error("Failed to fetch cart items");
 			}
-
 			const data = await response.json();
-
 			if (data.cart && data.cart.items.length > 0) {
 				setItems(data.cart.items);
 				setCount(data.cart.count);
@@ -40,7 +39,6 @@ const Cart = () => {
 				setCount(0);
 				setTotalAmount(0);
 			}
-
 			setLoading(false);
 		} catch (error) {
 			setError(error.message);
@@ -59,25 +57,47 @@ const Cart = () => {
 		setSelectedPaymentMethod(method);
 	};
 
+	const handleFileUpload = (event) => {
+		const file = event.target.files[0];
+		setProofOfPayment(file);
+		console.log(file);
+		setUploadMessage(`Selected file: ${file.name}`);
+	};
+
 	const checkout = async () => {
+		// Validate payment method and proof of payment
+		if (!selectedPaymentMethod) {
+			alert("Please select a payment method before checking out.");
+			return;
+		}
+		if (!proofOfPayment) {
+			alert("Please upload proof of payment before checking out.");
+			return;
+		}
+
+		// Create FormData to include both file and payment method
+		const formData = new FormData();
+		formData.append("proofOfPayment", proofOfPayment);
+		formData.append("paymentMethod", selectedPaymentMethod);
+
 		try {
 			const response = await fetch("http://localhost:3000/api/orders/create", {
 				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
+				body: formData, // Send the FormData
 				credentials: "include",
-				body: JSON.stringify({
-					paymentMethod: selectedPaymentMethod,
-				}),
 			});
 
 			if (!response.ok) {
-				toast.error("Please select payment method");
-			} else {
-				navigate('/order-details/:orderId');
+				const data = await response.json();
+				toast.error(data.message || "Failed to checkout.");
+				return;
 			}
-			await fetchCartItems();
+
+			const data = await response.json();
+			const orderId = data.order._id;
+			console.log(data);
+			navigate(`/order-details/${orderId}`);
+			await fetchCartItems(); // Refresh cart after checkout
 		} catch (error) {
 			setError(error.message);
 			setLoading(false);
@@ -90,7 +110,6 @@ const Cart = () => {
 			alert("Quantity cannot be less than 1");
 			return;
 		}
-
 		try {
 			const response = await fetch("http://localhost:3000/api/cart", {
 				method: "PUT",
@@ -103,11 +122,9 @@ const Cart = () => {
 					quantity: newQuantity,
 				}),
 			});
-
 			if (!response.ok) {
 				throw new Error("Failed to update item quantity");
 			}
-
 			fetchCartItems(); // Refresh cart after updating quantity
 		} catch (error) {
 			console.error("Error updating quantity:", error);
@@ -125,12 +142,10 @@ const Cart = () => {
 					credentials: "include",
 				}
 			);
-
 			if (!response.ok) {
 				throw new Error("Failed to remove item");
 			}
-
-			fetchCartItems(); // Refresh cart after removing item
+			fetchCartItems();
 		} catch (error) {
 			console.error("Error removing item:", error);
 			alert("Error removing item");
@@ -144,12 +159,10 @@ const Cart = () => {
 				method: "DELETE",
 				credentials: "include",
 			});
-
 			if (!response.ok) {
 				throw new Error("Failed to clear cart");
 			}
-
-			fetchCartItems(); // Refresh cart after clearing
+			fetchCartItems();
 		} catch (error) {
 			console.error("Error clearing cart:", error);
 			alert("Error clearing cart");
@@ -159,7 +172,6 @@ const Cart = () => {
 	if (loading) {
 		return <div>Loading cart items...</div>;
 	}
-
 	if (error) {
 		return <div>Error: {error}</div>;
 	}
@@ -174,7 +186,7 @@ const Cart = () => {
 					>
 						<IoMdArrowRoundBack size={30} />
 					</button>
-					<h2 className="text-2xl font-semibold">Your Cart</h2>
+					<h2 className="text-2xl font-semibold text-green-700">Your Cart</h2>
 					<button
 						onClick={clearCart}
 						className="text-red-600 text-lg px-4 py-2 rounded ml-auto"
@@ -182,7 +194,6 @@ const Cart = () => {
 						Clear Cart
 					</button>
 				</div>
-
 				{items.length === 0 ? (
 					<p className="text-center text-gray-600">Your cart is empty.</p>
 				) : (
@@ -191,115 +202,161 @@ const Cart = () => {
 							<ul className="divide-y divide-gray-300">
 								{items.map((item) => (
 									<li
-										key={item.furnitureId._id}
+										key={item.furnitureId?._id}
 										className="flex items-center justify-between py-6 px-4"
 									>
-										<img
-											src={
-												item.furnitureId.images &&
-												item.furnitureId.images.length > 0
-													? `data:image/jpeg;base64,${item.furnitureId.images[0]}`
-													: "fallback-image-url.jpg"
-											}
-											alt={item.furnitureId.name}
-											className="w-32 h-32 object-cover mr-4"
-										/>
-
-										<div className="flex-1">
-											<h3 className="text-lg font-medium">
-												{item.furnitureId.name}
-											</h3>
-											<p className="text-gray-600">
-												Price: ₱{item.furnitureId.price}
-											</p>
-										</div>
-										<div className="flex items-center">
-											<button
-												className="px-3 py-1 border border-gray-400"
-												onClick={() =>
-													updateQuantity(
-														item.furnitureId._id,
-														item.quantity - 1
-													)
-												}
-												disabled={item.quantity <= 1} // Disable if quantity is less than or equal to 1
-											>
-												-
-											</button>
-											<span className="px-4">{item.quantity}</span>
-											<button
-												className="px-3 py-1 border border-gray-400"
-												onClick={() =>
-													updateQuantity(
-														item.furnitureId._id,
-														item.quantity + 1
-													)
-												}
-											>
-												+
-											</button>
-										</div>
-										<p className="ml-4 text-lg font-medium">
-											₱
-											{(
-												parseFloat(item.furnitureId.price) * item.quantity
-											).toFixed(2)}
-										</p>
-										<button
-											className="ml-4 text-red-600 hover:text-red-800"
-											onClick={() => removeItem(item.furnitureId._id)}
-										>
-											Remove
-										</button>
+										{item.furnitureId && (
+											<>
+												<img
+													src={
+														item.furnitureId.images &&
+														item.furnitureId.images.length > 0
+															? `data:image/jpeg;base64,${item.furnitureId.images[0]}`
+															: "fallback-image-url.jpg"
+													}
+													alt={item.furnitureId.name}
+													className="w-32 h-32 object-cover mr-4"
+												/>
+												<div className="flex-1">
+													<h3 className="text-lg font-medium">
+														{item.furnitureId.name}
+													</h3>
+													<p className="text-gray-600">
+														Price: ₱{item.furnitureId.price}
+													</p>
+												</div>
+												<div className="flex items-center">
+													<button
+														className="px-3 py-1 border border-gray-400"
+														onClick={() =>
+															updateQuantity(
+																item.furnitureId._id,
+																item.quantity - 1
+															)
+														}
+														disabled={item.quantity <= 1}
+													>
+														-
+													</button>
+													<span className="px-4">{item.quantity}</span>
+													<button
+														className="px-3 py-1 border border-gray-400"
+														onClick={() =>
+															updateQuantity(
+																item.furnitureId._id,
+																item.quantity + 1
+															)
+														}
+													>
+														+
+													</button>
+												</div>
+												<p className="ml-4 text-lg font-medium">
+													₱
+													{(
+														parseFloat(item.furnitureId.price) * item.quantity
+													).toFixed(2)}
+												</p>
+												<button
+													className="ml-4 text-red-600 hover:text-red-800"
+													onClick={() => removeItem(item.furnitureId._id)}
+												>
+													Remove
+												</button>
+											</>
+										)}
 									</li>
 								))}
 							</ul>
 						</div>
 
-						{/* Payment Methods Section */}
-						<div className="border-t border-gray-300 pt-4 mt-5">
-							<h3 className="text-lg font-semibold mb-2">Payment Methods:</h3>
-							<div className="flex gap-4">
-								<button
-									value="GCash"
-									onClick={() => handlePaymentMethodClick("GCash")}
-									className={`px-4 py-2 rounded ${
-										selectedPaymentMethod === "GCash"
-											? "bg-blue-700"
-											: "bg-blue-500"
-									} text-white`}
-								>
-									GCash
-								</button>
-								<button
-									value="COD"
-									onClick={() => handlePaymentMethodClick("COD")}
-									className={`px-4 py-2 rounded ${
-										selectedPaymentMethod === "COD"
-											? "bg-yellow-700"
-											: "bg-yellow-500"
-									} text-white`}
-								>
-									COD
-								</button>
-								<button
-									value="Maya"
-									onClick={() => handlePaymentMethodClick("Maya")}
-									className={`px-4 py-2 rounded ${
-										selectedPaymentMethod === "Maya"
-											? "bg-green-700"
-											: "bg-green-500"
-									} text-white`}
-								>
-									Maya
-								</button>
+						<div className="border-2 border-gray-300 p-6 rounded-lg">
+							{/* QR Code Section - Top */}
+							<div className="flex justify-end mr-28 pb-5">
+								<img
+									src="/payment-icon/qrcode.png"
+									alt="qrcode"
+									className="w-52 h-52"
+								/>
 							</div>
-							{selectedPaymentMethod && (
-								<p className="mt-5 text-gray-600">
-									Selected Payment Method:{" "}
-									<strong>{selectedPaymentMethod}</strong>
-								</p>
-							)}
+
+							{/* Payment Methods and Image Upload - Bottom row */}
+							<div className="flex flex-col lg:flex-row gap-8">
+								{/* Payment Methods Section */}
+								<div className="flex-1">
+									<div className="border-t border-gray-300 pt-5">
+										<h3 className="text-lg font-semibold mb-2">
+											Payment Methods:
+										</h3>
+										<div className="flex gap-4">
+											{/* Gcash payment */}
+											<button
+												value="GCash"
+												onClick={() => handlePaymentMethodClick("GCash")}
+												className={`px-8 py-4 rounded ${
+													selectedPaymentMethod === "GCash"
+														? "bg-blue-700"
+														: "bg-blue-500"
+												} text-white`}
+											>
+												<img
+													src="/payment-icon/gcash.png"
+													alt="gcash"
+													className="w-16 h-16"
+												/>
+											</button>
+											{/* Maya payment */}
+											<button
+												value="Maya"
+												onClick={() => handlePaymentMethodClick("Maya")}
+												className={`px-8 py-4 rounded bg-black text-white`}
+											>
+												<img
+													src="/payment-icon/maya.jpg"
+													alt="maya"
+													className="w-16 h-16"
+												/>
+											</button>
+											{/* Cash on delivery payment */}
+											<button
+												value="COD"
+												onClick={() => handlePaymentMethodClick("COD")}
+												className={`px-8 py-4 rounded ${
+													selectedPaymentMethod === "COD"
+														? "bg-yellow-700"
+														: "bg-yellow-500"
+												} text-white`}
+											>
+												<div className="flex justify-center items-center gap-2">
+													<FaTruck size={30} />
+													<span className="font-semibold">COD</span>
+												</div>
+											</button>
+										</div>
+										{selectedPaymentMethod && (
+											<p className="mt-5 text-gray-600">
+												Selected Payment Method:{" "}
+												<strong>{selectedPaymentMethod}</strong>
+											</p>
+										)}
+									</div>
+								</div>
+
+								{/* Image Upload Section */}
+								<div className="flex-1">
+									<div className="w-full max-w-md border-t border-gray-300 pt-5">
+										<h2 className="text-2xl font-semibold text-green-700 mb-4">
+											Upload Proof of Payment
+										</h2>
+										<input
+											type="file"
+											onChange={handleFileUpload}
+											className="mb-4 w-full border border-gray-300 rounded-md px-3 py-2 text-gray-600 focus:border-green-500 focus:ring-green-500"
+										/>
+										{uploadMessage && <p>{uploadMessage}</p>}
+									</div>
+								</div>
+							</div>
 						</div>
 
 						<div className="border-t border-gray-300 pt-4 mt-5">

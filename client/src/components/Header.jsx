@@ -131,6 +131,10 @@ const Header = ({ isLogin, cartCount }) => {
 														View Profile
 													</Link>
 													<hr className="border-gray-200 py-2" />
+													<Link
+														to="/orders"
+													>View Order</Link>
+													<hr className="border-gray-200 py-2" />
 													<Logout isUser={true} />
 												</nav>
 											</div>

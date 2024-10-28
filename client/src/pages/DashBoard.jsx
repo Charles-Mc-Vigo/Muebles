@@ -114,46 +114,52 @@ const Dashboard = () => {
     ),
   };
 
-  return (
-    <div className="flex h-screen bg-gray-100">
-      {/* Sidebar */}
-      <aside className="w-64 bg-oliveGreen text-white flex flex-col border-2 items-center rounded-l-3xl ml-1 h-50 mt-2 mb-2">
-        <div className="font-semibold text-3xl text-center justify-center flex text-black my-10">
-          JCKAME
-        </div>
-        <nav className="w-full flex-grow">
-          <ul className="space-y-4">
-            <NavItem
-              icon={faBox}
-              label="Dashboard"
-              isActive={activeSection === "dashboard"}
-              onClick={() => setActiveSection("dashboard")}
-            />
-            {/* Product Management Section */}
-            <NavItem
-              icon={faBox}
-              label="Product Management"
-              isActive={activeSection.startsWith("product")}
-              onClick={() => toggleDropdown("product")}
-              hasDropdown
-              isOpen={dropdowns.product}
-            />
-            {dropdowns.product && (
-              <ul className="ml-8 space-y-2">
-                <DropdownItem
-                  label="View Products"
-                  section="view-products"
-                  currentSection={activeSection}
-                  onClick={setActiveSection}
-                />
-                <DropdownItem
-                  label="Modify Product"
-                  section="modify-product"
-                  currentSection={activeSection}
-                  onClick={setActiveSection}
-                />
-              </ul>
-            )}
+	return (
+		<div className="flex h-screen bg-gray-100">
+			{/* Sidebar */}
+			<aside className="w-64 bg-oliveGreen text-white flex flex-col items-center rounded-l-3xl ml-1 h-50 mt-2 mb-2">
+				<div className="flex flex-col items-center p-5 m-5">
+					<img
+						src="/landingimage/LOGO.jpg"
+						alt="LOGO"
+						className="w-12 h-12 rounded-full"
+					/>
+					<h1 className="mt-3">JCKAME</h1>
+				</div>
+
+				<nav className="w-full flex-grow">
+					<ul className="space-y-4">
+						<NavItem
+							icon={faBox}
+							label="Dashboard"
+							isActive={activeSection === "dashboard"}
+							onClick={() => setActiveSection("dashboard")}
+						/>
+						{/* Product Management Section */}
+						<NavItem
+							icon={faBox}
+							label="Product Management"
+							isActive={activeSection.startsWith("product")}
+							onClick={() => toggleDropdown("product")}
+							hasDropdown
+							isOpen={dropdowns.product}
+						/>
+						{dropdowns.product && (
+							<ul className="ml-8 space-y-2">
+								<DropdownItem
+									label="View Products"
+									section="view-products"
+									currentSection={activeSection}
+									onClick={setActiveSection}
+								/>
+								<DropdownItem
+									label="Modify Product"
+									section="modify-product"
+									currentSection={activeSection}
+									onClick={setActiveSection}
+								/>
+							</ul>
+						)}
 
             {/* Order Management */}
             <NavItem
