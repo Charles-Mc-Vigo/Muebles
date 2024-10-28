@@ -113,13 +113,13 @@ const Dashboard = () => {
 		<div className="flex h-screen bg-gray-100">
 			{/* Sidebar */}
 			<aside className="w-64 bg-oliveGreen text-white flex flex-col items-center rounded-l-3xl ml-1 h-50 mt-2 mb-2">
-				<div class="flex flex-col items-center p-5 m-5">
+				<div className="flex flex-col items-center p-5 m-5">
 					<img
 						src="/landingimage/LOGO.jpg"
 						alt="LOGO"
-						class="w-12 h-12 rounded-full"
+						className="w-12 h-12 rounded-full"
 					/>
-					<h1 class="mt-3">JCKAME</h1>
+					<h1 className="mt-3">JCKAME</h1>
 				</div>
 
 				<nav className="w-full flex-grow">

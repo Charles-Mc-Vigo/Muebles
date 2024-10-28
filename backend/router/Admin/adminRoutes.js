@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const {AdminSignup, AdminLogin, AllAdmins, verifyEmail, adminLogout, getAdminById, PendingAdminRequest, AcceptAdminRequest, updateProfile, myProfile, unconfirmedAdmin} = require('../../controllers/Admin/adminController');
+const {AdminSignup, AdminLogin, AllAdmins, verifyEmail, adminLogout, getAdminById, PendingAdminRequest, AcceptAdminRequest, updateProfile, myProfile, unconfirmedAdmin, viewPendingOrder, AcceptOrder, getOrderId} = require('../../controllers/Admin/adminController');
 const orderController = require('../../controllers/Order/orderController')
 const { checkAdminAuth } = require('../../middlewares/checkAuth');
 const multer = require('multer');
@@ -16,14 +16,19 @@ router.get('/unconfirmed/:adminId',unconfirmedAdmin)
 // Protected routes
 router.get("/", checkAdminAuth, AllAdmins);
 router.post("/logout", checkAdminAuth, adminLogout);
-router.post("/notifications/accept-request/:adminId", checkAdminAuth, AcceptAdminRequest);
-router.get('/verified/:adminId', checkAdminAuth, getAdminById);
+
+// notification
 router.get("/notifications/pending-request", checkAdminAuth, PendingAdminRequest);
+router.get("/notifications/pending-orders",checkAdminAuth, viewPendingOrder);
+router.post("/notifications/accept-request/:adminId", checkAdminAuth, AcceptAdminRequest);
+router.post('/notifications/accept-order/:orderId',checkAdminAuth,AcceptOrder); //need to fex
+
+router.get('/verified/:adminId', checkAdminAuth, getAdminById);
 router.put("/setting/update-profile", checkAdminAuth, upload.single('image'), updateProfile);
 router.get("/setting/my-profile/view", checkAdminAuth, myProfile);
 
-// Admin routes - protected with checkAdminAuth
 router.get('/order/all', checkAdminAuth, orderController.getAllOrders);
+router.get('/order/:orderId',checkAdminAuth, getOrderId);
 router.put('/order/status/:orderId', checkAdminAuth, orderController.updateOrderStatus);
 
 module.exports = router;

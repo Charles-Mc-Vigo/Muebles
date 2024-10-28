@@ -26,7 +26,6 @@ const orderController = {
         count: 0,
         totalAmount: 0
       });
-
       // Add order to user's orders array
       await User.findByIdAndUpdate(userId, {
         $push: { orders: order._id }
@@ -34,7 +33,7 @@ const orderController = {
 
       res.status(201).json({
         success: true,
-        message: "Order created successfully",
+        message: "Order was place successfully!",
         order
       });
     } catch (error) {
@@ -52,13 +51,10 @@ const orderController = {
     try {
       const userId = req.user._id;
       const orders = await Order.find({ user: userId })
-        .populate('items.furniture')
+        .populate('items.furniture user.firstname')
         .sort({ createdAt: -1 });
 
-      res.status(200).json({
-        success: true,
-        orders
-      });
+      res.status(200).json(orders);
     } catch (error) {
       res.status(500).json({
         success: false,

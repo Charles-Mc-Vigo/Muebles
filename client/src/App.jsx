@@ -30,6 +30,7 @@ import PasswordResetVerify from "./pages/PasswordResetVerify";
 import PasswordResetCreateNew from "./pages/PasswordResetCreateNew";
 import OrderDetails from "./pages/OrderDetails";
 import UserProfile from "./components/UserProfile";
+import ViewOrder from "./components/ViewOrder";
 
 export default function App() {
 	return (
@@ -63,6 +64,7 @@ export default function App() {
 					element={<ProtectedRoute element={OrderDetails} />}
 				/>
 				<Route path="/cart" element={<ProtectedRoute element={Cart} />} />
+				<Route path = "/orders" element={<ProtectedRoute element={ViewOrder}/>} />
 
 				{/* Admin routes */}
 				<Route path="/admin-login" element={<AdminLogin />} />

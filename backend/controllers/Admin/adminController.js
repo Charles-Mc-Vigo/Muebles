@@ -1,5 +1,7 @@
-const Admin = require('../../models/Admin/adminModel');
-const {AdminSchemaValidator} = require('../../middlewares/JoiSchemaValidation');
+const Admin = require("../../models/Admin/adminModel");
+const {
+	AdminSchemaValidator,
+} = require("../../middlewares/JoiSchemaValidation");
 const bcrypt = require("bcrypt");
 const validator = require("validator");
 const jwt = require("jsonwebtoken");
@@ -7,7 +9,8 @@ const {
 	sendVerificationEmail,
 	generateVerificationCode,
 } = require("../../utils/EmailVerification");
-const createToken = require('../../utils/tokenUtils');
+const createToken = require("../../utils/tokenUtils");
+const Order = require("../../models/Order/orderModel");
 
 // Admin login
 exports.AdminLogin = async (req, res) => {
@@ -19,7 +22,7 @@ exports.AdminLogin = async (req, res) => {
 		if (!admin) {
 			return res.status(404).json({ message: "Incorrect email account!" });
 		}
-		
+
 		// Check for admin role
 		if (!["Admin", "Manager"].includes(admin.role)) {
 			return res.status(403).json({ message: "Access denied: Admins only!" });
@@ -31,7 +34,7 @@ exports.AdminLogin = async (req, res) => {
 			return res.status(400).json({ message: "Incorrect password!" });
 		}
 
-	const token = createToken(admin._id);
+		const token = createToken(admin._id);
 
 		admin.isActive = true;
 		await admin.save();
@@ -45,8 +48,7 @@ exports.AdminLogin = async (req, res) => {
 		});
 
 		// Send response
-		return res.status(200).json({ message: "Login successful!"});
-
+		return res.status(200).json({ message: "Login successful!" });
 	} catch (error) {
 		console.error("Error during admin login:", error);
 		return res.status(500).json({ message: "Server error!" });
@@ -54,17 +56,40 @@ exports.AdminLogin = async (req, res) => {
 };
 
 //Admin Sign up here
-exports.AdminSignup = async (req,res) =>{
+exports.AdminSignup = async (req, res) => {
 	try {
-		const {firstname,lastname,gender,phoneNumber,email,password, confirmPassword} = req.body;
+		const {
+			firstname,
+			lastname,
+			gender,
+			phoneNumber,
+			email,
+			password,
+			confirmPassword,
+		} = req.body;
 
-		if(!firstname || !lastname || !gender || !phoneNumber || !email || !password || !confirmPassword){
+		if (
+			!firstname ||
+			!lastname ||
+			!gender ||
+			!phoneNumber ||
+			!email ||
+			!password ||
+			!confirmPassword
+		) {
 			return res.status(400).json({ message: "All fields are required!" });
 		}
 
-		const exisitingAdmin = await Admin.findOne({$or: [{ email }, { phoneNumber }]});
-		if(exisitingAdmin){
-			return res.status(400).json({message:"Your email or number is already exisiting. Please login your account!"})
+		const exisitingAdmin = await Admin.findOne({
+			$or: [{ email }, { phoneNumber }],
+		});
+		if (exisitingAdmin) {
+			return res
+				.status(400)
+				.json({
+					message:
+						"Your email or number is already exisiting. Please login your account!",
+				});
 		}
 
 		if (!validator.isMobilePhone(phoneNumber, "en-PH")) {
@@ -97,7 +122,7 @@ exports.AdminSignup = async (req,res) =>{
 			firstname,
 			lastname,
 			gender,
-			password
+			password,
 		});
 
 		if (error) {
@@ -116,41 +141,47 @@ exports.AdminSignup = async (req,res) =>{
 			email,
 			password: hashedPassword,
 			verificationCode,
-			verificationCodeExpires
+			verificationCodeExpires,
 		});
-		
-		await newAdmin.save();
-		res.status(201).json({  message: "Your account has been created successfully. Please check your email to verify your account.",newAdmin})
-		// console.log("New admin created: ",newAdmin)
 
+		await newAdmin.save();
+		res
+			.status(201)
+			.json({
+				message:
+					"Your account has been created successfully. Please check your email to verify your account.",
+				newAdmin,
+			});
+		// console.log("New admin created: ",newAdmin)
 	} catch (error) {
 		console.log(error);
-		res.status(500).json({message:"Server Error"})
+		res.status(500).json({ message: "Server Error" });
 	}
-}
+};
 
-exports.unconfirmedAdmin = async( req,res ) =>{
+//get specific unconfirmed amdin
+exports.unconfirmedAdmin = async (req, res) => {
 	try {
 		const { adminId } = req.params;
-    const admin = await Admin.findById(adminId);
+		const admin = await Admin.findById(adminId);
 
-    if (!admin) return res.status(404).json({ message: "Admin not found!" });
+		if (!admin) return res.status(404).json({ message: "Admin not found!" });
 
-    res.status(200).json(admin);
+		res.status(200).json(admin);
 	} catch (error) {
-		console.log("Error the unconfirmed admin: ",error);
-		res.status(500).json({message:"Server error!"});
+		console.log("Error the unconfirmed admin: ", error);
+		res.status(500).json({ message: "Server error!" });
 	}
-}
+};
 
 //admin account verification
 exports.verifyEmail = async (req, res) => {
 	try {
-		const {adminId} = req.params;
+		const { adminId } = req.params;
 
 		const admin = await Admin.findById(adminId);
 
-		if(!admin) return res.status(404).json({message:"Admin not found!"});
+		if (!admin) return res.status(404).json({ message: "Admin not found!" });
 
 		const email = admin.email;
 
@@ -177,9 +208,14 @@ exports.verifyEmail = async (req, res) => {
 
 		await admin.save();
 
-		res.status(200).json({ message: "Your account was successfully verified! However, the Admin Manager must first accept your request to proceed." });
+		res
+			.status(200)
+			.json({
+				message:
+					"Your account was successfully verified! However, the Admin Manager must first accept your request to proceed.",
+			});
 	} catch (err) {
-		console.error("Email verification error:",err);
+		console.error("Email verification error:", err);
 		res.status(500).json({ message: "Server error!" });
 	}
 };
@@ -187,203 +223,274 @@ exports.verifyEmail = async (req, res) => {
 //get admin by id
 //routes ("/admin/:adminId",getAdminById)
 exports.getAdminById = async (req, res) => {
-  try {
-    const { adminId } = req.params; // Get adminId from the URL parameters
-    const filters = req.query; // Get any additional query parameters
+	try {
+		const { adminId } = req.params; // Get adminId from the URL parameters
+		const filters = req.query; // Get any additional query parameters
 
-    // Add the adminId as part of the filter criteria
-    filters._id = adminId;
+		// Add the adminId as part of the filter criteria
+		filters._id = adminId;
 
-    // Use findOne with the combined filters
-    const admin = await Admin.findOne(filters);
+		// Use findOne with the combined filters
+		const admin = await Admin.findOne(filters);
 
-    if (!admin) return res.status(404).json({ message: "Admin not found!" });
+		if (!admin) return res.status(404).json({ message: "Admin not found!" });
 
-    res.status(200).json(admin);
-  } catch (error) {
-    console.log("Error fetching admin by ID:", error);
-    res.status(500).json({ message: "Server error!" });
-  }
+		res.status(200).json(admin);
+	} catch (error) {
+		console.log("Error fetching admin by ID:", error);
+		res.status(500).json({ message: "Server error!" });
+	}
 };
-
-
 
 // Manager power
 exports.AcceptAdminRequest = async (req, res) => {
-  try {
+	try {
 		const admin = await Admin.findById(req.admin._id);
 
-		if(!admin) return res.status(404).json({message:"Admin not found!"});
+		if (!admin) return res.status(404).json({ message: "Admin not found!" });
 
-    // Check if the current admin is a Manager
-    if (admin.role !== "Manager") {
-      return res.status(403).json({ message: "Action denied: Admin Manager only!" });
-    }
+		// Check if the current admin is a Manager
+		if (admin.role !== "Manager") {
+			return res
+				.status(403)
+				.json({ message: "Action denied: Admin Manager only!" });
+		}
 
-    const { adminId } = req.params; // Get adminId from URL parameters
+		const { adminId } = req.params; // Get adminId from URL parameters
 
-    // Fetch the admin who is requesting to be accepted
-    const adminToAccept = await Admin.findById(adminId);
-    if (!adminToAccept || adminToAccept.adminApproval === "Accepted") {
-      return res.status(400).json({ message: "Admin already accepted or not found!" });
-    }
+		// Fetch the admin who is requesting to be accepted
+		const adminToAccept = await Admin.findById(adminId);
+		if (!adminToAccept || adminToAccept.adminApproval === "Accepted") {
+			return res
+				.status(400)
+				.json({ message: "Admin already accepted or not found!" });
+		}
 
-    // Update the admin's approval and role
-    adminToAccept.adminApproval = "Accepted";
-    adminToAccept.role = "Admin";
-    adminToAccept.isActive = true;
+		// Update the admin's approval and role
+		adminToAccept.adminApproval = "Accepted";
+		adminToAccept.role = "Admin";
+		adminToAccept.isActive = true;
 
-    // Create token after the admin is approved
-    const token = createToken(adminToAccept._id);
+		// Create token after the admin is approved
+		const token = createToken(adminToAccept._id);
 
-    // Set token in the response as a cookie
-    res.cookie("adminToken", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      maxAge: 3 * 24 * 60 * 60 * 1000, // 3 days
-      sameSite: "strict",
-    });
+		// Set token in the response as a cookie
+		res.cookie("adminToken", token, {
+			httpOnly: true,
+			secure: process.env.NODE_ENV === "production",
+			maxAge: 3 * 24 * 60 * 60 * 1000, // 3 days
+			sameSite: "strict",
+		});
 
-    await adminToAccept.save();
+		await adminToAccept.save();
 
-    res.status(200).json({ message: "Admin request accepted successfully!" });
-  } catch (error) {
-    console.error("Error accepting admin request:", error);
-    res.status(500).json({ message: "Server error!" });
-  }
+		res.status(200).json({ message: "Admin request accepted successfully!" });
+	} catch (error) {
+		console.error("Error accepting admin request:", error);
+		res.status(500).json({ message: "Server error!" });
+	}
 };
 
-
 //pending admin request
-exports.PendingAdminRequest = async (req,res) => {
+exports.PendingAdminRequest = async (req, res) => {
 	try {
-		const admins = await Admin.find({adminApproval:"Pending"});
-		if(admins.length === 0) return res.status(400).json({message:"No admin request found!"});
-		res.status(200).json(admins)
+		const admins = await Admin.find({ adminApproval: "Pending" });
+		if (admins.length === 0)
+			return res.status(200).json({ message: "No admin request found!" });
+		res.status(200).json(admins);
 	} catch (error) {
-		console.log("Error fetching pending admin request : ",error);
+		console.log("Error fetching pending admin request : ", error);
+		res.status(500).json({ message: "Server error!" });
+	}
+};
+
+//get all admins
+exports.AllAdmins = async (req, res) => {
+	try {
+		const admins = await Admin.find(req.query);
+		if (admins.length === 0)
+			return res.status(200).json({ message: "No admin found!" });
+
+		res.status(200).json(admins);
+	} catch (error) {
+		console.log(error);
+		res.status(500).json({ message: "Server error!" });
+	}
+};
+
+//admin logout
+exports.adminLogout = async (req, res) => {
+	try {
+		const admin = await Admin.findById(req.admin._id);
+		if (!admin) {
+			return res.status(404).json({ message: "Admin not found!" });
+		}
+
+		// Clear the token from cookies
+		res.clearCookie("adminToken", {
+			httpOnly: true,
+			secure: process.env.NODE_ENV === "production",
+			sameSite: "strict",
+		});
+
+		// Update admin status and save
+		admin.isActive = false;
+		await admin.save();
+
+		return res.status(200).json({ message: "Logout successful!" });
+	} catch (error) {
+		console.error("Failed to log out admin:", error);
+		return res.status(500).json({ message: "Server error!" });
+	}
+};
+
+// Update profile
+exports.updateProfile = async (req, res) => {
+	try {
+		// Find the admin by ID (adminId is now available from the middleware)
+		const admin = await Admin.findById(req.admin._id);
+		if (!admin) {
+			return res.status(404).json({ message: "Admin not found!" });
+		}
+
+		// Fields to be updated
+		const { firstname, lastname, phoneNumber, gender } = req.body;
+		let isChanged = false; // To track if any changes are made
+		const updatedFields = {};
+
+		// Compare each field with the current value and only add to updatedFields if they are different
+		if (firstname && firstname !== admin.firstname) {
+			updatedFields.firstname = firstname;
+			isChanged = true;
+		}
+		if (lastname && lastname !== admin.lastname) {
+			updatedFields.lastname = lastname;
+			isChanged = true;
+		}
+		if (phoneNumber && phoneNumber !== admin.phoneNumber) {
+			updatedFields.phoneNumber = phoneNumber;
+			isChanged = true;
+		}
+		if (
+			gender &&
+			gender !== admin.gender &&
+			["Male", "Female"].includes(gender)
+		) {
+			updatedFields.gender = gender;
+			isChanged = true;
+		}
+
+		// Handle image URL if provided and different from current
+		if (req.body.image && req.body.image !== admin.image) {
+			updatedFields.image = req.body.image;
+			isChanged = true;
+		}
+
+		// Handle uploaded image file (convert to base64 and compare)
+		if (req.file) {
+			const imageBuffer = req.file.buffer; // Get the file buffer
+			const imageBase64 = imageBuffer.toString("base64"); // Convert to base64
+			const mimeType = req.file.mimetype;
+			const base64Image = `data:${mimeType};base64,${imageBase64}`;
+
+			if (base64Image !== admin.image) {
+				updatedFields.image = base64Image;
+				isChanged = true;
+			}
+		}
+
+		// If no changes were made, return a message
+		if (!isChanged) {
+			return res
+				.status(400)
+				.json({ message: "No changes made to the profile." });
+		}
+
+		// Update the admin document with the new fields
+		const updatedAdmin = await Admin.findByIdAndUpdate(
+			req.admin._id,
+			updatedFields,
+			{ new: true }
+		);
+
+		res
+			.status(200)
+			.json({ message: "Profile updated successfully!", admin: updatedAdmin });
+	} catch (error) {
+		console.error("Error updating profile setting", error);
+		res.status(500).json({ message: "Server error!" });
+	}
+};
+
+//myprofile
+exports.myProfile = async (req, res) => {
+	try {
+		const admin = await Admin.findById(req.admin._id);
+		if (!admin) {
+			return res.status(404).json({ message: "Admin not found!" });
+		}
+
+		res.status(200).json(admin);
+	} catch (error) {
+		console.log("Error fetching my profile: ", error);
+		res.status(500).json({ message: "Server error!" });
+	}
+};
+
+//accept order
+exports.AcceptOrder = async (req, res) => {
+	try {
+		const admin = await Admin.findById(req.admin._id);
+
+		if (!admin) return res.status(404).json({ message: "Admin not found!" });
+
+		// Check if the current admin is a Manager
+		if (admin.role !== "Manager") {
+			return res
+				.status(403)
+				.json({ message: "Action denied: Admin Manager only!" });
+		}
+
+		const { orderId } = req.params;
+
+		const orderToAccept = await Order.findById(orderId);
+
+		if (!orderToAccept) return res.status(404).json({ message: "Order not found!" });
+		
+		orderToAccept.isAccepted = true;
+		const orderUpdate = await orderToAccept.save();
+		res.status(200).json({ message: "Order was accepted", orderUpdate });
+	} catch (error) {
+		console.error("Error accepting the order: ", error);
+		res.status(500).json({ message: "Server error!" });
+	}
+};
+
+//get order by id
+exports.getOrderId = async (req,res) => {
+	try {
+		const {orderId} = req.params;
+		const exisitingOrder = await Order.findById(orderId);
+
+		if(!exisitingOrder) return res.status(404).json({message:"Order not found!"});
+		res.status(200).json(exisitingOrder);
+	} catch (error) {
+		console.error("Error in getting order id :", error);
 		res.status(500).json({message:"Server error!"});
 	}
 }
 
-//get all admins
-exports.AllAdmins = async(req,res)=>{
+//view all pending order
+exports.viewPendingOrder = async (req, res) => {
 	try {
-		const admins = await Admin.find(req.query);
-		if(admins.length === 0 ) return res.status(200).json({message:"No admin found!"});
-		
-		res.status(200).json(admins)
+		const pendingOrders = await Order.find({ isAccepted: false });
+		if (pendingOrders.length === 0)
+			return res.status(200).json({ message: "No pending order yet" });
+
+		res.status(200).json(pendingOrders);
 	} catch (error) {
-		console.log(error);
-		res.status(500).json({message:"Server error!"})
+		console.error("Error fetching pending order: ", error);
+		res.status(500).json({ message: "Server error!" });
 	}
-}
-
-
-exports.adminLogout = async (req, res) => {
-  try {
-    const admin = await Admin.findById(req.admin._id);
-    if (!admin) {
-      return res.status(404).json({ message: "Admin not found!" });
-    }
-
-    // Clear the token from cookies
-    res.clearCookie("adminToken", {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict"
-    });
-
-    // Update admin status and save
-    admin.isActive = false;
-    await admin.save();
-
-    return res.status(200).json({ message: "Logout successful!" });
-  } catch (error) {
-    console.error("Failed to log out admin:", error);
-    return res.status(500).json({ message: "Server error!" });
-  }
 };
-
-
-// Update profile
-exports.updateProfile = async (req, res) => {
-  try {
-    // Find the admin by ID (adminId is now available from the middleware)
-    const admin = await Admin.findById(req.admin._id);
-    if (!admin) {
-      return res.status(404).json({ message: "Admin not found!" });
-    }
-
-    // Fields to be updated
-    const { firstname, lastname, phoneNumber, gender } = req.body;
-    let isChanged = false; // To track if any changes are made
-    const updatedFields = {};
-
-    // Compare each field with the current value and only add to updatedFields if they are different
-    if (firstname && firstname !== admin.firstname) {
-      updatedFields.firstname = firstname;
-      isChanged = true;
-    }
-    if (lastname && lastname !== admin.lastname) {
-      updatedFields.lastname = lastname;
-      isChanged = true;
-    }
-    if (phoneNumber && phoneNumber !== admin.phoneNumber) {
-      updatedFields.phoneNumber = phoneNumber;
-      isChanged = true;
-    }
-    if (gender && gender !== admin.gender && ["Male", "Female"].includes(gender)) {
-      updatedFields.gender = gender;
-      isChanged = true;
-    }
-
-    // Handle image URL if provided and different from current
-    if (req.body.image && req.body.image !== admin.image) {
-      updatedFields.image = req.body.image;
-      isChanged = true;
-    }
-
-    // Handle uploaded image file (convert to base64 and compare)
-    if (req.file) {
-      const imageBuffer = req.file.buffer; // Get the file buffer
-      const imageBase64 = imageBuffer.toString('base64'); // Convert to base64
-      const mimeType = req.file.mimetype;
-      const base64Image = `data:${mimeType};base64,${imageBase64}`;
-
-      if (base64Image !== admin.image) {
-        updatedFields.image = base64Image;
-        isChanged = true;
-      }
-    }
-
-    // If no changes were made, return a message
-    if (!isChanged) {
-      return res.status(400).json({ message: "No changes made to the profile." });
-    }
-
-    // Update the admin document with the new fields
-    const updatedAdmin = await Admin.findByIdAndUpdate(req.admin._id, updatedFields, { new: true });
-
-    res.status(200).json({ message: "Profile updated successfully!", admin: updatedAdmin });
-  } catch (error) {
-    console.error("Error updating profile setting", error);
-    res.status(500).json({ message: "Server error!" });
-  }
-};
-
-//myprofile
-exports.myProfile = async (req,res) => {
-	try {
-    const admin = await Admin.findById(req.admin._id);
-    if (!admin) {
-      return res.status(404).json({ message: "Admin not found!" });
-    }
-
-		res.status(200).json(admin)
-	} catch (error) {
-		console.log("Error fetching my profile: ",error);
-		res.status(500).json({message:"Server error!"})
-	}
-}
 
