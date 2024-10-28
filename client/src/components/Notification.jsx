@@ -64,7 +64,7 @@ const Notification = () => {
 			);
 
 			if (!response.ok) {
-				throw new Error("Failed to accept request");
+				throw new Error(response.error);
 			}
 
 			const result = await response.json();

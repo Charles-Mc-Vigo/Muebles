@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaBoxOpen, FaCheckCircle, FaHourglassHalf } from 'react-icons/fa';
+import { FaBoxOpen, FaCheckCircle, FaHourglassHalf, FaClipboardCheck, FaTimesCircle } from 'react-icons/fa';
 
 const ViewOrder = () => {
   const [orders, setOrders] = useState([]);
@@ -47,9 +47,34 @@ const ViewOrder = () => {
                 <h2 className="text-lg font-semibold text-gray-800 flex items-center">
                   <FaBoxOpen className="mr-2 text-blue-500" /> Order ID: {order._id}
                 </h2>
-                <span className={`px-3 py-1 text-sm rounded-full ${order.orderStatus === 'pending' ? 'bg-yellow-200 text-yellow-800' : 'bg-green-200 text-green-800'}`}>
-                  {order.orderStatus === 'confirmed' ? <FaHourglassHalf className="inline mr-1" /> : <FaCheckCircle className="inline mr-1" />}
-                  {order.status}
+                <span
+                  className={`px-3 py-1 text-sm rounded-full flex items-center ${
+                    order.orderStatus === 'pending' ? 'bg-yellow-200 text-yellow-800' :
+                    order.orderStatus === 'confirmed' ? 'bg-blue-200 text-blue-800' :
+                    order.orderStatus === 'delivered' ? 'bg-green-200 text-green-800' :
+                    order.orderStatus === 'cancelled' ? 'bg-red-200 text-red-800' : ''
+                  }`}
+                >
+                  {order.orderStatus === 'pending' && (
+                    <>
+                      <FaHourglassHalf className="inline mr-1" /> Pending
+                    </>
+                  )}
+                  {order.orderStatus === 'confirmed' && (
+                    <>
+                      <FaClipboardCheck className="inline mr-1" /> Confirmed
+                    </>
+                  )}
+                  {order.orderStatus === 'delivered' && (
+                    <>
+                      <FaCheckCircle className="inline mr-1" /> Delivered
+                    </>
+                  )}
+                  {order.orderStatus === 'cancelled' && (
+                    <>
+                      <FaTimesCircle className="inline mr-1" /> Cancelled
+                    </>
+                  )}
                 </span>
               </div>
 

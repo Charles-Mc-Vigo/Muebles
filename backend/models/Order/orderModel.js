@@ -46,11 +46,6 @@ const orderSchema = new mongoose.Schema({
     enum: ['pending', 'confirmed', 'delivered', 'cancelled'],
     default: 'pending'
   },
-  isAccepted:{
-    type:Boolean,
-    required:true,
-    default:false
-  },
   subtotal: Number,
   shippingFee: Number,
   totalAmount: Number

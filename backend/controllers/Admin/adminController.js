@@ -252,7 +252,7 @@ exports.AcceptAdminRequest = async (req, res) => {
 		// Check if the current admin is a Manager
 		if (admin.role !== "Manager") {
 			return res
-				.status(403)
+				.status(400)
 				.json({ message: "Action denied: Admin Manager only!" });
 		}
 
@@ -457,7 +457,7 @@ exports.AcceptOrder = async (req, res) => {
 
 		if (!orderToAccept) return res.status(404).json({ message: "Order not found!" });
 		
-		orderToAccept.isAccepted = true;
+		orderToAccept.orderStatus = "confirmed";
 		const orderUpdate = await orderToAccept.save();
 		res.status(200).json({ message: "Order was accepted", orderUpdate });
 	} catch (error) {
@@ -483,7 +483,7 @@ exports.getOrderId = async (req,res) => {
 //view all pending order
 exports.viewPendingOrder = async (req, res) => {
 	try {
-		const pendingOrders = await Order.find({ isAccepted: false });
+		const pendingOrders = await Order.find({ orderStatus: "pending" });
 		if (pendingOrders.length === 0)
 			return res.status(200).json({ message: "No pending order yet" });
 
