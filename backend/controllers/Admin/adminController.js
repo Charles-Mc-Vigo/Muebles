@@ -466,6 +466,34 @@ exports.AcceptOrder = async (req, res) => {
 	}
 };
 
+exports.cancelOrder = async (req, res) => {
+	try {
+		const admin = await Admin.findById(req.admin._id);
+
+		if (!admin) return res.status(404).json({ message: "Admin not found!" });
+
+		// Check if the current admin is a Manager
+		if (admin.role !== "Manager") {
+			return res
+				.status(403)
+				.json({ message: "Action denied: Admin Manager only!" });
+		}
+
+		const { orderId } = req.params;
+
+		const orderToAccept = await Order.findById(orderId);
+
+		if (!orderToAccept) return res.status(404).json({ message: "Order not found!" });
+		
+		orderToAccept.orderStatus = "cancelled";
+		const orderUpdate = await orderToAccept.save();
+		res.status(200).json({ message: "Order was cancelled", orderUpdate });
+	} catch (error) {
+		console.error("Error canceling the order: ", error);
+		res.status(500).json({ message: "Server error!" });
+	}
+};
+
 //get order by id
 exports.getOrderId = async (req,res) => {
 	try {

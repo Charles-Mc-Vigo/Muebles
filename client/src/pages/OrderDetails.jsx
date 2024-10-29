@@ -148,17 +148,36 @@ const OrderDetails = () => {
 					Total: ₱{order.totalAmount ? order.totalAmount.toFixed(2) : "0.00"}
 				</p>
 			</div>
-			{/* Display the proof of payment */}
+			{/* Display the proof of payment with thank you message */}
 			{order.proofOfPayment && (
 				<div className="border-b pb-6 mb-6">
 					<h2 className="text-2xl font-semibold text-green-700 mb-4">
 						Proof of Payment
 					</h2>
-					<img
-						src={`data:image/jpeg;base64,${order.proofOfPayment}`}
-						alt="Proof of Payment"
-						className="w-25 h-25 border rounded-md"
-					/>
+					<div className="flex items-start gap-8">
+						<div className="min-w-[300px] max-w-[300px] h-[400px] overflow-hidden border rounded-md">
+							<img
+								src={`data:image/jpeg;base64,${order.proofOfPayment}`}
+								alt="Proof of Payment"
+								className="w-full h-full object-contain"
+							/>
+						</div>
+						<div className="flex-1 bg-green-50 p-6 rounded-lg">
+							<h3 className="text-xl font-semibold text-green-700 mb-2">
+								Thank You for Your Purchase!
+							</h3>
+              <br />
+							<p className="text-gray-700 mb-2">
+								We greatly appreciate your business and trust in our products.
+							</p>
+							<p className="text-gray-700">
+								Your payment is being process at the moment. You will recieve order confirmation in your Muebles account after the payment process.
+								We'll keep you updated on its status.
+							</p>
+              <br />
+              <p>Have a good day!</p>
+						</div>
+					</div>
 				</div>
 			)}
 		</div>

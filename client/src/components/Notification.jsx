@@ -112,6 +112,37 @@ const Notification = () => {
 		}
 	};
 
+	const cancelOrder = async (orderId) => {
+		try {
+			const response = await fetch(
+				`http://localhost:3000/api/admin/notifications/cancel-order/${orderId}`,
+				{
+					method: "PUT",
+					credentials: "include",
+					headers: {
+						"Content-Type": "application/json",
+					},
+				}
+			);
+
+			if (!response.ok) {
+				throw new Error("Failed to accept order");
+			}
+
+			const result = await response.json();
+			toast.success(result.message); // Show success toast notification
+
+			// Optionally, remove the accepted notification from the UI
+			setNotification((prev) => ({
+				...prev,
+				orders: prev.orders.filter((order) => order._id !== orderId),
+			}));
+		} catch (error) {
+			console.error("Error accepting order request:", error);
+			toast.error("Error accepting order: " + error.message); // Show error toast notification
+		}
+	};
+
 	return (
 		<div className="relative">
 			<button
@@ -125,16 +156,17 @@ const Notification = () => {
 				) : null}
 			</button>
 			{isOpen && (
-				<div className="absolute right-0 mt-2 w-[300px] bg-white shadow-lg rounded-lg p-4 z-50 max-h-64 overflow-y-auto">
-					{notification.requests.length === 0 && notification.orders.length === 0 && (
-						<h4 className="font-bold mb-2 text-center text-gray-500">No notifications</h4>
-					)}
+				<div className="absolute right-0 mt-2 w-[300px] bg-white shadow-lg rounded-lg p-4 z-50 max-h-[500px] overflow-y-auto">
+					{notification.requests.length === 0 &&
+						notification.orders.length === 0 && (
+							<h4 className="font-bold mb-2 text-center text-gray-500">
+								No notifications
+							</h4>
+						)}
 					<ul className="text-sm">
 						{notification.requests.map((admin, index) => (
 							<li key={index} className="mb-4">
-								<span>
-									{admin.firstname} has a pending approval request.
-								</span>
+								<span>{admin.firstname} has a pending approval request.</span>
 								<div className="mt-1">
 									<button
 										className="bg-green-500 text-white px-2 py-1 rounded mr-1"
@@ -153,7 +185,7 @@ const Notification = () => {
 					<ul className="text-sm">
 						{notification.orders.map((order, index) => (
 							<li key={index} className="mb-4">
-								<span>Order #{order._id} is pending.</span>
+								<span>Order #{order.orderNumber} has been place.</span>
 								<div className="mt-1">
 									<button
 										className="bg-green-500 text-white px-2 py-1 rounded mr-1"
@@ -161,8 +193,11 @@ const Notification = () => {
 									>
 										Accept
 									</button>
-									<button className="bg-red-500 text-white px-2 py-1 rounded">
-										Reject
+									<button
+										className="bg-red-500 text-white px-2 py-1 rounded"
+										onClick={() => cancelOrder(order._id)}
+									>
+										Cancel
 									</button>
 								</div>
 							</li>
