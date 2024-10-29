@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { FaChevronUp, FaChevronDown } from "react-icons/fa";
 import { FaLongArrowAltLeft, FaLongArrowAltRight } from "react-icons/fa";
 
-function ProductDetails() {
+function ProductDetails({ admin }) {
 	const { id } = useParams();
 	const navigate = useNavigate();
 	const [furnitureData, setFurnitureData] = useState(null);
@@ -37,6 +37,34 @@ function ProductDetails() {
 		};
 		fetchFurnitureDetails();
 	}, [id]);
+
+	const addToCart = async (e) => {
+		e.preventDefault(); // Prevents navigating when clicking the button
+		const item = {
+			furnitureId: id, // The server expects the ID of the furniture
+			quantity: 1, // Default quantity to 1
+		};
+		try {
+			const response = await fetch("http://localhost:3000/api/cart", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				credentials: "include",
+				body: JSON.stringify(item), // Send the furnitureId and quantity to the server
+			});
+			if (!response.ok) {
+				throw new Error("Failed to add item to cart");
+			}
+			const data = await response.json();
+			console.log("Item added to cart successfully:", data);
+			// Optionally show a success message here
+			alert("Item added to cart successfully!");
+		} catch (error) {
+			console.error("Error adding item to cart:", error);
+			alert("Error adding item to cart. Please try again.");
+		}
+	};
 
 	const handleColorClick = (color) => {
 		setSelectedColor(color.name);
@@ -127,14 +155,12 @@ function ProductDetails() {
 									/>
 								)}
 							</div>
-
 							{/* Thumbnail navigation */}
 							<div className="flex items-center justify-center mt-4 space-x-4">
 								{/* Left button for image navigation */}
 								<button onClick={handlePreviousImage}>
 									<FaLongArrowAltLeft size={30} />
 								</button>
-
 								{/* Thumbnails */}
 								<div className="flex space-x-2">
 									{furnitureData.images.map((image, index) => (
@@ -151,7 +177,6 @@ function ProductDetails() {
 										/>
 									))}
 								</div>
-
 								{/* Right button for image navigation */}
 								<button onClick={handleNextImage}>
 									<FaLongArrowAltRight size={30} />
@@ -159,84 +184,94 @@ function ProductDetails() {
 							</div>
 						</div>
 					</div>
-
 					{/* Right: Product Details */}
-					<div className="flex-1 lg:max-w-[400px] lg:h-[800px] p-5 bg-white border-2 border-gray-300 rounded-lg shadow-md ml-0 lg:ml-5">
-						<h1 className="text-3xl font-bold">{furnitureData.name}</h1>
-						<div className="mt-2">
-							<h2 className="text-lg font-semibold">Price</h2>
-							<p className="border-b-2 border-gray-400">
-								₱ {furnitureData.price}
-							</p>
-						</div>
-						{/* Color Selection */}
-						<div className="mb-4 rounded-md p-2">
-							<label className="block font-semibold">
-								Colors: {selectedColor || "None"}
-							</label>
-							<div className="flex flex-wrap gap-2">
-								{furnitureData.colors?.map((color) => (
-									<div
-										key={color._id}
-										onClick={() => handleColorClick(color)}
-										className={`w-16 h-16 rounded-full border cursor-pointer relative flex items-center justify-center transition-transform transform hover:scale-110 ${
-											selectedColor === color.name
-												? "border-blue-600"
-												: "border-gray-400"
-										}`}
-										style={{ backgroundColor: color.hex }}
-									></div>
+					{/* Right: Product Details */}
+					<div className="flex-1 lg:max-w-[400px] lg:h-[800px] p-5 bg-white border-2 border-gray-300 rounded-lg shadow-md ml-0 lg:ml-5 flex flex-col justify-between">
+						<div>
+							<h1 className="text-3xl font-bold">{furnitureData.name}</h1>
+							<div className="mt-2">
+								<h2 className="text-lg font-semibold">Price</h2>
+								<p className="border-b-2 border-gray-400">
+									₱ {furnitureData.price}
+								</p>
+							</div>
+							{/* Color Selection */}
+							<div className="mb-4 rounded-md p-2">
+								<label className="block font-semibold">
+									Colors: {selectedColor || "None"}
+								</label>
+								<div className="flex flex-wrap gap-2">
+									{furnitureData.colors?.map((color) => (
+										<div
+											key={color._id}
+											onClick={() => handleColorClick(color)}
+											className={`w-16 h-16 rounded-full border cursor-pointer relative flex items-center justify-center transition-transform transform hover:scale-110 ${
+												selectedColor === color.name
+													? "border-blue-600"
+													: "border-gray-400"
+											}`}
+											style={{ backgroundColor: color.hex }}
+										></div>
+									))}
+								</div>
+							</div>
+							{/* Furniture Materials */}
+							<div className="mt-4">
+								<h2 className="text-lg font-semibold">Materials</h2>
+								<div className="flex space-x-2 flex-wrap">
+									{furnitureData.materials?.map((material) => (
+										<span
+											key={material.id}
+											onClick={() => handleMaterialClick(material)}
+											className={`border px-2 py-1 rounded-md cursor-pointer transition ${
+												selectedMaterial === material.name
+													? "bg-blue-600 text-white"
+													: "text-gray-800"
+											}`}
+										>
+											{material.name}
+										</span>
+									))}
+								</div>
+							</div>
+							{/* Furniture Sizes */}
+							<div className="mt-4">
+								<h2 className="text-lg font-semibold">Sizes</h2>
+								<div className="flex space-x-2 flex-wrap">
+									{furnitureData.sizes?.map((size) => (
+										<span
+											key={size.id}
+											onClick={() => handleSizeClick(size)}
+											className={`border px-2 py-1 rounded-md cursor-pointer transition ${
+												selectedSize === size.label
+													? "bg-blue-600 text-white"
+													: "text-gray-800"
+											}`}
+										>
+											{size.label}
+										</span>
+									))}
+								</div>
+							</div>
+							{/* FAQ Section */}
+							<div className="mt-4">
+								{faqItems.map((item, index) => (
+									<FAQAccordion
+										key={index}
+										question={item.question}
+										answer={item.answer}
+									/>
 								))}
 							</div>
 						</div>
-
-						{/* Furniture Materials */}
+						{/* Action Button at the Bottom */}
 						<div className="mt-4">
-							<h2 className="text-lg font-semibold">Materials</h2>
-							<div className="flex space-x-2 flex-wrap">
-								{furnitureData.materials?.map((material) => (
-									<span
-										key={material.id}
-										onClick={() => handleMaterialClick(material)}
-										className={`border px-2 py-1 rounded-md cursor-pointer transition ${
-											selectedMaterial === material.name
-												? "bg-blue-600 text-white"
-												: "text-gray-800"
-										}`}
-									>
-										{material.name}
-									</span>
-								))}
-							</div>
-						</div>
-						{/* Furniture Sizes */}
-						<div className="mt-4">
-							<h2 className="text-lg font-semibold">Sizes</h2>
-							<div className="flex space-x-2 flex-wrap">
-								{furnitureData.sizes?.map((size) => (
-									<span
-										key={size.id}
-										onClick={() => handleSizeClick(size)}
-										className={`border px-2 py-1 rounded-md cursor-pointer transition ${
-											selectedSize === size.label
-												? "bg-blue-600 text-white"
-												: "text-gray-800"
-										}`}
-									>
-										{size.label}
-									</span>
-								))}
-							</div>
-						</div>
-						{/* FAQ Section */}
-						<div className="mt-4">
-							{faqItems.map((item, index) => (
-								<FAQAccordion
-									key={index}
-									question={item.question}
-									answer={item.answer}
-								/>
-							))}
+							<button
+								onClick={addToCart}
+								className="bg-green-600 hover:bg-green-700 text-white px-4 rounded-md transition-colors duration-300 w-full py-4"
+							>
+								Add to Cart
+							</button>
 						</div>
 					</div>
 				</div>

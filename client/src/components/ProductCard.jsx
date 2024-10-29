@@ -14,8 +14,7 @@ const ProductCard = ({
 	onArchiveSuccess,
 	onUnArchiveSuccess,
 	showToast,
-	onAddToCart
-
+	onAddToCart,
 }) => {
 	// Function to truncate the description
 	const truncateDescription = (desc, maxLength) => {
@@ -26,53 +25,24 @@ const ProductCard = ({
 	};
 	const maxDescriptionLength = 60; // Set the max length for the description
 
-	// Function to handle adding item to the cart
-	const addToCart = async (e) => {
-		e.preventDefault(); // Prevents navigating when clicking the button
-		const item = {
-			furnitureId: id, // The server expects the ID of the furniture
-			quantity: 1, // Default quantity to 1
-		};
-		try {
-			const response = await fetch('http://localhost:3000/api/cart', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				credentials: 'include',
-				body: JSON.stringify(item), // Send the furnitureId and quantity to the server
-			});
-			if (!response.ok) {
-				throw new Error('Failed to add item to cart');
-			}
-			const data = await response.json();
-			console.log('Item added to cart successfully:', data);
-			showToast("Item added to cart successfully!", "success");
-			if (onAddToCart) {
-				onAddToCart(); // Increment cart count
-			}
-		} catch (error) {
-			console.error('Error adding item to cart:', error);
-			showToast("Error adding item to cart. Please try again.", "error");
-			alert('Error adding item to cart. Please try again.');
-		}
-	};
-
 	// Function to handle archiving the item
 	const archiveItem = async (e) => {
 		e.preventDefault();
 		try {
-			const response = await fetch(`http://localhost:3000/api/furnitures/archive/${id}`, {
-				method: 'DELETE',
-				headers: { 'Content-Type': 'application/json' },
-				credentials: 'include',
-			});
-			if (!response.ok) throw new Error('Failed to archive item');
-			alert('Item archived successfully!');
+			const response = await fetch(
+				`http://localhost:3000/api/furnitures/archive/${id}`,
+				{
+					method: "DELETE",
+					headers: { "Content-Type": "application/json" },
+					credentials: "include",
+				}
+			);
+			if (!response.ok) throw new Error("Failed to archive item");
+			alert("Item archived successfully!");
 			onArchiveSuccess(); // Trigger update in parent component
 		} catch (error) {
-			console.error('Error archiving item:', error);
-			alert('Error archiving item. Please try again.');
+			console.error("Error archiving item:", error);
+			alert("Error archiving item. Please try again.");
 		}
 	};
 
@@ -80,23 +50,26 @@ const ProductCard = ({
 	const unarchiveItem = async (e) => {
 		e.preventDefault(); // Prevents navigating when clicking the button
 		try {
-			const response = await fetch(`http://localhost:3000/api/furnitures/unarchive/${id}`, {
-				method: 'POST', // Assuming POST for unarchiving
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				credentials: 'include',
-			});
+			const response = await fetch(
+				`http://localhost:3000/api/furnitures/unarchive/${id}`,
+				{
+					method: "POST", // Assuming POST for unarchiving
+					headers: {
+						"Content-Type": "application/json",
+					},
+					credentials: "include",
+				}
+			);
 			if (!response.ok) {
-				throw new Error('Failed to unarchive item');
+				throw new Error("Failed to unarchive item");
 			}
 			const data = await response.json();
-			console.log('Item unarchived successfully:', data); // Optionally handle success
-			alert('Item unarchived successfully!');
+			console.log("Item unarchived successfully:", data); // Optionally handle success
+			alert("Item unarchived successfully!");
 			onUnArchiveSuccess();
 		} catch (error) {
-			console.error('Error unarchiving item:', error); // Optionally handle error
-			alert('Error unarchiving item. Please try again.');
+			console.error("Error unarchiving item:", error); // Optionally handle error
+			alert("Error unarchiving item. Please try again.");
 		}
 	};
 
@@ -122,12 +95,12 @@ const ProductCard = ({
 			</div>
 			<div className="mt-4 flex flex-col">
 				{showAddToCart && (
-					<button
-						onClick={addToCart}
-						className="bg-green-600 hover:bg-green-700 text-white py-2 rounded-md transition-colors duration-300"
+					<Link
+					to={`/direct-order/${id}`}
+						className="bg-green-600 hover:bg-green-700 text-white py-2 rounded-md transition-colors duration-300 text-center w-full"
 					>
-						Add to Cart
-					</button>
+						Buy
+					</Link>
 				)}
 				{showUpdateButton && (
 					<Link
