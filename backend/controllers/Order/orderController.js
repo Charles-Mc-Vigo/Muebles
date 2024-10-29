@@ -29,10 +29,8 @@ const orderController = {
 			// Check if payment method requires proof of payment
 			let proofOfPayment;
 			if (req.file) {
-				// Convert the uploaded image to a base64-encoded string
-				proofOfPayment = `data:${
-					req.file.mimetype
-				};base64,${req.file.buffer.toString("base64")}`;
+				// Convert the uploaded image to a base64-encoded string without the data URL prefix
+				proofOfPayment = req.file.buffer.toString("base64");
 			}
 
 			// Find user's cart
