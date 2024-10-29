@@ -16,9 +16,9 @@ import ViewProduct from "../components/ViewProduct";
 import DashboardContent from "../components/DashboardContent";
 import Maintenance from "../components/Maintenance";
 import Logout from "../components/Logout";
-import Profile from "../../src/components/Profile";
 import HamburgerMenu from "../components/HamburgerMenu";
 import Notification from "../components/Notification";
+import ProductCustomization from "./ProductCustomization";
 
 const Dashboard = () => {
 	// State management for dropdowns
@@ -96,6 +96,7 @@ const Dashboard = () => {
 		"order-management": (
 			<h2 className="text-2xl font-semibold">Order Management Content</h2>
 		),
+		"product-customization": <ProductCustomization />,
 		"track-delivery": (
 			<h2 className="text-2xl font-semibold">Track Delivery Content</h2>
 		),
@@ -162,6 +163,14 @@ const Dashboard = () => {
 							label="Order Management"
 							isActive={activeSection === "order-management"}
 							onClick={() => setActiveSection("order-management")}
+						/>
+
+						{/* product customization */}
+						<NavItem
+							icon={faListUl}
+							label="Product Customization"
+							isActive={activeSection === "product-customization"}
+							onClick={() => setActiveSection("product-customization")}
 						/>
 
 						{/* Inventory */}
