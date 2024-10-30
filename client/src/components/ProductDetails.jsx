@@ -28,6 +28,7 @@ function ProductDetails({ admin }) {
 					throw new Error("Failed to fetch furniture details");
 				}
 				const data = await response.json();
+				console.log(data);
 				setFurnitureData(data);
 			} catch (error) {
 				setError(error.message);
@@ -185,14 +186,19 @@ function ProductDetails({ admin }) {
 						</div>
 					</div>
 					{/* Right: Product Details */}
-					{/* Right: Product Details */}
 					<div className="flex-1 lg:max-w-[400px] lg:h-[800px] p-5 bg-white border-2 border-gray-300 rounded-lg shadow-md ml-0 lg:ml-5 flex flex-col justify-between">
 						<div>
 							<h1 className="text-3xl font-bold">{furnitureData.name}</h1>
-							<div className="mt-2">
+							<div className="mt-2 flex justify-between">
 								<h2 className="text-lg font-semibold">Price</h2>
-								<p className="border-b-2 border-gray-400">
+								<p>
 									₱ {furnitureData.price}
+								</p>
+							</div>
+							<div className="mt-2 flex justify-between">
+								<h2 className="text-lg font-semibold">Stocks</h2>
+								<p>
+									{furnitureData.stocks.stocks}
 								</p>
 							</div>
 							{/* Color Selection */}

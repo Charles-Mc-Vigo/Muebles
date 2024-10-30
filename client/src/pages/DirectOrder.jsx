@@ -7,8 +7,6 @@ const DirectOrder = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState('');
-  const [shippingAddress, setShippingAddress] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
   const [proofOfPayment, setProofOfPayment] = useState(null);
   const [quantity, setQuantity] = useState(1); // New state for quantity
   const navigate = useNavigate();
@@ -39,7 +37,21 @@ const DirectOrder = () => {
   };
 
   const handleQuantityChange = (amount) => {
-    setQuantity((prevQuantity) => Math.max(1, prevQuantity + amount)); // Ensures quantity is at least 1
+    const newQuantity = quantity + amount;
+
+    // Prevent quantity from going below 1
+    if (newQuantity < 1) {
+      alert("Quantity cannot be less than 1.");
+      return;
+    }
+
+    // Prevent quantity from exceeding available stock
+    if (furniture && newQuantity > furniture.stocks.stocks) {
+      alert(`Cannot increase quantity. Only ${furniture.stocks.stocks} items available in stock.`);
+      return;
+    }
+
+    setQuantity(newQuantity);
   };
 
   const handleSubmit = async (e) => {
@@ -60,7 +72,7 @@ const DirectOrder = () => {
         throw new Error('Failed to create order');
       }
       const data = await response.json();
-      const orderId = data.order._id
+      const orderId = data.order._id;
       alert('Order created successfully!');
       navigate(`/order-details/${orderId}`);
     } catch (error) {

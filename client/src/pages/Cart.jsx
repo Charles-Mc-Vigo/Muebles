@@ -110,6 +110,7 @@ const Cart = () => {
 			alert("Quantity cannot be less than 1");
 			return;
 		}
+
 		try {
 			const response = await fetch("http://localhost:3000/api/cart", {
 				method: "PUT",
@@ -224,29 +225,43 @@ const Cart = () => {
 													<p className="text-gray-600">
 														Price: ₱{item.furnitureId.price}
 													</p>
+													<p className="text-gray-600">
+														Stocks : {item.furnitureId.stocks.stocks}
+													</p>
 												</div>
 												<div className="flex items-center">
 													<button
 														className="px-3 py-1 border border-gray-400"
-														onClick={() =>
-															updateQuantity(
-																item.furnitureId._id,
-																item.quantity - 1
-															)
-														}
-														disabled={item.quantity <= 1}
+														onClick={() => {
+															if (item.quantity <= 0) {
+																alert("Quantity cannot be less than zero.");
+															} else {
+																updateQuantity(
+																	item.furnitureId._id,
+																	item.quantity - 1
+																);
+															}
+														}}
 													>
 														-
 													</button>
 													<span className="px-4">{item.quantity}</span>
 													<button
 														className="px-3 py-1 border border-gray-400"
-														onClick={() =>
-															updateQuantity(
-																item.furnitureId._id,
-																item.quantity + 1
-															)
-														}
+														onClick={() => {
+															if (
+																item.furnitureId.stocks.stocks <= item.quantity
+															) {
+																alert(
+																	"Cannot increase quantity. Available stock is insufficient."
+																);
+															} else {
+																updateQuantity(
+																	item.furnitureId._id,
+																	item.quantity + 1
+																);
+															}
+														}}
 													>
 														+
 													</button>

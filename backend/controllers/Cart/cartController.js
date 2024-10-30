@@ -13,7 +13,10 @@ exports.viewCart = async (req, res) => {
     const cart = await Cart.findOne({ userId: user._id })
       .populate({
         path: 'items.furnitureId',
-        select: 'name description price images'
+        select: 'name description price images stocks',
+        populate:{
+          "path":"stocks"
+        }
       });
 
     if (!cart) {

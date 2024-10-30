@@ -12,9 +12,7 @@ const ProductCard = ({
 	showArchiveButton,
 	showUnArchivedButton,
 	onArchiveSuccess,
-	onUnArchiveSuccess,
-	showToast,
-	onAddToCart,
+	onUnArchiveSuccess
 }) => {
 	// Function to truncate the description
 	const truncateDescription = (desc, maxLength) => {

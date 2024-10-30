@@ -79,7 +79,8 @@ orderSchema.statics.createFromCart = async function(cartId, paymentMethod, proof
       items: cart.items.map(item => ({
           furniture: item.furnitureId._id,
           quantity: item.quantity,
-          price: item.furnitureId.price
+          price: item.furnitureId.price,
+          color: item.furnitureId.color
       })),
       shippingAddress: {
           streetAddress: cart.userId.streetAddress,
