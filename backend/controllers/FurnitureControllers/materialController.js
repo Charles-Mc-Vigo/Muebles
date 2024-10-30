@@ -108,12 +108,15 @@ exports.editMaterial = async (req, res) => {
     if (!name || !quantity) return res.status(400).json({ message: "All fields are required! : name, quantity" });
 
     // Check if any changes were made
-    if (material.name === name && material.quantity === quantity) {
+    if (name === undefined && quantity === undefined) {
       return res.status(400).json({ message: "No changes made!" });
     }
 
     material.name = name;
     material.quantity = quantity;
+    if (name !== undefined && material.name !== name) material.name = name;
+    if (quantity !== undefined && material.quantity !== quantity) material.quantity = quantity;
+
 
     await material.save();
     return res.status(200).json({ message: `${material.name} has been edited successfully!` });

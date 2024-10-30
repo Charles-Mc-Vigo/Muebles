@@ -10,15 +10,15 @@ const Table = ({
 	onArchive,
 	categoriesList,
 }) => {
-	const [editIndex, setEditIndex] = useState(null); // Track the index of the row being edited
+	const [editIndex, setEditIndex] = useState(null);
 
 	const handleEditClick = (index) => {
-		setEditIndex(index); // Set the index of the row to be edited
+		setEditIndex(index);
 	};
 
 	const handleSaveClick = (row) => {
-		onSave(row); // Call the save function passed as a prop
-		setEditIndex(null); // Reset the edit index after saving
+		onSave(row);
+		setEditIndex(null);
 	};
 
 	return (
@@ -44,42 +44,43 @@ const Table = ({
 						key={rowIndex}
 						className="hover:bg-gray-100 transition-colors duration-200"
 					>
-						{Object.keys(row).map((key, cellIndex) => (
-							<td key={cellIndex} className="border border-gray-300 p-2">
-								{editIndex === rowIndex ? (
-									key === "category" ? (
-										// Render a dropdown for category when in edit mode
-										<select
-											value={row.categoryId} // Use categoryId for the select
-											onChange={(e) =>
-												onEdit(rowIndex, "categoryId", e.target.value)
-											}
-											className="w-full border rounded-lg p-1"
-										>
-											<option value="">Select a Category</option>
-											{categoriesList.map((category) => (
-												<option key={category._id} value={category._id}>
-													{category.name}
-												</option>
-											))}
-										</select>
+						{/* Filter out 'id' when mapping through row keys */}
+						{Object.keys(row)
+							.filter((key) => key !== "id")
+							.map((key, cellIndex) => (
+								<td key={cellIndex} className="border border-gray-300 p-2">
+									{editIndex === rowIndex ? (
+										key === "category" ? (
+											<select
+												value={row.categoryId || ""}
+												onChange={(e) =>
+													onEdit(rowIndex, "categoryId", e.target.value)
+												}
+												className="w-full border rounded-lg p-1"
+											>
+												<option value="">Select a Category</option>
+												{categoriesList &&
+													categoriesList.map((category) => (
+														<option key={category._id} value={category._id}>
+															{category.name}
+														</option>
+													))}
+											</select>
+										) : (
+											<input
+												type="text"
+												value={row[key] || ""}
+												onChange={(e) => onEdit(rowIndex, key, e.target.value)}
+												className="w-full border rounded-lg p-1"
+											/>
+										)
 									) : (
-										// Render a text input for other fields
-										<input
-											type="text"
-											value={row[key]}
-											onChange={(e) => onEdit(rowIndex, key, e.target.value)}
-											className="w-full border rounded-lg p-1"
-										/>
-									)
-								) : (
-									row[key] // Display the value when not editing
-								)}
-							</td>
-						))}
+										row[key] || ""
+									)}
+								</td>
+							))}
+
 						<td className="border border-gray-300 p-2 flex space-x-2">
-							{" "}
-							{/* Flex container for buttons */}
 							{editIndex === rowIndex ? (
 								<button
 									onClick={() => handleSaveClick(row)}
@@ -98,10 +99,10 @@ const Table = ({
 							<button
 								onClick={() => {
 									const confirmArchive = window.confirm(
-										"Are you sure you want to archive this category?"
+										"Are you sure you want to archive this item?"
 									);
 									if (confirmArchive) {
-										onArchive(row.id); // Only call onArchive if confirmed
+										onArchive(row.id); // Pass row.id to onArchive without displaying it
 									}
 								}}
 								className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
@@ -186,7 +187,7 @@ const Maintenance = () => {
 	const handleArchive = async (entityType, entityId) => {
 		try {
 			const response = await fetch(
-				`http://localhost:3000/api/${entityType}/archive/${entityId}`, // Use entityType to determine the endpoint
+				`http://localhost:3000/api/${entityType}/archive/${entityId}`,
 				{
 					method: "POST",
 					headers: {
@@ -205,6 +206,11 @@ const Maintenance = () => {
 
 			// Optionally, update the UI by removing or updating the entity in the respective state
 			switch (entityType) {
+				case "sizes":
+					setSizes((prevSizes) => 
+					prevSizes.filter((size) => size._id !== entityId)
+				);
+				break;
 				case "categories":
 					setCategories((prevCategories) =>
 						prevCategories.filter((category) => category._id !== entityId)
@@ -225,7 +231,6 @@ const Maintenance = () => {
 						prevMaterials.filter((material) => material._id !== entityId)
 					);
 					break;
-				// Add more cases as necessary
 				default:
 					break;
 			}
@@ -323,7 +328,6 @@ const Maintenance = () => {
 				body: JSON.stringify({
 					label: newSize.label,
 					height: newSize.height,
-					length: newSize.length,
 					width: newSize.width,
 					depth: newSize.depth,
 					furnitureTypeId: selectedFurnitureType,
@@ -333,7 +337,7 @@ const Maintenance = () => {
 				const data = await response.json();
 				toast.success(data.message);
 				resetInputFields();
-				await fetchSizes(); // Refresh sizes list
+				await fetchSizes();
 			} else {
 				const errorData = await response.json();
 				toast.error(errorData.message);
@@ -433,7 +437,11 @@ const Maintenance = () => {
 					throw new Error("Failed to add furniture type.");
 				}
 				const newFurnitureType = await response.json();
-				setFurnitureTypes((prevTypes) => (Array.isArray(prevTypes) ? [...prevTypes, newFurnitureType] : [newFurnitureType]));
+				setFurnitureTypes((prevTypes) =>
+					Array.isArray(prevTypes)
+						? [...prevTypes, newFurnitureType]
+						: [newFurnitureType]
+				);
 				toast.success("Furniture type added successfully.");
 				await fetchFurnitureTypes();
 			}
@@ -518,7 +526,7 @@ const Maintenance = () => {
 		setNewColor(initialColorState);
 		setNewSize(initialSizeState);
 		setSelectedFurnitureType("");
-		setSelectedCategory(""); // Reset the selected category
+		setSelectedCategory("");
 	};
 
 	const renderInputField = (
@@ -568,13 +576,13 @@ const Maintenance = () => {
 						className="mb-6 space-y-4 bg-gray-100 p-4 rounded-lg shadow-md border-3 border-bg-oliveGreen"
 					>
 						<div className="mb-4">
-							<label className="block font-semibold text-2xl">
-								Select Type
+							<label className="block font-semibold text-2xl m-5">
+								Maintenance Options
 							</label>
 							<select
 								value={selectedFilter}
 								onChange={(e) => setSelectedFilter(e.target.value)}
-								className="w-full border rounded-lg p-2 shadow-sm focus:ring focus:ring-blue-300"
+								className="w-full border rounded-lg p-2 mb-10 shadow-sm focus:ring focus:ring-blue-300"
 							>
 								<option value="">-- Select --</option>
 								<option value="Categories">Categories</option>
@@ -595,12 +603,6 @@ const Maintenance = () => {
 							)}
 						{selectedFilter === "Furniture Types" && (
 							<>
-								{renderInputField(
-									"New Furniture Type",
-									"newFurnitureType",
-									newItemName,
-									(e) => setNewItemName(e.target.value)
-								)}
 								<div className="mb-4">
 									<label className="block mb-1 font-semibold text-gray-700">
 										Select Category
@@ -619,10 +621,35 @@ const Maintenance = () => {
 											))}
 									</select>
 								</div>
+								{renderInputField(
+									"New Furniture Type",
+									"newFurnitureType",
+									newItemName,
+									(e) => setNewItemName(e.target.value)
+								)}
 							</>
 						)}
 						{selectedFilter === "Furniture Size" && (
 							<>
+								<div className="mb-4">
+									<label className="block mb-1 font-semibold text-gray-700">
+										Select Furniture Type
+									</label>
+									<select
+										value={selectedFurnitureType}
+										onChange={(e) => setSelectedFurnitureType(e.target.value)}
+										className="w-full border rounded-lg p-2 shadow-sm focus:ring focus:ring-blue-300"
+									>
+										<option value="">-- Select --</option>
+										{Array.isArray(furnitureTypes) &&
+											furnitureTypes.map((type) => (
+												<option key={type._id} value={type._id}>
+													{type.name}
+												</option>
+											))}
+									</select>
+								</div>
+
 								{renderInputField("Label", "label", newSize.label, (e) =>
 									setNewSize({ ...newSize, label: e.target.value })
 								)}
@@ -647,24 +674,6 @@ const Maintenance = () => {
 									(e) => setNewSize({ ...newSize, depth: e.target.value }),
 									"number"
 								)}
-								<div className="mb-4">
-									<label className="block mb-1 font-semibold text-gray-700">
-										Select Furniture Type
-									</label>
-									<select
-										value={selectedFurnitureType}
-										onChange={(e) => setSelectedFurnitureType(e.target.value)}
-										className="w-full border rounded-lg p-2 shadow-sm focus:ring focus:ring-blue-300"
-									>
-										<option value="">-- Select --</option>
-										{Array.isArray(furnitureTypes) &&
-											furnitureTypes.map((type) => (
-												<option key={type._id} value={type._id}>
-													{type.name}
-												</option>
-											))}
-									</select>
-								</div>
 							</>
 						)}
 						{selectedFilter === "Colors" && (
@@ -726,7 +735,7 @@ const Maintenance = () => {
 							<h2 className="text-2xl font-bold mb-4">Categories</h2>
 							<div className="max-h-96 overflow-y-auto">
 								<Table
-									headers={["ID", "Category Name"]}
+									headers={["Category Name"]}
 									data={
 										Array.isArray(categories)
 											? categories.map((category) => ({
@@ -748,13 +757,12 @@ const Maintenance = () => {
 							<h2 className="text-2xl font-bold mb-4">Furniture Types</h2>
 							<div className="max-h-96 overflow-y-auto">
 								<Table
-									headers={["ID", "Furniture Type", "Category ID", "Category"]}
+									headers={["Furniture Type", "Category"]}
 									data={
 										Array.isArray(furnitureTypes)
 											? furnitureTypes.map((type) => ({
 													id: type._id,
 													name: type.name,
-													categoryId: type.categoryId,
 													category:
 														categories.find(
 															(cat) => cat._id === type.categoryId
@@ -764,7 +772,7 @@ const Maintenance = () => {
 									}
 									onEdit={handleEditItem}
 									onSave={handleSaveItem}
-									onArchive={(id) => handleArchive("furniture-types", id)} // Pass entity type and ID
+									onArchive={(id) => handleArchive("furniture-types", id)}
 								/>
 							</div>
 						</div>
@@ -775,17 +783,14 @@ const Maintenance = () => {
 							<h2 className="text-2xl font-bold mb-4">Furniture Colors</h2>
 							<div className="max-h-96 overflow-y-auto">
 								<Table
-									headers={["ID", "Color Name", "RGB", "Hex"]}
+									headers={["Color Name", "RGB", "Hex"]}
 									data={
-										Array.isArray(furnitureTypes)
-											? furnitureTypes.map((type) => ({
-													id: type._id,
-													name: type.name,
-													categoryId: type.categoryId,
-													category:
-														categories.find(
-															(cat) => cat._id === type.categoryId
-														)?.name || "N/A",
+										Array.isArray(colors)
+											? colors.map((color) => ({
+													id: color._id,
+													name: color.name,
+													rgb: color.rgb,
+													hex: color.hex,
 											  }))
 											: []
 									}
@@ -802,7 +807,7 @@ const Maintenance = () => {
 							<h2 className="text-2xl font-bold mb-4">Furniture Materials</h2>
 							<div className="max-h-96 overflow-y-auto">
 								<Table
-									headers={["ID", "Material Name", "Quantity"]}
+									headers={["Material Name", "Quantity"]}
 									data={
 										Array.isArray(materials)
 											? materials.map((material) => ({
@@ -815,6 +820,34 @@ const Maintenance = () => {
 									onEdit={handleEditItem}
 									onSave={handleSaveItem}
 									onArchive={(id) => handleArchive("materials", id)} // Pass entity type and ID
+								/>
+							</div>
+						</div>
+					)}
+					{selectedFilter === "Furniture Size" && (
+						<div className="space-y-4 mt-8">
+							<h2 className="text-2xl font-bold mb-4">Furniture Sizes</h2>
+							<div className="max-h-96 overflow-y-auto">
+								<Table
+									headers={["Size Label", "Height","Width","Depth","Furniture Type"]}
+									data={
+										Array.isArray(sizes)
+											? sizes.map((size) => ({
+													id: size._id,
+													label: size.label,
+													heigth: size.height,
+													width: size.width,
+													depth: size.depth,
+													furnitureTypes:
+													furnitureTypes.find(
+														(type) => type._id === size.furnitureTypeId
+													)?.name || "N/A",
+											  }))
+											: []
+									}
+									onEdit={handleEditItem}
+									onSave={handleSaveItem}
+									onArchive={(id) => handleArchive("sizes", id)}
 								/>
 							</div>
 						</div>

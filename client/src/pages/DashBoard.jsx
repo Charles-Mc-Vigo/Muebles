@@ -103,7 +103,7 @@ const Dashboard = () => {
 		"manage-delivery": (
 			<h2 className="text-2xl font-semibold">Manage Delivery Content</h2>
 		),
-		Category: <Maintenance />,
+		Furniture: <Maintenance />,
 		Services: <ServiceSection />,
 		"repair-hardware": (
 			<h2 className="text-2xl font-semibold">Repair Hardware Content</h2>
@@ -239,8 +239,8 @@ const Dashboard = () => {
 						{dropdowns.maintenance && (
 							<ul className="ml-8 space-y-2">
 								<DropdownItem
-									label="Category"
-									section="Category"
+									label="Furniture"
+									section="Furniture"
 									currentSection={activeSection}
 									onClick={setActiveSection}
 								/>

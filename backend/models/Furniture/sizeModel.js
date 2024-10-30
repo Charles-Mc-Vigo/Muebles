@@ -21,6 +21,10 @@ const sizeSchema = new mongoose.Schema({
     type: mongoose.Schema.ObjectId, 
     ref: "FurnitureType", 
     required: true
+  },
+  isArchived:{
+    type:Boolean,
+    default:false
   }
 },{
   timestamps:true
