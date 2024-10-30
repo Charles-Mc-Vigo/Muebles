@@ -93,7 +93,7 @@ export default function SignUp() {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
-      <div className="flex-grow flex justify-center items-center mb-3 mt-3 ">
+      <div className="flex-grow flex justify-center items-center mb-3 mt-40 ">
         <div className="w-full max-w-4xl p-8 mx-4 md:mx-auto bg-white shadow-lg rounded-lg flex flex-col md:flex-row border-4 border-green-200">
           {/* Left side with background image */}
           <div

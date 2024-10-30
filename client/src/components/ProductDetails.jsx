@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { FaChevronUp, FaChevronDown } from "react-icons/fa";
-import {FaArrowRight,FaArrowLeft} from "react-icons/fa";
+import {
+  FaChevronUp,
+  FaChevronDown,
+  FaArrowRight,
+  FaArrowLeft,
+} from "react-icons/fa";
 import { IoReturnUpBack } from "react-icons/io5";
 import Header from "./Header";
 import Footer from "./Footer";
@@ -107,22 +111,17 @@ function ProductDetails() {
   return (
     <section className="bg-white">
       <Header />
-      <div className="container mx-auto p-5 flex flex-col lg:flex-row">
-        {/* Combined: Product Image and Details */}
+      
+      <div className="container mx-auto p-5 flex flex-col lg:flex-row mt-40">
         <div className="flex flex-col lg:flex-row lg:w-full justify-center mt-10">
-          {/* Left: Product Image */}
-          <div className="flex flex-col lg:w-[800px] lg:h-[800px] p-2   bg-white rounded-xl shadow-xl shadow-gray-300 relative">
-			
-            {/* Back Button */}
+          <div className="flex flex-col lg:w-[800px] lg:h-[800px] p-2 bg-white rounded-xl shadow-xl shadow-gray-300 relative">
             <button
               onClick={() => navigate(-1)}
               className="text-teal-600 mb-4 lg:mb-0 lg:mr-5"
             >
               <IoReturnUpBack size={50} />
             </button>
-            {/* Main container with gray background */}
             <div className="flex-grow flex flex-col items-center p-4 ">
-              {/* Main furniture image */}
               <div className="flex-grow flex items-center justify-center ">
                 {furnitureData.images && furnitureData.images.length > 0 && (
                   <img
@@ -132,22 +131,17 @@ function ProductDetails() {
                   />
                 )}
               </div>
-
-              {/* Thumbnail navigation */}
-              <div className="flex items-center justify-center  space-x-4">
-                {/* Left button for image navigation */}
+              <div className="flex items-center justify-center space-x-4">
                 <button onClick={handlePreviousImage}>
                   <FaArrowLeft size={30} />
                 </button>
-
-                {/* Thumbnails */}
                 <div className="flex space-x-2">
                   {furnitureData.images.map((image, index) => (
                     <img
                       key={index}
                       src={`data:image/jpeg;base64,${image}`}
                       alt={`Image ${index + 1} of ${furnitureData.name}`}
-                      className={`w-20 h-20 object-contain  rounded cursor-pointer transition ${
+                      className={`w-20 h-20 object-contain rounded cursor-pointer transition ${
                         currentImageIndex === index
                           ? "border-blue-500"
                           : "border-gray-300"
@@ -156,17 +150,13 @@ function ProductDetails() {
                     />
                   ))}
                 </div>
-
-                {/* Right button for image navigation */}
                 <button onClick={handleNextImage}>
                   <FaArrowRight size={30} />
                 </button>
               </div>
             </div>
           </div>
-
-          {/* Right: Product Details */}
-          <div className="flex-1 lg:max-w-[400px] lg:h-[800px] p-5 bg-white  border-gray-300 rounded-lg shadow-lg ml-0 lg:ml-5">
+          <div className="flex-1 lg:max-w-[400px] lg:h-[800px] p-5 bg-white border-gray-300 rounded-lg shadow-lg ml-0 lg:ml-5">
             <h1 className="text-3xl font-bold">{furnitureData.name}</h1>
             <div className="mt-2">
               <h2 className="text-lg font-semibold">Price</h2>
@@ -174,7 +164,6 @@ function ProductDetails() {
                 ₱ {furnitureData.price}
               </p>
             </div>
-            {/* Color Selection */}
             <div className="mb-4 rounded-md p-2">
               <label className="block font-semibold">
                 Colors: {selectedColor || "None"}
@@ -194,8 +183,6 @@ function ProductDetails() {
                 ))}
               </div>
             </div>
-
-            {/* Furniture Materials */}
             <div className="mt-4">
               <h2 className="text-lg font-semibold">Materials</h2>
               <div className="flex space-x-2 flex-wrap">
@@ -214,7 +201,6 @@ function ProductDetails() {
                 ))}
               </div>
             </div>
-            {/* Furniture Sizes */}
             <div className="mt-4">
               <h2 className="text-lg font-semibold">Sizes</h2>
               <div className="flex space-x-2 flex-wrap">
@@ -233,7 +219,6 @@ function ProductDetails() {
                 ))}
               </div>
             </div>
-            {/* FAQ Section */}
             <div className="mt-4">
               {faqItems.map((item, index) => (
                 <FAQAccordion
@@ -246,6 +231,37 @@ function ProductDetails() {
           </div>
         </div>
       </div>
+
+      {/* Advertisement Section */}
+      <div
+        className="w-full mb-5 max-w-[1829px] p-10 mt-5 rounded-lg shadow-lg mx-auto"
+        style={{ backgroundColor: "#ecede4" }}
+      >
+        <h2 className="text-2xl font-bold mb-4 text-center">
+          Sustainable Furniture for a Greener Tomorrow
+        </h2>
+        <p className="text-lg text-gray-700 mb-6 text-justify">
+          Transform your house with furniture designed with nature in mind. Our
+          items are composed of carefully sourced materials and built to last,
+          reducing waste while promoting sustainability. For every tree we use,
+          we give back a hundredfold to reforestation efforts, ensuring a
+          greener future. From the warmth of natural wood to the long-lasting
+          durability of eco-friendly paints, our furniture combines style and
+          environmental responsibility. Join us in making a positive
+          contribution by designing a beautiful home while protecting nature for
+          future generations.
+        </p>
+        <p className="text-base font-bold text-center text-teal-600">JCKAME</p>
+        <p className="text-sm text-center text-gray-500">
+          Founded in Marinduque, 2003
+        </p>
+      </div>
+
+      <div className="w-full h-full mb-5 max-w-[1829px] max-h-[500px] p-10 mt-5 rounded-lg shadow-lg mx-auto"
+        style={{ backgroundColor: "#ecede4" }}>
+
+      </div>
+
       <Footer />
     </section>
   );
