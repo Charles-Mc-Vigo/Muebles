@@ -6,7 +6,7 @@ const PaymentMethod = () => {
   return (
     <section className="bg-white py-10">
       <Header />
-      <div className="container mx-auto px-4 mt-5">
+      <div className="container mx-auto px-4 mt-40">
         <h2 className="text-2xl md:text-3xl font-bold text-center mb-6">
           About Our Payment Method
         </h2>
