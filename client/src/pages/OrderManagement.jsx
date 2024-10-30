@@ -1,8 +1,15 @@
 import React from 'react'
+import OrderCustomer from '../components/OrderCustomer'
 
 const OrderManagement = () => {
   return (
-    <div>OrderManagement</div>
+    <div>
+      <OrderCustomer/>
+
+
+    </div>
+
+   
   )
 }
 

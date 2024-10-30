@@ -11,6 +11,7 @@ import AdminLogin from "./pages/AdminLogin";
 import DashBoard from "./pages/DashBoard";
 import UserManagement from "./pages/UserManagement";
 import OrderManagement from "./pages/OrderManagement";
+import TransactionHistory from "./pages/TransactionHistory";
 import ProductManagement from "./pages/ProductManagement";
 import ProductCustomization from "./pages/ProductCustomization";
 import FurnitureList from "./components/FurnitureList";
@@ -22,14 +23,21 @@ import ServicePage from "./pages/ServicePage";
 import ProductTable from "./components/ProductTable";
 import ProductDetails from "./components/ProductDetails";
 import EditProduct from "./components/EditProduct";
-import Delivery from "./components/Delivery";
+import DeliveryInfo from "./components/DeliveryInfo";
 import AdminPendingPage from "./pages/AdminPendingPage";
-import Profile from "../src/components/Profile";
+import Profile from "./components/Profile";
+import UserProfile from "./components/UserProfile";
+import TermsAndConditions from "./pages/TermsandCondition";
+import DeliveryManagement from "./DeliveryManagement";
 import PasswordResetRequest from "./pages/PasswordResetRequest";
 import PasswordResetVerify from "./pages/PasswordResetVerify";
 import PasswordResetCreateNew from "./pages/PasswordResetCreateNew";
 import OrderDetails from "./pages/OrderDetails";
-import UserProfile from "./components/UserProfile";
+import InventoryPage from "./pages/InventoryPage";
+import PaymentMethod from "./components/PaymentMethod";
+
+
+
 import ViewOrder from "./components/ViewOrder";
 
 export default function App() {
@@ -40,6 +48,8 @@ export default function App() {
 				<Route path="/about" element={<About />} />
 				<Route path="/signup" element={<SignUp />} />
 				<Route path="/login" element={<Login />} />
+                <Route path="/terms&condition" element={<TermsAndConditions />} />
+                <Route path="/payment-method" element={<PaymentMethod />} />
 				<Route path="/verify-account/:userId" element={<EmailVerification />} />
 				<Route path="/home" element={<ProtectedRoute element={Home} />} />
 				<Route path ="/my-profile/view" element={<ProtectedRoute element={UserProfile}/>} />
@@ -64,6 +74,7 @@ export default function App() {
 					element={<ProtectedRoute element={OrderDetails} />}
 				/>
 				<Route path="/cart" element={<ProtectedRoute element={Cart} />} />
+                <Route path="/delivery-info" element={<DeliveryInfo />} />
 				<Route path = "/orders" element={<ProtectedRoute element={ViewOrder}/>} />
 
 				{/* Admin routes */}
@@ -98,11 +109,12 @@ export default function App() {
 					element={<ProtectedRoute element={EditProduct} adminOnly={true} />}
 				/>
 				<Route path="/service-page" element={<ServicePage />} />
-				<Route path="/delivery-info" element={<Delivery />} />
+				<Route path="/inventory-management" element={<InventoryPage />} />
 				<Route
 					path="/furniture-list"
 					element={<ProtectedRoute element={FurnitureList} />}
 				/>
+                <Route path="/manage-delivery" element={<DeliveryManagement />} />
 				<Route
 					path="/user-management"
 					element={<ProtectedRoute element={UserManagement} adminOnly={true} />}
@@ -113,6 +125,7 @@ export default function App() {
 						<ProtectedRoute element={OrderManagement} adminOnly={true} />
 					}
 				/>
+                <Route path="/view-transaction" element={<ProtectedRoute element={TransactionHistory} adminOnly={true} />} />
 				<Route
 					path="/product-management"
 					element={

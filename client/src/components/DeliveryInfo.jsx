@@ -4,18 +4,18 @@ import Footer from "./Footer";
 
 const Delivery = () => {
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col mt-40" style={{ fontFamily: "Playfair Display, serif" }}>
       <Header />
       <div className="flex-grow">
-        <div className="max-w-7xl mx-auto bg-white rounded-lg shadow-lg p-12 my-8">
+        <div className="max-w-7xl mx-auto bg-gray-300 rounded-lg shadow-lg p-12 my-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
             {/* Left side - Delivery Information */}
-            <div className="space-y-6">
-              <h1 className="text-3xl font-bold mb-10 text-center">
+            <div className="space-y-6 text-justify">
+              <h1 className="text-3xl font-bold mb-5 text-center"style={{ fontFamily: "Playfair Display, serif" }}>
                 Shipping Information
               </h1>
 
-              <p className="mb-4">
+              <p className="mb-10 font-semibold">
                 Delivery and Shipping service will be provided by our partners.
               </p>
               <p className="mb-4">
@@ -45,7 +45,7 @@ const Delivery = () => {
             </div>
 
             {/* Right side - Coverage Area Table */}
-            <div className="space-y-6 bg-slate-100 p-6 rounded-lg">
+            <div className="space-y-6 bg-slate-100 p-6 rounded-lg text-justify">
               <h2 className="text-xl font-bold mb-4">Area of Coverage</h2>
               <p className="mb-4">
                 Décor & home fashion products can be shipped throughout
@@ -105,7 +105,7 @@ const Delivery = () => {
                 will be processed accordingly.
               </p>
 
-              <p className="mb-4 font-semibold">
+              <p className="mb-4 font-semibold ">
                 At present, JCKAME offers services exclusively in the following areas.
               </p>
             </div>
