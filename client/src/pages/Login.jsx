@@ -27,16 +27,19 @@ export default function Login() {
 				credentials: "include",
 				body: JSON.stringify(formData),
 			});
-
 			const data = await response.json();
-			if (!data.ok) {
-				toast.error(data.error)
+			
+			if (!response.ok) {
+				// Handle error case
+				toast.error(data.error || "Log in failed");
+				return; // Do not proceed further
 			}
+
+			// Handle success case
 			toast.success(data.success);
 			setTimeout(() => {
 				navigate("/home");
 			}, 2000);
-
 		} catch (error) {
 			console.error("Log in error", error);
 			toast.error(error.message || "Log in failed");
@@ -60,21 +63,19 @@ export default function Login() {
 				>
 					<FaArrowLeft className="text-xl" />
 				</button>
-
 				<div className="flex justify-center mb-6">
 					<FaFingerprint className="text-white text-4xl" />
 				</div>
-
 				<h1 className="text-center text-white text-3xl font-semibold mb-6">
 					Log In
 				</h1>
-
 				<form onSubmit={handleSubmit} className="space-y-4">
 					<input
 						type="email"
 						id="email"
 						placeholder="E-mail address"
 						required
+						value={formData.email} // Bind input value to state
 						onChange={handleChange}
 						className="w-full px-4 py-2 text-white bg-transparent border-b-2 border-gray-300 placeholder-gray-300 focus:outline-none focus:border-white transition duration-200"
 					/>
@@ -83,6 +84,7 @@ export default function Login() {
 						id="password"
 						placeholder="Password"
 						required
+						value={formData.password} // Bind input value to state
 						onChange={handleChange}
 						className="w-full px-4 py-2 text-white bg-transparent border-b-2 border-gray-300 placeholder-gray-300 focus:outline-none focus:border-white transition duration-200"
 					/>
@@ -93,7 +95,6 @@ export default function Login() {
 						Log In
 					</button>
 				</form>
-
 				<p className="text-white text-sm text-center mt-4">
 					Don't have an account?{" "}
 					<Link to="/SignUp" className="underline hover:text-gray-300">
@@ -101,7 +102,6 @@ export default function Login() {
 					</Link>
 					.
 				</p>
-
 				<p className="text-white text-sm text-center mt-2">
 					Forgot password?{" "}
 					<Link
@@ -113,7 +113,6 @@ export default function Login() {
 					.
 				</p>
 			</div>
-
 			<ToastContainer />
 		</div>
 	);

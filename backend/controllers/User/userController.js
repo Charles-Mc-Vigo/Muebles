@@ -18,7 +18,7 @@ exports.getAllUsers = async (req,res) => {
 		res.status(200).json(users);
 	} catch (error) {
 		console.error("Error fetching all the users: ", error);
-		res.status(500).json({message:"Server error!"});
+		res.status(500).json({error:"Server error!"});
 	}
 }
 
@@ -52,7 +52,7 @@ exports.SignUp = async (req, res) => {
 			!confirmPassword ||
 			!agreeToTerms
 		) {
-			return res.status(400).json({ message: "All fields are required!" });
+			return res.status(400).json({ error: "All fields are required!" });
 		}
 
 		const existingUser = await User.findOne({
@@ -61,15 +61,15 @@ exports.SignUp = async (req, res) => {
 		if (existingUser) {
 			return res
 				.status(400)
-				.json({ message: "Account or phone number is already existing!" });
+				.json({ error: "Account or phone number is already existing!" });
 		}
 
 		if (!validator.isMobilePhone(phoneNumber, "en-PH")) {
-			return res.status(400).json({ message: "Invalid phone number!" });
+			return res.status(400).json({ error: "Invalid phone number!" });
 		}
 
 		if (!validator.isEmail(email)) {
-			return res.status(400).json({ message: "Invalid email account!" });
+			return res.status(400).json({ error: "Invalid email account!" });
 		}
 
 		if (
@@ -81,11 +81,11 @@ exports.SignUp = async (req, res) => {
 				minSymbols: 1,
 			})
 		) {
-			return res.status(400).json({ message: "Password is weak!" });
+			return res.status(400).json({ error: "Password is weak!" });
 		}
 
 		if (password !== confirmPassword) {
-			return res.status(400).json({ message: "Passwords do not match!" });
+			return res.status(400).json({ error: "Passwords do not match!" });
 		}
 
 		const hashedPassword = await bcrypt.hash(password, 10);
@@ -99,7 +99,7 @@ exports.SignUp = async (req, res) => {
 			password,
 		});
 		if (error) {
-			return res.status(400).json({ message: error.details[0].message });
+			return res.status(400).json({ error: error.details[0].message });
 		}
 		const verificationCode = generateVerificationCode();
 		const verificationCodeExpires = Date.now() + 15 * 60 * 1000;
@@ -123,7 +123,7 @@ exports.SignUp = async (req, res) => {
 
 		await newUser.save();
 		console.log(newUser)
-		res.status(201).json({message:"We’ve sent a verification email to your inbox. Please check your email to verify your account.", newUser});
+		res.status(201).json({success:"We’ve sent a verification email to your inbox. Please check your email to verify your account.", newUser});
 	} catch (err) {
 		console.error(err);
 		res.status(500).json({ message: "Server error!" });
