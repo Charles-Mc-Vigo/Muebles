@@ -90,8 +90,8 @@ const orderController = {
 			const { orderId } = req.params;
 			const userId = req.user._id;
 			const order = await Order.findById(orderId)
-				.populate("items.furniture")
-				.populate("user", "firstname lastname email");
+			.populate('user')
+			.populate('items.furniture');
 
 			if (!order) {
 				return res.status(404).json({
@@ -106,7 +106,7 @@ const orderController = {
 				});
 			}
 
-			res.status(200).json({order});
+			res.status(200).json(order);
 		} catch (error) {
 			console.log("Error fetching order : ",error)
 			res.status(500).json({
