@@ -35,7 +35,7 @@ const Profile = ({ showNameAndImage }) => {
     if (error) return <p className="text-center text-red-500">{error}</p>;
 
     return (
-        <div className="flex border-2 mt-10 ">
+        <div className="flex border-2 mt-10  ">
             {/* Sidebar */}
             <aside className="w-1/5 p-4 border-r-2">
                 <nav className="space-y-4">
@@ -70,7 +70,7 @@ const Profile = ({ showNameAndImage }) => {
             </aside>
 
             {/* Profile Details */}
-            <main className="flex-1 p-6">
+            <main className="flex-1 p-6 ">
                 <h1 className="text-2xl font-bold mb-4">My Profile</h1>
                 <p className="text-gray-500 mb-6 border-b-2 border-black">Manage and protect your account</p>
                 
