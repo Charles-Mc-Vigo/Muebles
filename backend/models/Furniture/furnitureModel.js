@@ -8,8 +8,12 @@ const furnitureSchema = new mongoose.Schema({
   description: { type: String, required: true },
   materials: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Materials' }],
   colors: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Colors' }],
-  sizes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Size' }], // Reference to Size model
-  stocks: {type:mongoose.Schema.ObjectId, ref:"Stocks"},
+  sizes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Size' }],
+  stocks:{
+    type:Number,
+    required:true,
+    default:0
+  },
   price: { type: Number, required: true },
 
   isArchived:{

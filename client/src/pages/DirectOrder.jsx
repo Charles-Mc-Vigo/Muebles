@@ -46,8 +46,8 @@ const DirectOrder = () => {
     }
 
     // Prevent quantity from exceeding available stock
-    if (furniture && newQuantity > furniture.stocks.stocks) {
-      alert(`Cannot increase quantity. Only ${furniture.stocks.stocks} items available in stock.`);
+    if (furniture && newQuantity > furniture.stocks) {
+      alert(`Cannot increase quantity. Only ${furniture.stocks} items available in stock.`);
       return;
     }
 
@@ -95,8 +95,9 @@ const DirectOrder = () => {
             className="w-25 h-25 rounded-lg mb-4"
           />
         )}
-        <p className="text-xl font-semibold">Price: ₱{furniture.price}</p>
-        <p className="mt-2 text-gray-700">{furniture.description}</p>
+        <p className="text-xl font-semibold">Price: PHP {furniture.price}</p>
+        <p className="mt-2 text-gray-700">Description: {furniture.description}</p>
+        <p className="mt-2 text-gray-700">Stocks: {furniture.stocks}</p>
       </div>
       <form onSubmit={handleSubmit} className="bg-white shadow-md rounded-lg p-5 space-y-4">
         <div className="flex items-center mb-4">

@@ -6,7 +6,6 @@ const FurnitureType = require("../../models/Furniture/furnitureTypeModel");
 const Materials = require("../../models/Furniture/materialsModel");
 const Colors = require("../../models/Furniture/colorModel");
 const Size = require("../../models/Furniture/sizeModel");
-const Stocks = require("../../models/Furniture/stocksModel");
 
 // Multer setup for handling image uploads in memory
 
@@ -42,7 +41,6 @@ exports.getAllFurnitures = async (req, res) => {
 			{ path: "furnitureType", select: "name -_id" },
 			{ path: "materials", select: "name -_id" },
 			{ path: "colors", select: "name hex -_id" },
-			{ path: "stocks", select: "stocks -_id" },
 			{ path: "sizes", select: "label height width depth -_id" },
 		]);
 		
@@ -63,7 +61,6 @@ exports.ArchivedFurnitures = async (req, res) => {
 					{ path: "furnitureType", select: "name -_id" },
 					{ path: "materials", select: "name -_id" },
 					{ path: "colors", select: "name -_id" },
-					{ path: "stocks", select: "stocks -_id" },
 					{ path: "sizes", select: "label -_id" },
 			]);
 
@@ -87,7 +84,6 @@ exports.getFurnitureById = async (req, res) => {
 			{ path: "furnitureType", select: "name -_id" },
 			{ path: "materials", select: "name -_id" },
 			{ path: "colors", select: "name hex -_id" },
-			{ path: "stocks", select: "stocks -_id" },
 			{ path: "sizes", select: "label -_id" },
 		]);
 
@@ -182,8 +178,6 @@ exports.createFurniture = async (req, res) => {
         });
       }
 
-      const newStock = new Stocks({ stocks });
-      await newStock.save();
 
       // Create new furniture item
       const newFurniture = new Furniture({
@@ -192,7 +186,7 @@ exports.createFurniture = async (req, res) => {
         furnitureType: existingFurnitureType._id,
         name,
         description,
-        stocks: newStock._id,
+        stocks: req.body.stocks,
         materials: existingMaterials.map((material) => material._id),
         colors: existingColors.map((color) => color._id),
         sizes: existingSize.map((size) => size._id),

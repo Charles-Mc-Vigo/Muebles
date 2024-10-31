@@ -136,7 +136,7 @@ const Maintenance = () => {
 	const [colors, setColors] = useState([]);
 	const [sizes, setSizes] = useState([]);
 	const [materials, setMaterials] = useState([]);
-	const [newMaterial, setNewMaterial] = useState({ name: "", quantity: "" });
+	const [newMaterial, setNewMaterial] = useState({ name: "", stocks: "" });
 	const [selectedFilter, setSelectedFilter] = useState("");
 	const [selectedFurnitureType, setSelectedFurnitureType] = useState("");
 	const [selectedCategory, setSelectedCategory] = useState("");
@@ -281,9 +281,9 @@ const Maintenance = () => {
 	};
 
 	const handleAddNewMaterial = async () => {
-		const { name, quantity } = newMaterial;
-		if (!name || !quantity) {
-			toast.error("Please provide valid name and quantity.");
+		const { name, stocks } = newMaterial;
+		if (!name || !stocks) {
+			toast.error("Please provide valid name and stocks.");
 			return;
 		}
 		try {
@@ -293,13 +293,13 @@ const Maintenance = () => {
 					"Content-Type": "application/json",
 				},
 				credentials: "include",
-				body: JSON.stringify({ name, quantity }),
+				body: JSON.stringify({ name, stocks }),
 			});
 
 			if (response.ok) {
 				const data = await response.json();
 				toast.success("Material added successfully.");
-				setNewMaterial({ name: "", quantity: "" }); // Reset input
+				setNewMaterial({ name: "", stocks: "" }); // Reset input
 				await fetchMaterials(); // Refresh the list
 			} else {
 				const errorData = await response.json();
@@ -708,13 +708,13 @@ const Maintenance = () => {
 										setNewMaterial({ ...newMaterial, name: e.target.value })
 								)}
 								{renderInputField(
-									"Quantity",
-									"quantity",
-									newMaterial.quantity,
+									"Stocks",
+									"stocks",
+									newMaterial.stocks,
 									(e) =>
 										setNewMaterial({
 											...newMaterial,
-											quantity: e.target.value,
+											stocks: e.target.value,
 										}),
 									"number"
 								)}
@@ -807,13 +807,13 @@ const Maintenance = () => {
 							<h2 className="text-2xl font-bold mb-4">Furniture Materials</h2>
 							<div className="max-h-96 overflow-y-auto">
 								<Table
-									headers={["Material Name", "Quantity"]}
+									headers={["Material Name", "Stocks"]}
 									data={
 										Array.isArray(materials)
 											? materials.map((material) => ({
 													id: material._id,
 													name: material.name,
-													quantity: material.quantity,
+													stocks: material.stocks,
 											  }))
 											: []
 									}

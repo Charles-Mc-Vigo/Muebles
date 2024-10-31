@@ -198,7 +198,7 @@ function ProductDetails({ admin }) {
 							<div className="mt-2 flex justify-between">
 								<h2 className="text-lg font-semibold">Stocks</h2>
 								<p>
-									{furnitureData.stocks.stocks}
+									{furnitureData.stocks}
 								</p>
 							</div>
 							{/* Color Selection */}

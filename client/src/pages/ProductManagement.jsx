@@ -241,21 +241,21 @@ const ProductManagement = () => {
 			) : (
 				<div className="flex flex-row justify-center">
 					<form onSubmit={handleSubmit} className="mb-6 space-y-4 w-1/2">
-						<select
-							id="category"
-							name="category"
-							value={selectedCategory}
-							onChange={handleCategoryChange}
-							required
-							className="border rounded p-2 w-full"
-						>
-							<option value="">Select Category</option>
-							{categories.map((category) => (
-								<option key={category._id} value={category._id}>
-									{category.name}
-								</option>
-							))}
-						</select>
+					<select
+            id="category"
+            name="category"
+            value={selectedCategory}
+            onChange={handleCategoryChange}
+            required
+            className="border rounded p-2 w-full"
+        >
+            <option value="">Select Category</option>
+            {Array.isArray(categories) && categories.map((category) => (
+                <option key={category._id} value={category._id}>
+                    {category.name}
+                </option>
+            ))}
+        </select>
 						<select
 							id="furnitureType"
 							name="furnitureType"
@@ -524,7 +524,7 @@ const ProductManagement = () => {
 										{furniture.price}
 									</td>
 									<td className="border border-gray-300 p-2">
-										{furniture.stocks.stocks || "N/A"}
+										{furniture.stocks || "N/A"}
 									</td>
 								</tr>
 							))

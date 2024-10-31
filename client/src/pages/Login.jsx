@@ -28,17 +28,15 @@ export default function Login() {
 				body: JSON.stringify(formData),
 			});
 
-			if (!response.ok) {
-				toast.error("Something went wrong!");
-				return;
-			}
-
 			const data = await response.json();
-
-			toast.success("Logged in successfully");
+			if (!data.ok) {
+				toast.error(data.error)
+			}
+			toast.success(data.success);
 			setTimeout(() => {
 				navigate("/home");
 			}, 2000);
+
 		} catch (error) {
 			console.error("Log in error", error);
 			toast.error(error.message || "Log in failed");
@@ -106,14 +104,17 @@ export default function Login() {
 
 				<p className="text-white text-sm text-center mt-2">
 					Forgot password?{" "}
-					<Link to="/password-reset/request" className="underline hover:text-gray-300">
+					<Link
+						to="/password-reset/request"
+						className="underline hover:text-gray-300"
+					>
 						Click here
 					</Link>
 					.
 				</p>
 			</div>
 
-			<ToastContainer/>
+			<ToastContainer />
 		</div>
 	);
 }

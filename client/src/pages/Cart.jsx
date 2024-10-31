@@ -226,7 +226,7 @@ const Cart = () => {
 														Price: ₱{item.furnitureId.price}
 													</p>
 													<p className="text-gray-600">
-														Stocks : {item.furnitureId.stocks.stocks}
+														Stocks : {item.furnitureId.stocks}
 													</p>
 												</div>
 												<div className="flex items-center">
@@ -250,7 +250,7 @@ const Cart = () => {
 														className="px-3 py-1 border border-gray-400"
 														onClick={() => {
 															if (
-																item.furnitureId.stocks.stocks <= item.quantity
+																item.furnitureId.stocks <= item.quantity
 															) {
 																alert(
 																	"Cannot increase quantity. Available stock is insufficient."
