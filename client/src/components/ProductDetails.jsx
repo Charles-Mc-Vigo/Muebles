@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { FaChevronUp, FaChevronDown } from "react-icons/fa";
 import { FaLongArrowAltLeft, FaLongArrowAltRight } from "react-icons/fa";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function ProductDetails({ admin }) {
 	const { id } = useParams();
@@ -24,11 +26,10 @@ function ProductDetails({ admin }) {
 						credentials: "include",
 					}
 				);
-				if (!response.ok) {
-					throw new Error("Failed to fetch furniture details");
-				}
 				const data = await response.json();
-				console.log(data);
+				if (!data.ok) {
+					toast.error(data.error);
+				}
 				setFurnitureData(data);
 			} catch (error) {
 				setError(error.message);
@@ -40,11 +41,22 @@ function ProductDetails({ admin }) {
 	}, [id]);
 
 	const addToCart = async (e) => {
-		e.preventDefault(); // Prevents navigating when clicking the button
+		e.preventDefault();
+
+		// Ensure all options are selected
+		if (!selectedColor || !selectedMaterial || !selectedSize) {
+			toast.error("Please select color, material, and size.");
+			return;
+		}
+
 		const item = {
-			furnitureId: id, // The server expects the ID of the furniture
-			quantity: 1, // Default quantity to 1
+			furnitureId: id,
+			quantity: 1,
+			color: selectedColor,
+			material: selectedMaterial,
+			size: selectedSize
 		};
+
 		try {
 			const response = await fetch("http://localhost:3000/api/cart", {
 				method: "POST",
@@ -52,25 +64,24 @@ function ProductDetails({ admin }) {
 					"Content-Type": "application/json",
 				},
 				credentials: "include",
-				body: JSON.stringify(item), // Send the furnitureId and quantity to the server
+				body: JSON.stringify(item),
 			});
-			if (!response.ok) {
-				throw new Error("Failed to add item to cart");
-			}
+
 			const data = await response.json();
-			console.log("Item added to cart successfully:", data);
-			// Optionally show a success message here
-			alert("Item added to cart successfully!");
+
+			if (!data.ok) {
+				toast.error(data.error);
+			}
+
+			toast.success(data.success);
 		} catch (error) {
 			console.error("Error adding item to cart:", error);
-			alert("Error adding item to cart. Please try again.");
+			toast.error("Error adding item to cart. Please try again.");
 		}
 	};
 
 	const handleColorClick = (color) => {
 		setSelectedColor(color.name);
-		setSelectedMaterial(null);
-		setSelectedSize(null);
 	};
 
 	const handleMaterialClick = (material) => {
@@ -133,20 +144,15 @@ function ProductDetails({ admin }) {
 	return (
 		<section className="bg-gray-50">
 			<div className="container mx-auto p-5 flex flex-col lg:flex-row">
-				{/* Combined: Product Image and Details */}
 				<div className="flex flex-col lg:flex-row lg:w-full justify-center mt-10">
-					{/* Left: Product Image */}
 					<div className="flex flex-col lg:w-[800px] lg:h-[800px] p-5 border-2 border-gray-300 bg-white rounded-lg shadow-md relative">
-						{/* Back Button */}
 						<button
 							onClick={() => navigate(-1)}
 							className="text-gray-500 mb-4 lg:mb-0 lg:mr-5"
 						>
 							<FaLongArrowAltLeft size={30} />
 						</button>
-						{/* Main container with gray background */}
 						<div className="flex-grow flex flex-col items-center p-4">
-							{/* Main furniture image */}
 							<div className="flex-grow flex items-center justify-center mb-4">
 								{furnitureData.images && furnitureData.images.length > 0 && (
 									<img
@@ -156,13 +162,10 @@ function ProductDetails({ admin }) {
 									/>
 								)}
 							</div>
-							{/* Thumbnail navigation */}
 							<div className="flex items-center justify-center mt-4 space-x-4">
-								{/* Left button for image navigation */}
 								<button onClick={handlePreviousImage}>
 									<FaLongArrowAltLeft size={30} />
 								</button>
-								{/* Thumbnails */}
 								<div className="flex space-x-2">
 									{furnitureData.images.map((image, index) => (
 										<img
@@ -178,30 +181,23 @@ function ProductDetails({ admin }) {
 										/>
 									))}
 								</div>
-								{/* Right button for image navigation */}
 								<button onClick={handleNextImage}>
 									<FaLongArrowAltRight size={30} />
 								</button>
 							</div>
 						</div>
 					</div>
-					{/* Right: Product Details */}
 					<div className="flex-1 lg:max-w-[400px] lg:h-[800px] p-5 bg-white border-2 border-gray-300 rounded-lg shadow-md ml-0 lg:ml-5 flex flex-col justify-between">
 						<div>
 							<h1 className="text-3xl font-bold">{furnitureData.name}</h1>
 							<div className="mt-2 flex justify-between">
 								<h2 className="text-lg font-semibold">Price</h2>
-								<p>
-									₱ {furnitureData.price}
-								</p>
+								<p>₱ {furnitureData.price}</p>
 							</div>
 							<div className="mt-2 flex justify-between">
 								<h2 className="text-lg font-semibold">Stocks</h2>
-								<p>
-									{furnitureData.stocks}
-								</p>
+								<p>{furnitureData.stocks}</p>
 							</div>
-							{/* Color Selection */}
 							<div className="mb-4 rounded-md p-2">
 								<label className="block font-semibold">
 									Colors: {selectedColor || "None"}
@@ -221,7 +217,6 @@ function ProductDetails({ admin }) {
 									))}
 								</div>
 							</div>
-							{/* Furniture Materials */}
 							<div className="mt-4">
 								<h2 className="text-lg font-semibold">Materials</h2>
 								<div className="flex space-x-2 flex-wrap">
@@ -240,7 +235,6 @@ function ProductDetails({ admin }) {
 									))}
 								</div>
 							</div>
-							{/* Furniture Sizes */}
 							<div className="mt-4">
 								<h2 className="text-lg font-semibold">Sizes</h2>
 								<div className="flex space-x-2 flex-wrap">
@@ -259,7 +253,6 @@ function ProductDetails({ admin }) {
 									))}
 								</div>
 							</div>
-							{/* FAQ Section */}
 							<div className="mt-4">
 								{faqItems.map((item, index) => (
 									<FAQAccordion
@@ -270,7 +263,6 @@ function ProductDetails({ admin }) {
 								))}
 							</div>
 						</div>
-						{/* Action Button at the Bottom */}
 						<div className="mt-4">
 							<button
 								onClick={addToCart}
@@ -282,6 +274,7 @@ function ProductDetails({ admin }) {
 					</div>
 				</div>
 			</div>
+			<ToastContainer/>
 		</section>
 	);
 }

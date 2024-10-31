@@ -13,7 +13,7 @@ const orderController = {
 			// Validate that payment method is provided
 			if (!paymentMethod) {
 				return res.status(400).json({
-					message: "Please select a payment method to proceed.",
+					error: "Please select a payment method to proceed.",
 				});
 			}
 
@@ -21,8 +21,7 @@ const orderController = {
 			if (["GCash", "Maya", "COD"].includes(paymentMethod)) {
 				if (!req.file) {
 					return res.status(400).json({
-						success: false,
-						message: "Please upload proof of payment for the selected method.",
+						error: "Please upload proof of payment for the selected method.",
 					});
 				}
 			}
@@ -37,7 +36,7 @@ const orderController = {
 			// Find user's cart
 			const cart = await Cart.findOne({ userId });
 			if (!cart || cart.items.length === 0) {
-				return res.status(400).json({ message: "Cart is empty" });
+				return res.status(400).json({ error: "Cart is empty" });
 			}
 
 			// Create the order with the proof of payment as base64
@@ -59,17 +58,11 @@ const orderController = {
 				$push: { orders: order._id, proofOfPayment },
 			});
 
-			res.status(201).json({
-				success: true,
-				message: "Order placed successfully!",
-				order,
-			});
+			res.status(201).json({success: "Order placed successfully!", order});
 		} catch (error) {
 			console.error("Error creating order:", error);
 			res.status(500).json({
-				success: false,
-				message: "Error creating order",
-				error: error.message,
+				error: "Error creating order",
 			});
 		}
 	},
@@ -102,28 +95,22 @@ const orderController = {
 
 			if (!order) {
 				return res.status(404).json({
-					success: false,
-					message: "Order not found",
+					error: "Order not found",
 				});
 			}
 
 			// Check if order belongs to user (for non-admin users)
 			if (!req.admin && order.user._id.toString() !== userId) {
 				return res.status(403).json({
-					success: false,
-					message: "Not authorized to view this order",
+					error: "Not authorized to view this order",
 				});
 			}
 
-			res.status(200).json({
-				success: true,
-				order,
-			});
+			res.status(200).json({order});
 		} catch (error) {
+			console.log("Error fetching order : ",error)
 			res.status(500).json({
-				success: false,
-				message: "Error fetching order details",
-				error: error.message,
+				error: "Server error!",
 			});
 		}
 	},

@@ -1,5 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const ProductCard = ({
 	id,
@@ -35,12 +37,15 @@ const ProductCard = ({
 					credentials: "include",
 				}
 			);
-			if (!response.ok) throw new Error("Failed to archive item");
-			alert("Item archived successfully!");
+			const data = await response.json();
+			if (!data.ok){
+				toast.error(data.error)
+			}
+			toast.success(data.success);
 			onArchiveSuccess(); // Trigger update in parent component
 		} catch (error) {
 			console.error("Error archiving item:", error);
-			alert("Error archiving item. Please try again.");
+			toast.error("Error archiving item. Please try again.");
 		}
 	};
 
@@ -58,12 +63,12 @@ const ProductCard = ({
 					credentials: "include",
 				}
 			);
-			if (!response.ok) {
-				throw new Error("Failed to unarchive item");
-			}
 			const data = await response.json();
+			if (!data.ok) {
+				toast.error(data.error)
+			}
 			console.log("Item unarchived successfully:", data); // Optionally handle success
-			alert("Item unarchived successfully!");
+			toast.success(data.success);
 			onUnArchiveSuccess();
 		} catch (error) {
 			console.error("Error unarchiving item:", error); // Optionally handle error
@@ -126,6 +131,7 @@ const ProductCard = ({
 					</button>
 				)}
 			</div>
+			<ToastContainer/>
 		</Link>
 	);
 };

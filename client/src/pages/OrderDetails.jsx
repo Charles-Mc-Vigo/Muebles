@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { IoMdArrowRoundBack } from "react-icons/io";
 import { useNavigate, useParams } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const OrderDetails = () => {
 	const { orderId } = useParams();
@@ -21,12 +23,12 @@ const OrderDetails = () => {
           },
 				}
 			);
-			if (!response.ok) {
-				throw new Error("Failed to fetch order details");
+			const data = await response.json();
+			if (!data.ok) {
+				toast.error(data.error)
 			}
-			const orderData = await response.json();
-			console.log(orderData); // Log the order data
-			setOrder(orderData.order);
+			console.log(data);
+			setOrder(data);
 		} catch (error) {
 			console.log("Error fetching order", error);
 		} finally {
@@ -74,11 +76,11 @@ const OrderDetails = () => {
 					<div>
 						<p>
 							<span className="font-semibold text-gray-800">Order ID:</span>{" "}
-							{order.orderNumber}
+							{order.order.orderNumber}
 						</p>
 						<p>
 							<span className="font-semibold text-gray-800">Date:</span>{" "}
-							{new Date(order.createdAt).toLocaleDateString("en-US", {
+							{new Date(order.order.createdAt).toLocaleDateString("en-US", {
 								year: "numeric",
 								month: "long",
 								day: "numeric",
@@ -90,18 +92,18 @@ const OrderDetails = () => {
 							<span className="font-semibold text-gray-800">
 								Payment Method:
 							</span>{" "}
-							{order.paymentMethod || "N/A"}
+							{order.order.paymentMethod || "N/A"}
 						</p>
 						<p>
 							<span className="font-semibold text-gray-800">Status:</span>{" "}
 							<span
 								className={`${
-									order.orderStatus === "pending"
+									order.order.orderStatus === "pending"
 										? "text-yellow-600"
 										: "text-green-700"
 								} font-semibold`}
 							>
-								{order.orderStatus}
+								{order.order.orderStatus}
 							</span>
 						</p>
 					</div>
@@ -180,6 +182,7 @@ const OrderDetails = () => {
 					</div>
 				</div>
 			)}
+			<ToastContainer/>
 		</div>
 	);
 };

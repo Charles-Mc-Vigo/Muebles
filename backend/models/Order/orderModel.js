@@ -24,7 +24,10 @@ const orderSchema = new mongoose.Schema({
     price: {
       type: Number,
       required: true
-    }
+    },
+    material: { type: String },
+    color: { type: String },
+    size: { type: String }
   }],
   shippingAddress: {
     streetAddress: String,
@@ -80,7 +83,9 @@ orderSchema.statics.createFromCart = async function(cartId, paymentMethod, proof
           furniture: item.furnitureId._id,
           quantity: item.quantity,
           price: item.furnitureId.price,
-          color: item.furnitureId.color
+          material:item.material,
+          color:item.color,
+          size:item.size,
       })),
       shippingAddress: {
           streetAddress: cart.userId.streetAddress,
@@ -120,6 +125,9 @@ orderSchema.statics.createDirectOrder = async function(orderData) {
     return {
       furniture: furniture._id,
       quantity: item.quantity,
+      material:item.material,
+      color:item.color,
+      size:item.size,
       price: furniture.price
     };
   });

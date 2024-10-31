@@ -34,12 +34,17 @@ exports.viewCart = async (req, res) => {
 // Add to Cart
 exports.addToCart = async (req, res) => {
   try {
-    const { furnitureId, quantity = 1 } = req.body;
+    const { furnitureId, quantity = 1, material, color, size } = req.body;
     const user = await User.findById(req.user._id);
     
-    if (!user) return res.status(404).json({ message: "User not found!" });
+    if (!user) return res.status(404).json({ error: "User not found!" });
+    
+    // Validate required fields
+    if (!material || !color || !size) {
+      return res.status(400).json({ error: "Please select material, color, and size." });
+    }
 
-    // Find or create single cart for user
+    // Find or create a cart for the user
     let cart = await Cart.findOne({ userId: user._id });
     if (!cart) {
       cart = await Cart.create({
@@ -55,19 +60,27 @@ exports.addToCart = async (req, res) => {
 
     // Verify furniture exists
     const furniture = await Furniture.findById(furnitureId);
-    if (!furniture) return res.status(404).json({ message: "Furniture not found!" });
+    if (!furniture) return res.status(404).json({ error: "Furniture not found!" });
 
-    // Update existing item or add new item
+    // Check if the exact item (with specific attributes) already exists in the cart
     const existingItemIndex = cart.items.findIndex(
-      item => item.furnitureId.toString() === furnitureId
+      item => item.furnitureId.toString() === furnitureId &&
+              item.material === material &&
+              item.color === color &&
+              item.size === size
     );
 
     if (existingItemIndex > -1) {
+      // If it exists, update the quantity
       cart.items[existingItemIndex].quantity += quantity;
     } else {
+      // If not, add a new item with the selected attributes
       cart.items.push({
         furnitureId,
-        quantity
+        quantity,
+        material,
+        color,
+        size
       });
     }
 
@@ -78,32 +91,33 @@ exports.addToCart = async (req, res) => {
     await cart.save();
 
     // Populate furniture details
-    await cart.populate('items.furnitureId', 'name description price image');
+    await cart.populate("items.furnitureId", "name description price image");
 
-    res.status(200).json({ message: "Item added to cart successfully", cart });
+    res.status(200).json({ success: "Item added to cart successfully", cart });
   } catch (error) {
     console.error("Error in adding to cart", error);
-    res.status(500).json({ message: "Server error!" });
+    res.status(500).json({ error: "Server error!" });
   }
 };
+
 
 // Update Cart Item
 exports.updateCartItem = async (req, res) => {
   try {
     const { furnitureId, quantity } = req.body;
     if (quantity < 1) {
-      return res.status(400).json({ message: "Quantity must be at least 1" });
+      return res.status(400).json({ error: "Quantity must be at least 1" });
     }
 
     const cart = await Cart.findOne({ userId: req.user._id });
-    if (!cart) return res.status(404).json({ message: "Cart not found!" });
+    if (!cart) return res.status(404).json({ error: "Cart not found!" });
 
     const itemIndex = cart.items.findIndex(
       item => item.furnitureId.toString() === furnitureId
     );
 
     if (itemIndex === -1) {
-      return res.status(404).json({ message: "Item not found in cart!" });
+      return res.status(404).json({ error: "Item not found in cart!" });
     }
 
     cart.items[itemIndex].quantity = quantity;
@@ -128,7 +142,7 @@ exports.removeFromCart = async (req, res) => {
     const { furnitureId } = req.params;
     const cart = await Cart.findOne({ userId: req.user._id });
     
-    if (!cart) return res.status(404).json({ message: "Cart not found!" });
+    if (!cart) return res.status(404).json({ error: "Cart not found!" });
 
     cart.items = cart.items.filter(
       item => item.furnitureId.toString() !== furnitureId

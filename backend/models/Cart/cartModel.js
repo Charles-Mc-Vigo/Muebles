@@ -19,6 +19,9 @@ const cartSchema = new mongoose.Schema({
         min: 1,
         default: 1 // Set a default quantity of 1 when adding a new item
       },
+      material: { type: String }, // new field
+      color: { type: String },    // new field
+      size: { type: String }
     },
   ],
   count: {
