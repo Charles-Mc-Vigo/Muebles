@@ -11,7 +11,7 @@ function ViewProduct() {
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
 	const [showArchived, setShowArchived] = useState(false);
-	const [showArchivedCategories, setShowArchivedCategories] = useState(false); // New state for categories
+	const [showArchivedCategories, setShowArchivedCategories] = useState(false);
 	const [showDropdown, setShowDropdown] = useState(false);
 
 
@@ -21,11 +21,9 @@ function ViewProduct() {
 				method: "GET",
 				credentials: "include",
 			});
-			if (!response.ok) {
-				throw new Error("Failed to fetch furniture details");
-			}
 			const data = await response.json();
 			setFurnitureData(data);
+			await fetchFurniture();
 		} catch (error) {
 			setError(error.message);
 		} finally {
@@ -42,11 +40,9 @@ function ViewProduct() {
 					credentials: "include",
 				}
 			);
-			if (!response.ok) {
-				throw new Error("Failed to fetch archived furniture");
-			}
 			const data = await response.json();
 			setArchivedFurnitures(data);
+			await fetchArchivedFurnitures();
 		} catch (error) {
 			setError(error.message);
 		} finally {
@@ -63,9 +59,7 @@ function ViewProduct() {
 					credentials: "include",
 				}
 			);
-			if (!response.ok) {
-				throw new Error("Failed to fetch archived categories");
-			}
+
 			const data = await response.json();
 			setArchivedCategories(data);
 		} catch (error) {
@@ -120,10 +114,8 @@ function ViewProduct() {
 					credentials: "include",
 				}
 			);
-			if (!response.ok) {
-				throw new Error("Failed to unarchive category");
-			}
-			toast.success("Category unarchived successfully!");
+			const data = await response.json();
+			toast.success(data.success);
 			setArchivedCategories(
 				archivedCategories.filter((category) => category._id !== categoryId)
 			);
@@ -159,7 +151,7 @@ function ViewProduct() {
 							<ul className="py-1">
 								<li
 									className="block px-4 py-2 text-gray-700 hover:bg-gray-100 cursor-pointer"
-									onClick={showActiveFurniture} // Reset view to active furniture
+									onClick={showActiveFurniture}
 								>
 									Active Furniture
 								</li>
@@ -208,9 +200,6 @@ function ViewProduct() {
 					<thead>
 						<tr>
 							<th className="px-6 py-3 border-b-2 border-gray-300 text-left leading-4 text-blue-500 tracking-wider">
-								ID
-							</th>
-							<th className="px-6 py-3 border-b-2 border-gray-300 text-left leading-4 text-blue-500 tracking-wider">
 								Category Name
 							</th>
 							<th className="px-6 py-3 border-b-2 border-gray-300 text-left leading-4 text-blue-500 tracking-wider">
@@ -221,9 +210,6 @@ function ViewProduct() {
 					<tbody>
 						{archivedCategories.map((category) => (
 							<tr key={category._id}>
-								<td className="px-6 py-4 whitespace-no-wrap border-b border-gray-500">
-									{category._id}
-								</td>
 								<td className="px-6 py-4 whitespace-no-wrap border-b border-gray-500">
 									{category.name}
 								</td>
@@ -253,7 +239,7 @@ function ViewProduct() {
 								showViewDetails={true}
 								showUpdateButton={true}
 								showArchiveButton={true}
-								onArchiveSuccess={refreshFurnitureList} // Pass the refresh function
+								onArchiveSuccess={refreshFurnitureList}
 							/>
 						))
 					) : (
