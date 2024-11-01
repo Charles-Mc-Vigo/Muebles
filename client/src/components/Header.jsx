@@ -293,6 +293,7 @@ const Header = ({ isLogin, cartCount }) => {
                     </div>
                   )}
                 </div>
+                
               </div>
             </div>
           </div>

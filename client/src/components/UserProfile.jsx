@@ -197,7 +197,7 @@ const UserProfile = () => {
 
         <div className="button-container mt-8 flex flex-col space-y-4">
           <Link
-            to="/my-profile/edit" // Update the to prop to link to the desired route
+            to="/my-profile/edit" 
             className="bg-teal-500 text-white px-6 py-3 rounded-md hover:bg-teal-600 transition duration-300 text-center"
           >
             Edit Profile
@@ -246,7 +246,7 @@ const UserProfile = () => {
       </div>
     ),
   
-    myOrders: <OrderDetails />,
+    "myOrders": <OrderDetails />,
   };
 
   return (

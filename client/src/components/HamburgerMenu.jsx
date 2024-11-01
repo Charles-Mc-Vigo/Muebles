@@ -2,7 +2,8 @@ import React, { useState, useEffect, useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBars, faUser, faCog, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
-import Profile from "./Profile";
+
+import AdminProfile from "./AdminProfile";
 
 const HamburgerMenu = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -64,7 +65,7 @@ const HamburgerMenu = () => {
             >
                 <ul className="space-y-4 mt-8 p-4">
                     <li>
-                        <Profile showNameAndImage={true} />
+                        <AdminProfile showNameAndImage={true} />
                     </li>
                     {/* Profile */}
                     <li>
@@ -76,7 +77,7 @@ const HamburgerMenu = () => {
                     </li>
                     {/* Settings */}
                     <li>
-                        <Link to="/settings">
+                        <Link to="/dashboard/setting/admin-profile/view">
                             <button className="focus:outline-none flex items-center hover:bg-gray-100 rounded-md p-2 transition">
                                 <FontAwesomeIcon icon={faCog} className="mr-2" /> Settings
                             </button>
