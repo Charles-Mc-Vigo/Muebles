@@ -59,12 +59,7 @@ const AdminProfile = ({ showNameAndImage }) => {
                             {profile.firstname} {profile.lastname}
                         </h2>
                         <p className="text-gray-600">{profile.role}</p>
-                        <div className="flex items-center">
-                            <p className="text-2xl"><CiEdit /></p>
-                            <Link to="edit-profile" className="text-gray-600 flex-row flex space-x-4">
-                                <span>Edit Profile</span>
-                            </Link>
-                        </div>
+                        
                     </div>
                 </nav>
             </aside>
