@@ -35,6 +35,7 @@ import PasswordResetCreateNew from "./pages/PasswordResetCreateNew";
 import OrderDetails from "./pages/OrderDetails";
 import InventoryPage from "./pages/InventoryPage";
 import PaymentMethod from "./components/PaymentMethod";
+import EditUserProfile from "./components/EditUserProfile";
 
 
 
@@ -53,6 +54,7 @@ export default function App() {
 				<Route path="/verify-account/:userId" element={<EmailVerification />} />
 				<Route path="/home" element={<ProtectedRoute element={Home} />} />
 				<Route path ="/my-profile/view" element={<ProtectedRoute element={UserProfile}/>} />
+				<Route path ="/my-profile/edit" element={<ProtectedRoute element={EditUserProfile}/>} />
 				<Route
 					path="/password-reset/request"
 					element={<PasswordResetRequest />}
