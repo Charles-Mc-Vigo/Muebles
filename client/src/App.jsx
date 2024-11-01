@@ -35,6 +35,7 @@ import PasswordResetCreateNew from "./pages/PasswordResetCreateNew";
 import OrderDetails from "./pages/OrderDetails";
 import InventoryPage from "./pages/InventoryPage";
 import PaymentMethod from "./components/PaymentMethod";
+import EditAdminProfile from "./components/EditAdminProfile";
 import EditUserProfile from "./components/EditUserProfile";
 
 
@@ -86,7 +87,8 @@ export default function App() {
 				<Route path="/admin-signup/verify-account/:adminId/pending" element={<AdminPendingPage />}/>
 				<Route path="/dashboard"element={<ProtectedRoute element={DashBoard} adminOnly={true} />}/>
 				{/* nag rename ako at naga conflic dun sa client side */}
-				<Route path="/dashboard/setting/admin-profile/view"element={<ProtectedRoute element={AdminProfile} adminOnly={true} />}/> 
+				<Route path="/dashboard/setting/admin-profile/view"element={<ProtectedRoute element={AdminProfile} adminOnly={true} />}/>
+				<Route path="/dashboard/setting/admin-profile/edit"element={<ProtectedRoute element={EditAdminProfile} adminOnly={true} />}/> 
 				<Route path="/table"element={<ProtectedRoute element={ProductTable} adminOnly={true} />}/>
 				<Route path={`/furnitures/:id`}element={<ProtectedRoute element={ProductDetails} adminOnly={true} />}/>
 				<Route path={`/furnitures/edit/:furnitureId`} element={<ProtectedRoute element={EditProduct} adminOnly={true} />}/>
