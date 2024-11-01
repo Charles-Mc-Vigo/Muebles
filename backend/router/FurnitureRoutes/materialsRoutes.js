@@ -8,7 +8,7 @@ router.get('/',getMaterials);
 router.get('/:materialId',getSpecificMaterial);
 router.post('/add', checkAdminAuth, addMaterials);
 router.get('/archived',ArchivedMaterials);
-router.delete('/archived/:materialId', checkAdminAuth, ArchivingMaterials);
+router.post('/archive/:materialId', checkAdminAuth, ArchivingMaterials);
 router.post('/urachived/:materialId', checkAdminAuth, UnArchivingMaterials);
 router.put('/edit/:materialId', checkAdminAuth, editMaterial);
 

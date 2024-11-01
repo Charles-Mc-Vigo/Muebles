@@ -16,9 +16,9 @@ import ViewProduct from "../components/ViewProduct";
 import DashboardContent from "../components/DashboardContent";
 import Maintenance from "../components/Maintenance";
 import Logout from "../components/Logout";
-import Profile from "../../src/components/Profile";
 import HamburgerMenu from "../components/HamburgerMenu";
 import Notification from "../components/Notification";
+import ProductCustomization from "./ProductCustomization";
 import OrderManagement from "./OrderManagement";
 import TransactionHistory from "./TransactionHistory";
 import DeliveryManagement from "../DeliveryManagement";
@@ -101,12 +101,13 @@ const Dashboard = () => {
 
     "order-management": <OrderManagement />,
 
+		"product-customization": <ProductCustomization />,
     "track-delivery": (
       <h2 className="text-2xl font-semibold">Track Delivery Content</h2>
     ),
     "manage-delivery": <DeliveryManagement/> ,
 
-    Category: <Maintenance />,
+    Furniture: <Maintenance />,
 	
     Services: <ServiceSection />,
     "repair-hardware": (
@@ -169,6 +170,14 @@ const Dashboard = () => {
               onClick={() => setActiveSection("order-management")}
             />
 
+						{/* product customization */}
+						<NavItem
+							icon={faListUl}
+							label="Product Customization"
+							isActive={activeSection === "product-customization"}
+							onClick={() => setActiveSection("product-customization")}
+						/>
+
             {/* Inventory */}
             <NavItem
               icon={faBox}
@@ -230,8 +239,8 @@ const Dashboard = () => {
             {dropdowns.maintenance && (
               <ul className="ml-8 space-y-2">
                 <DropdownItem
-                  label="Category"
-                  section="Category"
+                  label="Furniture"
+                  section="Furniture"
                   currentSection={activeSection}
                   onClick={setActiveSection}
                 />

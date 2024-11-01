@@ -17,19 +17,13 @@ const userSchema = new mongoose.Schema({
     unique: true, 
     required: true
   },
-  streetAddress: { type: String, required: true },
-	municipality: { 
-    type: String, 
-    enum:["Boac","Gasan","Torrijos","Buenavista", "Mogpog","Santa_Cruz"],
-    required: true
-  },
-  barangay:{
-    type:String,
-    required:true
-  },
-  zipCode: {
-    type: Number
-  },
+  addresses:[{
+    addressStatus:{type:String},
+    municipality:{type:String},
+    barangay:{type:String},
+    streetAddress:{type:String},
+    zipCode:{type:Number},
+  }],
   email: { 
     type: String, 
     required: true, 

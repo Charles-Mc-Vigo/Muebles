@@ -26,10 +26,11 @@ const Cart = () => {
 				},
 				credentials: "include",
 			});
-			if (!response.ok) {
-				throw new Error("Failed to fetch cart items");
-			}
 			const data = await response.json();
+
+			if (!data.ok) {
+				toast.error(data.error)
+			}
 			if (data.cart && data.cart.items.length > 0) {
 				setItems(data.cart.items);
 				setCount(data.cart.count);
@@ -60,18 +61,17 @@ const Cart = () => {
 	const handleFileUpload = (event) => {
 		const file = event.target.files[0];
 		setProofOfPayment(file);
-		console.log(file);
 		setUploadMessage(`Selected file: ${file.name}`);
 	};
 
 	const checkout = async () => {
 		// Validate payment method and proof of payment
 		if (!selectedPaymentMethod) {
-			alert("Please select a payment method before checking out.");
+			toast.error("Please select a payment method before checking out.");
 			return;
 		}
 		if (!proofOfPayment) {
-			alert("Please upload proof of payment before checking out.");
+			toast.error("Please upload proof of payment before checking out.");
 			return;
 		}
 
@@ -83,21 +83,18 @@ const Cart = () => {
 		try {
 			const response = await fetch("http://localhost:3000/api/orders/create", {
 				method: "POST",
-				body: formData, // Send the FormData
+				body: formData,
 				credentials: "include",
 			});
 
-			if (!response.ok) {
-				const data = await response.json();
-				toast.error(data.message || "Failed to checkout.");
-				return;
-			}
-
 			const data = await response.json();
+
+			if (!data.ok) {
+				toast.error(data.error);
+			}
 			const orderId = data.order._id;
-			console.log(data);
 			navigate(`/order-details/${orderId}`);
-			await fetchCartItems(); // Refresh cart after checkout
+			await fetchCartItems();
 		} catch (error) {
 			setError(error.message);
 			setLoading(false);
@@ -107,9 +104,10 @@ const Cart = () => {
 	// Handle updating the quantity of an item in the cart
 	const updateQuantity = async (furnitureId, newQuantity) => {
 		if (newQuantity < 1) {
-			alert("Quantity cannot be less than 1");
+			toast.error("Quantity cannot be less than 1");
 			return;
 		}
+
 		try {
 			const response = await fetch("http://localhost:3000/api/cart", {
 				method: "PUT",
@@ -128,7 +126,7 @@ const Cart = () => {
 			fetchCartItems(); // Refresh cart after updating quantity
 		} catch (error) {
 			console.error("Error updating quantity:", error);
-			alert("Error updating quantity");
+			toast.error("Error updating quantity");
 		}
 	};
 
@@ -148,7 +146,7 @@ const Cart = () => {
 			fetchCartItems();
 		} catch (error) {
 			console.error("Error removing item:", error);
-			alert("Error removing item");
+			toast.error("Error removing item");
 		}
 	};
 
@@ -165,7 +163,7 @@ const Cart = () => {
 			fetchCartItems();
 		} catch (error) {
 			console.error("Error clearing cart:", error);
-			alert("Error clearing cart");
+			toast.error("Error clearing cart");
 		}
 	};
 
@@ -224,29 +222,43 @@ const Cart = () => {
 													<p className="text-gray-600">
 														Price: ₱{item.furnitureId.price}
 													</p>
+													<p className="text-gray-600">
+														Stocks : {item.furnitureId.stocks}
+													</p>
 												</div>
 												<div className="flex items-center">
 													<button
 														className="px-3 py-1 border border-gray-400"
-														onClick={() =>
-															updateQuantity(
-																item.furnitureId._id,
-																item.quantity - 1
-															)
-														}
-														disabled={item.quantity <= 1}
+														onClick={() => {
+															if (item.quantity < 1) {
+																toast.error("Quantity cannot be less than zero.");
+															} else {
+																updateQuantity(
+																	item.furnitureId._id,
+																	item.quantity - 1
+																);
+															}
+														}}
 													>
 														-
 													</button>
 													<span className="px-4">{item.quantity}</span>
 													<button
 														className="px-3 py-1 border border-gray-400"
-														onClick={() =>
-															updateQuantity(
-																item.furnitureId._id,
-																item.quantity + 1
-															)
-														}
+														onClick={() => {
+															if (
+																item.furnitureId.stocks <= item.quantity
+															) {
+																toast.error(
+																	"Cannot increase quantity. Available stock is insufficient."
+																);
+															} else {
+																updateQuantity(
+																	item.furnitureId._id,
+																	item.quantity + 1
+																);
+															}
+														}}
 													>
 														+
 													</button>

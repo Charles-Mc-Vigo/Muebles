@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { IoMdArrowRoundBack } from "react-icons/io";
 import { useNavigate, useParams } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const OrderDetails = () => {
 	const { orderId } = useParams();
@@ -16,19 +18,21 @@ const OrderDetails = () => {
 				{
 					method: "GET",
 					credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
+					headers: {
+						"Content-Type": "application/json",
+					},
 				}
 			);
 			if (!response.ok) {
-				throw new Error("Failed to fetch order details");
+				const errorData = await response.json();
+				toast.error(errorData.error || "Failed to fetch order details.");
+				return;
 			}
-			const orderData = await response.json();
-			console.log(orderData); // Log the order data
-			setOrder(orderData.order);
+			const data = await response.json();
+			setOrder(data);
 		} catch (error) {
 			console.log("Error fetching order", error);
+			toast.error("An error occurred while fetching order details.");
 		} finally {
 			setLoading(false);
 		}
@@ -59,7 +63,7 @@ const OrderDetails = () => {
 	return (
 		<div className="max-w-4xl mx-auto p-8 bg-white shadow-md rounded-md mt-10">
 			<div className="flex items-center justify-between mb-6">
-				<button onClick={() => navigate(-2)} className="text-gray-500">
+				<button onClick={() => navigate(-1)} className="text-gray-500">
 					<IoMdArrowRoundBack size={30} />
 				</button>
 				<h1 className="text-3xl font-bold text-green-700 text-center flex-grow">
@@ -87,20 +91,16 @@ const OrderDetails = () => {
 					</div>
 					<div>
 						<p>
-							<span className="font-semibold text-gray-800">
-								Payment Method:
-							</span>{" "}
+							<span className="font-semibold text-gray-800">Payment Method:</span>{" "}
 							{order.paymentMethod || "N/A"}
 						</p>
 						<p>
 							<span className="font-semibold text-gray-800">Status:</span>{" "}
-							<span
-								className={`${
-									order.orderStatus === "pending"
-										? "text-yellow-600"
-										: "text-green-700"
-								} font-semibold`}
-							>
+							<span className={`${
+								order.orderStatus === "pending"
+									? "text-yellow-600"
+									: "text-green-700"
+							} font-semibold`}>
 								{order.orderStatus}
 							</span>
 						</p>
@@ -166,20 +166,18 @@ const OrderDetails = () => {
 							<h3 className="text-xl font-semibold text-green-700 mb-2">
 								Thank You for Your Purchase!
 							</h3>
-              <br />
 							<p className="text-gray-700 mb-2">
 								We greatly appreciate your business and trust in our products.
 							</p>
 							<p className="text-gray-700">
-								Your payment is being process at the moment. You will recieve order confirmation in your Muebles account after the payment process.
-								We'll keep you updated on its status.
+								Your payment is being processed at the moment. You will receive order confirmation in your Muebles account after the payment process. We'll keep you updated on its status.
 							</p>
-              <br />
-              <p>Have a good day!</p>
+							<p>Have a good day!</p>
 						</div>
 					</div>
 				</div>
 			)}
+			<ToastContainer />
 		</div>
 	);
 };

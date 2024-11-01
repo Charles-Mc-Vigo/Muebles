@@ -1,5 +1,5 @@
 const express = require('express');
-const { getSizes, addSize, getSizeById, GetAllSizes } = require('../../controllers/FurnitureControllers/sizeController');
+const { getSizes, addSize, getSizeById, GetAllSizes, ArchiveSize, UpdateSize} = require('../../controllers/FurnitureControllers/sizeController');
 const router = express.Router();
 const {checkAdminAuth} = require('../../middlewares/checkAuth');
 
@@ -15,6 +15,11 @@ router.get('/',GetAllSizes);
 // Get a specific size by ID
 router.get('/size/:sizeId', checkAdminAuth, getSizeById);
 
-//put and delete operation is missing
+router.post('/archive/:sizeId',checkAdminAuth,ArchiveSize);
+
+router.put('/:sizeId',checkAdminAuth,UpdateSize);
+
+
+
 
 module.exports = router;

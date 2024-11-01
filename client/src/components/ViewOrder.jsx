@@ -67,7 +67,7 @@ const ViewOrder = () => {
 							<div className="flex items-center justify-between mb-4">
 								<h2 className="text-lg font-semibold text-gray-800 flex items-center">
 									<FaBoxOpen className="mr-2 text-blue-500" /> Order ID:{" "}
-									{order._id}
+									{order.orderNumber}
 								</h2>
 								<span
 									className={`px-3 py-1 text-sm rounded-full flex items-center ${

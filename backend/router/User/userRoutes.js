@@ -13,7 +13,9 @@ const {
   verifyPRCode,
   createNewPswd,
   getUserId,
-  getAllUsers
+  getAllUsers,
+  AddNewAddress,
+  GetUserAddresses
 } = require("../../controllers/User/userController")
 const {checkUserAuth, checkAdminAuth} = require('../../middlewares/checkAuth');
 
@@ -21,20 +23,32 @@ const multer = require('multer');
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-router.get('/:userId',getUserId);
+// Auth routes
 router.post("/signup", SignUp);
 router.post("/login", LogIn);
-router.get('/unconfirmed/:userId',unconfirmedUser);
-router.post('/verify-email/:userId', verifyEmail);
-router.post('/resend-verification/:userId',resendVerificationCode);
+router.post("/logout", checkUserAuth, Logout);
 
-// password reset
-router.get('/', checkAdminAuth, getAllUsers)
-router.post('/password-reset/request', passwordReset)
+// Email verification routes
+router.get('/unconfirmed/:userId', unconfirmedUser);
+router.post('/verify-email/:userId', verifyEmail);
+router.post('/resend-verification/:userId', resendVerificationCode);
+
+// Password reset routes
+router.post('/password-reset/request', passwordReset);
 router.post('/password-reset/verify/:userId', verifyPRCode);
 router.post('/password-reset/new-password/:userId', createNewPswd);
-router.get('/setting/my-profile/view',checkUserAuth,ViewProfile);
-router.put('/setting/my-profile/update', checkUserAuth,upload.single('image'),UpdateUserInformation);
-router.post("/logout", checkUserAuth, Logout);
+
+// Profile routes
+router.get('/setting/my-profile/view', checkUserAuth, ViewProfile);
+router.put('/setting/my-profile/update', checkUserAuth, upload.single('image'), UpdateUserInformation);
+
+// Address routes
+router.get('/addresses', checkUserAuth, GetUserAddresses);
+router.post('/addresses/new', checkUserAuth, AddNewAddress);
+
+// Admin routes
+router.get('/', checkAdminAuth, getAllUsers);
+
+router.get('/:userId', getUserId);
 
 module.exports = router;

@@ -102,7 +102,7 @@ exports.getSizeById = async (req, res) => {
 
 exports.GetAllSizes = async (req,res) =>{
   try {
-    const allSizes = await Size.find();
+    const allSizes = await Size.find({isArchived:false});
     if(allSizes.length === 0){
       return res.status(200).json({message:"No sizes found! Please create one"})
     }
@@ -111,4 +111,57 @@ exports.GetAllSizes = async (req,res) =>{
     console.log("Error fetching all sizes: ", error);
     res.status(500).json("Server error!")
   }
+}
+
+exports.UpdateSize = async (req, res) => {
+	try {
+		const { sizeId } = req.params;
+		const existingSize = await Size.findById(sizeId);
+
+		if (!existingSize) return res.status(404).json({ message: "Size not found!" });
+
+		const { label, height, width, depth } = req.body;
+
+		// Check if no fields were provided in the request body
+		if (label === undefined && height === undefined && width === undefined && depth === undefined) {
+			return res.status(400).json({ message: "At least one field is required to update: label, height, width, or depth" });
+		}
+
+		// Only update fields that are provided in the request body
+		if (label !== undefined && existingSize.label !== label) existingSize.label = label;
+		if (height !== undefined && existingSize.height !== height) existingSize.height = height;
+		if (width !== undefined && existingSize.width !== width) existingSize.width = width;
+		if (depth !== undefined && existingSize.depth !== depth) existingSize.depth = depth;
+
+		// Check if any changes were made
+		if (
+			existingSize.label === label &&
+			existingSize.height === height &&
+			existingSize.width === width &&
+			existingSize.depth === depth
+		) {
+			return res.status(400).json({ message: "No changes made!" });
+		}
+
+		await existingSize.save();
+		res.status(200).json({ message: `${existingSize.label} has been modified` });
+	} catch (error) {
+		console.error("Error in updating the size: ", error);
+		res.status(500).json({ message: "Server error!" });
+	}
+};
+
+
+exports.ArchiveSize = async (req,res) => {
+	try {
+		const {sizeId} = req.params;
+		const existingSize = await Size.findById(sizeId);
+		if(!existingSize) return res.status(404).json({message:"Size not found!"});
+		existingSize.isArchived=true
+		await existingSize.save();
+		res.status(200).json({message:`${existingSize.label} has been archived`})
+	} catch (error) {
+		console.error("Error in archiving size: ",error);
+		res.status(500).json({message:"Server error!"})
+	}
 }

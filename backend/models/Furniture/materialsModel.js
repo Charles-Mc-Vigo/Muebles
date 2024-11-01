@@ -6,7 +6,7 @@ const materialSchema = new mongoose.Schema({
     required:true,
     unique:true
   },
-  quantity:{
+  stocks:{
     type:Number,
     required:true
   },

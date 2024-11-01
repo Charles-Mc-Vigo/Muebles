@@ -14,7 +14,6 @@ const furnitureTypeRoutes = require('../backend/router/FurnitureRoutes/furniture
 const materialsRoutes = require('./router/FurnitureRoutes/materialsRoutes')
 const colorRoutes = require('../backend/router/FurnitureRoutes/colorRoutes');
 const sizeRoutes = require('../backend/router/FurnitureRoutes/sizeRoutes');
-const stocksRoutes = require('../backend/router/FurnitureRoutes/stocksRoutes');
 
 //Users
 const userRoutes = require('../backend/router/User/userRoutes')
@@ -82,7 +81,6 @@ app.use("/api/furniture-types", furnitureTypeRoutes);
 app.use("/api/materials",materialsRoutes)
 app.use("/api/colors",colorRoutes)
 app.use("/api/sizes",sizeRoutes)
-app.use("/api/stocks",stocksRoutes)
 
 // Cart
 app.use('/api/cart', cartRoutes);
