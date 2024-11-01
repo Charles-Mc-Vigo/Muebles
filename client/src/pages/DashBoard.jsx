@@ -16,6 +16,7 @@ import ViewProduct from "../components/ViewProduct";
 import DashboardContent from "../components/DashboardContent";
 import Maintenance from "../components/Maintenance";
 import Logout from "../components/Logout";
+import Profile from "../components/AdminProfile";
 import HamburgerMenu from "../components/HamburgerMenu";
 import Notification from "../components/Notification";
 import ProductCustomization from "./ProductCustomization";
