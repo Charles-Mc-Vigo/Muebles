@@ -5,7 +5,7 @@ import "react-toastify/dist/ReactToastify.css";
 import Header from "./Header";
 import Footer from "./Footer";
 
-const UserProfile = () => {
+const EditUserProfile = () => {
   const navigate = useNavigate(); // Initialize useNavigate
   const [profile, setProfile] = useState({});
   const [error, setError] = useState(null);
@@ -495,4 +495,4 @@ const UserProfile = () => {
   );
 };
 
-export default UserProfile;
+export default EditUserProfile;
