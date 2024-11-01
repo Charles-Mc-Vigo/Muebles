@@ -15,63 +15,62 @@ function ViewProduct() {
 	const [showDropdown, setShowDropdown] = useState(false);
 
 
-	const fetchFurniture = async () => {
-		try {
-			const response = await fetch(`http://localhost:3000/api/furnitures`, {
-				method: "GET",
-				credentials: "include",
-			});
-
-			const data = await response.json();
-			setFurnitureData(data);
-			await fetchFurniture();
-		} catch (error) {
-			setError(error.message);
-		} finally {
-			setLoading(false);
-		}
-	};
-
-	const fetchArchivedFurnitures = async () => {
-		try {
-			const response = await fetch(
-				`http://localhost:3000/api/furnitures/archived`,
-				{
-					method: "GET",
-					credentials: "include",
-				}
-			);
-
-			const data = await response.json();
-			setArchivedFurnitures(data);
-			await fetchArchivedFurnitures();
-		} catch (error) {
-			setError(error.message);
-		} finally {
-			setLoading(false);
-		}
-	};
-
-	const fetchArchivedCategories = async () => {
-		try {
-			const response = await fetch(
-				`http://localhost:3000/api/categories/archived`,
-				{
-					method: "GET",
-					credentials: "include",
-				}
-			);
-
-			const data = await response.json();
-			setArchivedCategories(data);
-		} catch (error) {
-			setError(error.message);
-		} finally {
-			setLoading(false);
-		}
-	};
 
 	useEffect(() => {
+		const fetchFurniture = async () => {
+			try {
+				const response = await fetch(`http://localhost:3000/api/furnitures`, {
+					method: "GET",
+					credentials: "include",
+				});
+	
+				const data = await response.json();
+				setFurnitureData(data);
+			} catch (error) {
+				setError(error.message);
+			} finally {
+				setLoading(false);
+			}
+		};
+	
+		const fetchArchivedFurnitures = async () => {
+			try {
+				const response = await fetch(
+					`http://localhost:3000/api/furnitures/archived`,
+					{
+						method: "GET",
+						credentials: "include",
+					}
+				);
+	
+				const data = await response.json();
+				setArchivedFurnitures(data);
+			} catch (error) {
+				setError(error.message);
+			} finally {
+				setLoading(false);
+			}
+		};
+	
+		const fetchArchivedCategories = async () => {
+			try {
+				const response = await fetch(
+					`http://localhost:3000/api/categories/archived`,
+					{
+						method: "GET",
+						credentials: "include",
+					}
+				);
+	
+				const data = await response.json();
+				setArchivedCategories(data);
+			} catch (error) {
+				setError(error.message);
+			} finally {
+				setLoading(false);
+			}
+		};
+		
 		fetchFurniture();
 		fetchArchivedFurnitures();
 		fetchArchivedCategories();

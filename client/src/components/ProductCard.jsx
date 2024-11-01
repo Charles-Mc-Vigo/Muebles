@@ -1,7 +1,5 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 
 const ProductCard = ({
 	id,
@@ -38,14 +36,15 @@ const ProductCard = ({
 				}
 			);
 			const data = await response.json();
-			if (!data.ok){
-				toast.error(data.error)
+			if (!data.ok) {
+				alert(data.error);
+			} else {
+				alert(data.success);
+				onArchiveSuccess(); // Trigger update in parent component
 			}
-			toast.success(data.success);
-			onArchiveSuccess(); // Trigger update in parent component
 		} catch (error) {
 			console.error("Error archiving item:", error);
-			toast.error("Error archiving item. Please try again.");
+			alert("Error archiving item. Please try again.");
 		}
 	};
 
@@ -65,13 +64,13 @@ const ProductCard = ({
 			);
 			const data = await response.json();
 			if (!data.ok) {
-				toast.error(data.error)
+				alert(data.error);
+			} else {
+				alert(data.success);
+				onUnArchiveSuccess();
 			}
-			console.log("Item unarchived successfully:", data); // Optionally handle success
-			toast.success(data.success);
-			onUnArchiveSuccess();
 		} catch (error) {
-			console.error("Error unarchiving item:", error); // Optionally handle error
+			console.error("Error unarchiving item:", error);
 			alert("Error unarchiving item. Please try again.");
 		}
 	};
@@ -99,7 +98,7 @@ const ProductCard = ({
 			<div className="mt-4 flex flex-col">
 				{showAddToCart && (
 					<Link
-					to={`/direct-order/${id}`}
+						to={`/direct-order/${id}`}
 						className="bg-green-600 hover:bg-green-700 text-white py-2 rounded-md transition-colors duration-300 text-center w-full"
 					>
 						Buy
@@ -131,7 +130,6 @@ const ProductCard = ({
 					</button>
 				)}
 			</div>
-			<ToastContainer/>
 		</Link>
 	);
 };

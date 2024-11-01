@@ -47,7 +47,7 @@ exports.getAllFurnitures = async (req, res) => {
 		res.status(200).json(furnitures);
 	} catch (error) {
 		console.error(error);
-		res.status(500).json({ message: "Server error!" });
+		res.status(500).json({ error: "Server error!" });
 	}
 };
 
@@ -70,7 +70,7 @@ exports.ArchivedFurnitures = async (req, res) => {
 			res.status(200).json(archivedFurnitures);
 	} catch (error) {
 			console.error("Error displaying archived furnitures: ", error);
-			res.status(500).json({ message: "Server error!" });
+			res.status(500).json({ error: "Server error!" });
 	}
 };
 
