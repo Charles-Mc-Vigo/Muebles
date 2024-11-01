@@ -83,7 +83,7 @@ const UserProfile = () => {
   // Content mapping for the active section
   const contentMap = {
     manageAccount: (
-      <div className="flex flex-col md:flex-row gap-8 w-full">
+      <div className="flex flex-col lg:flex-row gap-8 w-full">
         <div className="flex-1 p-6 bg-white border rounded-lg shadow flex flex-col">
           <h2 className="font-bold text-lg">
             Personal Profile
@@ -159,7 +159,7 @@ const UserProfile = () => {
           My profile
         </h1>
 
-        <div className="profile-details grid grid-cols-2 gap-6 mb-8">
+        <div className="profile-details grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           <div>
             <p className="text-sm text-gray-500">Full Name</p>
             <p className="text-lg font-medium text-gray-800">
@@ -206,7 +206,7 @@ const UserProfile = () => {
       </div>
     ),
     addressBook: (
-      <div className="p-6 bg-white border rounded-lg shadow-lg">
+      <div className="p-6 bg-white border rounded-lg shadow-lg overflow-auto">
         <h2 className="font-bold text-2xl mb-4">Address</h2>
         <div className="overflow-x-auto">
           <table className="min-w-full table-auto border-collapse">
@@ -215,9 +215,7 @@ const UserProfile = () => {
                 <th className="px-4 py-2 text-left font-semibold">Full Name</th>
                 <th className="px-4 py-2 text-left font-semibold">Address</th>
                 <th className="px-4 py-2 text-left font-semibold">Location</th>
-                <th className="px-4 py-2 text-left font-semibold">
-                  Phone Number
-                </th>
+                <th className="px-4 py-2 text-left font-semibold">Phone Number</th>
                 <th className="px-4 py-2 text-left font-semibold">Actions</th>
               </tr>
             </thead>
@@ -245,16 +243,14 @@ const UserProfile = () => {
         </button>
       </div>
     ),
-  
-    "myOrders": <OrderDetails />,
+    myOrders: <OrderDetails />,
   };
 
   return (
-    // Main component layout
     <div>
       <Header />
-      <div className="flex my-8 p-6 bg-gray-100 w-full border rounded-lg shadow-lg">
-        <aside className="w-1/4 bg-white border-r border-gray-200 mr-5 rounded-md">
+      <div className="flex flex-col lg:flex-row my-8 p-5 bg-gray-100 w-full border rounded-lg shadow-lg">
+        <aside className="w-full lg:w-1/4 bg-white border-r border-gray-200 mb-5 lg:mb-0 mr-5 rounded-md">
           <nav className="space-y-4 text-gray-700 p-4">
             <button
               onClick={() => setActiveSection("manageAccount")}
@@ -286,17 +282,6 @@ const UserProfile = () => {
             >
               Address
             </button>
-            {/* Optional */}
-            {/* <button
-              onClick={() => setActiveSection("paymentOptions")}
-              className={`block ${
-                activeSection === "paymentOptions"
-                  ? "text-teal-600"
-                  : "hover:text-teal-600"
-              }`}
-            >
-              My Payment Options
-            </button> */}
             <button
               onClick={() => setActiveSection("myOrders")}
               className={`block font-bold ${
@@ -307,9 +292,6 @@ const UserProfile = () => {
             >
               My Orders
             </button>
-            {/* Optional nalang tangina */}
-            {/* <button className="block hover:text-teal-600">My Returns</button>
-            <button className="block hover:text-teal-600">My Cancellations</button> */}
           </nav>
         </aside>
         <main className="flex-1">{contentMap[activeSection]}</main>
