@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBars, faUser, faCog, faSignOutAlt, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
+import Logout from "../components/Logout";
 
 const HamburgerMenu = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -41,6 +43,8 @@ const HamburgerMenu = () => {
         <div>
             <button onClick={toggleMenu} className="text-gray-800 p-2">
                 <FontAwesomeIcon icon={faBars} />
+            <button onClick={toggleMenu} className="text-gray-800 p-2">
+                <FontAwesomeIcon icon={faBars} />
             </button>
 
             {isOpen && (
@@ -58,30 +62,28 @@ const HamburgerMenu = () => {
                                 <p>{error}</p>
                             ) : profile ? (
                                 <div className="text-center">
-                                    <p className="text-lg font-semibold mb-2">JCKAME</p>
+                                    <p className="text-2xl text-teal-600 font-semibold mb-5">JCKAME</p>
                                     <img
                                         src={profile?.avatarUrl || "/default-avatar.png"}
                                         alt="Profile"
-                                        className="w-20 h-20 rounded-full mb-2"
+                                        className="w-32 h-32 rounded-full mb-2 border-2"
                                     />
-                                    <p className="text-sm text-gray-500">{profile.role}</p>
+                                    <p className="text-lg text-black">{profile.role}</p>
                                 </div>
                             ) : null}
                         </div>
 
                         <nav className="space-y-4">
-                            <Link to="/profile" className="flex items-center space-x-2 text-gray-700">
                                 <FontAwesomeIcon icon={faUser} />
-                                <span>Profile</span>
-                            </Link>
-                            <Link to="/dashboard/setting/admin-profile/view" className="flex items-center space-x-2 text-gray-700">
+                                <span className="ml-2">Profile</span>
+                           
+                            <Link to="/dashboard/setting/admin-profile/view" className="flex items-center space-x-2 text-gray-700 hover:text-teal-600">
                                 <FontAwesomeIcon icon={faCog} />
                                 <span>Settings</span>
                             </Link>
-                            <Link to="/logout" className="flex items-center space-x-2 text-gray-700">
-                                <FontAwesomeIcon icon={faSignOutAlt} />
-                                <span>Logout</span>
-                            </Link>
+                            <div className="w-full mt-auto flex justify-center items-center py-4">
+                                <Logout isAdmin={true} />
+                            </div>
                         </nav>
                     </div>
                 </div>
