@@ -4,230 +4,230 @@ import "react-toastify/dist/ReactToastify.css";
 import { ClipLoader } from "react-spinners";
 
 const ProductManagement = () => {
-	const [loading, setLoading] = useState(true);
-	const [furnitureData, setFurnitureData] = useState([]);
-	const [selectedCategory, setSelectedCategory] = useState("");
-	const [selectedFurnitureType, setSelectedFurnitureType] = useState("");
-	const [categories, setCategories] = useState([]);
-	const [filteredFurnitureTypes, setFilteredFurnitureTypes] = useState([]);
-	const [filteredSizes, setFilteredSizes] = useState([]);
-	const [furnitureTypes, setFurnitureTypes] = useState([]);
-	const [materials, setMaterials] = useState([]);
-	const [colors, setColors] = useState([]);
-	const [sizes, setSizes] = useState([]);
-	const [newFurniture, setNewFurniture] = useState({
-		images: [],
-		name: "",
-		category: "",
-		furnitureType: "",
-		description: "",
-		materials: [],
-		colors: [],
-		sizes: [],
-		stocks: "",
-		price: "",
-	});
+  const [loading, setLoading] = useState(true);
+  const [furnitureData, setFurnitureData] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedFurnitureType, setSelectedFurnitureType] = useState("");
+  const [categories, setCategories] = useState([]);
+  const [filteredFurnitureTypes, setFilteredFurnitureTypes] = useState([]);
+  const [filteredSizes, setFilteredSizes] = useState([]);
+  const [furnitureTypes, setFurnitureTypes] = useState([]);
+  const [materials, setMaterials] = useState([]);
+  const [colors, setColors] = useState([]);
+  const [sizes, setSizes] = useState([]);
+  const [newFurniture, setNewFurniture] = useState({
+    images: [],
+    name: "",
+    category: "",
+    furnitureType: "",
+    description: "",
+    materials: [],
+    colors: [],
+    sizes: [],
+    stocks: "",
+    price: "",
+  });
 
-	const fetchData = async () => {
-		setLoading(true);
-		try {
-			const [
-				furnitureResponse,
-				furnitureTypesResponse,
-				categoriesResponse,
-				materialsResponse,
-				colorsResponse,
-				sizesResponse,
-			] = await Promise.all([
-				fetch("http://localhost:3000/api/furnitures"),
-				fetch("http://localhost:3000/api/furniture-types"),
-				fetch("http://localhost:3000/api/categories"),
-				fetch("http://localhost:3000/api/materials"),
-				fetch("http://localhost:3000/api/colors"),
-				fetch("http://localhost:3000/api/sizes"),
-			]);
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const [
+        furnitureResponse,
+        furnitureTypesResponse,
+        categoriesResponse,
+        materialsResponse,
+        colorsResponse,
+        sizesResponse,
+      ] = await Promise.all([
+        fetch("http://localhost:3000/api/furnitures"),
+        fetch("http://localhost:3000/api/furniture-types"),
+        fetch("http://localhost:3000/api/categories"),
+        fetch("http://localhost:3000/api/materials"),
+        fetch("http://localhost:3000/api/colors"),
+        fetch("http://localhost:3000/api/sizes"),
+      ]);
 
-			if (
-				!furnitureResponse.ok ||
-				!furnitureTypesResponse.ok ||
-				!categoriesResponse.ok ||
-				!materialsResponse.ok ||
-				!colorsResponse.ok ||
-				!sizesResponse.ok
-			) {
-				throw new Error("Failed to fetch some data");
-			}
+      if (
+        !furnitureResponse.ok ||
+        !furnitureTypesResponse.ok ||
+        !categoriesResponse.ok ||
+        !materialsResponse.ok ||
+        !colorsResponse.ok ||
+        !sizesResponse.ok
+      ) {
+        throw new Error("Failed to fetch some data");
+      }
 
-			const furnitureData = await furnitureResponse.json();
-			const furnitureTypesData = await furnitureTypesResponse.json();
-			const categoriesData = await categoriesResponse.json();
-			const materialsData = await materialsResponse.json();
-			const colorsData = await colorsResponse.json();
-			const sizesData = await sizesResponse.json();
+      const furnitureData = await furnitureResponse.json();
+      const furnitureTypesData = await furnitureTypesResponse.json();
+      const categoriesData = await categoriesResponse.json();
+      const materialsData = await materialsResponse.json();
+      const colorsData = await colorsResponse.json();
+      const sizesData = await sizesResponse.json();
 
-			setFurnitureData(furnitureData || []);
-			setCategories(categoriesData || []);
-			setMaterials(materialsData || []);
-			setColors(colorsData || []);
-			setSizes(sizesData || []);
-			setFurnitureTypes(furnitureTypesData || []);
-		} catch (error) {
-			console.error("Error fetching data:", error);
-			toast.error("Error fetching data");
-		} finally {
-			setLoading(false);
-		}
-	};
+      setFurnitureData(furnitureData || []);
+      setCategories(categoriesData || []);
+      setMaterials(materialsData || []);
+      setColors(colorsData || []);
+      setSizes(sizesData || []);
+      setFurnitureTypes(furnitureTypesData || []);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      toast.error("Error fetching data");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-	useEffect(() => {
-		fetchData();
-	}, []);
+  useEffect(() => {
+    fetchData();
+  }, []);
 
-	const handleCategoryChange = (e) => {
-		const categoryId = e.target.value;
-		setSelectedCategory(categoryId);
-		setNewFurniture((prev) => ({
-			...prev,
-			category: categoryId,
-			furnitureType: "",
-		}));
-		setSelectedFurnitureType("");
-		const filteredTypes = furnitureTypes.filter(
-			(type) => type.categoryId === categoryId
-		);
-		setFilteredFurnitureTypes(filteredTypes);
-	};
+  const handleCategoryChange = (e) => {
+    const categoryId = e.target.value;
+    setSelectedCategory(categoryId);
+    setNewFurniture((prev) => ({
+      ...prev,
+      category: categoryId,
+      furnitureType: "",
+    }));
+    setSelectedFurnitureType("");
+    const filteredTypes = furnitureTypes.filter(
+      (type) => type.categoryId === categoryId
+    );
+    setFilteredFurnitureTypes(filteredTypes);
+  };
 
-	const handleFurnitureTypeChange = (e) => {
-		const furnitureTypeId = e.target.value;
-		setSelectedFurnitureType(furnitureTypeId);
-		setNewFurniture((prev) => ({
-			...prev,
-			furnitureType: furnitureTypeId,
-		}));
-		const filtered = sizes.filter(
-			(size) => size.furnitureTypeId === furnitureTypeId
-		);
-		setFilteredSizes(filtered);
-	};
+  const handleFurnitureTypeChange = (e) => {
+    const furnitureTypeId = e.target.value;
+    setSelectedFurnitureType(furnitureTypeId);
+    setNewFurniture((prev) => ({
+      ...prev,
+      furnitureType: furnitureTypeId,
+    }));
+    const filtered = sizes.filter(
+      (size) => size.furnitureTypeId === furnitureTypeId
+    );
+    setFilteredSizes(filtered);
+  };
 
-	const handleInputChange = (e) => {
-		const { name, value, type, checked } = e.target;
-		if (name === "price" && value < 0) {
-			toast.error("Price cannot be negative");
-			return;
-		}
-		if (type === "checkbox") {
-			if (name === "material") {
-				setNewFurniture((prev) => ({
-					...prev,
-					materials: checked
-						? [...prev.materials, value]
-						: prev.materials.filter((material) => material !== value),
-				}));
-			} else if (name === "color") {
-				setNewFurniture((prev) => ({
-					...prev,
-					colors: checked
-						? [...prev.colors, value]
-						: prev.colors.filter((color) => color !== value),
-				}));
-			} else if (name === "sizes") {
-				setNewFurniture((prev) => ({
-					...prev,
-					sizes: checked
-						? [...prev.sizes, value]
-						: prev.sizes.filter((size) => size !== value),
-				}));
-			}
-		} else {
-			setNewFurniture((prev) => ({
-				...prev,
-				[name]: value,
-			}));
-		}
-	};
+  const handleInputChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    if (name === "price" && value < 0) {
+      toast.error("Price cannot be negative");
+      return;
+    }
+    if (type === "checkbox") {
+      if (name === "material") {
+        setNewFurniture((prev) => ({
+          ...prev,
+          materials: checked
+            ? [...prev.materials, value]
+            : prev.materials.filter((material) => material !== value),
+        }));
+      } else if (name === "color") {
+        setNewFurniture((prev) => ({
+          ...prev,
+          colors: checked
+            ? [...prev.colors, value]
+            : prev.colors.filter((color) => color !== value),
+        }));
+      } else if (name === "sizes") {
+        setNewFurniture((prev) => ({
+          ...prev,
+          sizes: checked
+            ? [...prev.sizes, value]
+            : prev.sizes.filter((size) => size !== value),
+        }));
+      }
+    } else {
+      setNewFurniture((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
+  };
 
-	const handleFileChange = (e) => {
-		const files = Array.from(e.target.files);
+  const handleFileChange = (e) => {
+    const files = Array.from(e.target.files);
 
-		if (files.length > 5) {
-			toast.error("You can only upload a maximum of 5 images.");
-			return;
-		}
+    if (files.length > 5) {
+      toast.error("You can only upload a maximum of 5 images.");
+      return;
+    }
 
-		const readFileAsDataURL = (file) => {
-			return new Promise((resolve, reject) => {
-				const reader = new FileReader();
-				reader.onloadend = () => {
-					resolve(reader.result.split(",")[1]); // Get base64 data
-				};
-				reader.onerror = reject;
-				reader.readAsDataURL(file);
-			});
-		};
+    const readFileAsDataURL = (file) => {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          resolve(reader.result.split(",")[1]); // Get base64 data
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    };
 
-		Promise.all(files.map(readFileAsDataURL))
-			.then((base64Images) => {
-				setNewFurniture((prev) => ({
-					...prev,
-					images: base64Images,
-				}));
-			})
-			.catch((error) => {
-				console.error("Error reading files:", error);
-				toast.error("Failed to read files");
-			});
-	};
+    Promise.all(files.map(readFileAsDataURL))
+      .then((base64Images) => {
+        setNewFurniture((prev) => ({
+          ...prev,
+          images: base64Images,
+        }));
+      })
+      .catch((error) => {
+        console.error("Error reading files:", error);
+        toast.error("Failed to read files");
+      });
+  };
 
-	const handleSubmit = async (e) => {
-		e.preventDefault();
-		try {
-			const response = await fetch("http://localhost:3000/api/furnitures/add", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-                credentials: "include",
-				body: JSON.stringify({
-					images: newFurniture.images,
-					name: newFurniture.name,
-					category: newFurniture.category,
-					furnitureType: newFurniture.furnitureType,
-					description: newFurniture.description,
-					materials: newFurniture.materials,
-					colors: newFurniture.colors,
-					sizes: newFurniture.sizes,
-					stocks: newFurniture.stocks,
-					price: newFurniture.price,
-				}),
-			});
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await fetch("http://localhost:3000/api/furnitures/add", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          images: newFurniture.images,
+          name: newFurniture.name,
+          category: newFurniture.category,
+          furnitureType: newFurniture.furnitureType,
+          description: newFurniture.description,
+          materials: newFurniture.materials,
+          colors: newFurniture.colors,
+          sizes: newFurniture.sizes,
+          stocks: newFurniture.stocks,
+          price: newFurniture.price,
+        }),
+      });
 
-			if (response.ok) {
-				const data = await response.json();
-				toast.success(data.message);
-				setNewFurniture({
-					images: [],
-					name: "",
-					category: "",
-					furnitureType: "",
-					description: "",
-					materials: [],
-					colors: [],
-					sizes: [],
-					stocks: "",
-					price: "",
-				});
-				fetchData(); // Refresh the furniture list
-			} else {
-				const errorData = await response.json(); // Make sure the server returns JSON even on error
-				toast.error(errorData.message || "Failed to add furniture");
-			}
-		} catch (error) {
-			console.error("Error adding new Furniture:", error);
-			toast.error("Failed to add new Furniture");
-		}
-	};
+      if (response.ok) {
+        const data = await response.json();
+        toast.success(data.message);
+        setNewFurniture({
+          images: [],
+          name: "",
+          category: "",
+          furnitureType: "",
+          description: "",
+          materials: [],
+          colors: [],
+          sizes: [],
+          stocks: "",
+          price: "",
+        });
+        fetchData(); // Refresh the furniture list
+      } else {
+        const errorData = await response.json(); // Make sure the server returns JSON even on error
+        toast.error(errorData.message || "Failed to add furniture");
+      }
+    } catch (error) {
+      console.error("Error adding new Furniture:", error);
+      toast.error("Failed to add new Furniture");
+    }
+  };
 
 	return (
 		<div className="container mx-auto p-4">
@@ -312,59 +312,59 @@ const ProductManagement = () => {
 							className="border rounded p-2 w-full"
 						/>
 
-						<div className="mt-4 mb-4 bg-slate-200 rounded-md px-5 py-2">
-							<label className="block font-semibold">Materials:</label>
-							<div className="flex flex-wrap">
-								{materials.map((material) => (
-									<label
-										key={material._id}
-										className="flex items-center w-1/3 p-2"
-									>
-										<input
-											type="checkbox"
-											name="material"
-											value={material.name}
-											checked={newFurniture.materials.includes(material.name)}
-											onChange={handleInputChange}
-											className="mr-2 h-4 w-4 border rounded text-blue-600 focus:ring-blue-500"
-										/>
-										<span className="text-gray-700">
-											{material.name.charAt(0).toUpperCase() +
-												material.name.slice(1)}
-										</span>
-									</label>
-								))}
-							</div>
-						</div>
+            <div className="mt-4 mb-4 bg-slate-200 rounded-md px-5 py-2">
+              <label className="block font-semibold">Materials:</label>
+              <div className="flex flex-wrap">
+                {materials.map((material) => (
+                  <label
+                    key={material._id}
+                    className="flex items-center w-1/3 p-2"
+                  >
+                    <input
+                      type="checkbox"
+                      name="material"
+                      value={material.name}
+                      checked={newFurniture.materials.includes(material.name)}
+                      onChange={handleInputChange}
+                      className="mr-2 h-4 w-4 border rounded text-blue-600 focus:ring-blue-500"
+                    />
+                    <span className="text-gray-700">
+                      {material.name.charAt(0).toUpperCase() +
+                        material.name.slice(1)}
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </div>
 
-						{/* Colors */}
-						<div className="mt-4 mb-4 bg-slate-200 rounded-md px-5 py-2">
-							<label className="block font-semibold">Colors:</label>
-							<div className="flex flex-wrap">
-								{colors.map((color) => (
-									<label
-										key={color._id}
-										className="flex items-center w-1/3 p-2"
-									>
-										<input
-											type="checkbox"
-											name="color"
-											value={color.name}
-											checked={newFurniture.colors.includes(color.name)}
-											onChange={handleInputChange}
-											className="mr-2 h-4 w-4 border rounded text-blue-600 focus:ring-blue-500"
-										/>
-										<span className="text-gray-700 mr-2">
-											{color.name.charAt(0).toUpperCase() + color.name.slice(1)}
-										</span>
-										<div
-											className="h-4 w-4 border rounded"
-											style={{ backgroundColor: color.hex }}
-										/>
-									</label>
-								))}
-							</div>
-						</div>
+            {/* Colors */}
+            <div className="mt-4 mb-4 bg-slate-200 rounded-md px-5 py-2">
+              <label className="block font-semibold">Colors:</label>
+              <div className="flex flex-wrap">
+                {colors.map((color) => (
+                  <label
+                    key={color._id}
+                    className="flex items-center w-1/3 p-2"
+                  >
+                    <input
+                      type="checkbox"
+                      name="color"
+                      value={color.name}
+                      checked={newFurniture.colors.includes(color.name)}
+                      onChange={handleInputChange}
+                      className="mr-2 h-4 w-4 border rounded text-blue-600 focus:ring-blue-500"
+                    />
+                    <span className="text-gray-700 mr-2">
+                      {color.name.charAt(0).toUpperCase() + color.name.slice(1)}
+                    </span>
+                    <div
+                      className="h-4 w-4 border rounded"
+                      style={{ backgroundColor: color.hex }}
+                    />
+                  </label>
+                ))}
+              </div>
+            </div>
 
 						{/* Sizes */}
 						<div className="mb-4 bg-slate-200 rounded-md p-2">

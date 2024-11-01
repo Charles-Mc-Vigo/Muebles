@@ -84,62 +84,62 @@ function ProductDetails({ admin }) {
 		setSelectedColor(color.name);
 	};
 
-	const handleMaterialClick = (material) => {
-		setSelectedMaterial(material.name);
-	};
+  const handleMaterialClick = (material) => {
+    setSelectedMaterial(material.name);
+  };
 
-	const handleSizeClick = (size) => {
-		setSelectedSize(size.label);
-	};
+  const handleSizeClick = (size) => {
+    setSelectedSize(size.label);
+  };
 
-	const handleThumbnailClick = (index) => {
-		setCurrentImageIndex(index);
-	};
+  const handleThumbnailClick = (index) => {
+    setCurrentImageIndex(index);
+  };
 
-	const handlePreviousImage = () => {
-		setCurrentImageIndex((prevIndex) =>
-			prevIndex === 0 ? furnitureData.images.length - 1 : prevIndex - 1
-		);
-	};
+  const handlePreviousImage = () => {
+    setCurrentImageIndex((prevIndex) =>
+      prevIndex === 0 ? furnitureData.images.length - 1 : prevIndex - 1
+    );
+  };
 
-	const handleNextImage = () => {
-		setCurrentImageIndex((prevIndex) =>
-			prevIndex === furnitureData.images.length - 1 ? 0 : prevIndex + 1
-		);
-	};
+  const handleNextImage = () => {
+    setCurrentImageIndex((prevIndex) =>
+      prevIndex === furnitureData.images.length - 1 ? 0 : prevIndex + 1
+    );
+  };
 
-	if (loading) return <div className="text-center">Loading...</div>;
-	if (error) return <div className="text-red-500 text-center">{error}</div>;
-	if (!furnitureData)
-		return <div className="text-center">No furniture found</div>;
+  if (loading) return <div className="text-center">Loading...</div>;
+  if (error) return <div className="text-red-500 text-center">{error}</div>;
+  if (!furnitureData)
+    return <div className="text-center">No furniture found</div>;
 
-	const FAQAccordion = ({ question, answer }) => {
-		const [isOpen, setIsOpen] = useState(false);
-		const toggleAccordion = () => {
-			setIsOpen(!isOpen);
-		};
-		return (
-			<div className="border-b border-gray-300">
-				<button
-					onClick={toggleAccordion}
-					className="flex justify-between items-center w-full py-4 text-left focus:outline-none overflow-hidden"
-				>
-					<h3 className="text-lg font-medium text-gray-800">{question}</h3>
-					<span className="text-lg text-gray-600">
-						{isOpen ? <FaChevronUp /> : <FaChevronDown />}
-					</span>
-				</button>
-				{isOpen && <div className="py-4 text-gray-700 text-md">{answer}</div>}
-			</div>
-		);
-	};
+  const FAQAccordion = ({ question, answer }) => {
+    const [isOpen, setIsOpen] = useState(false);
+    const toggleAccordion = () => {
+      setIsOpen(!isOpen);
+    };
+    return (
+      <div className="border-b border-gray-300">
+        <button
+          onClick={toggleAccordion}
+          className="flex justify-between items-center w-full py-4 text-left focus:outline-none overflow-hidden"
+        >
+          <h3 className="text-lg font-medium text-gray-800">{question}</h3>
+          <span className="text-lg text-gray-600">
+            {isOpen ? <FaChevronUp /> : <FaChevronDown />}
+          </span>
+        </button>
+        {isOpen && <div className="py-4 text-gray-700 text-md">{answer}</div>}
+      </div>
+    );
+  };
 
-	const faqItems = [
-		{ question: "Description?", answer: furnitureData.description },
-		{ question: "Specification", answer: "None" },
-		{ question: "Warranty", answer: "None" },
-		{ question: "Care Guide", answer: "None" },
-	];
+  const faqItems = [
+    { question: "Description?", answer: furnitureData.description },
+    { question: "Specification", answer: "None" },
+    { question: "Warranty", answer: "None" },
+    { question: "Care Guide", answer: "None" },
+  ];
 
 	return (
 		<section className="bg-gray-50">

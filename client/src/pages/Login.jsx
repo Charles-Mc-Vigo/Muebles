@@ -3,18 +3,20 @@ import { Link, useNavigate } from "react-router-dom";
 import { FaFingerprint, FaArrowLeft } from "react-icons/fa";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Header from "../components/Header";
+import Footer from "../components/Footer";
 
 export default function Login() {
-	const [formData, setFormData] = useState({
-		email: "",
-		password: "",
-	});
-	const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+  const navigate = useNavigate();
 
-	const handleChange = (e) => {
-		const { id, value } = e.target;
-		setFormData({ ...formData, [id]: value });
-	};
+  const handleChange = (e) => {
+    const { id, value } = e.target;
+    setFormData({ ...formData, [id]: value });
+  };
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();

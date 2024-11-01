@@ -12,7 +12,7 @@ const Size = require("../../models/Furniture/sizeModel");
 const upload = multer({ 
   storage: multer.memoryStorage(),
   limits: {
-    fileSize: 50 * 1024 * 1024, // 50MB file size limit
+    fileSize: 50 * 1024 * 1024, // 5MB file size limit
   },
   fileFilter: (req, file, cb) => {
     if (file.mimetype.startsWith('image/')) {
