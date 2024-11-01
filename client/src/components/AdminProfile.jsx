@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { CiEdit } from "react-icons/ci";
+
 
 const AdminProfile = ({ showNameAndImage }) => {
     const [profile, setProfile] = useState(null);
@@ -35,9 +35,9 @@ const AdminProfile = ({ showNameAndImage }) => {
     if (error) return <p className="text-center text-red-500">{error}</p>;
 
     return (
-        <div className="flex border-2 mt-10 ">
+        <div className="flex  mt-10 ">
             {/* Sidebar */}
-            <aside className="w-1/5 p-4 border-r-2">
+            <aside className="w-1/5 p-4 mr-5 ">
                 <nav className="space-y-4">
                     <div className="flex flex-col items-start mb-5">
                         {profile.image ? (
@@ -59,7 +59,6 @@ const AdminProfile = ({ showNameAndImage }) => {
                             {profile.firstname} {profile.lastname}
                         </h2>
                         <p className="text-gray-600">{profile.role}</p>
-                        
                     </div>
                 </nav>
             </aside>
