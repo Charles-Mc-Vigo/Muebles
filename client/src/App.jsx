@@ -32,6 +32,8 @@ import OrderDetails from "./pages/OrderDetails";
 import UserProfile from "./components/UserProfile";
 import ViewOrder from "./components/ViewOrder";
 import DirectOrder from "./pages/DirectOrder";
+import AddNewAddress from "./components/AddNewAddress";
+
 
 export default function App() {
 	return (
@@ -45,6 +47,7 @@ export default function App() {
 				<Route path="/home" element={<ProtectedRoute element={Home} />} />
 				<Route path ="/my-profile/view" element={<ProtectedRoute element={UserProfile}/>} />
 				<Route path ="/direct-order/:furnitureId" element={<ProtectedRoute element={DirectOrder}/>} />
+				<Route path='/address/new' element={<AddNewAddress/>}/>
 				<Route
 					path="/password-reset/request"
 					element={<PasswordResetRequest />}

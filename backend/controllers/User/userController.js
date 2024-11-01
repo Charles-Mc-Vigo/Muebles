@@ -111,14 +111,17 @@ exports.SignUp = async (req, res) => {
 			lastname,
 			gender,
 			phoneNumber,
-			streetAddress,
-			municipality,
-			barangay,
 			email,
 			agreeToTerms,
 			password: hashedPassword,
 			verificationCode,
 			verificationCodeExpires
+		});
+
+		newUser.addresses.push({ 
+			streetAddress, 
+			municipality, 
+			barangay
 		});
 
 		await newUser.save();
@@ -502,3 +505,59 @@ exports.ViewProfile = async (req,res) => {
 		res.status(500).json({message:"Server error!"});
 	}
 }
+
+
+exports.AddNewAddress = async (req, res) => {
+    try {
+        const { streetAddress, municipality, barangay, zipCode } = req.body;
+
+        if (!streetAddress || !municipality || !barangay || !zipCode) {
+            return res.status(400).json({ error: "All fields are required." });
+        }
+
+        const userId = req.user._id;
+
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ error: "User not found." });
+        }
+
+        user.addresses.push({ 
+            streetAddress, 
+            municipality, 
+            barangay, 
+            zipCode 
+        });
+
+        await user.save();
+
+        res.status(201).json({ 
+            success: "Address added successfully!", 
+            addresses: user.addresses
+        });
+    } catch (error) {
+        console.error("Error adding new address: ", error);
+        res.status(500).json({ error: "Server error!" });
+    }
+};
+
+exports.GetUserAddresses = async (req, res) => {
+    try {
+
+        const userId = req.user._id; 
+
+        const user = await User.findById(userId).select('addresses');
+        if (!user) {
+            return res.status(404).json({ error: "User not found." });
+        }
+
+
+        res.status(200).json({
+            success: true,
+            addresses: user.addresses || [] 
+        });
+    } catch (error) {
+        console.error("Error fetching user addresses: ", error);
+        res.status(500).json({ error: "Server error!" });
+    }
+};
