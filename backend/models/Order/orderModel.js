@@ -1,5 +1,15 @@
 const mongoose = require('mongoose');
 
+// Shipping fee mapping
+const SHIPPING_FEES = {
+  'Mogpog': 700,
+  'Boac': 500,
+  'Gasan': 500,
+  'Buenavista': 800,
+  'Santa_Cruz': 3000,
+  'Torrijos': 3000
+};
+
 const orderSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
@@ -45,8 +55,8 @@ const orderSchema = new mongoose.Schema({
     required: true
   },
   proofOfPayment:{
-    type:String,
-    require:true
+    type: String,
+    required: true
   },
   orderStatus: {
     type: String,
@@ -70,35 +80,57 @@ orderSchema.pre('save', async function(next) {
   next();
 });
 
+// Helper function to calculate shipping fee
+const calculateShippingFee = (municipality) => {
+  const fee = SHIPPING_FEES[municipality];
+  if (!fee) {
+    throw new Error(`Invalid municipality: ${municipality}`);
+  }
+  return fee;
+};
+
 // Static method to create order from cart
 orderSchema.statics.createFromCart = async function(cartId, paymentMethod, proofOfPayment) {
   const cart = await mongoose.model('Cart').findById(cartId)
-      .populate('userId')
-      .populate('items.furnitureId');
+    .populate('userId')
+    .populate('items.furnitureId');
+  
   if (!cart) throw new Error('Cart not found');
   
+  // Find the user's default or primary address
+  const user = await mongoose.model('User').findById(cart.userId._id);
+  if (!user || !user.addresses || user.addresses.length === 0) {
+    throw new Error('User address not found');
+  }
+  
+  // Get the primary or first address
+  const primaryAddress = user.addresses.find(addr => addr.addressStatus === 'primary') || user.addresses[0];
+  
+  // Calculate shipping fee based on municipality
+  const shippingFee = calculateShippingFee(primaryAddress.municipality);
+  
   const orderData = {
-      user: cart.userId._id,
-      items: cart.items.map(item => ({
-          furniture: item.furnitureId._id,
-          quantity: item.quantity,
-          price: item.furnitureId.price,
-          material:item.material,
-          color:item.color,
-          size:item.size,
-      })),
-      shippingAddress: {
-          streetAddress: cart.userId.streetAddress,
-          municipality: cart.userId.municipality,
-          barangay: cart.userId.barangay,
-          zipCode: cart.userId.zipCode
-      },
-      phoneNumber: cart.userId.phoneNumber,
-      paymentMethod: paymentMethod,
-      subtotal: cart.totalAmount,
-      shippingFee: 100, 
-      totalAmount: cart.totalAmount + 100,
-      proofOfPayment: proofOfPayment
+    user: cart.userId._id,
+    items: cart.items.map(item => ({
+      furniture: item.furnitureId._id,
+      quantity: item.quantity,
+      price: item.furnitureId.price,
+      material: item.material,
+      color: item.color,
+      size: item.size,
+    })),
+    shippingAddress: {
+      streetAddress: primaryAddress.streetAddress,
+      municipality: primaryAddress.municipality,
+      barangay: primaryAddress.barangay,
+      zipCode: primaryAddress.zipCode
+    },
+    phoneNumber: user.phoneNumber,
+    paymentMethod: paymentMethod,
+    subtotal: cart.totalAmount,
+    shippingFee: shippingFee,
+    totalAmount: cart.totalAmount + shippingFee,
+    proofOfPayment: proofOfPayment
   };
 
   return this.create(orderData);
@@ -125,9 +157,9 @@ orderSchema.statics.createDirectOrder = async function(orderData) {
     return {
       furniture: furniture._id,
       quantity: item.quantity,
-      material:item.material,
-      color:item.color,
-      size:item.size,
+      material: item.material,
+      color: item.color,
+      size: item.size,
       price: furniture.price
     };
   });
@@ -136,18 +168,28 @@ orderSchema.statics.createDirectOrder = async function(orderData) {
 
   // Calculate totals
   const subtotal = processedItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  const shippingFee = 100; // Fixed shipping fee
+  
+  // Get shipping address (either from order data or user's default address)
+  const shippingAddress = orderData.shippingAddress || 
+    (user.addresses.find(addr => addr.addressStatus === 'primary') || user.addresses[0]);
+  
+  if (!shippingAddress || !shippingAddress.municipality) {
+    throw new Error('Valid shipping address with municipality is required');
+  }
+
+  // Calculate shipping fee based on municipality
+  const shippingFee = calculateShippingFee(shippingAddress.municipality);
   const totalAmount = subtotal + shippingFee;
 
   // Prepare order document
   const order = {
     user: user._id,
     items: processedItems,
-    shippingAddress: orderData.shippingAddress || {
-      streetAddress: user.streetAddress,
-      municipality: user.municipality,
-      barangay: user.barangay,
-      zipCode: user.zipCode
+    shippingAddress: {
+      streetAddress: shippingAddress.streetAddress,
+      municipality: shippingAddress.municipality,
+      barangay: shippingAddress.barangay,
+      zipCode: shippingAddress.zipCode
     },
     phoneNumber: orderData.phoneNumber || user.phoneNumber,
     paymentMethod: orderData.paymentMethod,
