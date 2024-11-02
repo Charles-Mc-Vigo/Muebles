@@ -99,7 +99,7 @@ const Notification = () => {
 			}
 
 			const result = await response.json();
-			toast.success(result.message); // Show success toast notification
+			alert(result.message); // Show success toast notification
 
 			// Optionally, remove the accepted notification from the UI
 			setNotification((prev) => ({

@@ -205,7 +205,7 @@ const ProductManagement = () => {
 
       if (response.ok) {
         const data = await response.json();
-        toast.success(data.message);
+        toast.success(data.success);
         setNewFurniture({
           images: [],
           name: "",
@@ -218,7 +218,7 @@ const ProductManagement = () => {
           stocks: "",
           price: "",
         });
-        fetchData(); // Refresh the furniture list
+        fetchData();
       } else {
         const errorData = await response.json(); // Make sure the server returns JSON even on error
         toast.error(errorData.message || "Failed to add furniture");

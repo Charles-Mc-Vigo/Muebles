@@ -14,7 +14,6 @@ function ViewProduct() {
 	const [showArchivedCategories, setShowArchivedCategories] = useState(false);
 	const [showDropdown, setShowDropdown] = useState(false);
 
-
 	const fetchFurniture = async () => {
 		try {
 			const response = await fetch(`http://localhost:3000/api/furnitures`, {
@@ -22,8 +21,7 @@ function ViewProduct() {
 				credentials: "include",
 			});
 			const data = await response.json();
-			setFurnitureData(data);
-			await fetchFurniture();
+			setFurnitureData(data || []);
 		} catch (error) {
 			setError(error.message);
 		} finally {
@@ -41,8 +39,7 @@ function ViewProduct() {
 				}
 			);
 			const data = await response.json();
-			setArchivedFurnitures(data);
-			await fetchArchivedFurnitures();
+			setArchivedFurnitures(data || []);
 		} catch (error) {
 			setError(error.message);
 		} finally {
@@ -59,9 +56,8 @@ function ViewProduct() {
 					credentials: "include",
 				}
 			);
-
 			const data = await response.json();
-			setArchivedCategories(data);
+			setArchivedCategories(data || []);
 		} catch (error) {
 			setError(error.message);
 		} finally {
@@ -79,6 +75,7 @@ function ViewProduct() {
 	const refreshFurnitureList = () => {
 		fetchFurniture();
 	};
+
 	const refreshArchiveFurnitureList = () => {
 		fetchArchivedFurnitures();
 	};
@@ -119,6 +116,7 @@ function ViewProduct() {
 			setArchivedCategories(
 				archivedCategories.filter((category) => category._id !== categoryId)
 			);
+			// Refresh the archived categories after unarchiving
 			await fetchArchivedCategories();
 		} catch (error) {
 			setError(error.message);
@@ -172,10 +170,10 @@ function ViewProduct() {
 					)}
 				</div>
 			</div>
-
 			{showArchived ? (
 				<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 transition-opacity">
-					{archivedFurnitures.length > 0 ? (
+					{Array.isArray(archivedFurnitures) &&
+					archivedFurnitures.length > 0 ? (
 						archivedFurnitures.map((furniture) => (
 							<ProductCard
 								key={furniture._id}
@@ -186,7 +184,7 @@ function ViewProduct() {
 								description={furniture.description}
 								showViewDetails={true}
 								showUnArchivedButton={true}
-								onUnArchiveSuccess={refreshArchiveFurnitureList}
+								onUnArchiveSuccess={refreshArchiveFurnitureList} // Refresh the archived furniture list
 							/>
 						))
 					) : (
@@ -208,26 +206,38 @@ function ViewProduct() {
 						</tr>
 					</thead>
 					<tbody>
-						{archivedCategories.map((category) => (
-							<tr key={category._id}>
-								<td className="px-6 py-4 whitespace-no-wrap border-b border-gray-500">
-									{category.name}
-								</td>
-								<td className="px-6 py-4 whitespace-no-wrap border-b border-gray-500">
-									<button
-										className="bg-green-500 text-white px-4 py-2 rounded-md transition-all hover:bg-green-600 focus:outline-none"
-										onClick={() => unarchiveCategory(category._id)}
-									>
-										Unarchive
-									</button>
+						{Array.isArray(archivedCategories) &&
+						archivedCategories.length > 0 ? (
+							archivedCategories.map((category) => (
+								<tr key={category._id}>
+									<td className="px-6 py-4 whitespace-no-wrap border-b border-gray-500">
+										{category.name}
+									</td>
+									<td className="px-6 py-4 whitespace-no-wrap border-b border-gray-500">
+										<button
+											className="bg-green-500 text-white px-4 py-2 rounded-md transition-all hover:bg-green-600 focus:outline-none"
+											onClick={() => unarchiveCategory(category._id)}
+										>
+											Unarchive
+										</button>
+									</td>
+								</tr>
+							))
+						) : (
+							<tr>
+								<td
+									className="text-center text-gray-500 col-span-full"
+									colSpan={2}
+								>
+									No archived categories available.
 								</td>
 							</tr>
-						))}
+						)}
 					</tbody>
 				</table>
 			) : (
 				<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 transition-opacity">
-					{furnitureData.length > 0 ? (
+					{Array.isArray(furnitureData) && furnitureData.length > 0 ? (
 						furnitureData.map((furniture) => (
 							<ProductCard
 								key={furniture._id}
@@ -239,7 +249,7 @@ function ViewProduct() {
 								showViewDetails={true}
 								showUpdateButton={true}
 								showArchiveButton={true}
-								onArchiveSuccess={refreshFurnitureList}
+								onArchiveSuccess={refreshFurnitureList} // Refresh the active furniture list
 							/>
 						))
 					) : (

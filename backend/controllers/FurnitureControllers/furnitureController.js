@@ -42,6 +42,10 @@ exports.getAllFurnitures = async (req, res) => {
 			{ path: "colors", select: "name hex -_id" },
 			{ path: "sizes", select: "label height width depth -_id" },
 		]);
+
+    if(furnitures.length === 0){
+      return res.status(400).json({error:"No furniture found!"})
+    }
 		
 		// Return the fetched furnitures
 		res.status(200).json(furnitures);
@@ -64,7 +68,7 @@ exports.ArchivedFurnitures = async (req, res) => {
 			]);
 
 			if (archivedFurnitures.length === 0) {
-					return res.status(404).json({ error: "No archived furnitures found!" });
+					return res.status(400).json({ error: "No archived furnitures found!" });
 			}
 
 			res.status(200).json(archivedFurnitures);

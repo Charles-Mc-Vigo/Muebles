@@ -57,7 +57,7 @@ export default function App() {
 				<Route path="/home" element={<ProtectedRoute element={Home} />} />
 				<Route path ="/my-profile/view" element={<ProtectedRoute element={UserProfile}/>} />
 				<Route path ="/direct-order/:furnitureId" element={<ProtectedRoute element={DirectOrder}/>} />
-				<Route path='/address/new' element={<AddNewAddress/>}/>
+				<Route path='/address/new' element={<ProtectedRoute element={AddNewAddress}/>} />
 				<Route
 					path="/password-reset/request"
 					element={<PasswordResetRequest />}
