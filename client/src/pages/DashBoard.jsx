@@ -254,11 +254,6 @@ const Dashboard = () => {
             )}
           </ul>
         </nav>
-
-        {/* signout */}
-        <div className="w-full mt-auto flex justify-center items-center py-4">
-          <Logout isAdmin={true} />
-        </div>
       </aside>
 
       {/* Main Content */}

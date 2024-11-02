@@ -67,7 +67,7 @@ const Logout = ({ isAdmin, isUser }) => {
         <button
           onClick={handleLogout}
           disabled={loading}
-          className={`flex items-center justify-center gap-2 bg-red-700 text-white font-bold py-3 px-6 w-full rounded-lg shadow-lg hover:bg-red-800 transition duration-200 ${
+          className={`flex items-center justify-center gap-2 bg-teal-600 text-black font-bold py-3 px-6 w-full rounded-lg shadow-lg hover:bg-teal-800 transition duration-200 ${
             loading ? "opacity-50 cursor-not-allowed" : ""
           }`}
         >
@@ -80,7 +80,7 @@ const Logout = ({ isAdmin, isUser }) => {
       {isUser && (
         <span
           onClick={handleLogout}
-          className="text-red-600 font-semibold cursor-pointer"
+          className="text-red-600 text-xl font-semibold cursor-pointer mr-2 "
         >
           {loading ? "Logging out..." : "Logout"}
         </span>

@@ -1,8 +1,14 @@
-import React from "react";
 import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
 import { FaFacebook, FaInstagram, FaTiktok } from "react-icons/fa";
 
+
 const Footer = () => {
+  const [showPhoneNumber, setShowPhoneNumber] = useState(false);
+
+  const togglePhoneNumber = () => {
+    setShowPhoneNumber((prev) => !prev);
+  };
   return (
     <footer className="bg-gray-200 p-10">
       <div className="container  mx-auto grid grid-cols-1 md:grid-cols-5 gap-15 ">
@@ -48,12 +54,24 @@ const Footer = () => {
               </a>
             </li>
             <li>
-              <a href="#" className="text-gray-600 hover:text-gray-900">
+              <a
+                href="#"
+                className="text-gray-600 hover:text-gray-900"
+                onClick={togglePhoneNumber}
+              >
                 Contact Us
               </a>
+              {showPhoneNumber && (
+                <div className="mt-2 text-gray-800">
+                  Phone: (+63) 1234567890
+                </div>
+              )}
             </li>
             <li>
-              <a href="https://tinyurl.com/5avjxzav" className="text-gray-600 hover:text-gray-900">
+              <a href="https://tinyurl.com/5avjxzav"
+              target="blank"
+              rel="noopener noreferrer"
+               className="text-gray-600 hover:text-gray-900">
                 Store Location
               </a>
             </li>
@@ -72,7 +90,7 @@ const Footer = () => {
               placeholder="jckamewoodworks@gmail.com"
               className="p-2 w-full border border-gray-300 rounded mb-4"
             />
-            <Link to="/signup"className="bg-teal-500 text-white py-2 px-4 rounded inline-block"
+            <Link to="/signup" className="bg-teal-500 text-white py-2 px-4 rounded inline-block"
             >
               Sign up
             </Link>
@@ -86,13 +104,19 @@ const Footer = () => {
         <div>
           <h3 className="font-bold mb-4">Follow us</h3>
           <div className="flex space-x-4">
-            <a href="https://www.facebook.com/ItsmeJeyC" className="text-gray-600 hover:text-gray-900">
+            <a href="https://www.facebook.com/ItsmeJeyC"
+              target="blank"
+              rel="noopener noreferrer"
+              className="text-gray-600 hover:text-teal-600">
               <FaFacebook size={24} />
             </a>
-            <a href="https://www.instagram.com/jckame_woodworks/" className="text-gray-600 hover:text-gray-900">
+            <a href="https://www.instagram.com/jckame_woodworks/"
+              target="blank"
+              rel="noopener noreferrer"
+              className="text-gray-600 hover:text-teal-600">
               <FaInstagram size={24} />
             </a>
-            <a href="#" className="text-gray-600 hover:text-gray-900">
+            <a href="#" className="text-gray-600 hover:text-teal-600">
               <FaTiktok size={24} />
             </a>
           </div>

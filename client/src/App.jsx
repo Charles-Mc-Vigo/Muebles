@@ -25,7 +25,7 @@ import ProductDetails from "./components/ProductDetails";
 import EditProduct from "./components/EditProduct";
 import DeliveryInfo from "./components/DeliveryInfo";
 import AdminPendingPage from "./pages/AdminPendingPage";
-import Profile from "./components/Profile";
+import AdminProfile from "./components/AdminProfile";
 import UserProfile from "./components/UserProfile";
 import TermsAndConditions from "./pages/TermsandCondition";
 import DeliveryManagement from "./DeliveryManagement";
@@ -35,7 +35,8 @@ import PasswordResetCreateNew from "./pages/PasswordResetCreateNew";
 import OrderDetails from "./pages/OrderDetails";
 import InventoryPage from "./pages/InventoryPage";
 import PaymentMethod from "./components/PaymentMethod";
-
+import EditUserProfile from "./components/EditUserProfile";
+import EditAdminProfile from "./components/EditAdminProfile";
 
 
 import ViewOrder from "./components/ViewOrder";
@@ -56,12 +57,10 @@ export default function App() {
 				<Route path="/verify-account/:userId" element={<EmailVerification />} />
 				<Route path="/home" element={<ProtectedRoute element={Home} />} />
 				<Route path ="/my-profile/view" element={<ProtectedRoute element={UserProfile}/>} />
+				<Route path ="/my-profile/edit" element={<ProtectedRoute element={EditUserProfile}/>} />
 				<Route path ="/direct-order/:furnitureId" element={<ProtectedRoute element={DirectOrder}/>} />
 				<Route path='/address/new' element={<AddNewAddress/>}/>
-				<Route
-					path="/password-reset/request"
-					element={<PasswordResetRequest />}
-				/>
+				<Route path="/password-reset/request" element={<PasswordResetRequest />}/>
 				<Route
 					path="/password-reset/verify/:userId"
 					element={<PasswordResetVerify />}
@@ -86,21 +85,16 @@ export default function App() {
 				<Route path="/admin-login" element={<AdminLogin />} />
 				<Route path="/admin-signup" element={<AdminSignUp />} />
 				<Route
-					path="/admin-signup/verify-account/:adminId"
-					element={<AdminVerify />}
-				/>
+					path="/admin-signup/verify-account/:adminId" element={<AdminVerify />}/>
 				<Route
-					path="/admin-signup/verify-account/:adminId/pending"
-					element={<AdminPendingPage />}
-				/>
+					path="/admin-signup/verify-account/:adminId/pending"element={<AdminPendingPage />}/>
 				<Route
 					path="/dashboard"
 					element={<ProtectedRoute element={DashBoard} adminOnly={true} />}
 				/>
-				<Route
-					path="/dashboard/setting/my-profile/view"
-					element={<ProtectedRoute element={Profile} adminOnly={true} />}
-				/>
+				<Route path="/dashboard/setting/admin-profile/view"element={<ProtectedRoute element={AdminProfile} adminOnly={true} />}/>
+				<Route path="/dashboard/setting/admin-profile/edit"element={<ProtectedRoute element={EditAdminProfile} adminOnly={true} />}/> 
+				<Route path="/table"element={<ProtectedRoute element={ProductTable} adminOnly={true} />}/>
 				<Route
 					path="/table"
 					element={<ProtectedRoute element={ProductTable} adminOnly={true} />}
