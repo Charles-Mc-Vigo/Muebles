@@ -498,9 +498,12 @@ exports.cancelOrder = async (req, res) => {
 exports.getOrderId = async (req,res) => {
 	try {
 		const {orderId} = req.params;
-		const exisitingOrder = await Order.findById(orderId);
+		const exisitingOrder = await Order.findById(orderId)
+		.populate('user')
+		.populate('items.furniture');
 
-		if(!exisitingOrder) return res.status(404).json({message:"Order not found!"});
+		if(!exisitingOrder) return res.status(404).json({error:"Order not found!"});
+
 		res.status(200).json(exisitingOrder);
 	} catch (error) {
 		console.error("Error in getting order id :", error);

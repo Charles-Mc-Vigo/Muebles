@@ -543,10 +543,16 @@ const UserProfile = ({ showNameAndImage }) => {
 						<div className="text-center text-gray-700 space-y-1">
 							<p>Email: {profile.email}</p>
 							<p>Phone: {profile.phoneNumber}</p>
-							<p>
-								Address:{" "}
-								{`${profile.streetAddress}, ${profile.barangay}, ${profile.municipality}, ${profile.zipCode}`}
-							</p>
+							<p>Addresses:</p>
+							{profile.addresses && profile.addresses.length > 0 ? (
+								profile.addresses.map((address, index) => (
+									<p key={index}>
+										{`${address.streetAddress}, ${address.barangay}, ${address.municipality}, ${address.zipCode}`}
+									</p>
+								))
+							) : (
+								<p>No addresses available.</p>
+							)}
 						</div>
 						<button
 							onClick={handleEditToggle}
