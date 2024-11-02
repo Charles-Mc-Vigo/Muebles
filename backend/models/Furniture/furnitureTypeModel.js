@@ -6,6 +6,9 @@ const furnitureTypeSchema = new mongoose.Schema({
     required:true,
     unique:true
   },
+  estimatedProductionDays:{
+    type:Number
+  },
   categoryId:{
     type:mongoose.Schema.ObjectId,
     ref:'Category',

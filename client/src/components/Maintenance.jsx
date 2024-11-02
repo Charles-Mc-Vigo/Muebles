@@ -132,6 +132,7 @@ const Maintenance = () => {
 	};
 
 	const [categories, setCategories] = useState([]);
+	const [productionDays, setProductionDays] = useState("");
 	const [furnitureTypes, setFurnitureTypes] = useState([]);
 	const [colors, setColors] = useState([]);
 	const [sizes, setSizes] = useState([]);
@@ -207,10 +208,10 @@ const Maintenance = () => {
 			// Optionally, update the UI by removing or updating the entity in the respective state
 			switch (entityType) {
 				case "sizes":
-					setSizes((prevSizes) => 
-					prevSizes.filter((size) => size._id !== entityId)
-				);
-				break;
+					setSizes((prevSizes) =>
+						prevSizes.filter((size) => size._id !== entityId)
+					);
+					break;
 				case "categories":
 					setCategories((prevCategories) =>
 						prevCategories.filter((category) => category._id !== entityId)
@@ -386,7 +387,7 @@ const Maintenance = () => {
 
 	const handleAddNewItem = async () => {
 		if (
-			!newItemName &&
+			!newItemName && 
 			selectedFilter !== "Furniture Size" &&
 			selectedFilter !== "Colors" &&
 			selectedFilter !== "Furniture Materials"
@@ -396,62 +397,57 @@ const Maintenance = () => {
 		}
 		try {
 			if (selectedFilter === "Categories") {
-				const response = await fetch(
-					"http://localhost:3000/api/categories/add",
-					{
-						method: "POST",
-						headers: {
-							"Content-Type": "application/json",
-						},
-						credentials: "include",
-						body: JSON.stringify({ name: newItemName }),
-					}
-				);
+				const response = await fetch("http://localhost:3000/api/categories/add", {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					credentials: "include",
+					body: JSON.stringify({ name: newItemName }),
+				});
 				if (!response.ok) {
 					throw new Error(response.message);
 				}
 				toast.success("Category added successfully.");
 				await fetchCategories(); // Refresh categories list
 			}
+	
 			if (selectedFilter === "Furniture Types") {
 				if (!selectedCategory) {
 					toast.error("Please select a category.");
 					return;
 				}
-				const response = await fetch(
-					"http://localhost:3000/api/furniture-types/add",
-					{
-						method: "POST",
-						headers: {
-							"Content-Type": "application/json",
-						},
-						credentials: "include",
-						body: JSON.stringify({
-							name: newItemName,
-							categoryId: selectedCategory,
-						}),
-					}
-				);
-
+				const response = await fetch("http://localhost:3000/api/furniture-types/add", {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					credentials: "include",
+					body: JSON.stringify({
+						name: newItemName,
+						categoryId: selectedCategory,
+						estimatedProductionDays: productionDays, // Include productionDays in the payload
+					}),
+				});
+	
 				const errorData = await response.json();
 				if (!errorData.ok) {
 					throw new Error(errorData.message);
 				}
 				const newFurnitureType = await response.json();
 				setFurnitureTypes((prevTypes) =>
-					Array.isArray(prevTypes)
-						? [...prevTypes, newFurnitureType]
-						: [newFurnitureType]
+					Array.isArray(prevTypes) ? [...prevTypes, newFurnitureType] : [newFurnitureType]
 				);
 				toast.success("Furniture type added successfully.");
 				await fetchFurnitureTypes();
 			}
-
+	
 			resetInputFields();
 		} catch (error) {
 			toast.error(error.message);
 		}
 	};
+	
 	const handleEditItem = (rowIndex, key, value) => {
 		const updateItem = (items, setItems) => {
 			const updatedItems = [...items];
@@ -528,6 +524,8 @@ const Maintenance = () => {
 		setNewSize(initialSizeState);
 		setSelectedFurnitureType("");
 		setSelectedCategory("");
+		setProductionDays("");
+
 	};
 
 	const renderInputField = (
@@ -627,6 +625,14 @@ const Maintenance = () => {
 									"newFurnitureType",
 									newItemName,
 									(e) => setNewItemName(e.target.value)
+								)}
+								{renderInputField(
+									"Production Days",
+									"productionDays",
+									productionDays ,
+									(e) => setProductionDays(e.target.value),
+									"number",
+									"Enter production days"
 								)}
 							</>
 						)}
@@ -758,17 +764,18 @@ const Maintenance = () => {
 							<h2 className="text-2xl font-bold mb-4">Furniture Types</h2>
 							<div className="max-h-96 overflow-y-auto">
 								<Table
-									headers={["Furniture Type", "Category"]}
+									headers={["Furniture Type", "Production Days","Category"]}
 									data={
 										Array.isArray(furnitureTypes)
 											? furnitureTypes.map((type) => ({
-													id: type._id,
-													name: type.name,
-													category:
-														categories.find(
-															(cat) => cat._id === type.categoryId
-														)?.name || "N/A",
-											  }))
+												name: type.name,
+												estimatedProductionDays:type.estimatedProductionDays,
+												category:
+												categories.find(
+													(cat) => cat._id === type.categoryId
+												)?.name || "N/A",
+												id: type._id,
+											}))
 											: []
 									}
 									onEdit={handleEditItem}
@@ -830,7 +837,13 @@ const Maintenance = () => {
 							<h2 className="text-2xl font-bold mb-4">Furniture Sizes</h2>
 							<div className="max-h-96 overflow-y-auto">
 								<Table
-									headers={["Size Label", "Height","Width","Depth","Furniture Type"]}
+									headers={[
+										"Size Label",
+										"Height",
+										"Width",
+										"Depth",
+										"Furniture Type",
+									]}
 									data={
 										Array.isArray(sizes)
 											? sizes.map((size) => ({
@@ -840,9 +853,9 @@ const Maintenance = () => {
 													width: size.width,
 													depth: size.depth,
 													furnitureTypes:
-													furnitureTypes.find(
-														(type) => type._id === size.furnitureTypeId
-													)?.name || "N/A",
+														furnitureTypes.find(
+															(type) => type._id === size.furnitureTypeId
+														)?.name || "N/A",
 											  }))
 											: []
 									}
