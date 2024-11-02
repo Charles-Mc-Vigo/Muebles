@@ -1,27 +1,17 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
-const {getAllOrders, createOrders, editOrder, getOrderById, deleteOrderById, getOrdersByStatus} = require('../../controllers/Order/orderController');
-// const authRoutes = require("../middlewares/authRoutes");
+const orderController = require('../../controllers/Order/orderController');
+const { checkUserAuth } = require('../../middlewares/checkAuth');
+const multer = require('multer');
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
+// User routes - protected with checkUserAuth
+router.post("/direct-order/:furnitureId", checkUserAuth, upload.single("proofOfPayment"), orderController.createDirectOrder);
+router.post("/create", checkUserAuth, upload.single("proofOfPayment"), orderController.createOrder);
+router.get('/my-orders', checkUserAuth, orderController.getUserOrders);
+router.get('/details/:orderId', checkUserAuth, orderController.getOrderDetails);
+router.put('/cancel/:orderId', checkUserAuth, orderController.cancelOrder);
 
-// router.use(authRoutes)
-
-//get all orders
-router.get("/",getAllOrders);
-
-//create orders
-router.post("/create-orders",createOrders);
-
-//get specific order by id
-router.get("/:id",getOrderById);
-
-//edit order information
-router.put("/:id",editOrder)
-
-//delete order
-router.delete("/:id",deleteOrderById)
-
-//get orders by status
-router.get("/status/:orderStatus",getOrdersByStatus);
 
 module.exports = router;

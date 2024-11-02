@@ -6,9 +6,13 @@ import {
   FaBars,
   FaTimes,
   FaUser,
+<<<<<<< HEAD
   FaBoxOpen,
 } from "react-icons/fa";
 import { CgProfile } from "react-icons/cg";
+=======
+} from "react-icons/fa";
+>>>>>>> 9cf6338200283184cb68d8c0260882492490931e
 import { Link } from "react-router-dom";
 import Logout from "./Logout";
 

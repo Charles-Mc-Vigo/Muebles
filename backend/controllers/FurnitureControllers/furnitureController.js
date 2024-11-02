@@ -6,15 +6,13 @@ const FurnitureType = require("../../models/Furniture/furnitureTypeModel");
 const Materials = require("../../models/Furniture/materialsModel");
 const Colors = require("../../models/Furniture/colorModel");
 const Size = require("../../models/Furniture/sizeModel");
-const Stocks = require("../../models/Furniture/stocksModel");
 
-// Multer setup for handling image uploads in memory
 
 // Multer setup for handling image uploads in memory
 const upload = multer({ 
   storage: multer.memoryStorage(),
   limits: {
-    fileSize: 5 * 1024 * 1024, // 5MB file size limit
+    fileSize: 50 * 1024 * 1024, // 5MB file size limit
   },
   fileFilter: (req, file, cb) => {
     if (file.mimetype.startsWith('image/')) {
@@ -29,22 +27,30 @@ const upload = multer({
 // Get all furnitures or furniture by ID
 exports.getAllFurnitures = async (req, res) => {
 	try {
-			const furnitures = await Furniture.find({ isArchived: false }).populate([
-					{ path: "category", select: "name -_id" },
-					{ path: "furnitureType", select: "name -_id" },
-					{ path: "materials", select: "name -_id" },
-					{ path: "colors", select: "name -_id" },
-					{ path: "stocks", select: "stocks -_id" },
-					{ path: "sizes", select: "label -_id" },
-			]);
-			
-			// Return the fetched furnitures
-			res.status(200).json({ furnitures }); // Changed here
+		// Initialize filters with the isArchived flag
+		const filters = { isArchived: false };
+
+		// Add any additional query parameters to filters
+		for (const key in req.query) {
+			filters[key] = req.query[key]; // Add each query parameter to filters
+		}
+
+		const furnitures = await Furniture.find(filters).populate([
+			{ path: "category", select: "name -_id" },
+			{ path: "furnitureType", select: "name -_id" },
+			{ path: "materials", select: "name -_id" },
+			{ path: "colors", select: "name hex -_id" },
+			{ path: "sizes", select: "label height width depth -_id" },
+		]);
+		
+		// Return the fetched furnitures
+		res.status(200).json(furnitures);
 	} catch (error) {
-			console.error(error);
-			res.status(500).json({ message: "Server error!" });
+		console.error(error);
+		res.status(500).json({ message: "Server error!" });
 	}
 };
+
 
 
 exports.ArchivedFurnitures = async (req, res) => {
@@ -54,12 +60,11 @@ exports.ArchivedFurnitures = async (req, res) => {
 					{ path: "furnitureType", select: "name -_id" },
 					{ path: "materials", select: "name -_id" },
 					{ path: "colors", select: "name -_id" },
-					{ path: "stocks", select: "stocks -_id" },
 					{ path: "sizes", select: "label -_id" },
 			]);
 
 			if (archivedFurnitures.length === 0) {
-					return res.status(404).json({ message: "No archived furnitures found!" });
+					return res.status(404).json({ error: "No archived furnitures found!" });
 			}
 
 			res.status(200).json(archivedFurnitures);
@@ -77,19 +82,18 @@ exports.getFurnitureById = async (req, res) => {
 			{ path: "category", select: "name -_id" },
 			{ path: "furnitureType", select: "name -_id" },
 			{ path: "materials", select: "name -_id" },
-			{ path: "colors", select: "name -_id" },
-			{ path: "stocks", select: "stocks -_id" },
+			{ path: "colors", select: "name hex -_id" },
 			{ path: "sizes", select: "label -_id" },
 		]);
 
 		if (!furniture) {
-			return res.status(404).json({ message: "Furniture not found!" });
+			return res.status(404).json({ error: "Furniture not found!" });
 		}
 
 		res.status(200).json(furniture);
 	} catch (error) {
 		console.error("Error in finding furniture by ID: ", error);
-		res.status(500).json({ message: "Server error!" });
+		res.status(500).json({ error: "Server error!" });
 	}
 };
 
@@ -109,8 +113,8 @@ exports.createFurniture = async (req, res) => {
         images = req.body.images;
       }
 
-      if (images.length < 3) {
-        return res.status(400).json({ message: "At least 3 images are required!" });
+      if (images.length < 5) {
+        return res.status(400).json({ error: "At least 5 images are required!" });
       }
 
       const {
@@ -145,22 +149,22 @@ exports.createFurniture = async (req, res) => {
       // Validate and find existing Category, FurnitureType, Materials, Colors
       const existingCategory = await Category.findById(category);
       if (!existingCategory) {
-        return res.status(400).json({ message: "Invalid category!" });
+        return res.status(400).json({ error: "Invalid category!" });
       }
 
       const existingFurnitureType = await FurnitureType.findById(furnitureType);
       if (!existingFurnitureType) {
-        return res.status(400).json({ message: "Invalid furniture type!" });
+        return res.status(400).json({ error: "Invalid furniture type!" });
       }
 
       const existingMaterials = await Materials.find({ name: { $in: materials } });
       if (existingMaterials.length !== materials.length) {
-        return res.status(400).json({ message: "Some materials are invalid!" });
+        return res.status(400).json({ error: "Some materials are invalid!" });
       }
 
       const existingColors = await Colors.find({ name: { $in: colors } });
       if (existingColors.length !== colors.length) {
-        return res.status(400).json({ message: "Some colors are invalid!" });
+        return res.status(400).json({ error: "Some colors are invalid!" });
       }
 
       const existingSize = await Size.find({
@@ -169,12 +173,10 @@ exports.createFurniture = async (req, res) => {
       });
       if (existingSize.length !== sizes.length) {
         return res.status(400).json({
-          message: `Some sizes are invalid for ${existingFurnitureType.name}. Please ensure all sizes are correct.`,
+          error: `Some sizes are invalid for ${existingFurnitureType.name}. Please ensure all sizes are correct.`,
         });
       }
 
-      const newStock = new Stocks({ stocks });
-      await newStock.save();
 
       // Create new furniture item
       const newFurniture = new Furniture({
@@ -183,17 +185,16 @@ exports.createFurniture = async (req, res) => {
         furnitureType: existingFurnitureType._id,
         name,
         description,
-        stocks: newStock._id,
+        stocks: req.body.stocks,
         materials: existingMaterials.map((material) => material._id),
         colors: existingColors.map((color) => color._id),
         sizes: existingSize.map((size) => size._id),
         price,
       });
 
-      console.log('New Furniture has been added!', newFurniture);
       await newFurniture.save();
       res.status(201).json({
-        message: "New furniture added successfully!",
+        success: "New furniture added successfully!",
         newFurniture,
       });
     } catch (error) {
@@ -216,7 +217,7 @@ exports.updateFurniture = async (req, res) => {
       const { furnitureId } = req.params;
       const furniture = await Furniture.findById(furnitureId);
       if (!furniture) {
-        return res.status(404).json({ message: "Furniture not found!" });
+        return res.status(404).json({ error: "Furniture not found!" });
       }
 
       // Preserve existing images
@@ -229,12 +230,12 @@ exports.updateFurniture = async (req, res) => {
         if (Array.isArray(req.body.images)) {
           images = [...images, ...req.body.images];
         } else {
-          return res.status(400).json({ message: "Images must be an array!" });
+          return res.status(400).json({ error: "Images must be an array!" });
         }
       }
 
-      if (images.length < 3) {
-        return res.status(400).json({ message: "At least 3 images are required!" });
+      if (images.length < 5) {
+        return res.status(400).json({ error: "At least 5 images are required!" });
       }
 
       const {
@@ -255,7 +256,7 @@ exports.updateFurniture = async (req, res) => {
         if (existingCategory) {
           furniture.category = existingCategory._id;
         } else {
-          return res.status(400).json({ message: "Invalid category!" });
+          return res.status(400).json({ error: "Invalid category!" });
         }
       }
 
@@ -264,14 +265,14 @@ exports.updateFurniture = async (req, res) => {
         if (existingFurnitureType) {
           furniture.furnitureType = existingFurnitureType._id;
         } else {
-          return res.status(400).json({ message: "Invalid furniture type!" });
+          return res.status(400).json({ error: "Invalid furniture type!" });
         }
       }
 
       if (materials) {
         const existingMaterials = await Materials.find({ name: { $in: materials } });
         if (existingMaterials.length !== materials.length) {
-          return res.status(400).json({ message: "Some materials are invalid!" });
+          return res.status(400).json({ error: "Some materials are invalid!" });
         }
         furniture.materials = existingMaterials.map((material) => material._id);
       }
@@ -279,7 +280,7 @@ exports.updateFurniture = async (req, res) => {
       if (colors) {
         const existingColors = await Colors.find({ name: { $in: colors } });
         if (existingColors.length !== colors.length) {
-          return res.status(400).json({ message: "Some colors are invalid!" });
+          return res.status(400).json({ error: "Some colors are invalid!" });
         }
         furniture.colors = existingColors.map((color) => color._id);
       }
@@ -288,7 +289,7 @@ exports.updateFurniture = async (req, res) => {
         const existingSize = await Size.find({ label: { $in: sizes }, furnitureTypeId: furniture.furnitureType });
         if (existingSize.length !== sizes.length) {
           return res.status(400).json({
-            message: `Some sizes are invalid for the given furniture type. Please ensure all sizes are correct.`,
+            error: `Some sizes are invalid for the given furniture type. Please ensure all sizes are correct.`,
           });
         }
         furniture.sizes = existingSize.map((size) => size._id);
@@ -299,11 +300,11 @@ exports.updateFurniture = async (req, res) => {
       furniture.name = name || furniture.name;
       furniture.description = description || furniture.description;
       furniture.price = price || furniture.price;
-      furniture.stocks = stocks ? stocks._id : furniture.stocks;
+      furniture.stocks = stocks || furniture.stocks;
 
       await furniture.save();
       res.status(200).json({
-        message: "Furniture updated successfully!",
+        success: "Furniture updated successfully!",
         furniture,
       });
     } catch (error) {
@@ -320,20 +321,20 @@ exports.Archived = async (req, res) => {
 
 			// Validate ObjectId
 			if (!mongoose.Types.ObjectId.isValid(furnitureId)) {
-					return res.status(400).json({ message: "Invalid furniture ID!" });
+					return res.status(400).json({ error: "Invalid furniture ID!" });
 			}
 
 			const furniture = await Furniture.findById(furnitureId);
 			if (!furniture) {
-					return res.status(404).json({ message: "Furniture not found!" });
+					return res.status(404).json({ error: "Furniture not found!" });
 			}
 
 			furniture.isArchived = true;
 			await furniture.save();
-			res.status(200).json({ message: `${furniture.name} has been archived successfully!` });
+			res.status(200).json({ success: `${furniture.name} has been archived successfully!` });
 	} catch (error) {
 			console.error("Error archiving the furniture: ", error);
-			res.status(500).json({ message: "Server error!" });
+			res.status(500).json({ error: "Server error!" });
 	}
 };
 
@@ -343,22 +344,20 @@ exports.UnArchived = async (req, res) => {
 
 			// Validate ObjectId
 			if (!mongoose.Types.ObjectId.isValid(furnitureId)) {
-					return res.status(400).json({ message: "Invalid furniture ID!" });
+					return res.status(400).json({ error: "Invalid furniture ID!" });
 			}
 
 			const furniture = await Furniture.findById(furnitureId);
 			if (!furniture) {
-				return res.status(404).json({ message: "Furniture not found!" });
+				return res.status(404).json({ error: "Furniture not found!" });
 			}
 
-			if(furniture.isArchived){
-				furniture.isArchived = false;
-			}
+			furniture.isArchived = false;
 
 			await furniture.save();
-			res.status(200).json({ message: `${furniture.name} has been unarchived successfully!` });
+			res.status(200).json({ success: `${furniture.name} has been unarchived successfully!` });
 	} catch (error) {
 			console.error("Error archiving the furniture: ", error);
-			res.status(500).json({ message: "Server error!" });
+			res.status(500).json({ error: "Server error!" });
 	}
 };

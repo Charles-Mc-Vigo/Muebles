@@ -21,7 +21,10 @@ const AdminVerify = () => {
     const fetchAdmin = async () => {
       try {
         const response = await fetch(
-          `http://localhost:3000/api/admin/${adminId}`
+          `http://localhost:3000/api/admin/unconfirmed/${adminId}`,
+          {
+						method: "GET"
+          }
         );
         if (!response.ok) {
           throw new Error("User not found");
@@ -67,7 +70,7 @@ const AdminVerify = () => {
       toast.success("Admin verified successfully!");
 
       setTimeout(() => {
-        navigate(`/verify-account/${adminId}/pending`);
+        navigate(`/admin-signup/verify-account/${adminId}/pending`);
       }, 3000);
     } catch (error) {
       console.error("Error verifying email:", error);

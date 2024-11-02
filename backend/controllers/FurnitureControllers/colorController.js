@@ -27,7 +27,7 @@ exports.addColor = async (req, res) => {
 
       const newColor = new Colors({ name, rgb, hex });
       await newColor.save();
-      res.status(201).json({ message: `${newColor.name} is added successfully!` });
+      res.status(201).json({ message: `${newColor.name} is added successfully!`, newColor});
   } catch (error) {
       console.log('Error adding color: ', error);
       res.status(500).json({ message: "Server error!" });
@@ -39,7 +39,7 @@ exports.getColors = async (req, res) => {
   try {
     const colors = await Colors.find({isArchived:false});
     if (colors.length === 0) {
-      return res.status(404).json({ message: "No colors found!" });
+      return res.status(200).json({ message: "No colors found!" });
     }
     res.status(200).json(colors);
   } catch (error) {

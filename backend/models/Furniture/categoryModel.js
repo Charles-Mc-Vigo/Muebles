@@ -5,6 +5,10 @@ const categorySchema = new mongoose.Schema({
     type:String,
     required:true,
     unique:true
+  },
+  isArchived:{
+    type:Boolean,
+    default:false
   }
 },{
   timestamps:true

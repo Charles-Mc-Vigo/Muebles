@@ -10,6 +10,10 @@ const furnitureTypeSchema = new mongoose.Schema({
     type:mongoose.Schema.ObjectId,
     ref:'Category',
     required:true
+  },
+  isArchived:{
+    type:Boolean,
+    default:false
   }
 },{
   timestamps:true

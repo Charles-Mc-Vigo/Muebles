@@ -13,10 +13,6 @@ const sizeSchema = new mongoose.Schema({
     type: Number,
     required: true 
   },
-  length:{
-    type:Number,
-    required:true
-  },
   depth: {
     type: Number,
     required: true
@@ -25,6 +21,10 @@ const sizeSchema = new mongoose.Schema({
     type: mongoose.Schema.ObjectId, 
     ref: "FurnitureType", 
     required: true
+  },
+  isArchived:{
+    type:Boolean,
+    default:false
   }
 },{
   timestamps:true

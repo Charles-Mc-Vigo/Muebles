@@ -17,19 +17,13 @@ const userSchema = new mongoose.Schema({
     unique: true, 
     required: true
   },
-  streetAddress: { type: String, required: true },
-	municipality: { 
-    type: String, 
-    enum:["Boac","Gasan","Torrijos","Buenavista", "Mogpog","Santa_Cruz"],
-    required: true
-  },
-  barangay:{
-    type:String,
-    required:true
-  },
-  zipCode: {
-    type: Number
-  },
+  addresses:[{
+    addressStatus:{type:String},
+    municipality:{type:String},
+    barangay:{type:String},
+    streetAddress:{type:String},
+    zipCode:{type:Number},
+  }],
   email: { 
     type: String, 
     required: true, 
@@ -39,10 +33,19 @@ const userSchema = new mongoose.Schema({
   type: String, 
   required: true
   },
+  isActive:{
+    type:Boolean,
+    default:false
+  },
   role:{
-    type:String
+    type:String,
+    default:"Guest"
   },
   isVerified:{
+    type:Boolean,
+    default:false
+  },
+  pswdResetOk:{
     type:Boolean,
     default:false
   },
@@ -61,11 +64,11 @@ const userSchema = new mongoose.Schema({
     type:mongoose.Schema.ObjectId,
     ref:"Order"
   }],
-  cart:[{
+  cart:{
     type:mongoose.Schema.ObjectId,
     ref:"Cart",
     default:null
-  }]
+  }
 },{
   timestamps:true
 });

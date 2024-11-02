@@ -4,6 +4,8 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const cookieParser = require('cookie-parser');
 
+const authCheckRouter = require('./router/authCheck');
+
 
 //furnitures
 const furnitureRoutes = require("./router/FurnitureRoutes/furnitureRoutes");
@@ -12,7 +14,6 @@ const furnitureTypeRoutes = require('../backend/router/FurnitureRoutes/furniture
 const materialsRoutes = require('./router/FurnitureRoutes/materialsRoutes')
 const colorRoutes = require('../backend/router/FurnitureRoutes/colorRoutes');
 const sizeRoutes = require('../backend/router/FurnitureRoutes/sizeRoutes');
-const stocksRoutes = require('../backend/router/FurnitureRoutes/stocksRoutes');
 
 //Users
 const userRoutes = require('../backend/router/User/userRoutes')
@@ -70,6 +71,7 @@ app.use(bodyParser.json());
 // 	res.json({message:"Welcome to Muebles!"})
 // })
 
+app.use(authCheckRouter);
 app.use("/api/users", userRoutes);
 
 //Furnitures maintainance
@@ -79,10 +81,9 @@ app.use("/api/furniture-types", furnitureTypeRoutes);
 app.use("/api/materials",materialsRoutes)
 app.use("/api/colors",colorRoutes)
 app.use("/api/sizes",sizeRoutes)
-app.use("/api/stocks",stocksRoutes)
 
 // Cart
-app.use('/api/carts', cartRoutes);
+app.use('/api/cart', cartRoutes);
 
 
 app.use("/api/admin", adminRoutes);

@@ -36,13 +36,13 @@ export default function AdminSignUp() {
 				throw new Error(errorData.message || "Admin sign up failed");
 			}
 			const data = await response.json();
-			if (!data || !data._id) {
+			if (!data || !data.newAdmin._id) {
 				throw new Error("No admin ID received from server");
 			}
-			const adminId = data._id;
+			const adminId = data.newAdmin._id;
 			console.log(adminId)
-			navigate(`/admin-verification/${adminId}`);
-			toast.success("Sign up successful! Please verify your email."); // Notify success
+			toast.success(data.message); // Notify success
+			navigate(`/admin-signup/verify-account/${adminId}`);
 		} catch (error) {
 			console.error("Sign up error", error.message);
 			toast.error(error.message || "Sign up failed"); // Notify error

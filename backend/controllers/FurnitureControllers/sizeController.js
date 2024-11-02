@@ -5,14 +5,14 @@ const FurnitureType = require("../../models/Furniture/furnitureTypeModel");
 // Add a new size
 exports.addSize = async (req, res) => {
 	try {
-		const { label, width, height, depth,length, furnitureTypeId } = req.body;
+		const { label, height, width, depth, furnitureTypeId } = req.body;
 
-		if (!label || !width || !height || !length || !depth || !furnitureTypeId) {
+		if (!label || !height || !width || !depth || !furnitureTypeId) {
 			return res
 				.status(400)
 				.json({
 					message:
-						"All fields are required: label, width, height, depth, and furnitureTypeId.",
+						"All fields are required: label, width, depth, and furnitureTypeId.",
 				});
 		}
 
@@ -40,11 +40,11 @@ exports.addSize = async (req, res) => {
 				});
 		}
 
-		const newSize = new Size({ label, width, height, length, depth, furnitureTypeId });
+		const newSize = new Size({ label, width, height, depth, furnitureTypeId });
 		await newSize.save();
 		res
 			.status(201)
-			.json({ message: `New size has been added ${furnitureType.name}!` });
+			.json({ message: `New size has been added ${furnitureType.name}!`,newSize });
 	} catch (error) {
 		console.error("Error adding size:", error);
 		res.status(500).json({ message: "Server error!" });
@@ -73,7 +73,7 @@ exports.getSizes = async (req, res) => {
 
     const avalableSizes = await Size.find({furnitureTypeId:furnitureType});
     if(avalableSizes.length===0){
-      return res.status(404).json({message:`No sizes available for ${furnitureType.name}`})
+      return res.status(200).json({message:`No sizes available for ${furnitureType.name}`})
     }
 
 		res.status(200).json(avalableSizes);
@@ -102,13 +102,66 @@ exports.getSizeById = async (req, res) => {
 
 exports.GetAllSizes = async (req,res) =>{
   try {
-    const allSizes = await Size.find();
+    const allSizes = await Size.find({isArchived:false});
     if(allSizes.length === 0){
-      return res.status(404).json({message:"No sizes found! Please create one"})
+      return res.status(200).json({message:"No sizes found! Please create one"})
     }
     res.status(200).json(allSizes)
   } catch (error) {
     console.log("Error fetching all sizes: ", error);
     res.status(500).json("Server error!")
   }
+}
+
+exports.UpdateSize = async (req, res) => {
+	try {
+		const { sizeId } = req.params;
+		const existingSize = await Size.findById(sizeId);
+
+		if (!existingSize) return res.status(404).json({ message: "Size not found!" });
+
+		const { label, height, width, depth } = req.body;
+
+		// Check if no fields were provided in the request body
+		if (label === undefined && height === undefined && width === undefined && depth === undefined) {
+			return res.status(400).json({ message: "At least one field is required to update: label, height, width, or depth" });
+		}
+
+		// Only update fields that are provided in the request body
+		if (label !== undefined && existingSize.label !== label) existingSize.label = label;
+		if (height !== undefined && existingSize.height !== height) existingSize.height = height;
+		if (width !== undefined && existingSize.width !== width) existingSize.width = width;
+		if (depth !== undefined && existingSize.depth !== depth) existingSize.depth = depth;
+
+		// Check if any changes were made
+		if (
+			existingSize.label === label &&
+			existingSize.height === height &&
+			existingSize.width === width &&
+			existingSize.depth === depth
+		) {
+			return res.status(400).json({ message: "No changes made!" });
+		}
+
+		await existingSize.save();
+		res.status(200).json({ message: `${existingSize.label} has been modified` });
+	} catch (error) {
+		console.error("Error in updating the size: ", error);
+		res.status(500).json({ message: "Server error!" });
+	}
+};
+
+
+exports.ArchiveSize = async (req,res) => {
+	try {
+		const {sizeId} = req.params;
+		const existingSize = await Size.findById(sizeId);
+		if(!existingSize) return res.status(404).json({message:"Size not found!"});
+		existingSize.isArchived=true
+		await existingSize.save();
+		res.status(200).json({message:`${existingSize.label} has been archived`})
+	} catch (error) {
+		console.error("Error in archiving size: ",error);
+		res.status(500).json({message:"Server error!"})
+	}
 }

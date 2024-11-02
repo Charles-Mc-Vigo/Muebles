@@ -1,11 +1,5 @@
 const Joi = require("joi");
 
-//order schema validation using Joi
-const OrderSchemaValidator = Joi.object({
-  orderStatus: Joi.string().valid("Pending", "Shipped", "Delivered", "Cancelled")
-});
-
-
 //user schema validation using Joi
 const UserSchemaValidator = Joi.object({
   firstname: Joi.string().required().min(3).max(30),
@@ -24,4 +18,4 @@ const AdminSchemaValidator = Joi.object({
 });
 
 
-module.exports = {UserSchemaValidator, OrderSchemaValidator, AdminSchemaValidator};
+module.exports = {UserSchemaValidator, AdminSchemaValidator};

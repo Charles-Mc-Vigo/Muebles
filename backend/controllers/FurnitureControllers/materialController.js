@@ -3,13 +3,13 @@ const Materials = require('../../models/Furniture/materialsModel');
 // Add new material
 exports.addMaterials = async (req, res) => {
   try {
-    const { name, quantity } = req.body;
+    const { name, stocks } = req.body;
 
-    if (!name || !quantity) {
-      return res.status(401).json({ message: "Material's name and quantity are required!" });
+    if (!name || !stocks) {
+      return res.status(401).json({ message: "Material's name and stocks are required!" });
     }
 
-    const newMaterial = new Materials({ name, quantity });
+    const newMaterial = new Materials({ name, stocks });
     await newMaterial.save();
     return res.status(201).json({ message: `${newMaterial.name} added successfully!` });
   } catch (error) {
@@ -38,7 +38,7 @@ exports.getMaterials = async (req, res) => {
   try {
     const materials = await Materials.find({ isArchived: false });
     if (materials.length === 0) {
-      return res.status(404).json({ message: "No materials found!" });
+      return res.status(200).json({ message: "No materials found!" });
     }
 
     return res.status(200).json(materials);
@@ -53,7 +53,7 @@ exports.ArchivedMaterials = async (req, res) => {
   try {
     const archivedMaterials = await Materials.find({ isArchived: true });
     if (archivedMaterials.length === 0) {
-      return res.status(400).json({ message: "No archived materials found!" });
+      return res.status(200).json({ message: "No archived materials found!" });
     }
 
     return res.status(200).json(archivedMaterials);
@@ -104,16 +104,19 @@ exports.editMaterial = async (req, res) => {
     const material = await Materials.findById(materialId);
     if (!material) return res.status(404).json({ message: "Material not found!" });
 
-    const { name, quantity } = req.body;
-    if (!name || !quantity) return res.status(400).json({ message: "All fields are required! : name, quantity" });
+    const { name, stocks } = req.body;
+    if (!name || !stocks) return res.status(400).json({ message: "All fields are required! : name, stocks" });
 
     // Check if any changes were made
-    if (material.name === name && material.quantity === quantity) {
+    if (name === undefined && stocks === undefined) {
       return res.status(400).json({ message: "No changes made!" });
     }
 
     material.name = name;
-    material.quantity = quantity;
+    material.stocks = stocks;
+    if (name !== undefined && material.name !== name) material.name = name;
+    if (stocks !== undefined && material.stocks !== stocks) material.stocks = stocks;
+
 
     await material.save();
     return res.status(200).json({ message: `${material.name} has been edited successfully!` });

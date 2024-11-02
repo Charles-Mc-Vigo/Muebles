@@ -10,7 +10,8 @@ const {
 	UnArchived,
 	ArchivedFurnitures,
 } = require("../../controllers/FurnitureControllers/furnitureController");
-// const adminOnly = require("../middlewares/adminOnly");
+
+const {checkAdminAuth} = require('../../middlewares/checkAuth');
 
 // Multer setup for handling image uploads in memory
 const upload = multer({
@@ -33,22 +34,22 @@ router.get("/", getAllFurnitures);
 
 // Get all archived furnitures
 // GET - /api/furnitures/archived
-router.get("/archived", ArchivedFurnitures);
+router.get("/archived", checkAdminAuth, ArchivedFurnitures);
 
 // Create new furniture
 // POST - /api/furnitures/add
-router.post("/add", upload.array("images", 5), createFurniture);
+router.post("/add", upload.array("images", 5), checkAdminAuth, createFurniture);
 
 // Update furniture
 // PUT - /api/furnitures/:furnitureId
-router.put("/edit/:furnitureId", upload.array("images", 5), updateFurniture);
+router.put("/edit/:furnitureId", upload.array("images", 5), checkAdminAuth, updateFurniture);
 
 // Archive furniture
 // DELETE - /api/furnitures/archived/:furnitureId
-router.delete("/archived/:furnitureId", Archived);
+router.delete("/archive/:furnitureId", checkAdminAuth, Archived);
 
 // UnArchiving the furniture
-router.post("/unarchived/:furnitureId", UnArchived);
+router.post("/unarchive/:furnitureId", checkAdminAuth, UnArchived);
 
 // Get furniture by ID
 // GET - /api/furnitures/:furnitureId
