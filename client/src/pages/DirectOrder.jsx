@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
+import Header from '../components/Header';
+import Footer from '../components/Footer';
+import { IoIosArrowBack } from "react-icons/io";
 
 const DirectOrder = () => {
   const { furnitureId } = useParams();
@@ -85,79 +88,116 @@ const DirectOrder = () => {
   if (!furniture) return <div className="text-center">No furniture found</div>;
 
   return (
-    <div className="container mx-auto p-5">
-      <h1 className="text-3xl font-bold mb-4 text-center">Direct Order for {furniture.name}</h1>
-      <div className="bg-white shadow-md rounded-lg p-5 mb-6">
-        {furniture.images && furniture.images.length > 0 && (
-          <img
-            src={`data:image/jpeg;base64,${furniture.images[0]}`}
-            alt={furniture.name}
-            className="w-25 h-25 rounded-lg mb-4"
-          />
-        )}
-        <p className="text-xl font-semibold">Price: PHP {furniture.price}</p>
-        <p className="mt-2 text-gray-700">Description: {furniture.description}</p>
-        <p className="mt-2 text-gray-700">Stocks: {furniture.stocks}</p>
-      </div>
-      <form onSubmit={handleSubmit} className="bg-white shadow-md rounded-lg p-5 space-y-4">
-        <div className="flex items-center mb-4">
-          <label className="block font-semibold mr-4">Quantity:</label>
-          <button 
-            type="button" 
-            onClick={() => handleQuantityChange(-1)} 
-            className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-1 px-3 rounded-l"
-          >
-            -
-          </button>
-          <input 
-            type="number" 
-            value={quantity} 
-            readOnly
-            className="border text-center w-16 py-1 rounded-md mx-1"
-          />
-          <button 
-            type="button" 
-            onClick={() => handleQuantityChange(1)} 
-            className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-1 px-3 rounded-r"
-          >
-            +
-          </button>
+    <div className="w-full">
+      <Header />
+      <div className="m-5 border-2 p-8 bg-white rounded-lg shadow-lg max-w-4xl mx-auto">
+
+        <div className="flex items-center mb-5">
+          <Link to="/home" className="mr-4 text-4xl text-gray-800 cursor-pointer">
+            <IoIosArrowBack />
+          </Link>
+          <h1 className="text-4xl font-bold text-gray-800">Direct Order for {furniture.name}</h1>
         </div>
-        <div>
-          <label className="block font-semibold">Payment Method:</label>
-          <select 
-            value={paymentMethod} 
-            onChange={(e) => setPaymentMethod(e.target.value)} 
-            required
-            className="border p-2 rounded w-full focus:outline-none focus:ring-2 focus:ring-green-500"
-          >
-            <option value="">Select a payment method</option>
-            <option value="GCash">GCash</option>
-            <option value="Maya">Maya</option>
-            <option value="COD">Cash on Delivery</option>
-          </select>
-        </div>
-        {["GCash", "Maya"].includes(paymentMethod) && (
-          <div>
-            <label className="block font-semibold">Proof of Payment:</label>
-            <input 
-              type="file" 
-              accept="image/*" 
-              onChange={handleFileChange} 
-              required
-              className="border p-2 rounded w-full focus:outline-none focus:ring-2 focus:ring-green-500"
-            />
+
+        {/* Main Content Section */}
+        <div className="flex flex-col md:flex-row gap-8 mb-8">
+          {/* Image on the Left */}
+          {furniture.images && furniture.images.length > 0 && (
+            <div className="bg-transparent w-full md:w-1/2 h-[400px] max-h-[400px] overflow-hidden rounded-lg shadow-md">
+              <img
+                src={`data:image/jpeg;base64,${furniture.images[0]}`}
+                alt={furniture.name}
+                className="w-full h-full object-contain p-2"
+              />
+            </div>
+          )}
+
+          {/* Product Details and Order Form on the Right */}
+          <div className="flex flex-col justify-between w-full md:w-1/2 h-[400px] space-y-6">
+            {/* Product Details */}
+            <div className="space-y-4">
+              <p className="text-3xl font-bold text-black">{furniture.name}</p>
+              <p className="text-2xl font-semibold text-black">₱ {furniture.price}</p>
+              <p className="text-black text-xl">Description: {furniture.description}</p>
+              <p className="text-black text-xl">Stocks: {furniture.stocks}</p>
+            </div>
+
+            {/* Order Form */}
+            <form onSubmit={handleSubmit} className="space-y-5">
+              {/* Quantity Selector */}
+              <div className="flex items-center">
+                <label className="block font-semibold mr-4">Quantity:</label>
+                <button
+                  type="button"
+                  onClick={() => handleQuantityChange(-1)}
+                  className="bg-gray-300 hover:bg-teal-600 text-gray-800 font-bold py-1 px-3 rounded-l"
+                >
+                  -
+                </button>
+                <input
+                  type="number"
+                  value={quantity}
+                  readOnly
+                  className="border text-center w-16 py-1 rounded-md mx-1"
+                />
+                <button
+                  type="button"
+                  onClick={() => handleQuantityChange(1)}
+                  className="bg-gray-300 hover:bg-teal-600 text-gray-800 font-bold py-1 px-3 rounded-r"
+                >
+                  +
+                </button>
+              </div>
+
+              {/* Payment Method */}
+              <div>
+                <label className="block font-semibold">Payment Method:</label>
+                <select
+                  value={paymentMethod}
+                  onChange={(e) => setPaymentMethod(e.target.value)}
+                  required
+                  className="border p-2 rounded w-full focus:outline-none focus:ring-2 focus:ring-teal-600"
+                >
+                  <option value="">Select a payment method</option>
+                  <option value="GCash">GCash</option>
+                  <option value="Maya">Maya</option>
+                  <option value="COD">Cash on Delivery</option>
+                </select>
+              </div>
+
+              {/* Proof of Payment (only for GCash or Maya) */}
+              {["GCash", "Maya"].includes(paymentMethod) && (
+                <div>
+                  <label className="block font-semibold">Proof of Payment:</label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    required
+                    className="border p-2 rounded w-full focus:outline-none focus:ring-2 focus:ring-teal-600 hover:text-teal-600"
+                  />
+                </div>
+              )}
+
+              {/* Place Order Button */}
+              <button
+                type="submit"
+                className="bg-teal-600 hover:bg-teal-800 text-black py-3 rounded-md transition-colors duration-300 w-full font-semibold"
+              >
+                Place Order
+              </button>
+            </form>
           </div>
-        )}
-        <button 
-          type="submit" 
-          className="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-md transition-colors duration-300 w-full"
-        >
-          Place Order
-        </button>
-      </form>
+        </div>
+      </div>
+      <Footer />
     </div>
   );
+
+
+
+
+
 };
 
 export default DirectOrder;

@@ -12,6 +12,7 @@ function ViewProduct() {
 	const [error, setError] = useState(null);
 	const [showArchived, setShowArchived] = useState(false);
 	const [showArchivedCategories, setShowArchivedCategories] = useState(false);
+	const [showArchivedCategories, setShowArchivedCategories] = useState(false);
 	const [showDropdown, setShowDropdown] = useState(false);
 
 	const fetchFurniture = async () => {
@@ -113,6 +114,8 @@ function ViewProduct() {
 			);
 			const data = await response.json();
 			toast.success(data.success);
+			const data = await response.json();
+			toast.success(data.success);
 			setArchivedCategories(
 				archivedCategories.filter((category) => category._id !== categoryId)
 			);
@@ -149,6 +152,7 @@ function ViewProduct() {
 							<ul className="py-1">
 								<li
 									className="block px-4 py-2 text-gray-700 hover:bg-gray-100 cursor-pointer"
+									onClick={showActiveFurniture}
 									onClick={showActiveFurniture}
 								>
 									Active Furniture
