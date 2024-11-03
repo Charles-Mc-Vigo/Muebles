@@ -426,7 +426,7 @@ const Maintenance = () => {
 					body: JSON.stringify({
 						name: newItemName,
 						categoryId: selectedCategory,
-						estimatedProductionDays: productionDays, // Include productionDays in the payload
+						estimatedProductionDays: productionDays,
 					}),
 				});
 	
@@ -438,7 +438,7 @@ const Maintenance = () => {
 				setFurnitureTypes((prevTypes) =>
 					Array.isArray(prevTypes) ? [...prevTypes, newFurnitureType] : [newFurnitureType]
 				);
-				toast.success("Furniture type added successfully.");
+				alert("Furniture type added successfully.");
 				await fetchFurnitureTypes();
 			}
 	

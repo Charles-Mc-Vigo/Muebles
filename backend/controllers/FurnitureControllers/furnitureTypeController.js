@@ -4,7 +4,7 @@ const Category = require("../../models/Furniture/categoryModel");
 
 exports.AddFurnitureType = async (req, res) => {
   try {
-    const { name, estimatedProductionDays, categoryId } = req.body;
+    const { name, categoryId } = req.body;
 
     // Check if the category exists by name
     const existingCategory = await Category.findById(categoryId);
@@ -19,7 +19,7 @@ exports.AddFurnitureType = async (req, res) => {
     }
 
     // Create a new furniture type with the category ID
-    const newFurnitureType = new FurnitureType({ name, estimatedProductionDays, categoryId: existingCategory._id });
+    const newFurnitureType = new FurnitureType({ name, categoryId: existingCategory._id });
     await newFurnitureType.save();
 
     return res.status(201).json({ message:`${newFurnitureType.name} added successfully`, newFurnitureType});
