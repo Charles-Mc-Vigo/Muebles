@@ -5,7 +5,7 @@ import { FaLongArrowAltLeft, FaLongArrowAltRight } from "react-icons/fa";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-function ProductDetails({ admin }) {
+function ProductDetails() {
 	const { id } = useParams();
 	const navigate = useNavigate();
 	const [furnitureData, setFurnitureData] = useState(null);
