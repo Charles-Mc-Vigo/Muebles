@@ -3,6 +3,8 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css"; // Import Toastify CSS
 import { IoMdArrowRoundBack } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
+import Header from "./Header";
+import Footer from "./Footer";
 
 const AddNewAddress = () => {
 	const [formData, setFormData] = useState({
@@ -351,14 +353,16 @@ const AddNewAddress = () => {
 	};
 
 	return (
-		<div className="p-8 bg-white shadow-lg rounded-lg">
+		<div className=" bg-white">
+			<Header/>
+			<div className="p-5 bg-gray-200 shadow-lg rounded-lg mb-5 mt-5 w-3/4 flex flex-col mx-auto">
 			<button
 				onClick={() => navigate(-1)} // Navigate to the previous page
-				className="text-gray-500 mr-2"
+				className="text-gray-500 mr-2 mb-2"
 			>
-				<IoMdArrowRoundBack size={30} />
+				<IoMdArrowRoundBack size={40} />
 			</button>
-			<h2 className="text-center font-semibold my-4 text-2xl">
+			<h2 className="text-center font-semibold my-2 text-2xl">
 				Add New Address
 			</h2>
 			<form className="flex flex-col gap-4" onSubmit={handleSubmit}>
@@ -417,12 +421,14 @@ const AddNewAddress = () => {
 				)}
 				<button
 					type="submit"
-					className="bg-green-800 hover:bg-green-600 text-white p-3 rounded-lg font-semibold"
+					className="bg-teal-600 hover:bg-teal-800 text-white p-3 rounded-lg font-semibold"
 				>
 					Add Address
 				</button>
 			</form>
 			<ToastContainer />
+			</div>
+			<Footer/>
 		</div>
 	);
 };

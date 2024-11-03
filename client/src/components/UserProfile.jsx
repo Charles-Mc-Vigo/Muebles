@@ -259,9 +259,12 @@ const UserProfile = () => {
 						</tbody>
 					</table>
 				</div>
+				<Link to={"/address/new"}>
 				<button className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg">
 					+ ADD NEW ADDRESS
 				</button>
+				</Link>
+				
 			</div>
 		),
 		myOrders: <OrderDetails />,

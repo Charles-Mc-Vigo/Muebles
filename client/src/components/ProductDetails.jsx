@@ -245,8 +245,8 @@ function ProductDetails({ admin }) {
 										onClick={() => handleColorClick(color)}
 										className={`w-16 h-16 rounded-full border cursor-pointer relative flex items-center justify-center transition-transform transform hover:scale-110 ${
 											selectedColor === color.name
-												? "border-blue-600"
-												: "border-gray-400"
+												? "bg-teal-600 text-black"
+												: "text-black"
 										}`}
 										style={{ backgroundColor: color.hex }}
 									></div>
@@ -260,10 +260,10 @@ function ProductDetails({ admin }) {
 									<span
 										key={material.id}
 										onClick={() => handleMaterialClick(material)}
-										className={`border px-2 py-1 rounded-md cursor-pointer transition ${
+										className={`border border-black px-2 py-1 rounded-md  cursor-pointer transition ${
 											selectedMaterial === material.name
-												? "bg-blue-600 text-white"
-												: "text-gray-800"
+												? "bg-teal-600 text-black"
+												: "text-black"
 										}`}
 									>
 										{material.name}
@@ -280,8 +280,8 @@ function ProductDetails({ admin }) {
 										onClick={() => handleSizeClick(size)}
 										className={`border px-2 py-1 rounded-md cursor-pointer transition ${
 											selectedSize === size.label
-												? "bg-blue-600 text-white"
-												: "text-gray-800"
+												? "bg-teal-600 text-black"
+												: "text-black"
 										}`}
 									>
 										{size.label}
@@ -302,14 +302,14 @@ function ProductDetails({ admin }) {
 						<div className="mt-4 flex gap-4">
 							<button
 								onClick={addToCart}
-								className="text-blue-600 hover:text-blue-800 border border-blue-600 text-xl font-semibold px-4 rounded-md transition-colors duration-300 flex-1 py-2"
+								className="text-black bg-teal-600 hover:bg-teal-800 border border-teal-600 text-xl font-semibold px-4 rounded-md transition-colors duration-300 flex-1 py-2"
 							>
 								Add to Cart
 							</button>
 
 							<Link
 								to={`/direct-order/${id}`}
-								className="bg-blue-600 text-white text-xl font-semibold px-4 rounded-md flex-1 py-2 text-center cursor-not-allowed opacity-50"
+								className="bg-teal-600 text-black text-xl font-semibold px-4 rounded-md flex-1 py-2 text-center cursor-not-allowed opacity-50"
 								aria-disabled="true"
 								tabIndex={-1}
 							>
