@@ -72,9 +72,9 @@ const Home = () => {
 		}
 	};
 
-  const handCartRefresh = async () => {
-    await fetchCartCount()
-  }
+	const handCartRefresh = async () => {
+		await fetchCartCount()
+	}
 
 	useEffect(() => {
 		fetchCartCount(); // Fetch cart count when the component mounts
@@ -246,7 +246,7 @@ const Home = () => {
             md:transform-none
           `}
 					>
-						 {/* Close Button (Mobile) */}
+						{/* Close Button (Mobile) */}
 						<button
 							onClick={toggleFilter}
 							className="md:hidden absolute top-4 right-4 text-gray-500 hover:text-gray-700"
@@ -281,7 +281,7 @@ const Home = () => {
 									incrementCartCount(); // Increment local cart count
 									fetchCartCount(); // Refresh cart count from API
 								}}
-                onRefresh = {handCartRefresh}
+								onRefresh={handCartRefresh}
 							/>
 						))}
 					</div>
