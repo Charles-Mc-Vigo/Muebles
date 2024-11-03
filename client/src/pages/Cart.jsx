@@ -5,8 +5,11 @@ import { FaTruck } from "react-icons/fa";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+
 const Cart = () => {
 	const [items, setItems] = useState([]);
+	const [user, setUser] = useState(null);
+	const [selectedAddress, setSelectedAddress] = useState(null);
 	const [count, setCount] = useState(0);
 	const [totalAmount, setTotalAmount] = useState(0);
 	const [proofOfPayment, setProofOfPayment] = useState(null);
@@ -15,6 +18,8 @@ const Cart = () => {
 	const [error, setError] = useState(null);
 	const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
 	const navigate = useNavigate(); // Hook to navigate
+
+	
 
 	// Fetch cart items from the API
 	const fetchCartItems = async () => {
@@ -29,16 +34,18 @@ const Cart = () => {
 			const data = await response.json();
 
 			if (!data.ok) {
-				toast.error(data.error)
+				toast.error(data.error);
 			}
 			if (data.cart && data.cart.items.length > 0) {
 				setItems(data.cart.items);
 				setCount(data.cart.count);
 				setTotalAmount(data.cart.totalAmount);
+				setUser(data.cart.userId);
 			} else {
 				setItems([]);
 				setCount(0);
 				setTotalAmount(0);
+				setUser(null);
 			}
 			setLoading(false);
 		} catch (error) {
@@ -174,6 +181,10 @@ const Cart = () => {
 		return <div>Error: {error}</div>;
 	}
 
+	const toggleAddressOptions = () => {
+    setShowAddressOptions((prev) => !prev);
+  };
+
 	return (
 		<div className="flex flex-col min-h-screen mt-16">
 			<main className="flex-grow w-2/4 mx-auto p-4">
@@ -192,6 +203,42 @@ const Cart = () => {
 						Clear Cart
 					</button>
 				</div>
+				<div>
+					<div>
+						Client: {user.firstname} {user.lastname} <br />
+						Phone Number: {user.phoneNumber}
+					</div>
+
+					<div>
+						<h3>Shipping Address</h3>
+						{user.addresses && user.addresses.length > 0 ? (
+							user.addresses.map((address, index) => (
+								<div key={index} className="address-option">
+									<label>
+										<input
+											type="radio"
+											name="selectedAddress"
+											value={index}
+											onChange={(e) => setSelectedAddress(e.target.value)}
+										/>
+										<span>
+											{address.streetAddress}, {address.barangay},{" "}
+											{address.municipality}, {address.zipCode}
+										</span>
+									</label>
+								</div>
+							))
+						) : (
+							<p>No addresses available. Please add an address.</p>
+						)}
+
+						{/* Button to Add New Address */}
+						<button onClick={()=>navigate('/address/new')} className="bg-blue-500 text-white px-2 py-1 rounded mt-3">
+							Create New Address
+						</button>
+					</div>
+				</div>
+
 				{items.length === 0 ? (
 					<p className="text-center text-gray-600">Your cart is empty.</p>
 				) : (
@@ -231,7 +278,9 @@ const Cart = () => {
 														className="px-3 py-1 border border-gray-400"
 														onClick={() => {
 															if (item.quantity < 1) {
-																toast.error("Quantity cannot be less than zero.");
+																toast.error(
+																	"Quantity cannot be less than zero."
+																);
 															} else {
 																updateQuantity(
 																	item.furnitureId._id,
@@ -246,9 +295,7 @@ const Cart = () => {
 													<button
 														className="px-3 py-1 border border-gray-400"
 														onClick={() => {
-															if (
-																item.furnitureId.stocks <= item.quantity
-															) {
+															if (item.furnitureId.stocks <= item.quantity) {
 																toast.error(
 																	"Cannot increase quantity. Available stock is insufficient."
 																);
