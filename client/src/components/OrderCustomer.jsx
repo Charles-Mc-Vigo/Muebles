@@ -1,130 +1,164 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
-const OrderManagement = () => {
-  // Dummydata
-  const dummyOrders = [
-    { id: 1, customerName: 'John Doe', totalAmount: 120.5, orderDate: '2024-10-01', status: 'Pending' },
-    { id: 2, customerName: 'Jane Smith', totalAmount: 250.0, orderDate: '2024-10-05', status: 'Processing' },
-    { id: 3, customerName: 'Michael Brown', totalAmount: 89.99, orderDate: '2024-09-28', status: 'Shipped' },
-    { id: 4, customerName: 'Lucy Green', totalAmount: 350.75, orderDate: '2024-10-12', status: 'Delivered' },
-    { id: 5, customerName: 'Chris Blue', totalAmount: 190.99, orderDate: '2024-10-03', status: 'Cancelled' },
-    { id: 6, customerName: 'Linda White', totalAmount: 480.5, orderDate: '2024-09-25', status: 'Pending' },
-    { id: 7, customerName: 'James Black', totalAmount: 70.99, orderDate: '2024-10-07', status: 'Processing' },
-    { id: 8, customerName: 'Patricia Johnson', totalAmount: 660.0, orderDate: '2024-09-22', status: 'Delivered' },
-    { id: 9, customerName: 'Robert King', totalAmount: 320.2, orderDate: '2024-10-10', status: 'Shipped' },
-    { id: 10, customerName: 'Sophia Williams', totalAmount: 140.3, orderDate: '2024-09-30', status: 'Cancelled' },
-  ];
+const OrderCustomer = () => {
+	const [orders, setOrders] = useState([]);
+	const [loading, setLoading] = useState(false);
+	const [filterStatus, setFilterStatus] = useState("All");
+	const [editingOrderId, setEditingOrderId] = useState(null);
+	const navigate = useNavigate();
 
-  const [orders, setOrders] = useState(dummyOrders);
-  const [statusFilter, setStatusFilter] = useState('All');
-  const [searchQuery, setSearchQuery] = useState('');
+	const fetchOrder = async () => {
+		setLoading(true);
+		try {
+			const response = await fetch("http://localhost:3000/api/orders/my-orders", {
+				method: "GET",
+				credentials: "include",
+			});
+			if (!response.ok) {
+				throw new Error("Failed to fetch orders");
+			}
+			const ordersData = await response.json();
+			setOrders(ordersData);
+		} catch (error) {
+			console.log("Error fetching orders", error);
+		} finally {
+			setLoading(false);
+		}
+	};
 
-  const handleStatusChange = (orderId, newStatus) => {
-    setOrders((prevOrders) =>
-      prevOrders.map((order) =>
-        order.id === orderId ? { ...order, status: newStatus } : order
-      )
-    );
-  };
+	useEffect(() => {
+		fetchOrder();
+	}, []);
 
-  const filteredOrders = orders
-    .filter((order) =>
-      statusFilter === 'All' ? true : order.status === statusFilter
-    )
-    .filter((order) =>
-      order.customerName.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+	const handleStatusChange = async (orderId, newStatus) => {
+		try {
+			const response = await fetch(`http://localhost:3000/api/orders/${orderId}/status`, {
+				method: "PUT",
+				credentials: "include",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({ orderStatus: newStatus }),
+			});
+			if (!response.ok) {
+				throw new Error("Failed to update order status");
+			}
+			setOrders((prevOrders) =>
+				prevOrders.map((order) =>
+					order._id === orderId ? { ...order, orderStatus: newStatus } : order
+				)
+			);
+			setEditingOrderId(null); // Close the edit mode after updating
+		} catch (error) {
+			console.error("Error updating order status", error);
+		}
+	};
 
-  return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold mb-6">Order Management</h1>
+	const filteredOrders =
+		filterStatus === "All"
+			? orders
+			: orders.filter((order) => order.orderStatus === filterStatus.toLowerCase());
 
-      {/* Filters and Search */}
-      <div className="flex justify-between items-center mb-6">
-        {/* Filter Dropdown */}
-        <div className="flex items-center space-x-2">
-          <label htmlFor="statusFilter" className="font-medium">Filter by Status:</label>
-          <select
-            id="statusFilter"
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="border p-2 rounded"
-          >
-            <option value="All">All</option>
-            <option value="Pending">Pending</option>
-            <option value="Processing">Processing</option>
-            <option value="Shipped">Shipped</option>
-            <option value="Delivered">Delivered</option>
-            <option value="Cancelled">Cancelled</option>
-          </select>
-        </div>
-
-        {/* Search Bar */}
-        <div className="w-80">
-          <input
-            type="text"
-            placeholder="Search by customer name"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="border p-2 rounded w-full"
-          />
-        </div>
-      </div>
-
-      {/* Order List Table */}
-      <div className="overflow-x-auto">
-        <table className="min-w-full bg-white border border-gray-300">
-          <thead>
-            <tr className="bg-gray-300 border-t-2">
-              <th className="py-3 px-6 text-center">Order ID</th>
-              <th className="py-3 px-6 text-left">Customer Name</th>
-              <th className="py-3 px-6 text-center">Total Amount</th>
-              <th className="py-3 px-6 text-center">Order Date</th>
-              <th className="py-3 px-6 text-center">Status</th>
-              <th className="py-3 px-6 text-center">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredOrders.map((order) => (
-              <tr key={order.id} className="hover:bg-gray-50">
-                <td className="py-3 px-6 text-center">{order.id}</td>
-                <td className="py-3 px-6 text-left">{order.customerName}</td>
-                <td className="py-3 px-6 text-center">${order.totalAmount}</td>
-                <td className="py-3 px-6 text-center">
-                  {new Date(order.orderDate).toLocaleDateString()}
-                </td>
-                <td className="py-3 px-6 text-center">
-                  <select
-                    value={order.status}
-                    onChange={(e) => handleStatusChange(order.id, e.target.value)}
-                    className="border p-1 rounded"
-                  >
-                    <option value="Pending">Pending</option>
-                    <option value="Processing">Processing</option>
-                    <option value="Shipped">Shipped</option>
-                    <option value="Delivered">Delivered</option>
-                    <option value="Cancelled">Cancelled</option>
-                  </select>
-                </td>
-                <td className="py-3 px-6 text-center">
-                  <button
-                    className="bg-blue-500 text-white px-4 py-1 rounded hover:bg-blue-600"
-                    onClick={() => alert(`Details of Order ${order.id}`)}
-                  >
-                    View
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {filteredOrders.length === 0 && (
-        <p className="text-center text-gray-500 mt-4">No orders found</p>
-      )}
-    </div>
-  );
+	return (
+		<div className="container mx-auto p-6 bg-gray-100 min-h-screen">
+			<h1 className="text-3xl font-bold text-center mb-6 text-gray-800">Order Management</h1>
+			<div className="flex justify-between mb-4">
+				<div>
+					<label className="text-gray-700">Filter by Status: </label>
+					<select
+						value={filterStatus}
+						onChange={(e) => setFilterStatus(e.target.value)}
+						className="border border-gray-300 rounded p-2 ml-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+					>
+						<option value="All">All</option>
+						<option value="Pending">Pending</option>
+						<option value="Confirmed">Confirmed</option>
+						<option value="Delivered">Delivered</option>
+						<option value="Cancelled">Cancelled</option>
+					</select>
+				</div>
+				<input
+					type="text"
+					placeholder="Search by customer name"
+					className="border border-gray-300 rounded p-2 ml-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+				/>
+			</div>
+			{loading ? (
+				<div className="flex items-center justify-center">
+					<div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-blue-500"></div>
+					<p className="ml-4 text-gray-600">Loading orders...</p>
+				</div>
+			) : (
+				<table className="min-w-full bg-white border border-gray-200 shadow-md">
+					<thead className="bg-gray-200">
+						<tr>
+							<th className="py-3 px-4 border-b text-left text-sm font-semibold text-gray-700">Order ID</th>
+							<th className="py-3 px-4 border-b text-left text-sm font-semibold text-gray-700">Customer Name</th>
+							<th className="py-3 px-4 border-b text-left text-sm font-semibold text-gray-700">Total Amount</th>
+							<th className="py-3 px-4 border-b text-left text-sm font-semibold text-gray-700">Order Date</th>
+							<th className="py-3 px-4 border-b text-left text-sm font-semibold text-gray-700">Status</th>
+							<th className="py-3 px-4 border-b text-left text-sm font-semibold text-gray-700">Action</th>
+						</tr>
+					</thead>
+					<tbody>
+						{filteredOrders.map((order) => (
+							<tr key={order._id} className="hover:bg-gray-100 transition-colors duration-200">
+								<td className="py-3 px-4 border-b text-gray-600">{order.orderNumber}</td>
+								<td className="py-3 px-4 border-b text-gray-600">{order.user.firstname}</td>
+								<td className="py-3 px-4 border-b text-gray-600">PHP {order.totalAmount}</td>
+								<td className="py-3 px-4 border-b text-gray-600">
+									{new Date(order.createdAt).toLocaleDateString("en-US")}
+								</td>
+								<td className="py-3 px-4 border-b text-gray-600">
+									{editingOrderId === order._id ? (
+										<select
+											defaultValue={order.orderStatus}
+											onChange={(e) => handleStatusChange(order._id, e.target.value)}
+											className="border p-1 rounded"
+										>
+											<option value="pending">Pending</option>
+											<option value="confirmed">Confirmed</option>
+											<option value="delivered">Delivered</option>
+											<option value="cancelled">Cancelled</option>
+										</select>
+									) : (
+										<span
+											className={`px-3 py-1 text-sm rounded-full ${
+												order.orderStatus === "pending"
+													? "bg-yellow-200 text-yellow-800"
+													: order.orderStatus === "confirmed"
+													? "bg-blue-200 text-blue-800"
+													: order.orderStatus === "delivered"
+													? "bg-green-200 text-green-800"
+													: "bg-red-200 text-red-800"
+											}`}
+										>
+											{order.orderStatus.charAt(0).toUpperCase() + order.orderStatus.slice(1)}
+										</span>
+									)}
+								</td>
+								<td className="py-3 px-4 border-b text-gray-600">
+									<button
+										onClick={() => setEditingOrderId(editingOrderId === order._id ? null : order._id)}
+										className="text-blue-500 hover:underline"
+									>
+										{editingOrderId === order._id ? "Save" : "Update"}
+									</button>
+									<button
+										onClick={() => navigate(`/orders/${order._id}`)} // Navigate to order details
+										className="ml-4 text-green-500 hover:underline"
+									>
+										View
+									</button>
+								</td>
+							</tr>
+						))}
+					</tbody>
+				</table>
+			)}
+		</div>
+	);
 };
 
-export default OrderManagement;
+export default OrderCustomer;

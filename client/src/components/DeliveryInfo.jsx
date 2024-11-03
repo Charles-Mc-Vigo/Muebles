@@ -4,7 +4,7 @@ import Footer from "./Footer";
 
 const Delivery = () => {
   return (
-    <div className="min-h-screen flex flex-col mt-40" style={{ fontFamily: "Playfair Display, serif" }}>
+    <div className="min-h-screen flex flex-col " style={{ fontFamily: "Playfair Display, serif" }}>
       <Header />
       <div className="flex-grow">
         <div className="max-w-7xl mx-auto bg-gray-300 rounded-lg shadow-lg p-12 my-8">

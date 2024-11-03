@@ -1,12 +1,11 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBars, faUser, faCog, faTimes } from "@fortawesome/free-solid-svg-icons";
+import { faBars, faUser, faCog, faSignOutAlt, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
-import Profile from "./Profile";
+import Logout from "../components/Logout";
 
 const HamburgerMenu = () => {
     const [isOpen, setIsOpen] = useState(false);
-    const menuRef = useRef(null);
     const [profile, setProfile] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -39,66 +38,52 @@ const HamburgerMenu = () => {
         setIsOpen((prev) => !prev);
     };
 
-    const handleKeyDown = (e) => {
-        if (e.key === "Escape") {
-            setIsOpen(false);
-        }
-    };
-
-    useEffect(() => {
-        if (isOpen) {
-            menuRef.current.focus();
-        }
-    }, [isOpen]);
-
     return (
         <div>
-            <button onClick={toggleMenu} className="p-2 focus:outline-none" aria-label="Toggle menu">
-                <FontAwesomeIcon icon={isOpen ? faTimes : faBars} size="lg" />
+            <button onClick={toggleMenu} className="text-gray-800 p-2">
+                <FontAwesomeIcon icon={faBars} />
             </button>
-            <div
-                className={`fixed top-0 right-0 h-full w-64 bg-white shadow-lg z-50 transform ${isOpen ? "translate-x-0" : "translate-x-full"} transition-transform duration-300 ease-in-out`}
-                tabIndex="-1"
-                ref={menuRef}
-                onKeyDown={handleKeyDown}
-            >
-                <ul className="space-y-4 mt-8 p-4">
-                    <li>
-                        <Profile showNameAndImage={true} />
-                    </li>
-                    {/* Profile */}
-                    <li>
-                        <Link to="/profile">
-                            <button className="focus:outline-none flex items-center hover:bg-gray-100 rounded-md p-2 transition">
-                                <FontAwesomeIcon icon={faUser} className="mr-2" /> Profile
-                            </button>
-                        </Link>
-                    </li>
-                    {/* Settings */}
-                    <li>
-                        <Link to="/settings">
-                            <button className="focus:outline-none flex items-center hover:bg-gray-100 rounded-md p-2 transition">
-                                <FontAwesomeIcon icon={faCog} className="mr-2" /> Settings
-                            </button>
-                        </Link>
-                    </li>
-                </ul>
-                {loading && <div>Loading...</div>}
-                {error && <div className="text-red-500">{error}</div>}
-            </div>
+
             {isOpen && (
-                <div
-                    className="fixed inset-0 bg-black opacity-50 z-40"
-                    onClick={toggleMenu}
-                    aria-label="Close menu overlay"
-                    role="button"
-                    tabIndex="0"
-                    onKeyDown={(e) => {
-                        if (e.key === "Enter" || e.key === " ") {
-                            toggleMenu();
-                        }
-                    }}
-                ></div>
+                <div className="fixed inset-0 z-50 flex">
+                    <div className="bg-black bg-opacity-50 w-full h-full" onClick={toggleMenu}></div>
+                    <div className="relative bg-white w-64 p-4 shadow-lg z-50" style={{ animation: "slideIn 0.3s forwards" }}>
+                        <button onClick={toggleMenu} className="absolute top-4 right-4 text-gray-600">
+                            <FontAwesomeIcon icon={faTimes} />
+                        </button>
+
+                        <div className="flex flex-col items-center mb-6">
+                            {loading ? (
+                                <p>Loading...</p>
+                            ) : error ? (
+                                <p>{error}</p>
+                            ) : profile ? (
+                                <div className="text-center">
+                                    <p className="text-2xl text-teal-600 font-semibold mb-5">JCKAME</p>
+                                    <img
+                                        src={profile?.avatarUrl || "/default-avatar.png"}
+                                        alt="Profile"
+                                        className="w-32 h-32 rounded-full mb-2 border-2"
+                                    />
+                                    <p className="text-lg text-black">{profile.role}</p>
+                                </div>
+                            ) : null}
+                        </div>
+
+                        <nav className="space-y-4">
+                                <FontAwesomeIcon icon={faUser} />
+                                <span className="ml-2">Profile</span>
+                           
+                            <Link to="/dashboard/setting/admin-profile/view" className="flex items-center space-x-2 text-gray-700 hover:text-teal-600">
+                                <FontAwesomeIcon icon={faCog} />
+                                <span>Settings</span>
+                            </Link>
+                            <div className="w-full mt-auto flex justify-center items-center py-4">
+                                <Logout isAdmin={true} />
+                            </div>
+                        </nav>
+                    </div>
+                </div>
             )}
         </div>
     );

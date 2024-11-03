@@ -4,6 +4,9 @@ import { IoMdArrowRoundBack } from "react-icons/io";
 import { FaTruck } from "react-icons/fa";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Header from "../components/Header";
+import Footer from "../components/Footer";
+
 
 const Cart = () => {
 	const [items, setItems] = useState([]);
@@ -228,26 +231,27 @@ const Cart = () => {
 	}
 
 	return (
-		<div className="flex flex-col min-h-screen mt-16">
-			<main className="flex-grow w-2/4 mx-auto p-4">
+		<div className="flex flex-col min-h-screen">
+			<Header/>
+			<main className="flex-grow w-2/4 mx-auto p-4 mt-5">
 				<div className="flex items-center mb-4 gap-5">
 					<button
 						onClick={() => navigate(-1)} // Navigate to the previous page
-						className="text-gray-500 mr-2"
+						className="text-gray-500 mr-2 hover:text-teal-600"
 					>
-						<IoMdArrowRoundBack size={30} />
+						<IoMdArrowRoundBack size={40} />
 					</button>
-					<h2 className="text-2xl font-semibold text-green-700">Your Cart</h2>
+					<h2 className="text-2xl font-semibold text-teal-600">Your Cart</h2>
 					<button
 						onClick={clearCart}
-						className="text-red-600 text-lg px-4 py-2 rounded ml-auto"
+						className="text-teal-600 hover:text-teal-800 font-semibold text-xl px-4 py-2 rounded ml-auto"
 					>
 						Clear Cart
 					</button>
 				</div>
 
 				{items.length === 0 ? (
-					<p className="text-center text-gray-600">Your cart is empty.</p>
+					<p className="text-center font-bold text-2xl text-teal-600">Your cart is empty.</p>
 				) : (
 					<>
 						{/* user details */}
@@ -403,7 +407,7 @@ const Cart = () => {
 													).toFixed(2)}
 												</p>
 												<button
-													className="ml-4 text-red-600 hover:text-red-800"
+													className="ml-4 text-teal-600 hover:teal-red-800"
 													onClick={() => removeItem(item.furnitureId._id)}
 												>
 													Remove
@@ -534,6 +538,7 @@ const Cart = () => {
 				)}
 			</main>
 			<ToastContainer />
+			<Footer/>
 		</div>
 	);
 };

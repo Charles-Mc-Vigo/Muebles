@@ -21,7 +21,7 @@ import Notification from "../components/Notification";
 import ProductCustomization from "./ProductCustomization";
 import OrderManagement from "./OrderManagement";
 import TransactionHistory from "./TransactionHistory";
-import DeliveryManagement from "../DeliveryManagement";
+import DeliveryManagement from "./DeliveryManagement";
 
 const Dashboard = () => {
   // State management for dropdowns
@@ -254,11 +254,6 @@ const Dashboard = () => {
             )}
           </ul>
         </nav>
-
-        {/* signout */}
-        <div className="w-full mt-auto flex justify-center items-center py-4">
-          <Logout isAdmin={true} />
-        </div>
       </aside>
 
       {/* Main Content */}
