@@ -1,5 +1,15 @@
 const mongoose = require('mongoose');
 
+// Define shipping fees based on municipality
+const shippingFees = {
+  Boac: 500,
+  Mogpog: 700,
+  Gasan: 500,
+  Buenavista: 800,
+  Santa_Cruz: 3000,
+  Torrijos: 3000,
+};
+
 const orderSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
@@ -44,9 +54,9 @@ const orderSchema = new mongoose.Schema({
     enum: ['COD', 'GCash', 'Maya'],
     required: true
   },
-  proofOfPayment:{
-    type:String,
-    require:true
+  proofOfPayment: {
+    type: String,
+    required: true
   },
   orderStatus: {
     type: String,
@@ -76,28 +86,32 @@ orderSchema.statics.createFromCart = async function(cartId, paymentMethod, proof
       .populate('userId')
       .populate('items.furnitureId');
   if (!cart) throw new Error('Cart not found');
-  
+
+  // Use the first address in the user's addresses array
+  const userAddress = cart.userId.addresses[0]; // Adjust this as necessary
+  const shippingFee = shippingFees[userAddress.municipality] || 0; // Default to 0 if not found
+
   const orderData = {
       user: cart.userId._id,
       items: cart.items.map(item => ({
           furniture: item.furnitureId._id,
           quantity: item.quantity,
           price: item.furnitureId.price,
-          material:item.material,
-          color:item.color,
-          size:item.size,
+          material: item.material,
+          color: item.color,
+          size: item.size,
       })),
       shippingAddress: {
-          streetAddress: cart.userId.streetAddress,
-          municipality: cart.userId.municipality,
-          barangay: cart.userId.barangay,
-          zipCode: cart.userId.zipCode
+          streetAddress: userAddress.streetAddress,
+          municipality: userAddress.municipality,
+          barangay: userAddress.barangay,
+          zipCode: userAddress.zipCode
       },
       phoneNumber: cart.userId.phoneNumber,
       paymentMethod: paymentMethod,
       subtotal: cart.totalAmount,
-      shippingFee: 100, 
-      totalAmount: cart.totalAmount + 100,
+      shippingFee: shippingFee, 
+      totalAmount: cart.totalAmount + shippingFee,
       proofOfPayment: proofOfPayment
   };
 
@@ -110,10 +124,13 @@ orderSchema.statics.createDirectOrder = async function(orderData) {
   if (!orderData.userId || !orderData.items || !orderData.paymentMethod) {
     throw new Error('Missing required fields');
   }
-
   // Fetch user details
   const user = await mongoose.model('User').findById(orderData.userId);
   if (!user) throw new Error('User not found');
+
+  // Use the first address in the user's addresses array
+  const userAddress = user.addresses[0]; // Adjust this as necessary
+  const shippingFee = shippingFees[userAddress.municipality] || 0; // Default to 0 if not found
 
   // Fetch furniture details and validate stock
   const furniturePromises = orderData.items.map(async (item) => {
@@ -125,18 +142,16 @@ orderSchema.statics.createDirectOrder = async function(orderData) {
     return {
       furniture: furniture._id,
       quantity: item.quantity,
-      material:item.material,
-      color:item.color,
-      size:item.size,
+      material: item.material,
+      color: item.color,
+      size: item.size,
       price: furniture.price
     };
   });
-
   const processedItems = await Promise.all(furniturePromises);
 
   // Calculate totals
   const subtotal = processedItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  const shippingFee = 100; // Fixed shipping fee
   const totalAmount = subtotal + shippingFee;
 
   // Prepare order document
@@ -144,10 +159,10 @@ orderSchema.statics.createDirectOrder = async function(orderData) {
     user: user._id,
     items: processedItems,
     shippingAddress: orderData.shippingAddress || {
-      streetAddress: user.streetAddress,
-      municipality: user.municipality,
-      barangay: user.barangay,
-      zipCode: user.zipCode
+      streetAddress: userAddress.streetAddress,
+      municipality: userAddress.municipality,
+      barangay: userAddress.barangay,
+      zipCode: userAddress.zipCode
     },
     phoneNumber: orderData.phoneNumber || user.phoneNumber,
     paymentMethod: orderData.paymentMethod,
@@ -162,5 +177,4 @@ orderSchema.statics.createDirectOrder = async function(orderData) {
 };
 
 const Order = mongoose.model('Order', orderSchema);
-
 module.exports = Order;
