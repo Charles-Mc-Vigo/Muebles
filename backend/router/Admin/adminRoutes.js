@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const {AdminSignup, AdminLogin, AllAdmins, verifyEmail, adminLogout, getAdminById, PendingAdminRequest, AcceptAdminRequest, updateProfile, myProfile, unconfirmedAdmin, viewPendingOrder, AcceptOrder, getOrderId , cancelOrder} = require('../../controllers/Admin/adminController');
+const {AdminSignup, AdminLogin, AllAdmins, verifyEmail, adminLogout, getAdminById, PendingAdminRequest, AcceptAdminRequest, updateProfile, myProfile, unconfirmedAdmin, viewPendingOrder, AcceptOrder, getOrderId , cancelOrder, getOrderByOrderNumber} = require('../../controllers/Admin/adminController');
 const orderController = require('../../controllers/Order/orderController')
 const { checkAdminAuth } = require('../../middlewares/checkAuth');
 const multer = require('multer');

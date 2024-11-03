@@ -42,7 +42,7 @@ import EditAdminProfile from "./components/EditAdminProfile";
 import ViewOrder from "./components/ViewOrder";
 import DirectOrder from "./pages/DirectOrder";
 import AddNewAddress from "./components/AddNewAddress";
-
+import ViewUserOrder from "./components/ViewUserOrder";
 
 export default function App() {
 	return (
@@ -52,14 +52,23 @@ export default function App() {
 				<Route path="/about" element={<About />} />
 				<Route path="/signup" element={<SignUp />} />
 				<Route path="/login" element={<Login />} />
-                <Route path="/terms&condition" element={<TermsAndConditions />} />
-                <Route path="/payment-method" element={<PaymentMethod />} />
+				<Route path="/terms&condition" element={<TermsAndConditions />} />
+				<Route path="/payment-method" element={<PaymentMethod />} />
 				<Route path="/verify-account/:userId" element={<EmailVerification />} />
 				<Route path="/home" element={<ProtectedRoute element={Home} />} />
-				<Route path ="/my-profile/view" element={<ProtectedRoute element={UserProfile}/>} />
+				<Route
+					path="/my-profile/view"
+					element={<ProtectedRoute element={UserProfile} />}
+				/>
 				<Route path ="/my-profile/edit" element={<ProtectedRoute element={EditUserProfile}/>} />
-				<Route path ="/direct-order/:furnitureId" element={<ProtectedRoute element={DirectOrder}/>} />
-				<Route path='/address/new' element={<AddNewAddress/>}/>
+				<Route
+					path="/direct-order/:furnitureId"
+					element={<ProtectedRoute element={DirectOrder} />}
+				/>
+				<Route
+					path="/address/new"
+					element={<ProtectedRoute element={AddNewAddress} />}
+				/>
 				<Route path="/password-reset/request" element={<PasswordResetRequest />}/>
 				<Route
 					path="/password-reset/verify/:userId"
@@ -78,14 +87,21 @@ export default function App() {
 					element={<ProtectedRoute element={OrderDetails} />}
 				/>
 				<Route path="/cart" element={<ProtectedRoute element={Cart} />} />
-                <Route path="/delivery-info" element={<DeliveryInfo />} />
-				<Route path = "/orders" element={<ProtectedRoute element={ViewOrder}/>} />
+				<Route path="/delivery-info" element={<DeliveryInfo />} />
+				<Route
+					path="/orders"
+					element={<ProtectedRoute element={ViewOrder} />}
+				/>
 
 				{/* Admin routes */}
 				<Route path="/admin-login" element={<AdminLogin />} />
 				<Route path="/admin-signup" element={<AdminSignUp />} />
 				<Route
 					path="/admin-signup/verify-account/:adminId" element={<AdminVerify />}/>
+				<Route
+					path={`/order/:orderId`}
+					element={<ProtectedRoute element={ViewUserOrder} adminOnly={true} />}
+				/>
 				<Route
 					path="/admin-signup/verify-account/:adminId/pending"element={<AdminPendingPage />}/>
 				<Route
@@ -113,7 +129,7 @@ export default function App() {
 					path="/furniture-list"
 					element={<ProtectedRoute element={FurnitureList} />}
 				/>
-                <Route path="/manage-delivery" element={<DeliveryManagement />} />
+				<Route path="/manage-delivery" element={<DeliveryManagement />} />
 				<Route
 					path="/user-management"
 					element={<ProtectedRoute element={UserManagement} adminOnly={true} />}
@@ -124,7 +140,12 @@ export default function App() {
 						<ProtectedRoute element={OrderManagement} adminOnly={true} />
 					}
 				/>
-                <Route path="/view-transaction" element={<ProtectedRoute element={TransactionHistory} adminOnly={true} />} />
+				<Route
+					path="/view-transaction"
+					element={
+						<ProtectedRoute element={TransactionHistory} adminOnly={true} />
+					}
+				/>
 				<Route
 					path="/product-management"
 					element={

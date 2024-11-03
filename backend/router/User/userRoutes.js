@@ -43,8 +43,8 @@ router.get('/setting/my-profile/view', checkUserAuth, ViewProfile);
 router.put('/setting/my-profile/update', checkUserAuth, upload.single('image'), UpdateUserInformation);
 
 // Address routes
-router.get('/addresses', checkUserAuth, GetUserAddresses);
-router.post('/addresses/new', checkUserAuth, AddNewAddress);
+router.get('/address', checkUserAuth, GetUserAddresses);
+router.post('/address/new', checkUserAuth, AddNewAddress);
 
 // Admin routes
 router.get('/', checkAdminAuth, getAllUsers);

@@ -15,15 +15,15 @@ import { IoChevronBackSharp } from "react-icons/io5";
 import { Link } from 'react-router-dom';
 
 function ProductDetails() {
-  const { id } = useParams();
-  const navigate = useNavigate();
-  const [furnitureData, setFurnitureData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [selectedColor, setSelectedColor] = useState(null);
-  const [selectedMaterial, setSelectedMaterial] = useState(null);
-  const [selectedSize, setSelectedSize] = useState(null);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+	const { id } = useParams();
+	const navigate = useNavigate();
+	const [furnitureData, setFurnitureData] = useState(null);
+	const [loading, setLoading] = useState(true);
+	const [error, setError] = useState(null);
+	const [selectedColor, setSelectedColor] = useState(null);
+	const [selectedMaterial, setSelectedMaterial] = useState(null);
+	const [selectedSize, setSelectedSize] = useState(null);
+	const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   useEffect(() => {
     const fetchFurnitureDetails = async () => {

@@ -3,6 +3,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBell } from "@fortawesome/free-solid-svg-icons";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css"; // Import the CSS for toast notifications
+import { useNavigate } from 'react-router-dom';
+
 
 const Notification = () => {
 	const [notification, setNotification] = useState({
@@ -10,6 +12,7 @@ const Notification = () => {
 		orders: [],
 	});
 	const [isOpen, setIsOpen] = useState(false);
+	const navigate = useNavigate();
 
 	const toggleNotification = () => {
 		setIsOpen(!isOpen);
@@ -81,6 +84,26 @@ const Notification = () => {
 		}
 	};
 
+	const viewNewOrder = async (orderId) => {
+		try {
+			const response = await fetch(
+				`http://localhost:3000/api/admin/order/${orderId}`,
+				{
+					method: "GET",
+					credentials: "include",
+				}
+			);
+			if (!response.ok) {
+				throw new Error("Failed to view order");
+			}
+			
+			navigate(`/order/${orderId}`);
+		} catch (error) {
+			console.error("Error in viewing the order: ",error);
+			alert("Error viewing order: " + error.message); // Show error toast notification
+		}
+	}
+
 	const acceptOrder = async (orderId) => {
 		try {
 			const response = await fetch(
@@ -99,7 +122,7 @@ const Notification = () => {
 			}
 
 			const result = await response.json();
-			toast.success(result.message); // Show success toast notification
+			alert(result.message); // Show success toast notification
 
 			// Optionally, remove the accepted notification from the UI
 			setNotification((prev) => ({
@@ -187,7 +210,7 @@ const Notification = () => {
 							<li key={index} className="mb-4">
 								<span>Order #{order.orderNumber} has been place.</span>
 								<div className="mt-1">
-									<button
+									{/* <button
 										className="bg-green-500 text-white px-2 py-1 rounded mr-1"
 										onClick={() => acceptOrder(order._id)}
 									>
@@ -198,6 +221,12 @@ const Notification = () => {
 										onClick={() => cancelOrder(order._id)}
 									>
 										Cancel
+									</button> */}
+									<button
+										className="bg-red-500 text-white px-2 py-1 rounded"
+										onClick={() => viewNewOrder(order._id)}
+									>
+										View
 									</button>
 								</div>
 							</li>

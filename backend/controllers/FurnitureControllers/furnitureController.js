@@ -42,6 +42,10 @@ exports.getAllFurnitures = async (req, res) => {
 			{ path: "colors", select: "name hex -_id" },
 			{ path: "sizes", select: "label height width depth -_id" },
 		]);
+
+    if(furnitures.length === 0){
+      return res.status(400).json({error:"No furniture found!"})
+    }
 		
 		// Return the fetched furnitures
 		res.status(200).json(furnitures);
@@ -64,7 +68,7 @@ exports.ArchivedFurnitures = async (req, res) => {
 			]);
 
 			if (archivedFurnitures.length === 0) {
-					return res.status(404).json({ error: "No archived furnitures found!" });
+					return res.status(400).json({ error: "No archived furnitures found!" });
 			}
 
 			res.status(200).json(archivedFurnitures);
@@ -149,22 +153,22 @@ exports.createFurniture = async (req, res) => {
       // Validate and find existing Category, FurnitureType, Materials, Colors
       const existingCategory = await Category.findById(category);
       if (!existingCategory) {
-        return res.status(400).json({ error: "Invalid category!" });
+        return res.status(400).json({ message: "Invalid category!" });
       }
 
       const existingFurnitureType = await FurnitureType.findById(furnitureType);
       if (!existingFurnitureType) {
-        return res.status(400).json({ error: "Invalid furniture type!" });
+        return res.status(400).json({ message: "Invalid furniture type!" });
       }
 
       const existingMaterials = await Materials.find({ name: { $in: materials } });
       if (existingMaterials.length !== materials.length) {
-        return res.status(400).json({ error: "Some materials are invalid!" });
+        return res.status(400).json({ message: "Some materials are invalid!" });
       }
 
       const existingColors = await Colors.find({ name: { $in: colors } });
       if (existingColors.length !== colors.length) {
-        return res.status(400).json({ error: "Some colors are invalid!" });
+        return res.status(400).json({ message: "Some colors are invalid!" });
       }
 
       const existingSize = await Size.find({
@@ -173,7 +177,7 @@ exports.createFurniture = async (req, res) => {
       });
       if (existingSize.length !== sizes.length) {
         return res.status(400).json({
-          error: `Some sizes are invalid for ${existingFurnitureType.name}. Please ensure all sizes are correct.`,
+          message: `Some sizes are invalid for ${existingFurnitureType.name}. Please ensure all sizes are correct.`,
         });
       }
 
@@ -194,7 +198,7 @@ exports.createFurniture = async (req, res) => {
 
       await newFurniture.save();
       res.status(201).json({
-        success: "New furniture added successfully!",
+        message: "New furniture added successfully!",
         newFurniture,
       });
     } catch (error) {

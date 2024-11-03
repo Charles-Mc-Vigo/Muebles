@@ -7,58 +7,65 @@ const orderController = {
 	// Create new order from cart
 	createOrder: async (req, res) => {
 		try {
-			const { paymentMethod } = req.body;
-			const userId = req.user._id; // Using ID from cookie token
+			const { paymentMethod, shippingAddress, deliveryMode } = req.body; // Extract deliveryMode
+			const userId = req.user._id;
 
-			// Validate that payment method is provided
 			if (!paymentMethod) {
 				return res.status(400).json({
 					error: "Please select a payment method to proceed.",
 				});
 			}
 
-			// For specific payment methods (e.g., GCash, Maya, COD), ensure proof of payment is provided
-			if (["GCash", "Maya", "COD"].includes(paymentMethod)) {
-				if (!req.file) {
-					return res.status(400).json({
-						error: "Please upload proof of payment for the selected method.",
-					});
-				}
+			if (["GCash", "Maya", "COD"].includes(paymentMethod) && !req.file) {
+				return res.status(400).json({
+					error: "Please upload proof of payment for the selected method.",
+				});
 			}
 
-			// Check if payment method requires proof of payment
 			let proofOfPayment;
 			if (req.file) {
-				// Convert the uploaded image to a base64-encoded string without the data URL prefix
 				proofOfPayment = req.file.buffer.toString("base64");
 			}
 
-			// Find user's cart
 			const cart = await Cart.findOne({ userId });
 			if (!cart || cart.items.length === 0) {
 				return res.status(400).json({ error: "Cart is empty" });
 			}
 
-			// Create the order with the proof of payment as base64
+			const shippingAddressObj = JSON.parse(shippingAddress);
+			const municipality = shippingAddressObj.municipality;
+
+			// Calculate shipping fee
+			const shippingFees = {
+				Boac: 500,
+				Mogpog: 700,
+				Gasan: 500,
+				Buenavista: 800,
+				Santa_Cruz: 3000,
+				Torrijos: 3000,
+			};
+			const shippingFee = shippingFees[municipality] || 0; // Default to 0 if municipality is not listed
+
 			const order = await Order.createFromCart(
 				cart._id,
 				paymentMethod,
-				proofOfPayment
+				proofOfPayment,
+				shippingAddressObj,
+				shippingFee,
+				deliveryMode // Pass delivery mode
 			);
 
-			// Clear the cart
 			await Cart.findByIdAndUpdate(cart._id, {
 				items: [],
 				count: 0,
 				totalAmount: 0,
 			});
 
-			// Add the order to the user's orders array
 			await User.findByIdAndUpdate(userId, {
 				$push: { orders: order._id, proofOfPayment },
 			});
 
-			res.status(201).json({success: "Order placed successfully!", order});
+			res.status(201).json({ success: "Order placed successfully!", order });
 		} catch (error) {
 			console.error("Error creating order:", error);
 			res.status(500).json({
@@ -66,6 +73,7 @@ const orderController = {
 			});
 		}
 	},
+
 	// Get user's orders
 	getUserOrders: async (req, res) => {
 		try {
@@ -90,8 +98,8 @@ const orderController = {
 			const { orderId } = req.params;
 			const userId = req.user._id;
 			const order = await Order.findById(orderId)
-			.populate('user')
-			.populate('items.furniture');
+				.populate("user")
+				.populate("items.furniture");
 
 			if (!order) {
 				return res.status(404).json({
@@ -108,7 +116,7 @@ const orderController = {
 
 			res.status(200).json(order);
 		} catch (error) {
-			console.log("Error fetching order : ",error)
+			console.log("Error fetching order : ", error);
 			res.status(500).json({
 				error: "Server error!",
 			});
@@ -183,107 +191,82 @@ const orderController = {
 	},
 
 	createDirectOrder: async (req, res) => {
-		try {
-			const { paymentMethod } = req.body;
-			const userId = req.user._id;
-			const { furnitureId } = req.params;
-			const { quantity = 1 } = req.body;
+    try {
+        const { items, paymentMethod, shippingAddress, deliveryMode } = req.body; // Expecting items to be included in the request body
+        const userId = req.user._id;
 
-			// Validate that payment method is provided
-			if (!paymentMethod) {
-				return res.status(400).json({
-					success: false,
-					message: "Please select a payment method to proceed.",
-				});
-			}
+        // Fetch the user from the database
+        const user = await User.findById(userId);
+        if (!user) return res.status(404).json({ message: "User not found" });
 
-			// For specific payment methods, ensure proof of payment is provided
-			if (["GCash", "Maya"].includes(paymentMethod)) {
-				if (!req.file) {
-					return res.status(400).json({
-						success: false,
-						message: "Please upload proof of payment for the selected method.",
-					});
-				}
-			}
+        // Validate the payment method
+        if (!paymentMethod) {
+            return res.status(400).json({
+                error: "Please select a payment method to proceed.",
+            });
+        }
 
-			// Check if furniture exists and has sufficient stock
-			const furniture = await Furniture.findById(furnitureId);
-			if (!furniture) {
-				return res.status(404).json({
-					success: false,
-					message: "Furniture not found!",
-				});
-			}
+        // Validate proof of payment for certain payment methods
+        if (["GCash", "Maya", "COD"].includes(paymentMethod) && !req.file) {
+            return res.status(400).json({
+                error: "Please upload proof of payment for the selected method.",
+            });
+        }
 
-			if (furniture.stockQuantity < quantity) {
-				return res.status(400).json({
-					success: false,
-					message: `Insufficient stock. Only ${furniture.stockQuantity} units available.`,
-				});
-			}
+        // Handle proof of payment if provided
+        let proofOfPayment;
+        if (req.file) {
+            proofOfPayment = req.file.buffer.toString("base64");
+        }
 
-			// Prepare order data
-			const orderData = {
-				userId,
-				items: [
-					{
-						furnitureId,
-						quantity,
-					},
-				],
-				paymentMethod,
-				proofOfPayment: req.file
-					? req.file.buffer.toString("base64")
-					: undefined
-			};
+        // Parse and validate shipping address
+        const shippingAddressObj = JSON.parse(shippingAddress);
+        if (!shippingAddressObj || !shippingAddressObj.municipality) {
+            return res.status(400).json({
+                error: "Invalid shipping address.",
+            });
+        }
+        const municipality = shippingAddressObj.municipality;
 
-			// Create the order using the model's static method
-			const order = await Order.createDirectOrder(orderData);
+        // Calculate shipping fee
+        const shippingFees = {
+            Boac: 500,
+            Mogpog: 700,
+            Gasan: 500,
+            Buenavista: 800,
+            Santa_Cruz: 3000,
+            Torrijos: 3000,
+        };
+        const shippingFee = shippingFees[municipality] || 0; // Default to 0 if municipality is not listed
 
-			// Update furniture stock
-			await Furniture.findByIdAndUpdate(furnitureId, {
-				$inc: { stockQuantity: -quantity },
-			});
+        // Create the order
+        const orderData = {
+            userId: userId,
+            items: items, // Expecting items to be an array of item objects
+            paymentMethod,
+            shippingAddress: shippingAddressObj,
+            proofOfPayment,
+            deliveryMode,
+        };
 
-			// Send success response
-			res.status(201).json({
-				success: true,
-				message: "Order created successfully",
-				order
-			});
-		} catch (error) {
-			console.error("Error in creating direct order:", error);
+        const order = await Order.createDirectOrder(orderData); // Use the orderData object
 
-			// Handle specific error cases
-			if (error.message.includes("Missing required fields")) {
-				return res.status(400).json({
-					success: false,
-					message: "Missing required order information",
-				});
-			}
+        // Optionally, update the user with the new order
+        await User.findByIdAndUpdate(userId, {
+            $push: { orders: order._id },
+        });
 
-			if (error.message.includes("Insufficient stock")) {
-				return res.status(400).json({
-					success: false,
-					message: error.message,
-				});
-			}
+        // Respond with success message and order details
+        res.status(201).json({ success: "Order placed successfully!", order });
+    } catch (error) {
+        console.error("Error creating order:", error);
+        res.status(500).json({
+            error: "Error creating order",
+        });
+    }
+},
 
-			if (error.message.includes("User not found")) {
-				return res.status(404).json({
-					success: false,
-					message: "User account not found",
-				});
-			}
-
-			// Generic error response
-			res.status(500).json({
-				success: false,
-				message: "Server error while processing your order",
-			});
-		}
-	},
+	
 
 	// Admin: Update order status
 	updateOrderStatus: async (req, res) => {

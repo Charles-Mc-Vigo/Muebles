@@ -433,8 +433,9 @@ const Maintenance = () => {
 					}
 				);
 
-				if (!response.ok) {
-					throw new Error("Failed to add furniture type.");
+				const errorData = await response.json();
+				if (!errorData.ok) {
+					throw new Error(errorData.message);
 				}
 				const newFurnitureType = await response.json();
 				setFurnitureTypes((prevTypes) =>

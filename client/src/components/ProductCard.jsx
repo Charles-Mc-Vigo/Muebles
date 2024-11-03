@@ -25,9 +25,12 @@ const ProductCard = ({
 	};
 	const maxDescriptionLength = 60; // Set the max length for the description
 
-	// Function to handle archiving the item
 	const archiveItem = async (e) => {
 		e.preventDefault();
+		// Confirmation dialog
+		if (!window.confirm("Are you sure you want to archive this item?")) {
+			return; // Exit if the user cancels
+		}
 		try {
 			const response = await fetch(
 				`http://localhost:3000/api/furnitures/archive/${id}`,
@@ -38,9 +41,7 @@ const ProductCard = ({
 				}
 			);
 			const data = await response.json();
-			if (!data.ok){
-				toast.error(data.error)
-			}
+			console.log("Item archived successfully:", data);
 			toast.success(data.success);
 			onArchiveSuccess(); // Trigger update in parent component
 		} catch (error) {
@@ -48,10 +49,13 @@ const ProductCard = ({
 			toast.error("Error archiving item. Please try again.");
 		}
 	};
-
-	// Function to handle unarchiving the item
+	
 	const unarchiveItem = async (e) => {
 		e.preventDefault(); // Prevents navigating when clicking the button
+		// Confirmation dialog
+		if (!window.confirm("Are you sure you want to unarchive this item?")) {
+			return; // Exit if the user cancels
+		}
 		try {
 			const response = await fetch(
 				`http://localhost:3000/api/furnitures/unarchive/${id}`,
@@ -64,15 +68,12 @@ const ProductCard = ({
 				}
 			);
 			const data = await response.json();
-			if (!data.ok) {
-				toast.error(data.error)
-			}
-			console.log("Item unarchived successfully:", data); // Optionally handle success
+			console.log("Item unarchived successfully:", data);
 			toast.success(data.success);
 			onUnArchiveSuccess();
 		} catch (error) {
-			console.error("Error unarchiving item:", error); // Optionally handle error
-			alert("Error unarchiving item. Please try again.");
+			console.error("Error unarchiving item:", error);
+			toast.error("Error unarchiving item. Please try again.");
 		}
 	};
 

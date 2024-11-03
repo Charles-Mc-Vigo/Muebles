@@ -180,371 +180,386 @@ const ProductManagement = () => {
       });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const response = await fetch("http://localhost:3000/api/furnitures/add", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({
-          images: newFurniture.images,
-          name: newFurniture.name,
-          category: newFurniture.category,
-          furnitureType: newFurniture.furnitureType,
-          description: newFurniture.description,
-          materials: newFurniture.materials,
-          colors: newFurniture.colors,
-          sizes: newFurniture.sizes,
-          stocks: newFurniture.stocks,
-          price: newFurniture.price,
-        }),
-      });
+	const handleSubmit = async (e) => {
+		e.preventDefault();
 
-      if (response.ok) {
-        const data = await response.json();
-        toast.success(data.message);
-        setNewFurniture({
-          images: [],
-          name: "",
-          category: "",
-          furnitureType: "",
-          description: "",
-          materials: [],
-          colors: [],
-          sizes: [],
-          stocks: "",
-          price: "",
-        });
-        fetchData(); // Refresh the furniture list
-      } else {
-        const errorData = await response.json(); // Make sure the server returns JSON even on error
-        toast.error(errorData.message || "Failed to add furniture");
-      }
-    } catch (error) {
-      console.error("Error adding new Furniture:", error);
-      toast.error("Failed to add new Furniture");
-    }
-  };
+    console.log(newFurniture)
+		try {
+			const response = await fetch("http://localhost:3000/api/furnitures/add", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				credentials: "include",
+				body: JSON.stringify({
+					images: newFurniture.images,
+					name: newFurniture.name,
+					category: newFurniture.category,
+					furnitureType: newFurniture.furnitureType,
+					description: newFurniture.description,
+					materials: newFurniture.materials,
+					colors: newFurniture.colors,
+					sizes: newFurniture.sizes,
+					stocks: newFurniture.stocks,
+					price: newFurniture.price,
+				}),
+			});
 
-  return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-3xl font-bold mb-6 text-center">
-        Product Management
-      </h1>
-      {loading ? (
-        <div className="flex justify-center items-center h-64">
-          <ClipLoader loading={loading} size={50} color="#007bff" />
-        </div>
-      ) : (
-        <div className="flex flex-row justify-center">
-          <form onSubmit={handleSubmit} className="mb-6 space-y-4 w-1/2">
-            <select
-              id="category"
-              name="category"
-              value={selectedCategory}
-              onChange={handleCategoryChange}
-              required
-              className="border rounded p-2 w-full"
-            >
-              <option value="">Select Category</option>
-              {Array.isArray(categories) && categories.map((category) => (
-                <option key={category._id} value={category._id}>
-                  {category.name}
-                </option>
-              ))}
-            </select>
-            <select
-              id="furnitureType"
-              name="furnitureType"
-              value={selectedFurnitureType}
-              onChange={handleFurnitureTypeChange}
-              required
-              className="border rounded p-2 w-full"
-            >
-              <option value="">Select Type</option>
-              {filteredFurnitureTypes.map((furnitureType) => (
-                <option key={furnitureType._id} value={furnitureType._id}>
-                  {furnitureType.name}
-                </option>
-              ))}
-            </select>
-            <input
-              id="name"
-              type="text"
-              name="name"
-              placeholder="Product Name"
-              value={newFurniture.name}
-              onChange={handleInputChange}
-              required
-              className="border rounded p-2 w-full"
-            />
-            <textarea
-              id="description"
-              name="description"
-              placeholder="Description"
-              value={newFurniture.description}
-              onChange={handleInputChange}
-              required
-              className="border rounded p-2 w-full"
-            />
-            <input
-              id="price"
-              type="number"
-              name="price"
-              placeholder="Price"
-              value={newFurniture.price}
-              onChange={handleInputChange}
-              required
-              min="0"
-              className="border rounded p-2 w-full"
-            />
-            <input
-              id="stocks"
-              type="number"
-              name="stocks"
-              placeholder="Stocks"
-              value={newFurniture.stocks}
-              onChange={handleInputChange}
-              required
-              className="border rounded p-2 w-full"
-            />
+			if (response.ok) {
+				const data = await response.json();
+				toast.success(data.message);
+				setNewFurniture({
+					images: [],
+					name: "",
+					category: "",
+					furnitureType: "",
+					description: "",
+					materials: [],
+					colors: [],
+					sizes: [],
+					stocks: "",
+					price: "",
+				});
+				fetchData();
+			} else {
+				const errorData = await response.json(); // Make sure the server returns JSON even on error
+				toast.error(errorData.message || "Failed to add furniture");
+			}
+		} catch (error) {
+			console.error("Error adding new Furniture:", error);
+			toast.error("Failed to add new Furniture");
+		}
+	};
 
-            <div className="mt-4 mb-4 bg-slate-200 rounded-md px-5 py-2">
-              <label className="block font-semibold">Materials:</label>
-              <div className="flex flex-wrap">
-                {materials.map((material) => (
-                  <label
-                    key={material._id}
-                    className="flex items-center w-1/3 p-2"
-                  >
-                    <input
-                      type="checkbox"
-                      name="material"
-                      value={material.name}
-                      checked={newFurniture.materials.includes(material.name)}
-                      onChange={handleInputChange}
-                      className="mr-2 h-4 w-4 border rounded text-blue-600 focus:ring-blue-500"
-                    />
-                    <span className="text-gray-700">
-                      {material.name.charAt(0).toUpperCase() +
-                        material.name.slice(1)}
-                    </span>
-                  </label>
-                ))}
-              </div>
-            </div>
+	return (
+		<div className="container mx-auto p-4">
+			<h1 className="text-3xl font-bold mb-6 text-center">
+				Product Management
+			</h1>
+			{loading ? (
+				<div className="flex justify-center items-center h-64">
+					<ClipLoader loading={loading} size={50} color="#007bff" />
+				</div>
+			) : (
+				<div className="flex flex-row justify-center">
+					<form onSubmit={handleSubmit} className="mb-6 space-y-4 w-1/2">
+						<select
+							id="category"
+							name="category"
+							value={selectedCategory}
+							onChange={handleCategoryChange}
+							required
+							className="border rounded p-2 w-full"
+						>
+							<option value="">Select Category</option>
+							{Array.isArray(categories) &&
+								categories.map((category) => (
+									<option key={category._id} value={category._id}>
+										{category.name}
+									</option>
+								))}
+						</select>
+						<select
+							id="furnitureType"
+							name="furnitureType"
+							value={selectedFurnitureType}
+							onChange={handleFurnitureTypeChange}
+							required
+							className="border rounded p-2 w-full"
+						>
+							<option value="">Select Type</option>
+							{filteredFurnitureTypes.map((furnitureType) => (
+								<option key={furnitureType._id} value={furnitureType._id}>
+									{furnitureType.name}
+								</option>
+							))}
+						</select>
+						<input
+							id="name"
+							type="text"
+							name="name"
+							placeholder="Product Name"
+							value={newFurniture.name}
+							onChange={handleInputChange}
+							required
+							className="border rounded p-2 w-full"
+						/>
+						<textarea
+							id="description"
+							name="description"
+							placeholder="Description"
+							value={newFurniture.description}
+							onChange={handleInputChange}
+							required
+							className="border rounded p-2 w-full"
+						/>
+						<input
+							id="price"
+							type="number"
+							name="price"
+							placeholder="Price"
+							value={newFurniture.price}
+							onChange={handleInputChange}
+							required
+							min="0"
+							className="border rounded p-2 w-full"
+						/>
+						<input
+							id="stocks"
+							type="number"
+							name="stocks"
+							placeholder="Stocks"
+							value={newFurniture.stocks}
+							onChange={handleInputChange}
+							required
+							className="border rounded p-2 w-full"
+						/>
 
-            {/* Colors */}
-            <div className="mt-4 mb-4 bg-slate-200 rounded-md px-5 py-2">
-              <label className="block font-semibold">Colors:</label>
-              <div className="flex flex-wrap">
-                {colors.map((color) => (
-                  <label
-                    key={color._id}
-                    className="flex items-center w-1/3 p-2"
-                  >
-                    <input
-                      type="checkbox"
-                      name="color"
-                      value={color.name}
-                      checked={newFurniture.colors.includes(color.name)}
-                      onChange={handleInputChange}
-                      className="mr-2 h-4 w-4 border rounded text-blue-600 focus:ring-blue-500"
-                    />
-                    <span className="text-gray-700 mr-2">
-                      {color.name.charAt(0).toUpperCase() + color.name.slice(1)}
-                    </span>
-                    <div
-                      className="h-4 w-4 border rounded"
-                      style={{ backgroundColor: color.hex }}
-                    />
-                  </label>
-                ))}
-              </div>
-            </div>
+						<div className="mt-4 mb-4 bg-slate-200 rounded-md px-5 py-2">
+							<label className="block font-semibold">Materials:</label>
+							<div className="flex flex-wrap">
+								{Array.isArray(materials) && materials.length > 0 ? (
+									materials.map((material) => (
+										<label
+											key={material._id}
+											className="flex items-center w-1/3 p-2"
+										>
+											<input
+												type="checkbox"
+												name="material"
+												value={material.name}
+												checked={newFurniture.materials.includes(material.name)}
+												onChange={handleInputChange}
+												className="mr-2 h-4 w-4 border rounded text-blue-600 focus:ring-blue-500"
+											/>
+											<span className="text-gray-700">
+												{material.name.charAt(0).toUpperCase() +
+													material.name.slice(1)}
+											</span>
+										</label>
+									))
+								) : (
+									<span className="text-gray-500">No materials available</span>
+								)}
+							</div>
+						</div>
 
-            {/* Sizes */}
-            <div className="mb-4 bg-slate-200 rounded-md p-2">
-              <label className="block font-semibold my-2 mb-2">
-                Sizes: (Height X Width X Length X Depth)
-              </label>
-              <div className="flex flex-wrap">
-                {filteredSizes.length > 0 ? (
-                  filteredSizes.map((size) => (
-                    <label
-                      key={size._id}
-                      className="flex items-center w-1/3 p-2"
-                    >
-                      <input
-                        type="checkbox"
-                        name="sizes"
-                        value={size.label}
-                        checked={newFurniture.sizes.includes(size.label)}
-                        onChange={handleInputChange}
-                        className="mr-2 h-4 w-4 border rounded text-blue-600 focus:ring-blue-500"
-                      />
-                      <span className="text-gray-700">
-                        {size.label.charAt(0).toUpperCase() +
-                          size.label.slice(1)}{" "}
-                        <span className="text-gray-500 italic">
-                          ( {size.height} X {size.width} X {size.length} X{" "}
-                          {size.depth} )
-                        </span>
-                      </span>
-                    </label>
-                  ))
-                ) : (
-                  <p className="text-gray-500">No sizes available</p>
-                )}
-              </div>
-            </div>
-            {/* IMAGE INPUT  */}
-            <div className="mt-4">
-              <label className="block font-semibold">Selected Images:</label>
-              <div className="flex flex-wrap gap-4">
-                {Array.isArray(newFurniture.images) &&
-                  newFurniture.images.length > 0 &&
-                  newFurniture.images.map((image, index) => (
-                    <img
-                      key={index}
-                      src={`data:image/jpeg;base64,${image}`}
-                      alt={`Selected image ${index + 1}`}
-                      className="w-16 h-16 object-contain"
-                    />
-                  ))}
-              </div>
-            </div>
-            <input
-              id="images"
-              type="file"
-              name="images"
-              onChange={handleFileChange}
-              required
-              className="border rounded p-2 w-full"
-              multiple
-              accept="image/*"
-            />
-            <button
-              onClick={handleSubmit}
-              type="submit"
-              className="bg-blue-500 text-white p-2 rounded w-full"
-            >
-              Add Product
-            </button>
-          </form>
-        </div>
-      )}
-      {/* Table to display furniture data */}
-      <div className="mt-8 overflow-x-auto">
-        <h2 className="text-2xl font-bold mb-4">Furniture List</h2>
-        <table className="min-w-full border-collapse border border-gray-200">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="border border-gray-300 p-2">Furniture Id</th>
-              <th className="border border-gray-300 p-2">Image</th>
-              <th className="border border-gray-300 p-2">Name</th>
-              <th className="border border-gray-300 p-2">Category</th>
-              <th className="border border-gray-300 p-2">Description</th>
-              <th className="border border-gray-300 p-2">Type</th>
-              <th className="border border-gray-300 p-2">Colors</th>
-              <th className="border border-gray-300 p-2">Sizes <br /> (Height X Width X Depth)</th>
-              <th className="border border-gray-300 p-2">Materials</th>
-              <th className="border border-gray-300 p-2">Price</th>
-              <th className="border border-gray-300 p-2">Stocks</th>
-            </tr>
-          </thead>
-          <tbody>
-            {furnitureData.length > 0 ? (
-              furnitureData.map((furniture) => (
-                <tr
-                  key={furniture._id}
-                  className="hover:bg-gray-50 transition-colors"
-                >
-                  <td className="border border-gray-300 p-2">
-                    {furniture._id}
-                  </td>
-                  <td className="border border-gray-300 p-2 flex justify-center">
-                    {furniture.images.length > 0 ? (
-                      <img
-                        src={`data:image/jpeg;base64,${furniture.images[0]}`} // Display only the first image
-                        alt={furniture.name}
-                        className="w-16 h-16 object-cover rounded-md"
-                      />
-                    ) : (
-                      <span className="text-gray-500">No Image</span>
-                    )}
-                  </td>
-                  <td className="border border-gray-300 p-2">
-                    {furniture.name}
-                  </td>
-                  <td className="border border-gray-300 p-2">
-                    {furniture.category?.name || "N/A"}
-                  </td>
-                  <td
-                    className="border border-gray-300 p-2"
-                    title={furniture.description}
-                  >
-                    {furniture.description.length > 50
-                      ? `${furniture.description.substring(0, 50)}...`
-                      : furniture.description}
-                  </td>
-                  <td className="border border-gray-300 p-2">
-                    {furniture.furnitureType?.name || "N/A"}
-                  </td>
-                  <td className="border border-gray-300 p-2">
-                    {furniture.colors && furniture.colors.length > 0
-                      ? furniture.colors.map((color) => (
-                        <span key={color._id} className="block">
-                          {color.name}
-                        </span>
-                      ))
-                      : "N/A"}
-                  </td>
-                  <td className="border border-gray-300 p-2">
-                    {furniture.sizes && furniture.sizes.length > 0
-                      ? furniture.sizes.map((size) => (
-                        <span key={size._id} className="block">
-                          {size.label} <br /> ({size.height} X {size.width} X {size.depth} )
-                        </span>
-                      ))
-                      : "N/A"}
-                  </td>
-                  <td className="border border-gray-300 p-2">
-                    {furniture.materials && furniture.materials.length > 0
-                      ? furniture.materials.map((material) => (
-                        <span key={material._id} className="block">
-                          {material.name}
-                        </span>
-                      ))
-                      : "N/A"}
-                  </td>
-                  <td className="border border-gray-300 p-2">
-                    {furniture.price}
-                  </td>
-                  <td className="border border-gray-300 p-2">
-                    {furniture.stocks || "N/A"}
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td
-                  colSpan="11"
-                  className="text-center p-4 text-gray-500 font-semibold"
-                >
-                  No furniture available
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-      <ToastContainer />
-    </div>
-  );
+						{/* Colors */}
+						<div className="mt-4 mb-4 bg-slate-200 rounded-md px-5 py-2">
+							<label className="block font-semibold">Colors:</label>
+							<div className="flex flex-wrap">
+								{Array.isArray(colors) && colors.length > 0 ? (
+									colors.map((color) => (
+										<label
+											key={color._id}
+											className="flex items-center w-1/3 p-2"
+										>
+											<input
+												type="checkbox"
+												name="color"
+												value={color.name}
+												checked={newFurniture.colors.includes(color.name)}
+												onChange={handleInputChange}
+												className="mr-2 h-4 w-4 border rounded text-blue-600 focus:ring-blue-500"
+											/>
+											<span className="text-gray-700 mr-2">
+												{color.name.charAt(0).toUpperCase() +
+													color.name.slice(1)}
+											</span>
+											<div
+												className="h-4 w-4 border rounded"
+												style={{ backgroundColor: color.hex }}
+											/>
+										</label>
+									))
+								) : (
+									<span className="text-gray-500">No colors available</span>
+								)}
+							</div>
+						</div>
+
+						{/* Sizes */}
+						<div className="mb-4 bg-slate-200 rounded-md p-2">
+							<label className="block font-semibold my-2 mb-2">
+								Sizes: (Height X Width X Length X Depth)
+							</label>
+							<div className="flex flex-wrap">
+								{filteredSizes.length > 0 ? (
+									filteredSizes.map((size) => (
+										<label
+											key={size._id}
+											className="flex items-center w-1/3 p-2"
+										>
+											<input
+												type="checkbox"
+												name="sizes"
+												value={size.label}
+												checked={newFurniture.sizes.includes(size.label)}
+												onChange={handleInputChange}
+												className="mr-2 h-4 w-4 border rounded text-blue-600 focus:ring-blue-500"
+											/>
+											<span className="text-gray-700">
+												{size.label.charAt(0).toUpperCase() +
+													size.label.slice(1)}{" "}
+												<span className="text-gray-500 italic">
+													( {size.height} X {size.width} X {size.length} X{" "}
+													{size.depth} )
+												</span>
+											</span>
+										</label>
+									))
+								) : (
+									<p className="text-gray-500">No sizes available</p>
+								)}
+							</div>
+						</div>
+						{/* IMAGE INPUT  */}
+						<div className="mt-4">
+							<label className="block font-semibold">Selected Images:</label>
+							<div className="flex flex-wrap gap-4">
+								{Array.isArray(newFurniture.images) &&
+									newFurniture.images.length > 0 &&
+									newFurniture.images.map((image, index) => (
+										<img
+											key={index}
+											src={`data:image/jpeg;base64,${image}`}
+											alt={`Selected image ${index + 1}`}
+											className="w-16 h-16 object-contain"
+										/>
+									))}
+							</div>
+						</div>
+						<input
+							id="images"
+							type="file"
+							name="images"
+							onChange={handleFileChange}
+							required
+							className="border rounded p-2 w-full"
+							multiple
+							accept="image/*"
+						/>
+						<button
+							onClick={handleSubmit}
+							type="submit"
+							className="bg-blue-500 text-white p-2 rounded w-full"
+						>
+							Add Product
+						</button>
+					</form>
+				</div>
+			)}
+			{/* Table to display furniture data */}
+			<div className="mt-8 overflow-x-auto">
+				<h2 className="text-2xl font-bold mb-4">Furniture List</h2>
+				<table className="min-w-full border-collapse border border-gray-200">
+					<thead>
+						<tr className="bg-gray-100">
+							<th className="border border-gray-300 p-2">Furniture Id</th>
+							<th className="border border-gray-300 p-2">Image</th>
+							<th className="border border-gray-300 p-2">Name</th>
+							<th className="border border-gray-300 p-2">Category</th>
+							<th className="border border-gray-300 p-2">Description</th>
+							<th className="border border-gray-300 p-2">Type</th>
+							<th className="border border-gray-300 p-2">Colors</th>
+							<th className="border border-gray-300 p-2">
+								Sizes <br /> (Height X Width X Depth)
+							</th>
+							<th className="border border-gray-300 p-2">Materials</th>
+							<th className="border border-gray-300 p-2">Price</th>
+							<th className="border border-gray-300 p-2">Stocks</th>
+						</tr>
+					</thead>
+					<tbody>
+						{furnitureData.length > 0 ? (
+							furnitureData.map((furniture) => (
+								<tr
+									key={furniture._id}
+									className="hover:bg-gray-50 transition-colors"
+								>
+									<td className="border border-gray-300 p-2">
+										{furniture._id}
+									</td>
+									<td className="border border-gray-300 p-2 flex justify-center">
+										{furniture.images.length > 0 ? (
+											<img
+												src={`data:image/jpeg;base64,${furniture.images[0]}`} // Display only the first image
+												alt={furniture.name}
+												className="w-16 h-16 object-cover rounded-md"
+											/>
+										) : (
+											<span className="text-gray-500">No Image</span>
+										)}
+									</td>
+									<td className="border border-gray-300 p-2">
+										{furniture.name}
+									</td>
+									<td className="border border-gray-300 p-2">
+										{furniture.category?.name || "N/A"}
+									</td>
+									<td
+										className="border border-gray-300 p-2"
+										title={furniture.description}
+									>
+										{furniture.description.length > 50
+											? `${furniture.description.substring(0, 50)}...`
+											: furniture.description}
+									</td>
+									<td className="border border-gray-300 p-2">
+										{furniture.furnitureType?.name || "N/A"}
+									</td>
+									<td className="border border-gray-300 p-2">
+										{furniture.colors && furniture.colors.length > 0
+											? furniture.colors.map((color) => (
+													<span key={color._id} className="block">
+														{color.name}
+													</span>
+											  ))
+											: "N/A"}
+									</td>
+									<td className="border border-gray-300 p-2">
+										{furniture.sizes && furniture.sizes.length > 0
+											? furniture.sizes.map((size) => (
+													<span key={size._id} className="block">
+														{size.label} <br /> ({size.height} X {size.width} X{" "}
+														{size.depth} )
+													</span>
+											  ))
+											: "N/A"}
+									</td>
+									<td className="border border-gray-300 p-2">
+										{furniture.materials && furniture.materials.length > 0
+											? furniture.materials.map((material) => (
+													<span key={material._id} className="block">
+														{material.name}
+													</span>
+											  ))
+											: "N/A"}
+									</td>
+									<td className="border border-gray-300 p-2">
+										{furniture.price}
+									</td>
+									<td className="border border-gray-300 p-2">
+										{furniture.stocks || "N/A"}
+									</td>
+								</tr>
+							))
+						) : (
+							<tr>
+								<td
+									colSpan="11"
+									className="text-center p-4 text-gray-500 font-semibold"
+								>
+									No furniture available
+								</td>
+							</tr>
+						)}
+					</tbody>
+				</table>
+			</div>
+			<ToastContainer />
+		</div>
+	);
 };
 
 export default ProductManagement;
