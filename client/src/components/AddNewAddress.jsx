@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css"; // Import Toastify CSS
+import { IoMdArrowRoundBack } from "react-icons/io";
+import { useNavigate } from "react-router-dom";
 
 const AddNewAddress = () => {
 	const [formData, setFormData] = useState({
@@ -14,6 +16,7 @@ const AddNewAddress = () => {
 		],
 	});
 	const [availableBarangays, setAvailableBarangays] = useState([]);
+	const navigate = useNavigate();
 
 	const zipCodes = {
 		Boac: 4900,
@@ -282,70 +285,79 @@ const AddNewAddress = () => {
 		}
 	};
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-    
-        try {
-            // Destructure the address fields from the form data
-            const { streetAddress, municipality, barangay, zipCode } = formData.addresses[0];
-    
-            // Validate that all required fields are filled
-            if (!streetAddress || !municipality || !barangay) {
-                toast.error("Please fill in all address fields.");
-                return;
-            }
-    
-            // Prepare the data to be sent in the request body
-            const body = JSON.stringify({
-                streetAddress,
-                municipality,
-                barangay,
-                zipCode,
-            });
-    
-            // Send the POST request to the API endpoint
-            const response = await fetch('http://localhost:3000/api/users/address/new', {
-                method: "POST",
-                credentials: 'include',
-                headers: {
-                    "Content-Type": "application/json", // Set the content type
-                },
-                body: body,
-            });
-    
-            // Check if the response is ok (status in the range 200-299)
-            if (!response.ok) {
-                const errorData = await response.json(); // Get the error message from the response
-                toast.error(errorData.error || "Failed to add address. Please try again.");
-                return;
-            }
-    
-            // If successful, log the submitted address and show a success message
-            console.log("New Address Submitted:", formData.addresses[0]);
-            toast.success("Address added successfully!");
-    
-            // Reset the form data
-            setFormData({
-                addresses: [
-                    {
-                        streetAddress: "",
-                        municipality: "",
-                        barangay: "",
-                        zipCode: "",
-                    },
-                ],
-            });
-    
-            // Reset available barangays if applicable
-            setAvailableBarangays([]);
-        } catch (error) {
-            console.log("Error in adding new address:", error);
-            toast.error("An unexpected error occurred. Please try again.");
-        }
-    };
+	const handleSubmit = async (e) => {
+		e.preventDefault();
+		const { streetAddress, municipality, barangay, zipCode } =
+			formData.addresses[0];
+
+		// Validate address fields
+		if (!streetAddress || !municipality || !barangay || !zipCode) {
+			toast.error("Please fill in all address fields.");
+			return;
+		}
+
+		// Prepare the request payload
+		const newAddress = {
+			streetAddress,
+			municipality,
+			barangay,
+			zipCode,
+		};
+
+		try {
+			// Send the POST request to the API endpoint
+			const response = await fetch(
+				"http://localhost:3000/api/users/addresses/new",
+				{
+					method: "POST",
+                    credentials:'include',
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify(newAddress),
+				}
+			);
+
+			// Check if the response is okay
+			if (!response.ok) {
+				const errorData = await response.json();
+				toast.error(`Error: ${errorData.message || "Failed to add address."}`);
+				return;
+			}
+
+			// Parse the response if needed
+			const data = await response.json();
+			toast.success("Address added successfully!");
+
+			// Reset form
+			setFormData({
+				addresses: [
+					{
+						streetAddress: "",
+						municipality: "",
+						barangay: "",
+						zipCode: "",
+					},
+				],
+			});
+			setAvailableBarangays([]);
+
+			// Optionally, you can update the user state with the new address if needed
+			// updateUserAddresses(data.updatedAddresses);
+		} catch (error) {
+			console.error("Error while submitting address:", error);
+			toast.error("Server error! Please try again later.");
+		}
+	};
 
 	return (
 		<div className="p-8 bg-white shadow-lg rounded-lg">
+			<button
+				onClick={() => navigate(-1)} // Navigate to the previous page
+				className="text-gray-500 mr-2"
+			>
+				<IoMdArrowRoundBack size={30} />
+			</button>
 			<h2 className="text-center font-semibold my-4 text-2xl">
 				Add New Address
 			</h2>

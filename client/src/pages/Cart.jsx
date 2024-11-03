@@ -7,14 +7,32 @@ import "react-toastify/dist/ReactToastify.css";
 
 const Cart = () => {
 	const [items, setItems] = useState([]);
+	const [deliveryMode, setDeliveryMode] = useState("delivery"); // Default to 'delivery'
+	const [user, setUser] = useState(null);
+	const [isOpen, setIsOpen] = useState(false); // State to manage visibility
+	const [selectedAddress, setSelectedAddress] = useState(null);
 	const [count, setCount] = useState(0);
 	const [totalAmount, setTotalAmount] = useState(0);
+	const [shippingFee, setShippingFee] = useState(0);
 	const [proofOfPayment, setProofOfPayment] = useState(null);
 	const [uploadMessage, setUploadMessage] = useState("");
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
 	const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
 	const navigate = useNavigate(); // Hook to navigate
+
+	const toggleAddresses = () => {
+		setIsOpen((prev) => !prev); // Toggle the visibility
+	};
+
+	const shippingFees = {
+		Boac: 500,
+		Mogpog: 700,
+		Gasan: 500,
+		Buenavista: 800,
+		Santa_Cruz: 3000,
+		Torrijos: 3000,
+	};
 
 	// Fetch cart items from the API
 	const fetchCartItems = async () => {
@@ -29,16 +47,18 @@ const Cart = () => {
 			const data = await response.json();
 
 			if (!data.ok) {
-				toast.error(data.error)
+				toast.error(data.error);
 			}
 			if (data.cart && data.cart.items.length > 0) {
 				setItems(data.cart.items);
 				setCount(data.cart.count);
 				setTotalAmount(data.cart.totalAmount);
+				setUser(data.cart.userId);
 			} else {
 				setItems([]);
 				setCount(0);
 				setTotalAmount(0);
+				setUser("");
 			}
 			setLoading(false);
 		} catch (error) {
@@ -51,8 +71,21 @@ const Cart = () => {
 		fetchCartItems();
 	}, []);
 
+	useEffect(() => {
+		// Calculate and set shipping fee based on selected address
+		if (selectedAddress) {
+			const address = user.addresses.find(
+				(address) => address._id === selectedAddress
+			);
+			const fee = shippingFees[address.municipality] || 0;
+			setShippingFee(fee);
+		} else {
+			setShippingFee(0); // Reset if no address is selected
+		}
+	}, [selectedAddress, user]);
+
 	// Calculate total price
-	const totalPrice = totalAmount.toFixed(2);
+	const totalWithShipping = (totalAmount + shippingFee).toFixed(2);
 
 	const handlePaymentMethodClick = (method) => {
 		setSelectedPaymentMethod(method);
@@ -66,6 +99,15 @@ const Cart = () => {
 
 	const checkout = async () => {
 		// Validate payment method and proof of payment
+		if (!deliveryMode) {
+			toast.error("Please select a delivery mode.");
+			return;
+		}
+
+		if (!selectedAddress) {
+			toast.error("Please select shipping address.");
+			return;
+		}
 		if (!selectedPaymentMethod) {
 			toast.error("Please select a payment method before checking out.");
 			return;
@@ -75,11 +117,22 @@ const Cart = () => {
 			return;
 		}
 
+		const addressToSend = user.addresses.find(
+			(address) => address._id === selectedAddress
+		);
+
 		// Create FormData to include both file and payment method
 		const formData = new FormData();
 		formData.append("proofOfPayment", proofOfPayment);
 		formData.append("paymentMethod", selectedPaymentMethod);
+		formData.append("shippingAddress", JSON.stringify(addressToSend)); // Send address as JSON
+		formData.append("deliveryMode", deliveryMode); // Append delivery mode
 
+
+		// Log FormData entries
+		for (const [key, value] of formData.entries()) {
+			console.log(`${key}:`, value);
+		}
 		try {
 			const response = await fetch("http://localhost:3000/api/orders/create", {
 				method: "POST",
@@ -192,10 +245,90 @@ const Cart = () => {
 						Clear Cart
 					</button>
 				</div>
+
 				{items.length === 0 ? (
 					<p className="text-center text-gray-600">Your cart is empty.</p>
 				) : (
 					<>
+						{/* user details */}
+						<div>
+							<div>
+								Client: {user.firstname} {user.lastname} <br />
+								Phone Number: {user.phoneNumber}
+							</div>
+
+							<div className="flex justify-between">
+								<div>Delivery Mode:</div>
+								<div className="flex gap-3">
+									<label>
+										<input
+											type="radio"
+											name="deliveryMode"
+											value="delivery"
+											onChange={(e) => setDeliveryMode(e.target.value)}
+										/>
+										Delivery
+									</label>
+									<label>
+										<input
+											type="radio"
+											name="deliveryMode"
+											value="pickup"
+											onChange={(e) => setDeliveryMode(e.target.value)}
+										/>
+										Pick Up
+									</label>
+								</div>
+							</div>
+
+							<div>
+								<div
+									className="flex p-2 justify-between"
+									onClick={toggleAddresses}
+									style={{ cursor: "pointer" }}
+								>
+									<h3>
+										{isOpen
+											? "Hide Shipping Addresses"
+											: "Change Shipping Address"}
+									</h3>
+									<button
+										onClick={() => navigate("/address/new")}
+										className="text-sky-500"
+									>
+										New
+									</button>
+								</div>
+								{isOpen && ( // Only show addresses when isOpen is true
+									<div>
+										{user.addresses && user.addresses.length > 0 ? (
+											user.addresses.map((address) => (
+												<div key={address._id} className="address-option">
+													{" "}
+													{/* Use address.id as the key */}
+													<label>
+														<input
+															type="radio"
+															name="selectedAddress"
+															value={address._id} // Use address.id instead of index
+															onChange={(e) =>
+																setSelectedAddress(e.target.value)
+															}
+														/>
+														<span>
+															{address.streetAddress}, {address.barangay},{" "}
+															{address.municipality}, {address.zipCode}
+														</span>
+													</label>
+												</div>
+											))
+										) : (
+											<p>No addresses available. Please add an address.</p>
+										)}
+									</div>
+								)}
+							</div>
+						</div>
 						<div className="border-t border-gray-300 py-4">
 							<ul className="divide-y divide-gray-300">
 								{items.map((item) => (
@@ -231,7 +364,9 @@ const Cart = () => {
 														className="px-3 py-1 border border-gray-400"
 														onClick={() => {
 															if (item.quantity < 1) {
-																toast.error("Quantity cannot be less than zero.");
+																toast.error(
+																	"Quantity cannot be less than zero."
+																);
 															} else {
 																updateQuantity(
 																	item.furnitureId._id,
@@ -246,9 +381,7 @@ const Cart = () => {
 													<button
 														className="px-3 py-1 border border-gray-400"
 														onClick={() => {
-															if (
-																item.furnitureId.stocks <= item.quantity
-															) {
+															if (item.furnitureId.stocks <= item.quantity) {
 																toast.error(
 																	"Cannot increase quantity. Available stock is insufficient."
 																);
@@ -371,10 +504,16 @@ const Cart = () => {
 							</div>
 						</div>
 
+						<div className="mt-4">
+							<div>Items total: {totalAmount.toFixed(2)}</div>
+							<div>Shipping Fee: {shippingFee.toFixed(2)}</div>
+							<div>Total Amount: {totalWithShipping}</div>
+						</div>
+
 						<div className="border-t border-gray-300 pt-4 mt-5">
 							<div className="flex justify-between items-center mb-4">
 								<h3 className="text-lg font-semibold">Subtotal:</h3>
-								<p className="text-lg font-semibold">₱{totalPrice}</p>
+								<p className="text-lg font-semibold">₱{totalWithShipping}</p>
 							</div>
 							<div className="flex justify-between mb-4">
 								<button
