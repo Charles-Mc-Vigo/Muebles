@@ -11,7 +11,7 @@ function ViewProduct() {
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
 	const [showArchived, setShowArchived] = useState(false);
-	const [showArchivedCategories, setShowArchivedCategories] = useState(false);
+	const [showArchivedCategories, setShowArchivedCategories] = useState(false); // New state for categories
 	const [showDropdown, setShowDropdown] = useState(false);
 
 	const fetchFurniture = async () => {
