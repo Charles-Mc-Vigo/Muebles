@@ -12,6 +12,7 @@ const Cart = () => {
 	const [selectedAddress, setSelectedAddress] = useState(null);
 	const [count, setCount] = useState(0);
 	const [totalAmount, setTotalAmount] = useState(0);
+	const [shippingFee, setShippingFee] = useState(0);
 	const [proofOfPayment, setProofOfPayment] = useState(null);
 	const [uploadMessage, setUploadMessage] = useState("");
 	const [loading, setLoading] = useState(true);
@@ -21,6 +22,15 @@ const Cart = () => {
 
 	const toggleAddresses = () => {
 		setIsOpen((prev) => !prev); // Toggle the visibility
+	};
+
+	const shippingFees = {
+		Boac: 500,
+		Mogpog: 700,
+		Gasan: 500,
+		Buenavista: 800,
+		Santa_Cruz: 3000,
+		Torrijos: 3000,
 	};
 
 	// Fetch cart items from the API
@@ -60,7 +70,22 @@ const Cart = () => {
 		fetchCartItems();
 	}, []);
 
+	useEffect(() => {
+		// Calculate and set shipping fee based on selected address
+		if (selectedAddress) {
+				const address = user.addresses.find(
+						(address) => address._id === selectedAddress
+				);
+				const fee = shippingFees[address.municipality] || 0;
+				setShippingFee(fee);
+		} else {
+				setShippingFee(0); // Reset if no address is selected
+		}
+}, [selectedAddress, user]);
+
 	// Calculate total price
+	const totalWithShipping = (totalAmount + shippingFee).toFixed(2);
+
 	const totalPrice = totalAmount.toFixed(2);
 
 	const handlePaymentMethodClick = (method) => {
@@ -89,13 +114,15 @@ const Cart = () => {
 			return;
 		}
 
-		const addressToSend = user.addresses.find(address => address._id === selectedAddress);
+		const addressToSend = user.addresses.find(
+			(address) => address._id === selectedAddress
+		);
 
 		// Create FormData to include both file and payment method
 		const formData = new FormData();
 		formData.append("proofOfPayment", proofOfPayment);
 		formData.append("paymentMethod", selectedPaymentMethod);
-    formData.append("shippingAddress", JSON.stringify(addressToSend)); // Send address as JSON
+		formData.append("shippingAddress", JSON.stringify(addressToSend)); // Send address as JSON
 
 		// Log FormData entries
 		for (const [key, value] of formData.entries()) {
@@ -447,10 +474,16 @@ const Cart = () => {
 							</div>
 						</div>
 
+						<div className="mt-4">
+							<div>Items total: {totalAmount.toFixed(2)}</div>
+							<div>Shipping Fee: {shippingFee.toFixed(2)}</div>
+							<div>Total Amount: {totalWithShipping}</div>
+						</div>
+
 						<div className="border-t border-gray-300 pt-4 mt-5">
 							<div className="flex justify-between items-center mb-4">
 								<h3 className="text-lg font-semibold">Subtotal:</h3>
-								<p className="text-lg font-semibold">₱{totalPrice}</p>
+								<p className="text-lg font-semibold">₱{totalWithShipping}</p>
 							</div>
 							<div className="flex justify-between mb-4">
 								<button
