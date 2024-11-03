@@ -6,69 +6,74 @@ const Furniture = require("../../models/Furniture/furnitureModel");
 const orderController = {
 	// Create new order from cart
 	createOrder: async (req, res) => {
-			try {
-					const { paymentMethod, shippingAddress } = req.body; // Get shippingAddress from request body
-					const userId = req.user._id; // Using ID from cookie token
+    try {
+        const { paymentMethod, shippingAddress } = req.body; // Expecting JSON string here
+        const userId = req.user._id;
 
-					// Validate that payment method is provided
-					if (!paymentMethod) {
-							return res.status(400).json({
-									error: "Please select a payment method to proceed.",
-							});
-					}
+        if (!paymentMethod) {
+            return res.status(400).json({
+                error: "Please select a payment method to proceed.",
+            });
+        }
 
-					// For specific payment methods (e.g., GCash, Maya, COD), ensure proof of payment is provided
-					if (["GCash", "Maya", "COD"].includes(paymentMethod)) {
-							if (!req.file) {
-									return res.status(400).json({
-											error: "Please upload proof of payment for the selected method.",
-									});
-							}
-					}
+        if (["GCash", "Maya", "COD"].includes(paymentMethod) && !req.file) {
+            return res.status(400).json({
+                error: "Please upload proof of payment for the selected method.",
+            });
+        }
 
-					let proofOfPayment;
-					if (req.file) {
-							// Convert the uploaded image to a base64-encoded string without the data URL prefix
-							proofOfPayment = req.file.buffer.toString("base64");
-					}
+        let proofOfPayment;
+        if (req.file) {
+            proofOfPayment = req.file.buffer.toString("base64");
+        }
 
-					// Find user's cart
-					const cart = await Cart.findOne({ userId });
-					if (!cart || cart.items.length === 0) {
-							return res.status(400).json({ error: "Cart is empty" });
-					}
+        const cart = await Cart.findOne({ userId });
+        if (!cart || cart.items.length === 0) {
+            return res.status(400).json({ error: "Cart is empty" });
+        }
 
-					const shippingAddressObj = JSON.parse(shippingAddress);
+        // Parse and extract municipality from shipping address
+        const shippingAddressObj = JSON.parse(shippingAddress);
+        const municipality = shippingAddressObj.municipality;
 
+        // Use the shippingFees object for calculating shipping fee
+        const shippingFees = {
+            Boac: 500,
+            Mogpog: 700,
+            Gasan: 500,
+            Buenavista: 800,
+            Santa_Cruz: 3000,
+            Torrijos: 3000,
+        };
+        const shippingFee = shippingFees[municipality] || 0; // Default to 0 if municipality is not listed
 
-					// Create the order with the proof of payment as base64
-					const order = await Order.createFromCart(
-							cart._id,
-							paymentMethod,
-							proofOfPayment,
-							shippingAddressObj // Pass the selected shipping address to createFromCart
-					);
+        const order = await Order.createFromCart(
+            cart._id,
+            paymentMethod,
+            proofOfPayment,
+            shippingAddressObj,
+            shippingFee // Pass calculated shipping fee
+        );
 
-					// Clear the cart
-					await Cart.findByIdAndUpdate(cart._id, {
-							items: [],
-							count: 0,
-							totalAmount: 0,
-					});
+        await Cart.findByIdAndUpdate(cart._id, {
+            items: [],
+            count: 0,
+            totalAmount: 0,
+        });
 
-					// Add the order to the user's orders array
-					await User.findByIdAndUpdate(userId, {
-							$push: { orders: order._id, proofOfPayment },
-					});
+        await User.findByIdAndUpdate(userId, {
+            $push: { orders: order._id, proofOfPayment },
+        });
 
-					res.status(201).json({ success: "Order placed successfully!", order });
-			} catch (error) {
-					console.error("Error creating order:", error);
-					res.status(500).json({
-							error: "Error creating order",
-					});
-			}
-	},
+        res.status(201).json({ success: "Order placed successfully!", order });
+    } catch (error) {
+        console.error("Error creating order:", error);
+        res.status(500).json({
+            error: "Error creating order",
+        });
+    }
+},
+
 
 	// Get user's orders
 	getUserOrders: async (req, res) => {

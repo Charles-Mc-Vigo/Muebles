@@ -1,15 +1,5 @@
 const mongoose = require("mongoose");
 
-// Define shipping fees based on municipality
-const shippingFees = {
-	Boac: 500,
-	Mogpog: 700,
-	Gasan: 500,
-	Buenavista: 800,
-	Santa_Cruz: 3000,
-	Torrijos: 3000,
-};
-
 const orderSchema = new mongoose.Schema(
 	{
 		user: {
@@ -87,14 +77,11 @@ orderSchema.pre("save", async function (next) {
 	next();
 });
 
-orderSchema.statics.createFromCart = async function(cartId, paymentMethod, proofOfPayment, shippingAddress) {
+orderSchema.statics.createFromCart = async function(cartId, paymentMethod, proofOfPayment, shippingAddress, shippingFee) {
   const cart = await mongoose.model('Cart').findById(cartId)
       .populate('userId')
       .populate('items.furnitureId');
   if (!cart) throw new Error('Cart not found');
-
-  // Ensure the shippingAddress is correctly set
-  const shippingFee = shippingFees[shippingAddress._id] || 0; // Default to 0 if not found
 
   const orderData = {
       user: cart.userId._id,
@@ -106,17 +93,18 @@ orderSchema.statics.createFromCart = async function(cartId, paymentMethod, proof
           color: item.color,
           size: item.size,
       })),
-      shippingAddress: shippingAddress, // Directly assign the shipping address
+      shippingAddress: shippingAddress,
       phoneNumber: cart.userId.phoneNumber,
       paymentMethod: paymentMethod,
       subtotal: cart.totalAmount,
-      shippingFee: shippingFee,
+      shippingFee: shippingFee, // Use passed shipping fee
       totalAmount: cart.totalAmount + shippingFee,
       proofOfPayment: proofOfPayment
   };
 
   return this.create(orderData);
 };
+
 
 // // Static method to create direct order
 // orderSchema.statics.createDirectOrder = async function(orderData) {
