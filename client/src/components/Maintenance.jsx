@@ -132,7 +132,6 @@ const Maintenance = () => {
 	};
 
 	const [categories, setCategories] = useState([]);
-	const [productionDays, setProductionDays] = useState("");
 	const [furnitureTypes, setFurnitureTypes] = useState([]);
 	const [colors, setColors] = useState([]);
 	const [sizes, setSizes] = useState([]);
@@ -426,7 +425,6 @@ const Maintenance = () => {
 					body: JSON.stringify({
 						name: newItemName,
 						categoryId: selectedCategory,
-						estimatedProductionDays: productionDays,
 					}),
 				});
 	
@@ -524,7 +522,6 @@ const Maintenance = () => {
 		setNewSize(initialSizeState);
 		setSelectedFurnitureType("");
 		setSelectedCategory("");
-		setProductionDays("");
 
 	};
 
@@ -625,14 +622,6 @@ const Maintenance = () => {
 									"newFurnitureType",
 									newItemName,
 									(e) => setNewItemName(e.target.value)
-								)}
-								{renderInputField(
-									"Production Days",
-									"productionDays",
-									productionDays ,
-									(e) => setProductionDays(e.target.value),
-									"number",
-									"Enter production days"
 								)}
 							</>
 						)}
@@ -764,17 +753,16 @@ const Maintenance = () => {
 							<h2 className="text-2xl font-bold mb-4">Furniture Types</h2>
 							<div className="max-h-96 overflow-y-auto">
 								<Table
-									headers={["Furniture Type", "Production Days","Category"]}
+									headers={["Furniture Type","Category"]}
 									data={
 										Array.isArray(furnitureTypes)
 											? furnitureTypes.map((type) => ({
+												id: type._id,
 												name: type.name,
-												estimatedProductionDays:type.estimatedProductionDays,
 												category:
 												categories.find(
 													(cat) => cat._id === type.categoryId
 												)?.name || "N/A",
-												id: type._id,
 											}))
 											: []
 									}

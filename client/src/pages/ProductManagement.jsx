@@ -47,6 +47,8 @@ const ProductManagement = () => {
         fetch("http://localhost:3000/api/sizes"),
       ]);
 
+      console.log(furnitureResponse)
+
       if (
         !furnitureResponse.ok ||
         !furnitureTypesResponse.ok ||
