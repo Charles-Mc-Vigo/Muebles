@@ -6,74 +6,73 @@ const Furniture = require("../../models/Furniture/furnitureModel");
 const orderController = {
 	// Create new order from cart
 	createOrder: async (req, res) => {
-    try {
-        const { paymentMethod, shippingAddress } = req.body; // Expecting JSON string here
-        const userId = req.user._id;
+		try {
+			const { paymentMethod, shippingAddress, deliveryMode } = req.body; // Extract deliveryMode
+			const userId = req.user._id;
 
-        if (!paymentMethod) {
-            return res.status(400).json({
-                error: "Please select a payment method to proceed.",
-            });
-        }
+			if (!paymentMethod) {
+				return res.status(400).json({
+					error: "Please select a payment method to proceed.",
+				});
+			}
 
-        if (["GCash", "Maya", "COD"].includes(paymentMethod) && !req.file) {
-            return res.status(400).json({
-                error: "Please upload proof of payment for the selected method.",
-            });
-        }
+			if (["GCash", "Maya", "COD"].includes(paymentMethod) && !req.file) {
+				return res.status(400).json({
+					error: "Please upload proof of payment for the selected method.",
+				});
+			}
 
-        let proofOfPayment;
-        if (req.file) {
-            proofOfPayment = req.file.buffer.toString("base64");
-        }
+			let proofOfPayment;
+			if (req.file) {
+				proofOfPayment = req.file.buffer.toString("base64");
+			}
 
-        const cart = await Cart.findOne({ userId });
-        if (!cart || cart.items.length === 0) {
-            return res.status(400).json({ error: "Cart is empty" });
-        }
+			const cart = await Cart.findOne({ userId });
+			if (!cart || cart.items.length === 0) {
+				return res.status(400).json({ error: "Cart is empty" });
+			}
 
-        // Parse and extract municipality from shipping address
-        const shippingAddressObj = JSON.parse(shippingAddress);
-        const municipality = shippingAddressObj.municipality;
+			const shippingAddressObj = JSON.parse(shippingAddress);
+			const municipality = shippingAddressObj.municipality;
 
-        // Use the shippingFees object for calculating shipping fee
-        const shippingFees = {
-            Boac: 500,
-            Mogpog: 700,
-            Gasan: 500,
-            Buenavista: 800,
-            Santa_Cruz: 3000,
-            Torrijos: 3000,
-        };
-        const shippingFee = shippingFees[municipality] || 0; // Default to 0 if municipality is not listed
+			// Calculate shipping fee
+			const shippingFees = {
+				Boac: 500,
+				Mogpog: 700,
+				Gasan: 500,
+				Buenavista: 800,
+				Santa_Cruz: 3000,
+				Torrijos: 3000,
+			};
+			const shippingFee = shippingFees[municipality] || 0; // Default to 0 if municipality is not listed
 
-        const order = await Order.createFromCart(
-            cart._id,
-            paymentMethod,
-            proofOfPayment,
-            shippingAddressObj,
-            shippingFee // Pass calculated shipping fee
-        );
+			const order = await Order.createFromCart(
+				cart._id,
+				paymentMethod,
+				proofOfPayment,
+				shippingAddressObj,
+				shippingFee,
+				deliveryMode // Pass delivery mode
+			);
 
-        await Cart.findByIdAndUpdate(cart._id, {
-            items: [],
-            count: 0,
-            totalAmount: 0,
-        });
+			await Cart.findByIdAndUpdate(cart._id, {
+				items: [],
+				count: 0,
+				totalAmount: 0,
+			});
 
-        await User.findByIdAndUpdate(userId, {
-            $push: { orders: order._id, proofOfPayment },
-        });
+			await User.findByIdAndUpdate(userId, {
+				$push: { orders: order._id, proofOfPayment },
+			});
 
-        res.status(201).json({ success: "Order placed successfully!", order });
-    } catch (error) {
-        console.error("Error creating order:", error);
-        res.status(500).json({
-            error: "Error creating order",
-        });
-    }
-},
-
+			res.status(201).json({ success: "Order placed successfully!", order });
+		} catch (error) {
+			console.error("Error creating order:", error);
+			res.status(500).json({
+				error: "Error creating order",
+			});
+		}
+	},
 
 	// Get user's orders
 	getUserOrders: async (req, res) => {
@@ -99,8 +98,8 @@ const orderController = {
 			const { orderId } = req.params;
 			const userId = req.user._id;
 			const order = await Order.findById(orderId)
-			.populate('user')
-			.populate('items.furniture');
+				.populate("user")
+				.populate("items.furniture");
 
 			if (!order) {
 				return res.status(404).json({
@@ -117,7 +116,7 @@ const orderController = {
 
 			res.status(200).json(order);
 		} catch (error) {
-			console.log("Error fetching order : ",error)
+			console.log("Error fetching order : ", error);
 			res.status(500).json({
 				error: "Server error!",
 			});
@@ -244,7 +243,7 @@ const orderController = {
 				paymentMethod,
 				proofOfPayment: req.file
 					? req.file.buffer.toString("base64")
-					: undefined
+					: undefined,
 			};
 
 			// Create the order using the model's static method
@@ -259,7 +258,7 @@ const orderController = {
 			res.status(201).json({
 				success: true,
 				message: "Order created successfully",
-				order
+				order,
 			});
 		} catch (error) {
 			console.error("Error in creating direct order:", error);

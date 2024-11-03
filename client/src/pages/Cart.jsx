@@ -7,6 +7,7 @@ import "react-toastify/dist/ReactToastify.css";
 
 const Cart = () => {
 	const [items, setItems] = useState([]);
+	const [deliveryMode, setDeliveryMode] = useState("delivery"); // Default to 'delivery'
 	const [user, setUser] = useState(null);
 	const [isOpen, setIsOpen] = useState(false); // State to manage visibility
 	const [selectedAddress, setSelectedAddress] = useState(null);
@@ -73,20 +74,18 @@ const Cart = () => {
 	useEffect(() => {
 		// Calculate and set shipping fee based on selected address
 		if (selectedAddress) {
-				const address = user.addresses.find(
-						(address) => address._id === selectedAddress
-				);
-				const fee = shippingFees[address.municipality] || 0;
-				setShippingFee(fee);
+			const address = user.addresses.find(
+				(address) => address._id === selectedAddress
+			);
+			const fee = shippingFees[address.municipality] || 0;
+			setShippingFee(fee);
 		} else {
-				setShippingFee(0); // Reset if no address is selected
+			setShippingFee(0); // Reset if no address is selected
 		}
-}, [selectedAddress, user]);
+	}, [selectedAddress, user]);
 
 	// Calculate total price
 	const totalWithShipping = (totalAmount + shippingFee).toFixed(2);
-
-	const totalPrice = totalAmount.toFixed(2);
 
 	const handlePaymentMethodClick = (method) => {
 		setSelectedPaymentMethod(method);
@@ -100,17 +99,21 @@ const Cart = () => {
 
 	const checkout = async () => {
 		// Validate payment method and proof of payment
+		if (!deliveryMode) {
+			toast.error("Please select a delivery mode.");
+			return;
+		}
+
+		if (!selectedAddress) {
+			toast.error("Please select shipping address.");
+			return;
+		}
 		if (!selectedPaymentMethod) {
 			toast.error("Please select a payment method before checking out.");
 			return;
 		}
 		if (!proofOfPayment) {
 			toast.error("Please upload proof of payment before checking out.");
-			return;
-		}
-
-		if (!selectedAddress) {
-			toast.error("Please select shipping address.");
 			return;
 		}
 
@@ -123,6 +126,8 @@ const Cart = () => {
 		formData.append("proofOfPayment", proofOfPayment);
 		formData.append("paymentMethod", selectedPaymentMethod);
 		formData.append("shippingAddress", JSON.stringify(addressToSend)); // Send address as JSON
+		formData.append("deliveryMode", deliveryMode); // Append delivery mode
+
 
 		// Log FormData entries
 		for (const [key, value] of formData.entries()) {
@@ -245,10 +250,35 @@ const Cart = () => {
 					<p className="text-center text-gray-600">Your cart is empty.</p>
 				) : (
 					<>
+						{/* user details */}
 						<div>
 							<div>
 								Client: {user.firstname} {user.lastname} <br />
 								Phone Number: {user.phoneNumber}
+							</div>
+
+							<div className="flex justify-between">
+								<div>Delivery Mode:</div>
+								<div className="flex gap-3">
+									<label>
+										<input
+											type="radio"
+											name="deliveryMode"
+											value="delivery"
+											onChange={(e) => setDeliveryMode(e.target.value)}
+										/>
+										Delivery
+									</label>
+									<label>
+										<input
+											type="radio"
+											name="deliveryMode"
+											value="pickup"
+											onChange={(e) => setDeliveryMode(e.target.value)}
+										/>
+										Pick Up
+									</label>
+								</div>
 							</div>
 
 							<div>

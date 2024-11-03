@@ -56,9 +56,13 @@ const orderSchema = new mongoose.Schema(
 			enum: ["pending", "confirmed", "delivered", "cancelled"],
 			default: "pending",
 		},
+    deliveryMode:{
+      type:String,
+    },
 		subtotal: Number,
 		shippingFee: Number,
 		totalAmount: Number,
+
 	},
 	{
 		timestamps: true,
@@ -77,7 +81,7 @@ orderSchema.pre("save", async function (next) {
 	next();
 });
 
-orderSchema.statics.createFromCart = async function(cartId, paymentMethod, proofOfPayment, shippingAddress, shippingFee) {
+orderSchema.statics.createFromCart = async function(cartId, paymentMethod, proofOfPayment, shippingAddress, shippingFee, deliveryMode) {
   const cart = await mongoose.model('Cart').findById(cartId)
       .populate('userId')
       .populate('items.furnitureId');
@@ -97,13 +101,15 @@ orderSchema.statics.createFromCart = async function(cartId, paymentMethod, proof
       phoneNumber: cart.userId.phoneNumber,
       paymentMethod: paymentMethod,
       subtotal: cart.totalAmount,
-      shippingFee: shippingFee, // Use passed shipping fee
+      shippingFee: shippingFee,
       totalAmount: cart.totalAmount + shippingFee,
-      proofOfPayment: proofOfPayment
+      proofOfPayment: proofOfPayment,
+      deliveryMode: deliveryMode // Include delivery mode in order data
   };
 
   return this.create(orderData);
 };
+
 
 
 // // Static method to create direct order
