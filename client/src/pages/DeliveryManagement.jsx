@@ -1,5 +1,5 @@
 import React from "react";
-import DeliveryPage from "./components/DeliveryPage";
+import DeliveryPage from "../components/DeliveryPage";
 
 
 const DeliveryManagement = () => {

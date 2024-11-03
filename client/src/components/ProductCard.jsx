@@ -14,23 +14,21 @@ const ProductCard = ({
 	showArchiveButton,
 	showUnArchivedButton,
 	onArchiveSuccess,
-	onUnArchiveSuccess
+	onUnArchiveSuccess,
 }) => {
 	// Function to truncate the description
 	const truncateDescription = (desc, maxLength) => {
-		if (desc.length > maxLength) {
-			return `${desc.substring(0, maxLength)}...`;
-		}
-		return desc;
+		return desc.length > maxLength
+			? `${desc.substring(0, maxLength)}...`
+			: desc;
 	};
-	const maxDescriptionLength = 60; // Set the max length for the description
+
+	const maxDescriptionLength = 60;
 
 	const archiveItem = async (e) => {
-		e.preventDefault();
-		// Confirmation dialog
-		if (!window.confirm("Are you sure you want to archive this item?")) {
-			return; // Exit if the user cancels
-		}
+		e.stopPropagation();
+		if (!window.confirm("Are you sure you want to archive this item?")) return;
+
 		try {
 			const response = await fetch(
 				`http://localhost:3000/api/furnitures/archive/${id}`,
@@ -41,79 +39,73 @@ const ProductCard = ({
 				}
 			);
 			const data = await response.json();
-			console.log("Item archived successfully:", data);
 			toast.success(data.success);
-			onArchiveSuccess(); // Trigger update in parent component
+			onArchiveSuccess();
 		} catch (error) {
-			console.error("Error archiving item:", error);
 			toast.error("Error archiving item. Please try again.");
 		}
 	};
-	
+
 	const unarchiveItem = async (e) => {
-		e.preventDefault(); // Prevents navigating when clicking the button
-		// Confirmation dialog
-		if (!window.confirm("Are you sure you want to unarchive this item?")) {
-			return; // Exit if the user cancels
-		}
+		e.stopPropagation();
+		if (!window.confirm("Are you sure you want to unarchive this item?"))
+			return;
+
 		try {
 			const response = await fetch(
 				`http://localhost:3000/api/furnitures/unarchive/${id}`,
 				{
-					method: "POST", // Assuming POST for unarchiving
-					headers: {
-						"Content-Type": "application/json",
-					},
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
 					credentials: "include",
 				}
 			);
 			const data = await response.json();
-			console.log("Item unarchived successfully:", data);
 			toast.success(data.success);
 			onUnArchiveSuccess();
 		} catch (error) {
-			console.error("Error unarchiving item:", error);
 			toast.error("Error unarchiving item. Please try again.");
 		}
 	};
 
 	return (
-		<Link
-			to={`/furnitures/${id}`}
-			className="bg-white border-2 rounded-md shadow-lg transition-transform transform hover:scale-105 p-6 flex flex-col justify-between w-auto"
-		>
-			{/* Render only the first image from the images array */}
-			{images && images.length > 0 && (
-				<img
-					src={`data:image/jpeg;base64,${images[0]}`} // Accessing the first image
-					alt={name}
-					className="w-full h-40 object-contain rounded-md mb-4"
-				/>
-			)}
-			<div className="flex-grow">
-				<h3 className="text-xl font-bold text-gray-800">{name}</h3>
-				<p className="mt-2 text-lg text-green-600">₱ {price}</p>
-				<p className="mt-2 text-gray-500">
-					{truncateDescription(description, maxDescriptionLength)}
-				</p>
-			</div>
+		<div className="bg-white border-2 rounded-md shadow-lg transition-transform transform hover:scale-105 p-6 flex flex-col justify-between w-auto">
+			<Link to={`/furnitures/${id}`} className="flex-grow">
+				{images && images.length > 0 && (
+					<img
+						src={`data:image/jpeg;base64,${images[0]}`}
+						alt={name}
+						className="w-full h-40 object-contain rounded-md mb-4"
+					/>
+				)}
+				<div>
+					<h3 className="text-xl font-bold text-gray-800">{name}</h3>
+					<p className="mt-2 text-lg text-green-600">₱ {price}</p>
+					<p className="mt-2 text-gray-500">
+						{truncateDescription(description, maxDescriptionLength)}
+					</p>
+				</div>
+			</Link>
 			<div className="mt-4 flex flex-col">
 				{showAddToCart && (
-					<Link
-					to={`/direct-order/${id}`}
-						className="bg-green-600 hover:bg-green-700 text-white py-2 rounded-md transition-colors duration-300 text-center w-full"
+					<button
+						onClick={(e) => e.stopPropagation()}
+						disabled
+						className="bg-gray-400 text-white py-2 rounded-md transition-colors duration-300 text-center w-full cursor-not-allowed"
 					>
-						Buy
-					</Link>
+						Buy (Unavailable)
+					</button>
 				)}
 				{showUpdateButton && (
-					<Link
-						to={`/furnitures/edit/${id}`}
-						onClick={(e) => e.stopPropagation()} // Prevent card click navigation
-						className="bg-green-600 hover:bg-green-700 text-white py-2 rounded-md transition-colors duration-300 text-center"
+					<button
+						onClick={(e) => {
+							e.stopPropagation();
+							window.location.href = `/furnitures/edit/${id}`;
+						}}
+						className="bg-green-600 hover:bg-green-700 text-white py-2 rounded-md transition-colors duration-300 text-center mt-2"
 					>
 						Update Furniture
-					</Link>
+					</button>
 				)}
 				{showArchiveButton && (
 					<button
@@ -132,8 +124,8 @@ const ProductCard = ({
 					</button>
 				)}
 			</div>
-			<ToastContainer/>
-		</Link>
+			<ToastContainer />
+		</div>
 	);
 };
 

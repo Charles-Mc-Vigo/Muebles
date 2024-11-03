@@ -161,13 +161,12 @@ const UserProfile = () => {
 							? profile.image
 							: profile?.image || "default-profile-image.jpg" // Use a default image if profile.image is undefined
 					}
-					alt={`${profile?.firstname || ""} ${profile?.lastname || ""
-						}'s Profile Picture`}
+					alt={`${profile?.firstname || ""} ${
+						profile?.lastname || ""
+					}'s Profile Picture`}
 					className="w-24 h-24 rounded-full object-cover mb-2 shadow-lg transition-transform group-hover:scale-105"
 				/>
-				<h1 className="text-xl font-semibold text-gray-700 mb-3">
-					My profile
-				</h1>
+				<h1 className="text-xl font-semibold text-gray-700 mb-3">My profile</h1>
 
 				<div className="profile-details grid grid-cols-1 md:grid-cols-2 gap-6 mb-5">
 					<div>
@@ -224,8 +223,9 @@ const UserProfile = () => {
 							<tr className="bg-gray-200">
 								<th className="px-4 py-2 text-left font-semibold">Full Name</th>
 								<th className="px-4 py-2 text-left font-semibold">Address</th>
-								<th className="px-4 py-2 text-left font-semibold">Location</th>
-								<th className="px-4 py-2 text-left font-semibold">Phone Number</th>
+								<th className="px-4 py-2 text-left font-semibold">
+									Phone Number
+								</th>
 								<th className="px-4 py-2 text-left font-semibold">Actions</th>
 							</tr>
 						</thead>
@@ -234,9 +234,20 @@ const UserProfile = () => {
 								<td className="px-4 py-2">
 									{profile.firstname} {profile.lastname}
 								</td>
-								<td className="px-4 py-2">{profile.streetAddress}</td>
 								<td className="px-4 py-2">
-									{profile.municipality}, {profile.zipCode}
+									{profile.addresses.map((address, index) => (
+										<div key={index}>
+											<p>
+												{address.streetAddress}, {address.barangay},{" "}
+												{address.municipality}, {address.zipCode}
+												{address.addressStatus === "default" && (
+													<span className="ml-2 text-sm text-green-600 font-semibold">
+														(Default)
+													</span>
+												)}
+											</p>
+										</div>
+									))}
 								</td>
 								<td className="px-4 py-2">{profile.phoneNumber}</td>
 								<td className="px-4 py-2">
@@ -264,37 +275,41 @@ const UserProfile = () => {
 					<nav className="space-y-4 text-gray-700 p-4">
 						<button
 							onClick={() => setActiveSection("manageAccount")}
-							className={`block font-bold ${activeSection === "manageAccount"
+							className={`block font-bold ${
+								activeSection === "manageAccount"
 									? "text-teal-600"
 									: "hover:text-teal-600"
-								}`}
+							}`}
 						>
 							Manage My Account
 						</button>
 						<button
 							onClick={() => setActiveSection("personalProfile")}
-							className={`block ${activeSection === "personalProfile"
+							className={`block ${
+								activeSection === "personalProfile"
 									? "text-teal-600"
 									: "hover:text-teal-600"
-								}`}
+							}`}
 						>
 							My Profile
 						</button>
 						<button
 							onClick={() => setActiveSection("addressBook")}
-							className={`block ${activeSection === "addressBook"
+							className={`block ${
+								activeSection === "addressBook"
 									? "text-teal-600"
 									: "hover:text-teal-600"
-								}`}
+							}`}
 						>
 							Address
 						</button>
 						<button
 							onClick={() => setActiveSection("myOrders")}
-							className={`block font-bold ${activeSection === "myOrders"
+							className={`block font-bold ${
+								activeSection === "myOrders"
 									? "text-teal-600"
 									: "hover:text-teal-600"
-								}`}
+							}`}
 						>
 							My Orders
 						</button>

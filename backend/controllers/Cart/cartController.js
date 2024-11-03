@@ -14,11 +14,11 @@ exports.viewCart = async (req, res) => {
 		const cart = await Cart.findOne({ userId: user._id })
 			.populate({
 				path: "items.furnitureId",
-				select: "name description price images stocks", // Populate furniture details
+				select: "name description price images stocks colors",
 			})
 			.populate({
 				path: "userId",
-				select: "firstname lastname email phoneNumber addresses", // Populate user details
+				select: "firstname lastname email phoneNumber addresses",
 			});
 
 		// If cart is empty

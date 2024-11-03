@@ -28,7 +28,7 @@ import AdminPendingPage from "./pages/AdminPendingPage";
 import AdminProfile from "./components/AdminProfile";
 import UserProfile from "./components/UserProfile";
 import TermsAndConditions from "./pages/TermsandCondition";
-import DeliveryManagement from "./DeliveryManagement";
+import DeliveryManagement from "./pages/DeliveryManagement";
 import PasswordResetRequest from "./pages/PasswordResetRequest";
 import PasswordResetVerify from "./pages/PasswordResetVerify";
 import PasswordResetCreateNew from "./pages/PasswordResetCreateNew";
@@ -97,7 +97,9 @@ export default function App() {
 				<Route path="/admin-login" element={<AdminLogin />} />
 				<Route path="/admin-signup" element={<AdminSignUp />} />
 				<Route
-					path="/admin-signup/verify-account/:adminId" element={<AdminVerify />}/>
+					path="/admin-signup/verify-account/:adminId"
+					element={<AdminVerify />}
+				/>
 				<Route
 					path={`/order/:orderId`}
 					element={<ProtectedRoute element={ViewUserOrder} adminOnly={true} />}

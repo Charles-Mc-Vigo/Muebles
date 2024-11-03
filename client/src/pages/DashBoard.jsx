@@ -21,7 +21,7 @@ import Notification from "../components/Notification";
 import ProductCustomization from "./ProductCustomization";
 import OrderManagement from "./OrderManagement";
 import TransactionHistory from "./TransactionHistory";
-import DeliveryManagement from "../DeliveryManagement";
+import DeliveryManagement from "./DeliveryManagement";
 
 const Dashboard = () => {
   // State management for dropdowns
