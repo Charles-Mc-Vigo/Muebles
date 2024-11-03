@@ -232,7 +232,7 @@ const Cart = () => {
 
 	return (
 		<div className="flex flex-col min-h-screen">
-			<Header/>
+			<Header isLogin={true} cartCount={true}/>
 			<main className="flex-grow w-2/4 mx-auto p-4 mt-5">
 				<div className="flex items-center mb-4 gap-5">
 					<button
@@ -356,6 +356,9 @@ const Cart = () => {
 													<h3 className="text-lg font-medium">
 														{item.furnitureId.name}
 													</h3>
+													<p className="text-gray-600">
+														Color: {item.furnitureId.colors.name}
+													</p>
 													<p className="text-gray-600">
 														Price: ₱{item.furnitureId.price}
 													</p>

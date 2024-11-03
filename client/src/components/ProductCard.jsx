@@ -14,11 +14,13 @@ const ProductCard = ({
 	showArchiveButton,
 	showUnArchivedButton,
 	onArchiveSuccess,
-	onUnArchiveSuccess
+	onUnArchiveSuccess,
 }) => {
 	// Function to truncate the description
 	const truncateDescription = (desc, maxLength) => {
-		return desc.length > maxLength ? `${desc.substring(0, maxLength)}...` : desc;
+		return desc.length > maxLength
+			? `${desc.substring(0, maxLength)}...`
+			: desc;
 	};
 
 	const maxDescriptionLength = 60;
@@ -46,7 +48,8 @@ const ProductCard = ({
 
 	const unarchiveItem = async (e) => {
 		e.stopPropagation();
-		if (!window.confirm("Are you sure you want to unarchive this item?")) return;
+		if (!window.confirm("Are you sure you want to unarchive this item?"))
+			return;
 
 		try {
 			const response = await fetch(
@@ -86,13 +89,11 @@ const ProductCard = ({
 			<div className="mt-4 flex flex-col">
 				{showAddToCart && (
 					<button
-						onClick={(e) => {
-							e.stopPropagation();
-							window.location.href = `/direct-order/${id}`;
-						}}
-						className="bg-green-600 hover:bg-green-700 text-white py-2 rounded-md transition-colors duration-300 text-center w-full"
+						onClick={(e) => e.stopPropagation()}
+						disabled
+						className="bg-gray-400 text-white py-2 rounded-md transition-colors duration-300 text-center w-full cursor-not-allowed"
 					>
-						Buy
+						Buy (Unavailable)
 					</button>
 				)}
 				{showUpdateButton && (
