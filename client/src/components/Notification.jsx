@@ -3,8 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBell } from "@fortawesome/free-solid-svg-icons";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css"; // Import the CSS for toast notifications
-import { useNavigate } from 'react-router-dom';
-
+import { useNavigate } from "react-router-dom";
 
 const Notification = () => {
 	const [notification, setNotification] = useState({
@@ -52,37 +51,6 @@ const Notification = () => {
 		fetchNotifications();
 	}, []);
 
-	// Function to accept admin request
-	const acceptRequest = async (adminId) => {
-		try {
-			const response = await fetch(
-				`http://localhost:3000/api/admin/notifications/accept-request/${adminId}`,
-				{
-					method: "POST",
-					credentials: "include",
-					headers: {
-						"Content-Type": "application/json",
-					},
-				}
-			);
-
-			if (!response.ok) {
-				throw new Error(response.error);
-			}
-
-			const result = await response.json();
-			toast.success(result.message); // Show success toast notification
-
-			// Optionally, remove the accepted notification from the UI
-			setNotification((prev) => ({
-				...prev,
-				requests: prev.requests.filter((admin) => admin._id !== adminId),
-			}));
-		} catch (error) {
-			console.error("Error accepting admin request:", error);
-			toast.error("Error accepting request: " + error.message); // Show error toast notification
-		}
-	};
 
 	const viewNewOrder = async (orderId) => {
 		try {
@@ -96,73 +64,31 @@ const Notification = () => {
 			if (!response.ok) {
 				throw new Error("Failed to view order");
 			}
-			
+
 			navigate(`/order/${orderId}`);
 		} catch (error) {
-			console.error("Error in viewing the order: ",error);
+			console.error("Error in viewing the order: ", error);
 			alert("Error viewing order: " + error.message); // Show error toast notification
-		}
-	}
-
-	const acceptOrder = async (orderId) => {
-		try {
-			const response = await fetch(
-				`http://localhost:3000/api/admin/notifications/accept-order/${orderId}`,
-				{
-					method: "POST",
-					credentials: "include",
-					headers: {
-						"Content-Type": "application/json",
-					},
-				}
-			);
-
-			if (!response.ok) {
-				throw new Error("Failed to accept order");
-			}
-
-			const result = await response.json();
-			alert(result.message); // Show success toast notification
-
-			// Optionally, remove the accepted notification from the UI
-			setNotification((prev) => ({
-				...prev,
-				orders: prev.orders.filter((order) => order._id !== orderId),
-			}));
-		} catch (error) {
-			console.error("Error accepting order request:", error);
-			toast.error("Error accepting order: " + error.message); // Show error toast notification
 		}
 	};
 
-	const cancelOrder = async (orderId) => {
+	const viewRequest = async (adminId) => {
 		try {
 			const response = await fetch(
-				`http://localhost:3000/api/admin/notifications/cancel-order/${orderId}`,
+				`http://localhost:3000/api/admin/notifications/pending-request/${adminId}`,
 				{
-					method: "PUT",
+					method: "GET",
 					credentials: "include",
-					headers: {
-						"Content-Type": "application/json",
-					},
 				}
 			);
-
 			if (!response.ok) {
-				throw new Error("Failed to accept order");
+				throw new Error("Failed to view the request");
 			}
 
-			const result = await response.json();
-			toast.success(result.message); // Show success toast notification
-
-			// Optionally, remove the accepted notification from the UI
-			setNotification((prev) => ({
-				...prev,
-				orders: prev.orders.filter((order) => order._id !== orderId),
-			}));
+			navigate(`/view-request/${adminId}`);
 		} catch (error) {
-			console.error("Error accepting order request:", error);
-			toast.error("Error accepting order: " + error.message); // Show error toast notification
+			console.error("Error in viewing the request: ", error);
+			alert("Error viewing order: " + error.message);
 		}
 	};
 
@@ -189,18 +115,7 @@ const Notification = () => {
 					<ul className="text-sm">
 						{notification.requests.map((admin, index) => (
 							<li key={index} className="mb-4">
-								<span>{admin.firstname} has a pending approval request.</span>
-								<div className="mt-1">
-									<button
-										className="bg-green-500 text-white px-2 py-1 rounded mr-1"
-										onClick={() => acceptRequest(admin._id)} // Pass the admin ID to the acceptRequest function
-									>
-										Accept
-									</button>
-									<button className="bg-red-500 text-white px-2 py-1 rounded">
-										Reject
-									</button>
-								</div>
+								<span onClick={()=> viewRequest(admin._id)}>{admin.firstname} has a pending approval request.</span>
 							</li>
 						))}
 					</ul>
@@ -208,27 +123,9 @@ const Notification = () => {
 					<ul className="text-sm">
 						{notification.orders.map((order, index) => (
 							<li key={index} className="mb-4">
-								<span>Order #{order.orderNumber} has been place.</span>
-								<div className="mt-1">
-									{/* <button
-										className="bg-green-500 text-white px-2 py-1 rounded mr-1"
-										onClick={() => acceptOrder(order._id)}
-									>
-										Accept
-									</button>
-									<button
-										className="bg-red-500 text-white px-2 py-1 rounded"
-										onClick={() => cancelOrder(order._id)}
-									>
-										Cancel
-									</button> */}
-									<button
-										className="bg-red-500 text-white px-2 py-1 rounded"
-										onClick={() => viewNewOrder(order._id)}
-									>
-										View
-									</button>
-								</div>
+								<span onClick={() => viewNewOrder(order._id)}>
+									Order #{order.orderNumber} has been place.
+								</span>
 							</li>
 						))}
 					</ul>
