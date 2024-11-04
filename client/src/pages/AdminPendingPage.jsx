@@ -25,7 +25,7 @@ const AdminPendingPage = () => {
 				setAdmin(adminData);
 
 				// Check if the adminApproval status is "Pending" and set the message
-				if (adminData.message) {
+				if (adminData.adminApproval === "Pending") {
 					setPendingMessage(adminData.message);
 					toast.info("Admin approval is still pending");
 				} else if (adminData.adminApproval === "Accepted") {
@@ -34,7 +34,10 @@ const AdminPendingPage = () => {
 						navigate("/dashboard");
 					}, 3000);
 				} else {
-					toast.info("Admin approval is still pending or was rejected.");
+					toast.error("Admin approval was rejected.");
+					setTimeout(() => {
+						navigate("/admin-signup");
+					}, 3000);
 				}
 			} catch (error) {
 				console.error("Error fetching admin:", error);
