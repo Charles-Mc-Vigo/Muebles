@@ -595,6 +595,42 @@ exports.AddNewAddress = async (req, res) => {
 	}
 };
 
+exports.updateAddress = async (req, res) => {
+	const{addressId} = req.params;
+	const { municipality, barangay, streetAddress, zipCode, isDefault } = req.body;
+	const userId = req.user._id;
+
+	try {
+			// Find the user
+			const user = await User.findById(userId);
+			if (!user) return res.status(404).json({ message: "User not found!" });
+
+			// Find the address to update
+			const address = user.addresses.id(addressId);
+			if (!address) return res.status(404).json({ message: "Address not found!" });
+
+			// Update the address fields
+			address.municipality = municipality || address.municipality;
+			address.barangay = barangay || address.barangay;
+			address.streetAddress = streetAddress || address.streetAddress;
+			address.zipCode = zipCode || address.zipCode;
+
+			if (isDefault) {
+					user.addresses.forEach(address => {
+							address.isDefault = false;
+					});
+					address.isDefault = true;
+			}
+
+			// Save the user
+			await user.save();
+			res.status(200).json(user);
+	} catch (error) {
+			console.error("Error updating address: ", error);
+			res.status(500).json({ message: "Server error!" });
+	}
+};
+
 exports.GetUserAddresses = async (req, res) => {
 	try {
 		const userId = req.user._id;
