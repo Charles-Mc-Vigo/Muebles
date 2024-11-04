@@ -17,7 +17,8 @@ const {
   AddNewAddress,
   GetUserAddresses,
   userData,
-  updateAddress
+  updateAddress,
+  setToDefault
 } = require("../../controllers/User/userController")
 const {checkUserAuth, checkAdminAuth} = require('../../middlewares/checkAuth');
 
@@ -49,6 +50,7 @@ router.put('/setting/my-profile/update', checkUserAuth, upload.single('image'), 
 router.get('/address', checkUserAuth, GetUserAddresses);
 router.post('/address/new', checkUserAuth, AddNewAddress);
 router.put('/address/update/:addressId', checkUserAuth, updateAddress);
+router.put('/address/default/:addressId', checkUserAuth, setToDefault);
 
 // Admin routes
 router.get('/', checkAdminAuth, getAllUsers);
