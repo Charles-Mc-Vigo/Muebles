@@ -8,14 +8,10 @@ import Footer from "./Footer";
 
 const AddNewAddress = () => {
 	const [formData, setFormData] = useState({
-		addresses: [
-			{
-				streetAddress: "",
-				municipality: "",
-				barangay: "",
-				zipCode: "",
-			},
-		],
+		streetAddress: "",
+		municipality: "",
+		barangay: "",
+		zipCode: "",
 	});
 	const [availableBarangays, setAvailableBarangays] = useState([]);
 	const navigate = useNavigate();
@@ -264,33 +260,24 @@ const AddNewAddress = () => {
 
 	const handleChange = (e) => {
 		const { id, value } = e.target;
-		setFormData((prev) => {
-			const updatedAddresses = [...prev.addresses];
-			updatedAddresses[0][id] = value; // Update the first address object
-			return {
-				...prev,
-				addresses: updatedAddresses,
-			};
-		});
+		setFormData((prev) => ({
+			...prev,
+			[id]: value,
+		}));
 
 		if (id === "municipality") {
-			setFormData((prev) => {
-				const updatedAddresses = [...prev.addresses];
-				updatedAddresses[0].barangay = ""; // Reset barangay
-				updatedAddresses[0].zipCode = zipCodes[value] || ""; // Set zip code
-				return {
-					...prev,
-					addresses: updatedAddresses,
-				};
-			});
+			setFormData((prev) => ({
+				...prev,
+				barangay: "",
+				zipCode: zipCodes[value] || "",
+			}));
 			setAvailableBarangays(barangays[value] || []);
 		}
 	};
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
-		const { streetAddress, municipality, barangay, zipCode } =
-			formData.addresses[0];
+		const { streetAddress, municipality, barangay, zipCode } = formData;
 
 		// Validate address fields
 		if (!streetAddress || !municipality || !barangay || !zipCode) {
@@ -298,54 +285,44 @@ const AddNewAddress = () => {
 			return;
 		}
 
-		// Prepare the request payload
-		const newAddress = {
-			streetAddress,
-			municipality,
-			barangay,
-			zipCode,
-		};
-
 		try {
 			// Send the POST request to the API endpoint
-			const response = await fetch(
-				"http://localhost:3000/api/users/addresses/new",
-				{
-					method: "POST",
-                    credentials:'include',
-					headers: {
-						"Content-Type": "application/json",
-					},
-					body: JSON.stringify(newAddress),
-				}
-			);
+			const response = await fetch("http://localhost:3000/api/users/address/new", {
+				method: "POST",
+				credentials: "include",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					streetAddress,
+					municipality,
+					barangay,
+					zipCode,
+				}),
+			});
 
 			// Check if the response is okay
 			if (!response.ok) {
 				const errorData = await response.json();
-				toast.error(`Error: ${errorData.message || "Failed to add address."}`);
+				toast.error(`Error: ${errorData.error || "Failed to add address."}`);
 				return;
 			}
 
-			// Parse the response if needed
+			// Parse the response
 			const data = await response.json();
 			toast.success("Address added successfully!");
 
 			// Reset form
 			setFormData({
-				addresses: [
-					{
-						streetAddress: "",
-						municipality: "",
-						barangay: "",
-						zipCode: "",
-					},
-				],
+				streetAddress: "",
+				municipality: "",
+				barangay: "",
+				zipCode: "",
 			});
 			setAvailableBarangays([]);
 
 			// Optionally, you can update the user state with the new address if needed
-			// updateUserAddresses(data.updatedAddresses);
+			// updateUserAddresses(data.addresses);
 		} catch (error) {
 			console.error("Error while submitting address:", error);
 			toast.error("Server error! Please try again later.");
@@ -353,82 +330,82 @@ const AddNewAddress = () => {
 	};
 
 	return (
-		<div className=" bg-white">
-			<Header/>
+		<div className="bg-white">
+			<Header />
 			<div className="p-5 bg-gray-200 shadow-lg rounded-lg mb-5 mt-5 w-3/4 flex flex-col mx-auto">
-			<button
-				onClick={() => navigate(-1)} // Navigate to the previous page
-				className="text-gray-500 mr-2 mb-2"
-			>
-				<IoMdArrowRoundBack size={40} />
-			</button>
-			<h2 className="text-center font-semibold my-2 text-2xl">
-				Add New Address
-			</h2>
-			<form className="flex flex-col gap-4" onSubmit={handleSubmit}>
-				<input
-					type="text"
-					placeholder="Street Address"
-					id="streetAddress"
-					required
-					className="bg-slate-100 p-3 rounded-lg"
-					onChange={handleChange}
-					value={formData.addresses[0].streetAddress}
-				/>
-				<select
-					id="municipality"
-					required
-					onChange={handleChange}
-					value={formData.addresses[0].municipality}
-					className="bg-slate-100 p-3 rounded-lg"
-				>
-					<option value="" disabled hidden>
-						Select Municipality
-					</option>
-					<option value="Boac">Boac</option>
-					<option value="Mogpog">Mogpog</option>
-					<option value="Santa_Cruz">Santa Cruz</option>
-					<option value="Gasan">Gasan</option>
-					<option value="Buenavista">Buenavista</option>
-					<option value="Torrijos">Torrijos</option>
-				</select>
-				{formData.addresses[0].municipality && (
-					<>
-						<input
-							type="text"
-							value={formData.addresses[0].zipCode}
-							readOnly
-							className="bg-slate-100 p-3 rounded-lg"
-							placeholder="Zip Code"
-						/>
-						<select
-							id="barangay"
-							required
-							onChange={handleChange}
-							value={formData.addresses[0].barangay}
-							className="bg-slate-100 p-3 rounded-lg"
-						>
-							<option value="" disabled hidden>
-								Select Barangay
-							</option>
-							{availableBarangays.map((barangay) => (
-								<option key={barangay} value={barangay}>
-									{barangay}
-								</option>
-							))}
-						</select>
-					</>
-				)}
 				<button
-					type="submit"
-					className="bg-teal-600 hover:bg-teal-800 text-white p-3 rounded-lg font-semibold"
+					onClick={() => navigate(-1)}
+					className="text-gray-500 mr-2 mb-2"
 				>
-					Add Address
+					<IoMdArrowRoundBack size={40} />
 				</button>
-			</form>
-			<ToastContainer />
+				<h2 className="text-center font-semibold my-2 text-2xl">
+					Add New Address
+				</h2>
+				<form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+					<input
+						type="text"
+						placeholder="Street Address"
+						id="streetAddress"
+						required
+						className="bg-slate-100 p-3 rounded-lg"
+						onChange={handleChange}
+						value={formData.streetAddress}
+					/>
+					<select
+						id="municipality"
+						required
+						onChange={handleChange}
+						value={formData.municipality}
+						className="bg-slate-100 p-3 rounded-lg"
+					>
+						<option value="" disabled hidden>
+							Select Municipality
+						</option>
+						<option value="Boac">Boac</option>
+						<option value="Mogpog">Mogpog</option>
+						<option value="Santa_Cruz">Santa Cruz</option>
+						<option value="Gasan">Gasan</option>
+						<option value="Buenavista">Buenavista</option>
+						<option value="Torrijos">Torrijos</option>
+					</select>
+					{formData.municipality && (
+						<>
+							<input
+								type="text"
+								value={formData.zipCode}
+								readOnly
+								className="bg-slate-100 p-3 rounded-lg"
+								placeholder="Zip Code"
+							/>
+							<select
+								id="barangay"
+								required
+								onChange={handleChange}
+								value={formData.barangay}
+								className="bg-slate-100 p-3 rounded-lg"
+							>
+								<option value="" disabled hidden>
+									Select Barangay
+								</option>
+								{availableBarangays.map((barangay) => (
+									<option key={barangay} value={barangay}>
+										{barangay}
+									</option>
+								))}
+							</select>
+						</>
+					)}
+					<button
+						type="submit"
+						className="bg-teal-600 hover:bg-teal-800 text-white p-3 rounded-lg font-semibold"
+					>
+						Add Address
+					</button>
+				</form>
+				<ToastContainer />
 			</div>
-			<Footer/>
+			<Footer />
 		</div>
 	);
 };

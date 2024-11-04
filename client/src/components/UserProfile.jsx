@@ -240,7 +240,7 @@ const UserProfile = () => {
 											<p>
 												{address.streetAddress}, {address.barangay},{" "}
 												{address.municipality}, {address.zipCode}
-												{address.addressStatus === "default" && (
+												{address.isDefault && (
 													<span className="ml-2 text-sm text-green-600 font-semibold">
 														(Default)
 													</span>
