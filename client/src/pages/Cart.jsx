@@ -55,6 +55,13 @@ const Cart = () => {
 				setCount(data.cart.count);
 				setTotalAmount(data.cart.totalAmount);
 				setUser(data.cart.userId);
+
+				const defaultAddress = data.cart.userId.addresses.find(
+					(address) => address.isDefault
+				);
+				if (defaultAddress) {
+					setSelectedAddress(defaultAddress._id);
+				}
 			} else {
 				setItems([]);
 				setCount(0);
@@ -99,15 +106,7 @@ const Cart = () => {
 	};
 
 	const checkout = async () => {
-		// Validate payment method and proof of payment
-		if (!deliveryMode) {
-			toast.error("Please select a delivery mode.");
-			return;
-		}
-		if (!selectedAddress) {
-			toast.error("Please select shipping address.");
-			return;
-		}
+		
 		if (!selectedPaymentMethod) {
 			toast.error("Please select a payment method before checking out.");
 			return;
@@ -300,6 +299,7 @@ const Cart = () => {
 															type="radio"
 															name="selectedAddress"
 															value={address._id}
+															checked={address.isDefault}
 															onChange={(e) =>
 																setSelectedAddress(e.target.value)
 															}
