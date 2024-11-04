@@ -381,7 +381,7 @@ const ProductManagement = () => {
 						{/* Sizes */}
 						<div className="mb-4 bg-slate-200 rounded-md p-2">
 							<label className="block font-semibold my-2 mb-2">
-								Sizes: (Height X Width X Length X Depth)
+								Sizes: (Height X Width X Depth)
 							</label>
 							<div className="flex flex-wrap">
 								{filteredSizes.length > 0 ? (
@@ -521,8 +521,7 @@ const ProductManagement = () => {
 										{furniture.sizes && furniture.sizes.length > 0
 											? furniture.sizes.map((size) => (
 													<span key={size._id} className="block">
-														{size.label} <br /> ({size.height} X {size.width} X{" "}
-														{size.depth} )
+														{size.label} <br /> ({size.height} X {size.width} X {size.depth} )
 													</span>
 											  ))
 											: "N/A"}

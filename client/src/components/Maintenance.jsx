@@ -655,21 +655,21 @@ const Maintenance = () => {
 									setNewSize({ ...newSize, label: e.target.value })
 								)}
 								{renderInputField(
-									"Height",
+									"Height (inches)",
 									"height",
 									newSize.height,
 									(e) => setNewSize({ ...newSize, height: e.target.value }),
 									"number"
 								)}
 								{renderInputField(
-									"Width",
+									"Width (inches)",
 									"width",
 									newSize.width,
 									(e) => setNewSize({ ...newSize, width: e.target.value }),
 									"number"
 								)}
 								{renderInputField(
-									"Depth",
+									"Depth (inches)",
 									"depth",
 									newSize.depth,
 									(e) => setNewSize({ ...newSize, depth: e.target.value }),
