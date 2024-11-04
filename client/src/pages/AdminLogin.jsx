@@ -8,6 +8,8 @@ const AdminLogin = () => {
     email: "",
     password: ""
   });
+  const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -17,6 +19,7 @@ const AdminLogin = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
       const response = await fetch('http://localhost:3000/api/admin/login', {
         method: 'POST',
@@ -45,6 +48,7 @@ const AdminLogin = () => {
       console.error("Admin Login error", error.message);
       toast.error(error.message || "Admin Login failed");
     }
+    setLoading(false);
   };
 
   return (
@@ -68,12 +72,16 @@ const AdminLogin = () => {
           onChange={handleChange} 
           className="bg-slate-100 p-3 rounded-lg"
         />
-        <button
-          type="submit"
-          className="p-3 bg-slate-500 rounded-lg text-slate-50 font-bold uppercase hover:opacity-80 disabled:opacity-70"
-        >
-          Log In
-        </button>
+						<button
+							type="submit"
+							className={`py-4 px-24 rounded-lg mx-auto text-white font-bold uppercase hover:opacity-80 disabled:opacity-70 ${
+								loading ? "bg-blue-400" : "bg-blue-500"
+							}`}
+							style={{ display: "block", margin: "20px auto 0" }}
+							disabled={loading}
+						>
+							{loading ? "Logging in..." : "Log in"}
+						</button>
       </form>
     </div>
   );

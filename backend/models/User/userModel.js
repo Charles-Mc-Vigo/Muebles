@@ -18,11 +18,11 @@ const userSchema = new mongoose.Schema({
     required: true
   },
   addresses:[{
-    addressStatus:{type:String},
     municipality:{type:String},
     barangay:{type:String},
     streetAddress:{type:String},
     zipCode:{type:Number},
+    isDefault:{type:Boolean, default:false}
   }],
   email: { 
     type: String, 

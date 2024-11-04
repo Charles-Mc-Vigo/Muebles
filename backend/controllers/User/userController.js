@@ -33,6 +33,7 @@ exports.SignUp = async (req, res) => {
 			streetAddress,
 			municipality,
 			barangay,
+			zipCode,
 			email,
 			agreeToTerms,
 			password,
@@ -119,10 +120,11 @@ exports.SignUp = async (req, res) => {
 		});
 
 		newUser.addresses.push({
-			addressStatus:"default",
 			streetAddress,
 			municipality,
 			barangay,
+			zipCode,
+			isDefault : true,
 		});
 
 		await newUser.save();
@@ -578,12 +580,6 @@ exports.AddNewAddress = async (req, res) => {
 			barangay,
 			zipCode,
 		};
-
-		if (user.addresses.length === 0) {
-			newAddress.addressStatus = "default";
-		}else{
-			newAddress.addressStatus = undefined;
-		}
 
 		user.addresses.push(newAddress);
 
