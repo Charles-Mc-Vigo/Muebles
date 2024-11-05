@@ -92,7 +92,7 @@ export default function SignUp() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-teal-100">
       <Header />
       <div className="flex-grow flex justify-center items-center mb-3 mt-5">
         <div className="w-full max-w-4xl p-8 mx-4 md:mx-auto bg-white shadow-lg rounded-lg flex flex-col md:flex-row border-4 border-green-200">
@@ -257,7 +257,7 @@ export default function SignUp() {
               </div>
               <button
                 type="submit"
-                className="w-full bg-green-800 hover:bg-green-600 text-white p-3 rounded-lg font-semibold"
+                className="w-full bg-teal-600 hover:bg-teal-800 text-white p-3 rounded-lg font-semibold"
               >
                 Sign Up
               </button>

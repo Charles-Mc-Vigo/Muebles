@@ -51,7 +51,7 @@ export default function Login() {
     <>
       <Header />
       <div
-        className="min-h-screen flex flex-col justify-center items-center mb-5 mt-40"
+        className="min-h-screen flex flex-col justify-center items-center mb-5 mt-5"
         style={{
           backgroundImage: "url(/landingimage/login.png)",
           backgroundSize: "contain",
@@ -118,7 +118,7 @@ export default function Login() {
         </div>
       </div>
       <Footer />
-      <ToastContainer position="bottom-right" />
+      <ToastContainer position="upper-right" />
     </>
   );
 }
