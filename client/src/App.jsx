@@ -38,11 +38,11 @@ import PaymentMethod from "./components/PaymentMethod";
 import EditUserProfile from "./components/EditUserProfile";
 import EditAdminProfile from "./components/EditAdminProfile";
 
-
 import ViewOrder from "./components/ViewOrder";
 import DirectOrder from "./pages/DirectOrder";
 import AddNewAddress from "./components/AddNewAddress";
 import ViewUserOrder from "./components/ViewUserOrder";
+import ViewPendingRequest from "./pages/ViewPendingRequest";
 
 export default function App() {
 	return (
@@ -60,7 +60,10 @@ export default function App() {
 					path="/my-profile/view"
 					element={<ProtectedRoute element={UserProfile} />}
 				/>
-				<Route path ="/my-profile/edit" element={<ProtectedRoute element={EditUserProfile}/>} />
+				<Route
+					path="/my-profile/edit"
+					element={<ProtectedRoute element={EditUserProfile} />}
+				/>
 				<Route
 					path="/direct-order/:furnitureId"
 					element={<ProtectedRoute element={DirectOrder} />}
@@ -69,7 +72,10 @@ export default function App() {
 					path="/address/new"
 					element={<ProtectedRoute element={AddNewAddress} />}
 				/>
-				<Route path="/password-reset/request" element={<PasswordResetRequest />}/>
+				<Route
+					path="/password-reset/request"
+					element={<PasswordResetRequest />}
+				/>
 				<Route
 					path="/password-reset/verify/:userId"
 					element={<PasswordResetVerify />}
@@ -101,18 +107,37 @@ export default function App() {
 					element={<AdminVerify />}
 				/>
 				<Route
+					path="/view-request/:adminId"
+					element={
+						<ProtectedRoute element={ViewPendingRequest} adminOnly={true} />
+					}
+				/>
+				<Route
 					path={`/order/:orderId`}
 					element={<ProtectedRoute element={ViewUserOrder} adminOnly={true} />}
 				/>
 				<Route
-					path="/admin-signup/verify-account/:adminId/pending"element={<AdminPendingPage />}/>
+					path="/admin-signup/verify-account/:adminId/pending"
+					element={<AdminPendingPage />}
+				/>
 				<Route
 					path="/dashboard"
 					element={<ProtectedRoute element={DashBoard} adminOnly={true} />}
 				/>
-				<Route path="/dashboard/setting/admin-profile/view"element={<ProtectedRoute element={AdminProfile} adminOnly={true} />}/>
-				<Route path="/dashboard/setting/admin-profile/edit"element={<ProtectedRoute element={EditAdminProfile} adminOnly={true} />}/> 
-				<Route path="/table"element={<ProtectedRoute element={ProductTable} adminOnly={true} />}/>
+				<Route
+					path="/dashboard/setting/admin-profile/view"
+					element={<ProtectedRoute element={AdminProfile} adminOnly={true} />}
+				/>
+				<Route
+					path="/dashboard/setting/admin-profile/edit"
+					element={
+						<ProtectedRoute element={EditAdminProfile} adminOnly={true} />
+					}
+				/>
+				<Route
+					path="/table"
+					element={<ProtectedRoute element={ProductTable} adminOnly={true} />}
+				/>
 				<Route
 					path="/table"
 					element={<ProtectedRoute element={ProductTable} adminOnly={true} />}

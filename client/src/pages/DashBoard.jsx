@@ -94,7 +94,7 @@ const Dashboard = () => {
   const contentMap = {
     dashboard: <DashboardContent />,
     "view-products": <ViewProduct />,
-    "modify-product": <ProductManagement />,
+    "add-product": <ProductManagement />,
     inventory: <Inventory />,
 
     "view-transaction": <TransactionHistory />,
@@ -154,8 +154,8 @@ const Dashboard = () => {
 									onClick={setActiveSection}
 								/>
 								<DropdownItem
-									label="Modify Product"
-									section="modify-product"
+									label="Add Product"
+									section="add-product"
 									currentSection={activeSection}
 									onClick={setActiveSection}
 								/>

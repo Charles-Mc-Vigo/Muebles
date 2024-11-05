@@ -7,12 +7,11 @@ import "react-toastify/dist/ReactToastify.css";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 
-
 const Cart = () => {
 	const [items, setItems] = useState([]);
 	const [deliveryMode, setDeliveryMode] = useState("delivery"); // Default to 'delivery'
 	const [user, setUser] = useState(null);
-	const [isOpen, setIsOpen] = useState(false); // State to manage visibility
+	const [isOpen, setIsOpen] = useState(false);
 	const [selectedAddress, setSelectedAddress] = useState(null);
 	const [count, setCount] = useState(0);
 	const [totalAmount, setTotalAmount] = useState(0);
@@ -22,10 +21,10 @@ const Cart = () => {
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
 	const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
-	const navigate = useNavigate(); // Hook to navigate
+	const navigate = useNavigate();
 
 	const toggleAddresses = () => {
-		setIsOpen((prev) => !prev); // Toggle the visibility
+		setIsOpen((prev) => !prev);
 	};
 
 	const shippingFees = {
@@ -48,7 +47,6 @@ const Cart = () => {
 				credentials: "include",
 			});
 			const data = await response.json();
-
 			if (!data.ok) {
 				toast.error(data.error);
 			}
@@ -57,6 +55,13 @@ const Cart = () => {
 				setCount(data.cart.count);
 				setTotalAmount(data.cart.totalAmount);
 				setUser(data.cart.userId);
+
+				const defaultAddress = data.cart.userId.addresses.find(
+					(address) => address.isDefault
+				);
+				if (defaultAddress) {
+					setSelectedAddress(defaultAddress._id);
+				}
 			} else {
 				setItems([]);
 				setCount(0);
@@ -101,16 +106,7 @@ const Cart = () => {
 	};
 
 	const checkout = async () => {
-		// Validate payment method and proof of payment
-		if (!deliveryMode) {
-			toast.error("Please select a delivery mode.");
-			return;
-		}
-
-		if (!selectedAddress) {
-			toast.error("Please select shipping address.");
-			return;
-		}
+		
 		if (!selectedPaymentMethod) {
 			toast.error("Please select a payment method before checking out.");
 			return;
@@ -119,32 +115,23 @@ const Cart = () => {
 			toast.error("Please upload proof of payment before checking out.");
 			return;
 		}
-
 		const addressToSend = user.addresses.find(
 			(address) => address._id === selectedAddress
 		);
-
 		// Create FormData to include both file and payment method
 		const formData = new FormData();
 		formData.append("proofOfPayment", proofOfPayment);
 		formData.append("paymentMethod", selectedPaymentMethod);
-		formData.append("shippingAddress", JSON.stringify(addressToSend)); // Send address as JSON
-		formData.append("deliveryMode", deliveryMode); // Append delivery mode
+		formData.append("shippingAddress", JSON.stringify(addressToSend));
+		formData.append("deliveryMode", deliveryMode);
 
-
-		// Log FormData entries
-		for (const [key, value] of formData.entries()) {
-			console.log(`${key}:`, value);
-		}
 		try {
 			const response = await fetch("http://localhost:3000/api/orders/create", {
 				method: "POST",
 				body: formData,
 				credentials: "include",
 			});
-
 			const data = await response.json();
-
 			if (!data.ok) {
 				toast.error(data.error);
 			}
@@ -163,7 +150,6 @@ const Cart = () => {
 			toast.error("Quantity cannot be less than 1");
 			return;
 		}
-
 		try {
 			const response = await fetch("http://localhost:3000/api/cart", {
 				method: "PUT",
@@ -229,14 +215,13 @@ const Cart = () => {
 	if (error) {
 		return <div>Error: {error}</div>;
 	}
-
 	return (
 		<div className="flex flex-col min-h-screen">
-			<Header isLogin={true} cartCount={true}/>
+			<Header isLogin={true} cartCount={true} />
 			<main className="flex-grow w-2/4 mx-auto p-4 mt-5">
 				<div className="flex items-center mb-4 gap-5">
 					<button
-						onClick={() => navigate(-1)} // Navigate to the previous page
+						onClick={() => navigate(-1)}
 						className="text-gray-500 mr-2 hover:text-teal-600"
 					>
 						<IoMdArrowRoundBack size={40} />
@@ -249,18 +234,18 @@ const Cart = () => {
 						Clear Cart
 					</button>
 				</div>
-
 				{items.length === 0 ? (
-					<p className="text-center font-bold text-2xl text-teal-600">Your cart is empty.</p>
+					<p className="text-center font-bold text-2xl text-teal-600">
+						Your cart is empty.
+					</p>
 				) : (
 					<>
-						{/* user details */}
+						{/* User details */}
 						<div>
 							<div>
 								Client: {user.firstname} {user.lastname} <br />
 								Phone Number: {user.phoneNumber}
 							</div>
-
 							<div className="flex justify-between">
 								<div>Delivery Mode:</div>
 								<div className="flex gap-3">
@@ -269,6 +254,7 @@ const Cart = () => {
 											type="radio"
 											name="deliveryMode"
 											value="delivery"
+											checked={deliveryMode === "delivery"} // Set checked based on deliveryMode state
 											onChange={(e) => setDeliveryMode(e.target.value)}
 										/>
 										Delivery
@@ -278,13 +264,13 @@ const Cart = () => {
 											type="radio"
 											name="deliveryMode"
 											value="pickup"
+											checked={deliveryMode === "pickup"} // Set checked based on deliveryMode state
 											onChange={(e) => setDeliveryMode(e.target.value)}
 										/>
 										Pick Up
 									</label>
 								</div>
 							</div>
-
 							<div>
 								<div
 									className="flex p-2 justify-between"
@@ -303,18 +289,17 @@ const Cart = () => {
 										New
 									</button>
 								</div>
-								{isOpen && ( // Only show addresses when isOpen is true
+								{isOpen && (
 									<div>
 										{user.addresses && user.addresses.length > 0 ? (
 											user.addresses.map((address) => (
 												<div key={address._id} className="address-option">
-													{" "}
-													{/* Use address.id as the key */}
 													<label>
 														<input
 															type="radio"
 															name="selectedAddress"
-															value={address._id} // Use address.id instead of index
+															value={address._id}
+															checked={address.isDefault}
 															onChange={(e) =>
 																setSelectedAddress(e.target.value)
 															}
@@ -421,7 +406,6 @@ const Cart = () => {
 								))}
 							</ul>
 						</div>
-
 						<div className="border-2 border-gray-300 p-6 rounded-lg">
 							{/* QR Code Section - Top */}
 							<div className="flex justify-end mr-28 pb-5">
@@ -431,7 +415,6 @@ const Cart = () => {
 									className="w-52 h-52"
 								/>
 							</div>
-
 							{/* Payment Methods and Image Upload - Bottom row */}
 							<div className="flex flex-col lg:flex-row gap-8">
 								{/* Payment Methods Section */}
@@ -445,7 +428,7 @@ const Cart = () => {
 											<button
 												value="GCash"
 												onClick={() => handlePaymentMethodClick("GCash")}
-												className={`px-8 py-4 rounded ${
+												className={`rounded ${
 													selectedPaymentMethod === "GCash"
 														? "bg-blue-700"
 														: "bg-blue-500"
@@ -454,7 +437,7 @@ const Cart = () => {
 												<img
 													src="/payment-icon/gcash.png"
 													alt="gcash"
-													className="w-16 h-16"
+													className="w-full h-full object-contain rounded"
 												/>
 											</button>
 											{/* Maya payment */}
@@ -466,7 +449,7 @@ const Cart = () => {
 												<img
 													src="/payment-icon/maya.jpg"
 													alt="maya"
-													className="w-16 h-16"
+													className="w-full h-full object-contain" // Use object-contain to maintain aspect ratio
 												/>
 											</button>
 											{/* Cash on delivery payment */}
@@ -493,7 +476,6 @@ const Cart = () => {
 										)}
 									</div>
 								</div>
-
 								{/* Image Upload Section */}
 								<div className="flex-1">
 									<div className="w-full max-w-md border-t border-gray-300 pt-5">
@@ -510,13 +492,11 @@ const Cart = () => {
 								</div>
 							</div>
 						</div>
-
 						<div className="mt-4">
 							<div>Items total: {totalAmount.toFixed(2)}</div>
 							<div>Shipping Fee: {shippingFee.toFixed(2)}</div>
 							<div>Total Amount: {totalWithShipping}</div>
 						</div>
-
 						<div className="border-t border-gray-300 pt-4 mt-5">
 							<div className="flex justify-between items-center mb-4">
 								<h3 className="text-lg font-semibold">Subtotal:</h3>
@@ -541,7 +521,7 @@ const Cart = () => {
 				)}
 			</main>
 			<ToastContainer />
-			<Footer/>
+			<Footer />
 		</div>
 	);
 };

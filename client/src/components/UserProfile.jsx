@@ -240,7 +240,7 @@ const UserProfile = () => {
 											<p>
 												{address.streetAddress}, {address.barangay},{" "}
 												{address.municipality}, {address.zipCode}
-												{address.addressStatus === "default" && (
+												{address.isDefault && (
 													<span className="ml-2 text-sm text-green-600 font-semibold">
 														(Default)
 													</span>
@@ -272,7 +272,7 @@ const UserProfile = () => {
 
 	return (
 		<div>
-			<Header />
+			<Header isLogin={true} cartCount={true} />
 			<div className="flex flex-col lg:flex-row my-8 p-5 bg-gray-100 w-full border rounded-lg shadow-lg">
 				<aside className="w-full lg:w-1/4 bg-white border-r border-gray-200 mb-5 lg:mb-0 mr-5 rounded-md">
 					<nav className="space-y-4 text-gray-700 p-4">

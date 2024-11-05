@@ -242,6 +242,34 @@ exports.getAdminById = async (req, res) => {
 	}
 };
 
+exports.RejectAdminRequest = async (req,res) => {
+	try {
+		const admin = await Admin.findById(req.admin._id);
+
+		if (!admin) return res.status(404).json({ message: "Admin not found!" });
+
+		// Check if the current admin is a Manager
+		if (admin.role !== "Manager") {
+			return res
+				.status(400)
+				.json({ message: "Action denied: Admin Manager only!" });
+		}
+		
+		const {adminId} = req.params;
+		const adminToReject = await Admin.findById(adminId);
+
+		if(!adminToReject) return res.status(404).json({message:"Admin not found!"});
+
+		adminToReject.adminApproval = "Rejected";
+
+		await adminToReject.save();
+		res.status(200).json({message:"Admin was rejected!"})
+	} catch (error) {
+		console.error("Error rejecting request: ", error);
+		res.status(500).json({message:"Server error!"});
+	}
+}
+
 // Manager power
 exports.AcceptAdminRequest = async (req, res) => {
 	try {
@@ -256,7 +284,7 @@ exports.AcceptAdminRequest = async (req, res) => {
 				.json({ message: "Action denied: Admin Manager only!" });
 		}
 
-		const { adminId } = req.params; // Get adminId from URL parameters
+		const { adminId } = req.params;
 
 		// Fetch the admin who is requesting to be accepted
 		const adminToAccept = await Admin.findById(adminId);
@@ -525,3 +553,16 @@ exports.viewPendingOrder = async (req, res) => {
 	}
 };
 
+exports.ViewRequest = async (req,res) => {
+	try {
+		const {adminId} = req.params;
+		const requestingAdmin = await Admin.findById(adminId);
+
+		if(!requestingAdmin) return res.status(404).json({message: "Admin not found!"});
+
+		res.status(200).json(requestingAdmin);
+	} catch (error) {
+		console.error("Error viewing the request: ",error);
+		res.status(500).json({message:"Server error!"});
+	}
+}

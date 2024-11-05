@@ -90,14 +90,11 @@ const Footer = () => {
               placeholder="jckamewoodworks@gmail.com"
               className="p-2 w-full border border-gray-300 rounded mb-4"
             />
-            <Link to="/signup" className="bg-teal-500 text-white py-2 px-4 rounded inline-block"
+            <Link to="#" onClick={()=>alert("Unavailable for now hihiih")} className="bg-teal-500 text-white py-2 px-4 rounded inline-block"
             >
-              Sign up
+              Subscribe
             </Link>
           </div>
-          {/* <div className="mt-4">
-            <img src="path-to-ps-award-logo.png" alt="PS Award" className="w-full"/>
-          </div> */}
         </div>
 
         {/* Follow us */}
