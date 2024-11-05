@@ -524,14 +524,14 @@ const AddNewAddress = () => {
 							</div>
 							<div className="flex gap-2">
 								<button
-									className="bg-blue-500 hover:bg-blue-700 text-white p-2 rounded-lg"
+									className="bg-blue-500 hover:bg-blue-700 text-white py-2 px-8 rounded-lg"
 									onClick={() => handleEditAddress(address)}
 								>
 									Edit
 								</button>
 								{!address.isDefault && (
 									<button
-										className="bg-green-500 hover:bg-green-700 text-white p-2 rounded-lg"
+										className="bg-green-500 hover:bg-green-700 text-white py-2 px-8 rounded-lg"
 										onClick={() => handleSetDefaultAddress(address._id)}
 									>
 										Set as Default
