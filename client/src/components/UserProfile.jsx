@@ -143,12 +143,18 @@ const UserProfile = () => {
 				<div className="flex-1 p-6 bg-white border rounded-lg shadow flex flex-col">
 					<h2 className="font-bold text-lg">Address Book</h2>
 					<div className="mt-4 flex-grow flex flex-col">
-						<p className="font-semibold">DEFAULT SHIPPING ADDRESS</p>
-						<p>{profile.streetAddress}</p>
-						<p>
-							{profile.municipality}, {profile.zipCode}
-						</p>
-						<p>{profile.phoneNumber}</p>
+						<p className="font-semibold mb-2">DEFAULT SHIPPING ADDRESS</p>
+						{profile.addresses ? (
+							profile.addresses
+								.filter((address) => address.isDefault)
+								.map((defaultAddress, index) => (
+									<div key={index}>
+										<p className="tracking-wide">{defaultAddress.streetAddress}, {defaultAddress.barangay}, {defaultAddress.municipality}, {defaultAddress.zipCode}</p>
+									</div>
+								))
+						) : (
+							<p>No default address available</p>
+						)}
 					</div>
 				</div>
 			</div>
@@ -260,11 +266,10 @@ const UserProfile = () => {
 					</table>
 				</div>
 				<Link to={"/address/new"}>
-				<button className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg">
-					+ ADD NEW ADDRESS
-				</button>
+					<button className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg">
+						+ ADD NEW ADDRESS
+					</button>
 				</Link>
-				
 			</div>
 		),
 		myOrders: <OrderDetails />,
