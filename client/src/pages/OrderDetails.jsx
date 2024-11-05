@@ -74,6 +74,7 @@ const OrderDetails = () => {
 				<h2 className="text-2xl font-semibold text-green-700 mb-4">
 					Order Summary
 				</h2>
+				{/* order details */}
 				<div className="grid grid-cols-2 gap-4 text-lg text-gray-600">
 					<div>
 						<p>
@@ -91,19 +92,44 @@ const OrderDetails = () => {
 					</div>
 					<div>
 						<p>
-							<span className="font-semibold text-gray-800">Payment Method:</span>{" "}
+							<span className="font-semibold text-gray-800">
+								Payment Method:
+							</span>{" "}
 							{order.paymentMethod || "N/A"}
 						</p>
 						<p>
 							<span className="font-semibold text-gray-800">Status:</span>{" "}
-							<span className={`${
-								order.orderStatus === "pending"
-									? "text-yellow-600"
-									: "text-green-700"
-							} font-semibold`}>
+							<span
+								className={`${
+									order.orderStatus === "pending"
+										? "text-yellow-600"
+										: "text-green-700"
+								} font-semibold`}
+							>
 								{order.orderStatus}
 							</span>
 						</p>
+					</div>
+				</div>
+				{/* user details */}
+				<div className="bg-slate-200 p-2 m-2">
+					<h1>
+						Client : {order.user.firstname} {order.user.lastname}
+					</h1>
+					<h1>Email : {order.user.email}</h1>
+					<h1>Phone Number : {order.user.phoneNumber}</h1>
+					<div className="flex justify-between">
+						<h1>Shipping Address :</h1>
+						{order.user.addresses
+							.filter((address) => address.isDefault)
+							.map((defaultAddress, index) => (
+								<div key={index}>
+									<p className="tracking-wide mr-2">
+										{defaultAddress.streetAddress}, {defaultAddress.barangay},{" "}
+										{defaultAddress.municipality}, {defaultAddress.zipCode}
+									</p>
+								</div>
+							))}
 					</div>
 				</div>
 			</div>
@@ -128,6 +154,9 @@ const OrderDetails = () => {
 										<p className="font-semibold text-gray-800">
 											{item.furniture.name}
 										</p>
+										<p className="text-gray-800">Color : {item.color}</p>
+										<p className="text-gray-800">Material : {item.material}</p>
+										<p className="text-gray-800">Size : {item.size}</p>
 										<p className="text-gray-600">
 											Quantity: {item.quantity} x ₱{item.price.toFixed(2)}
 										</p>
@@ -144,9 +173,15 @@ const OrderDetails = () => {
 						</li>
 					)}
 				</ul>
-				<p className="text-right text-xl font-semibold mt-4 text-green-700">
-					Total: ₱{order.totalAmount ? order.totalAmount.toFixed(2) : "0.00"}
-				</p>
+				{/* payment method at delivery method */}
+				<div className="bg-slate-200 p-2 m-2 flex flex-col text-right">
+					<h1>Delivery Option: {order.deliveryMode}</h1>
+					<h1>Subtotal: {order.subtotal}</h1>
+					<h1>Shipping Fee: {order.shippingFee}</h1>
+					<p className="text-right text-xl font-semibold mt-4 text-green-700">
+						Total: ₱{order.totalAmount ? order.totalAmount.toFixed(2) : "0.00"}
+					</p>
+				</div>
 			</div>
 			{/* Display the proof of payment with thank you message */}
 			{order.proofOfPayment && (
@@ -170,7 +205,9 @@ const OrderDetails = () => {
 								We greatly appreciate your business and trust in our products.
 							</p>
 							<p className="text-gray-700">
-								Your payment is being processed at the moment. You will receive order confirmation in your Muebles account after the payment process. We'll keep you updated on its status.
+								Your payment is being processed at the moment. You will receive
+								order confirmation in your Muebles account after the payment
+								process. We'll keep you updated on its status.
 							</p>
 							<p>Have a good day!</p>
 						</div>
