@@ -106,7 +106,6 @@ const Cart = () => {
 	};
 
 	const checkout = async () => {
-		
 		if (!selectedPaymentMethod) {
 			toast.error("Please select a payment method before checking out.");
 			return;
@@ -271,51 +270,38 @@ const Cart = () => {
 									</label>
 								</div>
 							</div>
-							<div>
+							<div className="bg-slate-100">
 								<div
 									className="flex p-2 justify-between"
-									onClick={toggleAddresses}
-									style={{ cursor: "pointer" }}
 								>
-									<h3>
-										{isOpen
-											? "Hide Shipping Addresses"
-											: "Change Shipping Address"}
+									<h3 className="font-semibold">
+										Current Shipping Address
 									</h3>
 									<button
 										onClick={() => navigate("/address/new")}
-										className="text-sky-500"
+										className="text-sky-500 pr-2"
 									>
-										New
+										Change
 									</button>
 								</div>
-								{isOpen && (
-									<div>
-										{user.addresses && user.addresses.length > 0 ? (
-											user.addresses.map((address) => (
-												<div key={address._id} className="address-option">
-													<label>
-														<input
-															type="radio"
-															name="selectedAddress"
-															value={address._id}
-															checked={address.isDefault}
-															onChange={(e) =>
-																setSelectedAddress(e.target.value)
-															}
-														/>
-														<span>
-															{address.streetAddress}, {address.barangay},{" "}
-															{address.municipality}, {address.zipCode}
-														</span>
-													</label>
+								<div>
+									{user.addresses && user.addresses.length > 0 ? (
+										user.addresses
+											.filter((address) => address.isDefault)
+											.map((defaultAddress, index) => (
+												<div key={index}>
+													<p className="tracking-wide p-2">
+														{defaultAddress.streetAddress},{" "}
+														{defaultAddress.barangay},{" "}
+														{defaultAddress.municipality},{" "}
+														{defaultAddress.zipCode}
+													</p>
 												</div>
 											))
-										) : (
-											<p>No addresses available. Please add an address.</p>
-										)}
-									</div>
-								)}
+									) : (
+										<p>No addresses available</p>
+									)}
+								</div>
 							</div>
 						</div>
 						<div className="border-t border-gray-300 py-4">
