@@ -8,7 +8,7 @@ const Delivery = () => {
       className="min-h-screen flex flex-col "
       style={{ fontFamily: "Playfair Display, serif" }}
     >
-      <Header />
+      <Header isLogin={true} cartCount={true} />
       <div className="flex-grow">
         <div className="max-w-7xl mx-auto bg-gray-300 rounded-lg shadow-lg p-12 my-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12">

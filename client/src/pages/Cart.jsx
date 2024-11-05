@@ -23,121 +23,121 @@ const Cart = () => {
 	const navigate = useNavigate();
 
 
-	const shippingFees = {
-		Boac: 500,
-		Mogpog: 700,
-		Gasan: 500,
-		Buenavista: 800,
-		Santa_Cruz: 3000,
-		Torrijos: 3000,
-	};
+  const shippingFees = {
+    Boac: 500,
+    Mogpog: 700,
+    Gasan: 500,
+    Buenavista: 800,
+    Santa_Cruz: 3000,
+    Torrijos: 3000,
+  };
 
-	// Fetch cart items from the API
-	const fetchCartItems = async () => {
-		try {
-			const response = await fetch("http://localhost:3000/api/cart", {
-				method: "GET",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				credentials: "include",
-			});
-			const data = await response.json();
-			if (!data.ok) {
-				toast.error(data.error);
-			}
-			if (data.cart && data.cart.items.length > 0) {
-				setItems(data.cart.items);
-				setCount(data.cart.count);
-				setTotalAmount(data.cart.totalAmount);
-				setUser(data.cart.userId);
+  // Fetch cart items from the API
+  const fetchCartItems = async () => {
+    try {
+      const response = await fetch("http://localhost:3000/api/cart", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      });
+      const data = await response.json();
+      if (!data.ok) {
+        toast.error(data.error);
+      }
+      if (data.cart && data.cart.items.length > 0) {
+        setItems(data.cart.items);
+        setCount(data.cart.count);
+        setTotalAmount(data.cart.totalAmount);
+        setUser(data.cart.userId);
 
-				const defaultAddress = data.cart.userId.addresses.find(
-					(address) => address.isDefault
-				);
-				if (defaultAddress) {
-					setSelectedAddress(defaultAddress._id);
-				}
-			} else {
-				setItems([]);
-				setCount(0);
-				setTotalAmount(0);
-				setUser("");
-			}
-			setLoading(false);
-		} catch (error) {
-			setError(error.message);
-			setLoading(false);
-		}
-	};
+        const defaultAddress = data.cart.userId.addresses.find(
+          (address) => address.isDefault
+        );
+        if (defaultAddress) {
+          setSelectedAddress(defaultAddress._id);
+        }
+      } else {
+        setItems([]);
+        setCount(0);
+        setTotalAmount(0);
+        setUser("");
+      }
+      setLoading(false);
+    } catch (error) {
+      setError(error.message);
+      setLoading(false);
+    }
+  };
 
-	useEffect(() => {
-		fetchCartItems();
-	}, []);
+  useEffect(() => {
+    fetchCartItems();
+  }, []);
 
-	useEffect(() => {
-		// Calculate and set shipping fee based on selected address
-		if (selectedAddress) {
-			const address = user.addresses.find(
-				(address) => address._id === selectedAddress
-			);
-			const fee = shippingFees[address.municipality] || 0;
-			setShippingFee(fee);
-		} else {
-			setShippingFee(0); // Reset if no address is selected
-		}
-	}, [selectedAddress, user]);
+  useEffect(() => {
+    // Calculate and set shipping fee based on selected address
+    if (selectedAddress) {
+      const address = user.addresses.find(
+        (address) => address._id === selectedAddress
+      );
+      const fee = shippingFees[address.municipality] || 0;
+      setShippingFee(fee);
+    } else {
+      setShippingFee(0); // Reset if no address is selected
+    }
+  }, [selectedAddress, user]);
 
-	// Calculate total price
-	const totalWithShipping = (totalAmount + shippingFee).toFixed(2);
+  // Calculate total price
+  const totalWithShipping = (totalAmount + shippingFee).toFixed(2);
 
-	const handlePaymentMethodClick = (method) => {
-		setSelectedPaymentMethod(method);
-	};
+  const handlePaymentMethodClick = (method) => {
+    setSelectedPaymentMethod(method);
+  };
 
-	const handleFileUpload = (event) => {
-		const file = event.target.files[0];
-		setProofOfPayment(file);
-		setUploadMessage(`Selected file: ${file.name}`);
-	};
+  const handleFileUpload = (event) => {
+    const file = event.target.files[0];
+    setProofOfPayment(file);
+    setUploadMessage(`Selected file: ${file.name}`);
+  };
 
-	const checkout = async () => {
-		if (!selectedPaymentMethod) {
-			toast.error("Please select a payment method before checking out.");
-			return;
-		}
-		if (!proofOfPayment) {
-			toast.error("Please upload proof of payment before checking out.");
-			return;
-		}
-		const addressToSend = user.addresses.find(
-			(address) => address._id === selectedAddress
-		);
-		// Create FormData to include both file and payment method
-		const formData = new FormData();
-		formData.append("proofOfPayment", proofOfPayment);
-		formData.append("paymentMethod", selectedPaymentMethod);
-		formData.append("shippingAddress", JSON.stringify(addressToSend));
-		formData.append("deliveryMode", deliveryMode);
+  const checkout = async () => {
+    if (!selectedPaymentMethod) {
+      toast.error("Please select a payment method before checking out.");
+      return;
+    }
+    if (!proofOfPayment) {
+      toast.error("Please upload proof of payment before checking out.");
+      return;
+    }
+    const addressToSend = user.addresses.find(
+      (address) => address._id === selectedAddress
+    );
+    // Create FormData to include both file and payment method
+    const formData = new FormData();
+    formData.append("proofOfPayment", proofOfPayment);
+    formData.append("paymentMethod", selectedPaymentMethod);
+    formData.append("shippingAddress", JSON.stringify(addressToSend));
+    formData.append("deliveryMode", deliveryMode);
 
-		try {
-			const response = await fetch("http://localhost:3000/api/orders/create", {
-				method: "POST",
-				body: formData,
-				credentials: "include",
-			});
-			const data = await response.json();
-			if (!data.ok) {
-				toast.error(data.error);
-			}
-			const orderId = data.order._id;
-			navigate(`/order-details/${orderId}`);
-			await fetchCartItems();
-		} catch (error) {
-			setError(error.message);
-			setLoading(false);
-		}
-	};
+    try {
+      const response = await fetch("http://localhost:3000/api/orders/create", {
+        method: "POST",
+        body: formData,
+        credentials: "include",
+      });
+      const data = await response.json();
+      if (!data.ok) {
+        toast.error(data.error);
+      }
+      const orderId = data.order._id;
+      navigate(`/order-details/${orderId}`);
+      await fetchCartItems();
+    } catch (error) {
+      setError(error.message);
+      setLoading(false);
+    }
+  };
 
 	// Handle updating the quantity of an item in the cart
 	const updateQuantity = async (furnitureId, newQuantity) => {
@@ -167,345 +167,342 @@ const Cart = () => {
 		}
 	};
 
-	// Handle removing an item from the cart
-	const removeItem = async (furnitureId) => {
-		try {
-			const response = await fetch(
-				`http://localhost:3000/api/cart/${furnitureId}`,
-				{
-					method: "DELETE",
-					credentials: "include",
-				}
-			);
-			if (!response.ok) {
-				throw new Error("Failed to remove item");
-			}
-			fetchCartItems();
-		} catch (error) {
-			console.error("Error removing item:", error);
-			toast.error("Error removing item");
-		}
-	};
+  // Handle removing an item from the cart
+  const removeItem = async (furnitureId) => {
+    try {
+      const response = await fetch(
+        `http://localhost:3000/api/cart/${furnitureId}`,
+        {
+          method: "DELETE",
+          credentials: "include",
+        }
+      );
+      if (!response.ok) {
+        throw new Error("Failed to remove item");
+      }
+      fetchCartItems();
+    } catch (error) {
+      console.error("Error removing item:", error);
+      toast.error("Error removing item");
+    }
+  };
 
-	// Handle clearing the entire cart
-	const clearCart = async () => {
-		try {
-			const response = await fetch("http://localhost:3000/api/cart", {
-				method: "DELETE",
-				credentials: "include",
-			});
-			if (!response.ok) {
-				throw new Error("Failed to clear cart");
-			}
-			fetchCartItems();
-		} catch (error) {
-			console.error("Error clearing cart:", error);
-			toast.error("Error clearing cart");
-		}
-	};
+  // Handle clearing the entire cart
+  const clearCart = async () => {
+    try {
+      const response = await fetch("http://localhost:3000/api/cart", {
+        method: "DELETE",
+        credentials: "include",
+      });
+      if (!response.ok) {
+        throw new Error("Failed to clear cart");
+      }
+      fetchCartItems();
+    } catch (error) {
+      console.error("Error clearing cart:", error);
+      toast.error("Error clearing cart");
+    }
+  };
 
-	if (loading) {
-		return <div>Loading cart items...</div>;
-	}
-	if (error) {
-		return <div>Error: {error}</div>;
-	}
-	return (
-		<div className="flex flex-col min-h-screen">
-			<Header isLogin={true} cartCount={true} />
-			<main className="flex-grow w-2/4 mx-auto p-4 mt-5">
-				<div className="flex items-center mb-4 gap-5">
-					<button
-						onClick={() => navigate(-1)}
-						className="text-gray-500 mr-2 hover:text-teal-600"
-					>
-						<IoMdArrowRoundBack size={40} />
-					</button>
-					<h2 className="text-2xl font-semibold text-teal-600">Your Cart</h2>
-					<button
-						onClick={clearCart}
-						className="text-teal-600 hover:text-teal-800 font-semibold text-xl px-4 py-2 rounded ml-auto"
-					>
-						Clear Cart
-					</button>
-				</div>
-				{items.length === 0 ? (
-					<p className="text-center font-bold text-2xl text-teal-600">
-						Your cart is empty.
-					</p>
-				) : (
-					<>
-						{/* User details */}
-						<div>
-							<div>
-								Client: {user.firstname} {user.lastname} <br />
-								Phone Number: {user.phoneNumber}
-							</div>
-							<div className="flex justify-between">
-								<div>Delivery Mode:</div>
-								<div className="flex gap-3">
-									<label>
-										<input
-											type="radio"
-											name="deliveryMode"
-											value="delivery"
-											checked={deliveryMode === "delivery"} // Set checked based on deliveryMode state
-											onChange={(e) => setDeliveryMode(e.target.value)}
-										/>
-										Delivery
-									</label>
-									<label>
-										<input
-											type="radio"
-											name="deliveryMode"
-											value="pickup"
-											checked={deliveryMode === "pickup"} // Set checked based on deliveryMode state
-											onChange={(e) => setDeliveryMode(e.target.value)}
-										/>
-										Pick Up
-									</label>
-								</div>
-							</div>
-							<div className="bg-slate-100">
-								<div
-									className="flex p-2 justify-between"
-								>
-									<h3 className="font-semibold">
-										Current Shipping Address
-									</h3>
-									<button
-										onClick={() => navigate("/address/new")}
-										className="text-sky-500 pr-2"
-									>
-										Change
-									</button>
-								</div>
-								<div>
-									{user.addresses && user.addresses.length > 0 ? (
-										user.addresses
-											.filter((address) => address.isDefault)
-											.map((defaultAddress, index) => (
-												<div key={index}>
-													<p className="tracking-wide p-2">
-														{defaultAddress.streetAddress},{" "}
-														{defaultAddress.barangay},{" "}
-														{defaultAddress.municipality},{" "}
-														{defaultAddress.zipCode}
-													</p>
-												</div>
-											))
-									) : (
-										<p>No addresses available</p>
-									)}
-								</div>
-							</div>
-						</div>
-						<div className="border-t border-gray-300 py-4">
-							<ul className="divide-y divide-gray-300">
-								{items.map((item) => (
-									<li
-										key={item.furnitureId?._id}
-										className="flex items-center justify-between py-6 px-4"
-									>
-										{item.furnitureId && (
-											<>
-												<img
-													src={
-														item.furnitureId.images &&
-														item.furnitureId.images.length > 0
-															? `data:image/jpeg;base64,${item.furnitureId.images[0]}`
-															: "fallback-image-url.jpg"
-													}
-													alt={item.furnitureId.name}
-													className="w-32 h-32 object-cover mr-4"
-												/>
-												<div className="flex-1">
-													<h3 className="text-lg font-medium">
-														{item.furnitureId.name}
-													</h3>
-													<p className="text-gray-600">
-														Color: {item.furnitureId.colors.name}
-													</p>
-													<p className="text-gray-600">
-														Price: ₱{item.furnitureId.price}
-													</p>
-													<p className="text-gray-600">
-														Stocks : {item.furnitureId.stocks}
-													</p>
-												</div>
-												<div className="flex items-center">
-													<button
-														className="px-3 py-1 border border-gray-400"
-														onClick={() => {
-															if (item.quantity < 1) {
-																toast.error(
-																	"Quantity cannot be less than zero."
-																);
-															} else {
-																updateQuantity(
-																	item.furnitureId._id,
-																	item.quantity - 1
-																);
-															}
-														}}
-													>
-														-
-													</button>
-													<span className="px-4">{item.quantity}</span>
-													<button
-														className="px-3 py-1 border border-gray-400"
-														onClick={() => {
-															if (item.furnitureId.stocks <= item.quantity) {
-																toast.error(
-																	"Cannot increase quantity. Available stock is insufficient."
-																);
-															} else {
-																updateQuantity(
-																	item.furnitureId._id,
-																	item.quantity + 1
-																);
-															}
-														}}
-													>
-														+
-													</button>
-												</div>
-												<p className="ml-4 text-lg font-medium">
-													₱
-													{(
-														parseFloat(item.furnitureId.price) * item.quantity
-													).toFixed(2)}
-												</p>
-												<button
-													className="ml-4 text-teal-600 hover:teal-red-800"
-													onClick={() => removeItem(item.furnitureId._id)}
-												>
-													Remove
-												</button>
-											</>
-										)}
-									</li>
-								))}
-							</ul>
-						</div>
-						<div className="border-2 border-gray-300 p-6 rounded-lg">
-							{/* QR Code Section - Top */}
-							<div className="flex justify-end mr-28 pb-5">
-								<img
-									src="/payment-icon/qrcode.png"
-									alt="qrcode"
-									className="w-52 h-52"
-								/>
-							</div>
-							{/* Payment Methods and Image Upload - Bottom row */}
-							<div className="flex flex-col lg:flex-row gap-8">
-								{/* Payment Methods Section */}
-								<div className="flex-1">
-									<div className="border-t border-gray-300 pt-5">
-										<h3 className="text-lg font-semibold mb-2">
-											Payment Methods:
-										</h3>
-										<div className="flex gap-4">
-											{/* Gcash payment */}
-											<button
-												value="GCash"
-												onClick={() => handlePaymentMethodClick("GCash")}
-												className={`rounded ${
-													selectedPaymentMethod === "GCash"
-														? "bg-blue-700"
-														: "bg-blue-500"
-												} text-white`}
-											>
-												<img
-													src="/payment-icon/gcash.png"
-													alt="gcash"
-													className="w-full h-full object-contain rounded"
-												/>
-											</button>
-											{/* Maya payment */}
-											<button
-												value="Maya"
-												onClick={() => handlePaymentMethodClick("Maya")}
-												className={`px-8 py-4 rounded bg-black text-white`}
-											>
-												<img
-													src="/payment-icon/maya.jpg"
-													alt="maya"
-													className="w-full h-full object-contain" // Use object-contain to maintain aspect ratio
-												/>
-											</button>
-											{/* Cash on delivery payment */}
-											<button
-												value="COD"
-												onClick={() => handlePaymentMethodClick("COD")}
-												className={`px-8 py-4 rounded ${
-													selectedPaymentMethod === "COD"
-														? "bg-yellow-700"
-														: "bg-yellow-500"
-												} text-white`}
-											>
-												<div className="flex justify-center items-center gap-2">
-													<FaTruck size={30} />
-													<span className="font-semibold">COD</span>
-												</div>
-											</button>
-										</div>
-										{selectedPaymentMethod && (
-											<p className="mt-5 text-gray-600">
-												Selected Payment Method:{" "}
-												<strong>{selectedPaymentMethod}</strong>
-											</p>
-										)}
-									</div>
-								</div>
-								{/* Image Upload Section */}
-								<div className="flex-1">
-									<div className="w-full max-w-md border-t border-gray-300 pt-5">
-										<h2 className="text-2xl font-semibold text-green-700 mb-4">
-											Upload Proof of Payment
-										</h2>
-										<input
-											type="file"
-											onChange={handleFileUpload}
-											className="mb-4 w-full border border-gray-300 rounded-md px-3 py-2 text-gray-600 focus:border-green-500 focus:ring-green-500"
-										/>
-										{uploadMessage && <p>{uploadMessage}</p>}
-									</div>
-								</div>
-							</div>
-						</div>
-						<div className="mt-4">
-							<div>Items total: {totalAmount.toFixed(2)}</div>
-							<div>Shipping Fee: {shippingFee.toFixed(2)}</div>
-							<div>Total Amount: {totalWithShipping}</div>
-						</div>
-						<div className="border-t border-gray-300 pt-4 mt-5">
-							<div className="flex justify-between items-center mb-4">
-								<h3 className="text-lg font-semibold">Subtotal:</h3>
-								<p className="text-lg font-semibold">₱{totalWithShipping}</p>
-							</div>
-							<div className="flex justify-between mb-4">
-								<button
-									onClick={() => navigate(-1)}
-									className="bg-blue-500 text-white px-4 py-2 rounded"
-								>
-									Continue Shopping
-								</button>
-								<button
-									className="bg-green-500 text-white px-4 py-2 rounded"
-									onClick={checkout}
-								>
-									Checkout
-								</button>
-							</div>
-						</div>
-					</>
-				)}
-			</main>
-			<ToastContainer />
-			<Footer />
-		</div>
-	);
+  if (loading) {
+    return <div>Loading cart items...</div>;
+  }
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
+  return (
+    <div className="flex flex-col min-h-screen">
+      <Header isLogin={true} cartCount={true} />
+      <main className="flex-grow w-2/4 mx-auto p-4 mt-5">
+        <div className="flex items-center mb-4 gap-5 border-b-2 border-teal-600">
+          <button
+            onClick={() => navigate(-1)}
+            className="text-gray-500 mr-2 hover:text-teal-600"
+          >
+            <IoMdArrowRoundBack size={40} />
+          </button>
+          <h2 className="text-2xl font-semibold text-teal-600">Your Cart</h2>
+          <button
+            onClick={clearCart}
+            className="text-teal-600 hover:text-teal-800 font-semibold text-xl px-4 py-2 rounded ml-auto"
+          >
+            Clear Cart
+          </button>
+        </div>
+        {items.length === 0 ? (
+          <p className="text-center font-bold text-2xl text-teal-600">
+            Your cart is empty.
+          </p>
+        ) : (
+          <>
+            {/* Shipping Mode */}
+            <div className="bg-white">
+              <div className="bg-white shadow-xl">
+                <div className="flex justify-between">
+                  <h3 className="font-semibold text-2xl pl-2">Current Shipping Address</h3>
+                  <button
+                    onClick={() => navigate("/address/new")}
+                    className="text-teal-600 text-base font-semibold pr-2"> Change
+                  </button>
+                </div>
+                <div className="text-base font-medium">
+                  {user.addresses && user.addresses.length > 0 ? (
+                    user.addresses
+                      .filter((address) => address.isDefault)
+                      .map((defaultAddress, index) => (
+                        <div key={index}>
+                          <p className="tracking-wide p-2">
+                            {defaultAddress.streetAddress},{" "}
+                            {defaultAddress.barangay},{" "}
+                            {defaultAddress.municipality},{" "}
+                            {defaultAddress.zipCode}
+                          </p>
+                        </div>
+                      ))
+                  ) : (
+                    <p>No addresses available</p>
+                  )}
+                </div>
+                <div className="flex justify-between pl-2">
+                  <div>Delivery Mode:</div>
+                  <div className="flex gap-3 pr-2">
+                    <label>
+                      <input
+                        type="radio"
+                        name="deliveryMode"
+                        value="delivery"
+                        checked={deliveryMode === "delivery"} // Set checked based on deliveryMode state
+                        onChange={(e) => setDeliveryMode(e.target.value)}
+                      />
+                      Delivery
+                    </label>
+                    <label>
+                      <input
+                        type="radio"
+                        name="deliveryMode"
+                        value="pickup"
+                        checked={deliveryMode === "pickup"} // Set checked based on deliveryMode state
+                        onChange={(e) => setDeliveryMode(e.target.value)}
+                      />
+                      Pick Up
+                    </label>
+                  </div>
+                </div>
+              </div>
+             
+              {/* Client information */}
+              <div className="mt-5 bg-gray-400">
+                Client: {user.firstname} {user.lastname} <br />
+                Phone Number: {user.phoneNumber}
+              </div>
+              <div className="flex justify-between"></div>
+            </div>
+            <div className="border-t border-gray-300 py-4">
+              <ul className="divide-y divide-gray-300">
+                {items.map((item) => (
+                  <li
+                    key={item.furnitureId?._id}
+                    className="flex items-center justify-between py-6 px-4"
+                  >
+                    {item.furnitureId && (
+                      <>
+                        <img
+                          src={
+                            item.furnitureId.images &&
+                            item.furnitureId.images.length > 0
+                              ? `data:image/jpeg;base64,${item.furnitureId.images[0]}`
+                              : "fallback-image-url.jpg"
+                          }
+                          alt={item.furnitureId.name}
+                          className="w-32 h-32 object-cover mr-4"
+                        />
+                        <div className="flex-1">
+                          <h3 className="text-lg font-medium">
+                            {item.furnitureId.name}
+                          </h3>
+                          <p className="text-gray-600">
+                            Color: {item.furnitureId.colors.name}
+                          </p>
+                          <p className="text-gray-600">
+                            Price: ₱{item.furnitureId.price}
+                          </p>
+                          <p className="text-gray-600">
+                            Stocks : {item.furnitureId.stocks}
+                          </p>
+                        </div>
+                        <div className="flex items-center">
+                          <button
+                            className="px-3 py-1 border border-gray-400"
+                            onClick={() => {
+                              if (item.quantity < 1) {
+                                toast.error(
+                                  "Quantity cannot be less than zero."
+                                );
+                              } else {
+                                updateQuantity(
+                                  item.furnitureId._id,
+                                  item.quantity - 1
+                                );
+                              }
+                            }}
+                          >
+                            -
+                          </button>
+                          <span className="px-4">{item.quantity}</span>
+                          <button
+                            className="px-3 py-1 border border-gray-400"
+                            onClick={() => {
+                              if (item.furnitureId.stocks <= item.quantity) {
+                                toast.error(
+                                  "Cannot increase quantity. Available stock is insufficient."
+                                );
+                              } else {
+                                updateQuantity(
+                                  item.furnitureId._id,
+                                  item.quantity + 1
+                                );
+                              }
+                            }}
+                          >
+                            +
+                          </button>
+                        </div>
+                        <p className="ml-4 text-lg font-medium">
+                          ₱
+                          {(
+                            parseFloat(item.furnitureId.price) * item.quantity
+                          ).toFixed(2)}
+                        </p>
+                        <button
+                          className="ml-4 text-teal-600 hover:teal-red-800"
+                          onClick={() => removeItem(item.furnitureId._id)}
+                        >
+                          Remove
+                        </button>
+                      </>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="border-2 border-gray-300 p-6 rounded-lg">
+              {/* QR Code Section - Top */}
+              <div className="flex justify-end mr-28 pb-5">
+                <img
+                  src="/payment-icon/qrcode.png"
+                  alt="qrcode"
+                  className="w-52 h-52"
+                />
+              </div>
+              {/* Payment Methods and Image Upload - Bottom row */}
+              <div className="flex flex-col lg:flex-row gap-8">
+                {/* Payment Methods Section */}
+                <div className="flex-1">
+                  <div className="border-t border-gray-300 pt-5">
+                    <h3 className="text-lg font-semibold mb-2">
+                      Payment Methods:
+                    </h3>
+                    <div className="flex gap-4">
+                      {/* Gcash payment */}
+                      <button
+                        value="GCash"
+                        onClick={() => handlePaymentMethodClick("GCash")}
+                        className={`rounded ${
+                          selectedPaymentMethod === "GCash"
+                            ? "bg-blue-700"
+                            : "bg-blue-500"
+                        } text-white`}
+                      >
+                        <img
+                          src="/payment-icon/gcash.png"
+                          alt="gcash"
+                          className="w-full h-full object-contain rounded"
+                        />
+                      </button>
+                      {/* Maya payment */}
+                      <button
+                        value="Maya"
+                        onClick={() => handlePaymentMethodClick("Maya")}
+                        className={`px-8 py-4 rounded bg-black text-white`}
+                      >
+                        <img
+                          src="/payment-icon/maya.jpg"
+                          alt="maya"
+                          className="w-full h-full object-contain" // Use object-contain to maintain aspect ratio
+                        />
+                      </button>
+                      {/* Cash on delivery payment */}
+                      {/* <button
+                        value="COD"
+                        onClick={() => handlePaymentMethodClick("COD")}
+                        className={`px-8 py-4 rounded ${
+                          selectedPaymentMethod === "COD"
+                            ? "bg-yellow-700"
+                            : "bg-yellow-500"
+                        } text-white`}
+                      >
+                        <div className="flex justify-center items-center gap-2">
+                          <FaTruck size={30} />
+                          <span className="font-semibold">COD</span>
+                        </div>
+                      </button> */}
+                    </div>
+                    {selectedPaymentMethod && (
+                      <p className="mt-5 text-gray-600">
+                        Selected Payment Method:{" "}
+                        <strong>{selectedPaymentMethod}</strong>
+                      </p>
+                    )}
+                  </div>
+                </div>
+                {/* Image Upload Section */}
+                <div className="flex-1">
+                  <div className="w-full max-w-md border-t border-gray-300 pt-5">
+                    <h2 className="text-2xl font-semibold text-green-700 mb-4">
+                      Upload Proof of Payment
+                    </h2>
+                    <input
+                      type="file"
+                      onChange={handleFileUpload}
+                      className="mb-4 w-full border border-gray-300 rounded-md px-3 py-2 text-gray-600 focus:border-green-500 focus:ring-green-500"
+                    />
+                    {uploadMessage && <p>{uploadMessage}</p>}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="mt-4">
+              <div>Items total: {totalAmount.toFixed(2)}</div>
+              <div>Shipping Fee: {shippingFee.toFixed(2)}</div>
+              <div>Total Amount: {totalWithShipping}</div>
+            </div>
+            <div className="border-t border-gray-300 pt-4 mt-5">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-semibold">Subtotal:</h3>
+                <p className="text-lg font-semibold">₱{totalWithShipping}</p>
+              </div>
+              <div className="flex justify-between mb-4">
+                <button
+                  onClick={() => navigate(-1)}
+                  className="bg-blue-500 text-white px-4 py-2 rounded"
+                >
+                  Continue Shopping
+                </button>
+                <button
+                  className="bg-green-500 text-white px-4 py-2 rounded"
+                  onClick={checkout}
+                >
+                  Checkout
+                </button>
+              </div>
+            </div>
+          </>
+        )}
+      </main>
+      <ToastContainer />
+      <Footer />
+    </div>
+  );
 };
 
 export default Cart;

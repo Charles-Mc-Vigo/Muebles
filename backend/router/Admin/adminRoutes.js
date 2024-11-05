@@ -30,7 +30,7 @@ router.get('/verified/:adminId', checkAdminAuth, getAdminById);
 router.put("/setting/update-profile", checkAdminAuth, upload.single('image'), updateProfile);
 router.get("/setting/my-profile/view", checkAdminAuth, myProfile);
 
-router.get('/order/all', checkAdminAuth, orderController.getAllOrders);
+router.get('/orders/all', checkAdminAuth, orderController.getAllOrders);
 router.get('/order/:orderId',checkAdminAuth, getOrderId);
 router.put('/order/status/:orderId', checkAdminAuth, orderController.updateOrderStatus);
 
