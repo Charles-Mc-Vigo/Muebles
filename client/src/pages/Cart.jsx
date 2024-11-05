@@ -9,9 +9,8 @@ import Footer from "../components/Footer";
 
 const Cart = () => {
 	const [items, setItems] = useState([]);
-	const [deliveryMode, setDeliveryMode] = useState("delivery"); // Default to 'delivery'
+	const [deliveryMode, setDeliveryMode] = useState("delivery");
 	const [user, setUser] = useState(null);
-	const [isOpen, setIsOpen] = useState(false);
 	const [selectedAddress, setSelectedAddress] = useState(null);
 	const [count, setCount] = useState(0);
 	const [totalAmount, setTotalAmount] = useState(0);
@@ -23,9 +22,6 @@ const Cart = () => {
 	const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
 	const navigate = useNavigate();
 
-	const toggleAddresses = () => {
-		setIsOpen((prev) => !prev);
-	};
 
 	const shippingFees = {
 		Boac: 500,
@@ -164,7 +160,7 @@ const Cart = () => {
 			if (!response.ok) {
 				throw new Error("Failed to update item quantity");
 			}
-			fetchCartItems(); // Refresh cart after updating quantity
+			fetchCartItems();
 		} catch (error) {
 			console.error("Error updating quantity:", error);
 			toast.error("Error updating quantity");
