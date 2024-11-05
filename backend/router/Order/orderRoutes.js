@@ -12,6 +12,6 @@ router.post("/create", checkUserAuth, upload.single("proofOfPayment"), orderCont
 router.get('/my-orders', checkUserAuth, orderController.getUserOrders);
 router.get('/details/:orderId', checkUserAuth, orderController.getOrderDetails);
 router.put('/cancel/:orderId', checkUserAuth, orderController.cancelOrder);
-
+router.put('/update/:orderId',checkUserAuth,orderController.updateOrderStatus);
 
 module.exports = router;

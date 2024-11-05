@@ -6,6 +6,7 @@ const OrderCustomer = () => {
 	const [loading, setLoading] = useState(false);
 	const [filterStatus, setFilterStatus] = useState("All");
 	const [editingOrderId, setEditingOrderId] = useState(null);
+	const [user,setUser] = useState (null);
 	const navigate = useNavigate();
 
 	const fetchOrder = async () => {
@@ -33,7 +34,7 @@ const OrderCustomer = () => {
 
 	const handleStatusChange = async (orderId, newStatus) => {
 		try {
-			const response = await fetch(`http://localhost:3000/api/orders/${orderId}/status`, {
+			const response = await fetch(`http://localhost:3000/api/orders/update/${orderId}`, {
 				method: "PUT",
 				credentials: "include",
 				headers: {
