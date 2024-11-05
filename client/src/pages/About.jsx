@@ -17,7 +17,7 @@ const About = () => {
 
   return (
     <div className="bg-gray-50 font-poppins">
-      <Header />
+     <Header isLogin={true}  />
 
       {/* About Section */}
       <section className="bg-white rounded-lg shadow-md p-6 sm:p-8 w-full h-auto flex flex-col justify-center items-center mt-40">
