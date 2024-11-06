@@ -43,150 +43,163 @@ import DirectOrder from "./pages/DirectOrder";
 import AddNewAddress from "./components/AddNewAddress";
 import ViewUserOrder from "./components/ViewUserOrder";
 import ViewPendingRequest from "./pages/ViewPendingRequest";
+import ErrorBoundary from "./components/ErrorBoundary";
+
 
 export default function App() {
 	return (
-		<BrowserRouter>
-			<Routes>
-				<Route path="/" element={<LandingPage />} />
-				<Route path="/about" element={<About />} />
-				<Route path="/signup" element={<SignUp />} />
-				<Route path="/login" element={<Login />} />
-				<Route path="/terms&condition" element={<TermsAndConditions />} />
-				<Route path="/payment-method" element={<PaymentMethod />} />
-				<Route path="/verify-account/:userId" element={<EmailVerification />} />
-				<Route path="/home" element={<ProtectedRoute element={Home} />} />
-				<Route
-					path="/my-profile/view"
-					element={<ProtectedRoute element={UserProfile} />}
-				/>
-				<Route
-					path="/my-profile/edit"
-					element={<ProtectedRoute element={EditUserProfile} />}
-				/>
-				<Route
-					path="/direct-order/:furnitureId"
-					element={<ProtectedRoute element={DirectOrder} />}
-				/>
-				<Route
-					path="/address/new"
-					element={<ProtectedRoute element={AddNewAddress} />}
-				/>
-				<Route
-					path="/password-reset/request"
-					element={<PasswordResetRequest />}
-				/>
-				<Route
-					path="/password-reset/verify/:userId"
-					element={<PasswordResetVerify />}
-				/>
-				<Route
-					path="/password-reset/new-password/:userId"
-					element={<PasswordResetCreateNew />}
-				/>
-				<Route
-					path={`/furnitures/:id`}
-					element={<ProtectedRoute element={ProductDetails} />}
-				/>
-				<Route
-					path={`/order-details/:orderId`}
-					element={<ProtectedRoute element={OrderDetails} />}
-				/>
-				<Route path="/cart" element={<ProtectedRoute element={Cart} />} />
-				<Route path="/delivery-info" element={<DeliveryInfo />} />
-				<Route
-					path="/orders"
-					element={<ProtectedRoute element={ViewOrder} />}
-				/>
+		<ErrorBoundary>
+			<BrowserRouter>
+				<Routes>
+					<Route path="/" element={<LandingPage />} />
+					<Route path="/about" element={<About />} />
+					<Route path="/signup" element={<SignUp />} />
+					<Route path="/login" element={<Login />} />
+					<Route path="/terms&condition" element={<TermsAndConditions />} />
+					<Route path="/payment-method" element={<PaymentMethod />} />
+					<Route
+						path="/verify-account/:userId"
+						element={<EmailVerification />}
+					/>
+					<Route path="/home" element={<ProtectedRoute element={Home} />} />
+					<Route
+						path="/my-profile/view"
+						element={<ProtectedRoute element={UserProfile} />}
+					/>
+					<Route
+						path="/my-profile/edit"
+						element={<ProtectedRoute element={EditUserProfile} />}
+					/>
+					<Route
+						path="/direct-order/:furnitureId"
+						element={<ProtectedRoute element={DirectOrder} />}
+					/>
+					<Route
+						path="/address/new"
+						element={<ProtectedRoute element={AddNewAddress} />}
+					/>
+					<Route
+						path="/password-reset/request"
+						element={<PasswordResetRequest />}
+					/>
+					<Route
+						path="/password-reset/verify/:userId"
+						element={<PasswordResetVerify />}
+					/>
+					<Route
+						path="/password-reset/new-password/:userId"
+						element={<PasswordResetCreateNew />}
+					/>
+					<Route
+						path={`/furnitures/:id`}
+						element={<ProtectedRoute element={ProductDetails} />}
+					/>
+					<Route
+						path={`/order-details/:orderId`}
+						element={<ProtectedRoute element={OrderDetails} />}
+					/>
+					<Route path="/cart" element={<ProtectedRoute element={Cart} />} />
+					<Route path="/delivery-info" element={<DeliveryInfo />} />
+					<Route
+						path="/orders"
+						element={<ProtectedRoute element={ViewOrder} />}
+					/>
 
-				{/* Admin routes */}
-				<Route path="/admin-login" element={<AdminLogin />} />
-				<Route path="/admin-signup" element={<AdminSignUp />} />
-				<Route
-					path="/admin-signup/verify-account/:adminId"
-					element={<AdminVerify />}
-				/>
-				<Route
-					path="/view-request/:adminId"
-					element={
-						<ProtectedRoute element={ViewPendingRequest} adminOnly={true} />
-					}
-				/>
-				<Route
-					path={`/order/:orderId`}
-					element={<ProtectedRoute element={ViewUserOrder} adminOnly={true} />}
-				/>
-				<Route
-					path="/admin-signup/verify-account/:adminId/pending"
-					element={<AdminPendingPage />}
-				/>
-				<Route
-					path="/dashboard"
-					element={<ProtectedRoute element={DashBoard} adminOnly={true} />}
-				/>
-				<Route
-					path="/dashboard/setting/admin-profile/view"
-					element={<ProtectedRoute element={AdminProfile} adminOnly={true} />}
-				/>
-				<Route
-					path="/dashboard/setting/admin-profile/edit"
-					element={
-						<ProtectedRoute element={EditAdminProfile} adminOnly={true} />
-					}
-				/>
-				<Route
-					path="/table"
-					element={<ProtectedRoute element={ProductTable} adminOnly={true} />}
-				/>
-				<Route
-					path="/table"
-					element={<ProtectedRoute element={ProductTable} adminOnly={true} />}
-				/>
-				<Route
-					path={`/furnitures/:id`}
-					element={<ProtectedRoute element={ProductDetails} adminOnly={true} />}
-				/>
-				<Route
-					path={`/furnitures/edit/:furnitureId`}
-					element={<ProtectedRoute element={EditProduct} adminOnly={true} />}
-				/>
-				<Route path="/service-page" element={<ServicePage />} />
-				<Route path="/inventory-management" element={<InventoryPage />} />
-				<Route
-					path="/furniture-list"
-					element={<ProtectedRoute element={FurnitureList} />}
-				/>
-				<Route path="/manage-delivery" element={<DeliveryManagement />} />
-				<Route
-					path="/user-management"
-					element={<ProtectedRoute element={UserManagement} adminOnly={true} />}
-				/>
-				<Route
-					path="/order-management"
-					element={
-						<ProtectedRoute element={OrderManagement} adminOnly={true} />
-					}
-				/>
-				<Route
-					path="/view-transaction"
-					element={
-						<ProtectedRoute element={TransactionHistory} adminOnly={true} />
-					}
-				/>
-				<Route
-					path="/product-management"
-					element={
-						<ProtectedRoute element={ProductManagement} adminOnly={true} />
-					}
-				/>
-				<Route
-					path="/product-customization"
-					element={
-						<ProtectedRoute element={ProductCustomization} adminOnly={true} />
-					}
-				/>
-				<Route path="/logout" element={<ProtectedRoute element={Logout} />} />
-			</Routes>
-		</BrowserRouter>
+					{/* Admin routes */}
+					<Route path="/admin-login" element={<AdminLogin />} />
+					<Route path="/admin-signup" element={<AdminSignUp />} />
+					<Route
+						path="/admin-signup/verify-account/:adminId"
+						element={<AdminVerify />}
+					/>
+					<Route
+						path="/view-request/:adminId"
+						element={
+							<ProtectedRoute element={ViewPendingRequest} adminOnly={true} />
+						}
+					/>
+					<Route
+						path={`/order/:orderId`}
+						element={
+							<ProtectedRoute element={ViewUserOrder} adminOnly={true} />
+						}
+					/>
+					<Route
+						path="/admin-signup/verify-account/:adminId/pending"
+						element={<AdminPendingPage />}
+					/>
+					<Route
+						path="/dashboard"
+						element={<ProtectedRoute element={DashBoard} adminOnly={true} />}
+					/>
+					<Route
+						path="/dashboard/setting/admin-profile/view"
+						element={<ProtectedRoute element={AdminProfile} adminOnly={true} />}
+					/>
+					<Route
+						path="/dashboard/setting/admin-profile/edit"
+						element={
+							<ProtectedRoute element={EditAdminProfile} adminOnly={true} />
+						}
+					/>
+					<Route
+						path="/table"
+						element={<ProtectedRoute element={ProductTable} adminOnly={true} />}
+					/>
+					<Route
+						path="/table"
+						element={<ProtectedRoute element={ProductTable} adminOnly={true} />}
+					/>
+					<Route
+						path={`/furnitures/:id`}
+						element={
+							<ProtectedRoute element={ProductDetails} adminOnly={true} />
+						}
+					/>
+					<Route
+						path={`/furnitures/edit/:furnitureId`}
+						element={<ProtectedRoute element={EditProduct} adminOnly={true} />}
+					/>
+					<Route path="/service-page" element={<ServicePage />} />
+					<Route path="/inventory-management" element={<InventoryPage />} />
+					<Route
+						path="/furniture-list"
+						element={<ProtectedRoute element={FurnitureList} />}
+					/>
+					<Route path="/manage-delivery" element={<DeliveryManagement />} />
+					<Route
+						path="/user-management"
+						element={
+							<ProtectedRoute element={UserManagement} adminOnly={true} />
+						}
+					/>
+					<Route
+						path="/order-management"
+						element={
+							<ProtectedRoute element={OrderManagement} adminOnly={true} />
+						}
+					/>
+					<Route
+						path="/view-transaction"
+						element={
+							<ProtectedRoute element={TransactionHistory} adminOnly={true} />
+						}
+					/>
+					<Route
+						path="/product-management"
+						element={
+							<ProtectedRoute element={ProductManagement} adminOnly={true} />
+						}
+					/>
+					<Route
+						path="/product-customization"
+						element={
+							<ProtectedRoute element={ProductCustomization} adminOnly={true} />
+						}
+					/>
+					<Route path="/logout" element={<ProtectedRoute element={Logout} />} />
+				</Routes>
+			</BrowserRouter>
+		</ErrorBoundary>
 	);
 }

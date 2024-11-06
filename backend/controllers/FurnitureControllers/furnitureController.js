@@ -27,15 +27,7 @@ const upload = multer({
 // Get all furnitures or furniture by ID
 exports.getAllFurnitures = async (req, res) => {
 	try {
-		// Initialize filters with the isArchived flag
-		const filters = { isArchived: false };
-
-		// Add any additional query parameters to filters
-		for (const key in req.query) {
-			filters[key] = req.query[key]; // Add each query parameter to filters
-		}
-
-		const furnitures = await Furniture.find(filters).populate([
+		const furnitures = await Furniture.find().populate([
 			{ path: "category", select: "name -_id" },
 			{ path: "furnitureType", select: "name -_id" },
 			{ path: "materials", select: "name -_id" },
@@ -126,7 +118,6 @@ exports.createFurniture = async (req, res) => {
         furnitureType,
         name,
         description,
-        stocks,
         materials,
         colors,
         sizes,
@@ -141,7 +132,6 @@ exports.createFurniture = async (req, res) => {
       if (!name) missingFields.push("name");
       if (!materials || materials.length === 0) missingFields.push("materials");
       if (!colors || colors.length === 0) missingFields.push("colors");
-      if (!stocks) missingFields.push("stocks");
       if (!price) missingFields.push("price");
       if (!sizes || sizes.length === 0) missingFields.push("sizes");
       if (missingFields.length > 0) {
@@ -189,7 +179,6 @@ exports.createFurniture = async (req, res) => {
         furnitureType: existingFurnitureType._id,
         name,
         description,
-        stocks: req.body.stocks,
         materials: existingMaterials.map((material) => material._id),
         colors: existingColors.map((color) => color._id),
         sizes: existingSize.map((size) => size._id),
@@ -247,7 +236,6 @@ exports.updateFurniture = async (req, res) => {
         furnitureType,
         name,
         description,
-        stocks,
         materials,
         colors,
         sizes,
@@ -304,7 +292,6 @@ exports.updateFurniture = async (req, res) => {
       furniture.name = name || furniture.name;
       furniture.description = description || furniture.description;
       furniture.price = price || furniture.price;
-      furniture.stocks = stocks || furniture.stocks;
 
       await furniture.save();
       res.status(200).json({

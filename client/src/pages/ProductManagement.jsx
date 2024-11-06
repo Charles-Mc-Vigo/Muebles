@@ -24,26 +24,71 @@ const ProductManagement = () => {
 		materials: [],
 		colors: [],
 		sizes: [],
-		stocks: "",
 		price: "",
 	});
 
 	const fetchData = async () => {
 		setLoading(true);
 		try {
-			const furnitureResponse = await fetch(
-				"http://localhost:3000/api/furnitures"
-			);
+			const [
+				furnitureResponse,
+				furnitureTypesResponse,
+				categoriesResponse,
+				materialsResponse,
+				colorsResponse,
+				sizesResponse,
+			] = await Promise.all([
+				fetch("http://localhost:3000/api/furnitures", {
+					method: "GET",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					credentials: "include",
+				}),
+				fetch("http://localhost:3000/api/furniture-types",{
+					method: "GET",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					credentials: "include",
+				}),
+				fetch("http://localhost:3000/api/categories",{
+					method: "GET",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					credentials: "include",
+				}),
+				fetch("http://localhost:3000/api/materials",{
+					method: "GET",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					credentials: "include",
+				}),
+				fetch("http://localhost:3000/api/colors",{
+					method: "GET",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					credentials: "include",
+				}),
+				fetch("http://localhost:3000/api/sizes",{
+					method: "GET",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					credentials: "include",
+				}),
+			]);
+
 			if (furnitureResponse.ok) {
 				const furnitureData = await furnitureResponse.json();
 				setFurnitureData(furnitureData || []);
 			} else {
-				throw new Error("Failed to fetch furniture data");
+				throw new Error(furnitureResponse.message || furnitureResponse.error);
 			}
 
-			const furnitureTypesResponse = await fetch(
-				"http://localhost:3000/api/furniture-types"
-			);
 			if (furnitureTypesResponse.ok) {
 				const furnitureTypesData = await furnitureTypesResponse.json();
 				setFurnitureTypes(furnitureTypesData || []);
@@ -51,9 +96,6 @@ const ProductManagement = () => {
 				throw new Error("Failed to fetch furniture types");
 			}
 
-			const categoriesResponse = await fetch(
-				"http://localhost:3000/api/categories"
-			);
 			if (categoriesResponse.ok) {
 				const categoriesData = await categoriesResponse.json();
 				setCategories(categoriesData || []);
@@ -61,9 +103,6 @@ const ProductManagement = () => {
 				throw new Error("Failed to fetch categories");
 			}
 
-			const materialsResponse = await fetch(
-				"http://localhost:3000/api/materials"
-			);
 			if (materialsResponse.ok) {
 				const materialsData = await materialsResponse.json();
 				setMaterials(materialsData || []);
@@ -71,7 +110,6 @@ const ProductManagement = () => {
 				throw new Error("Failed to fetch materials");
 			}
 
-			const colorsResponse = await fetch("http://localhost:3000/api/colors");
 			if (colorsResponse.ok) {
 				const colorsData = await colorsResponse.json();
 				setColors(colorsData || []);
@@ -79,7 +117,6 @@ const ProductManagement = () => {
 				throw new Error("Failed to fetch colors");
 			}
 
-			const sizesResponse = await fetch("http://localhost:3000/api/sizes");
 			if (sizesResponse.ok) {
 				const sizesData = await sizesResponse.json();
 				setSizes(sizesData || []);
@@ -87,7 +124,8 @@ const ProductManagement = () => {
 				throw new Error("Failed to fetch sizes");
 			}
 		} catch (error) {
-			console.error("Error fetching data:", error);
+			console.error("Error fetching data:", error.message);
+			toast.error("Failed to fetch data");
 		} finally {
 			setLoading(false);
 		}
@@ -214,7 +252,6 @@ const ProductManagement = () => {
 					materials: newFurniture.materials,
 					colors: newFurniture.colors,
 					sizes: newFurniture.sizes,
-					stocks: newFurniture.stocks,
 					price: newFurniture.price,
 				}),
 			});
@@ -231,7 +268,6 @@ const ProductManagement = () => {
 					materials: [],
 					colors: [],
 					sizes: [],
-					stocks: "",
 					price: "",
 				});
 				fetchData();
@@ -316,16 +352,6 @@ const ProductManagement = () => {
 							onChange={handleInputChange}
 							required
 							min="0"
-							className="border rounded p-2 w-full"
-						/>
-						<input
-							id="stocks"
-							type="number"
-							name="stocks"
-							placeholder="Stocks"
-							value={newFurniture.stocks}
-							onChange={handleInputChange}
-							required
 							className="border rounded p-2 w-full"
 						/>
 
@@ -481,7 +507,6 @@ const ProductManagement = () => {
 							</th>
 							<th className="border border-gray-300 p-2">Materials</th>
 							<th className="border border-gray-300 p-2">Price</th>
-							<th className="border border-gray-300 p-2">Stocks</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -552,9 +577,6 @@ const ProductManagement = () => {
 									</td>
 									<td className="border border-gray-300 p-2">
 										{furniture.price}
-									</td>
-									<td className="border border-gray-300 p-2">
-										{furniture.stocks || "N/A"}
 									</td>
 								</tr>
 							))

@@ -203,7 +203,7 @@ const Maintenance = () => {
 			}
 
 			toast.success(`Successfully archived ${entityType}`);
-			console.log(`${entityType} with ID ${entityId} archived successfully`);
+			// console.log(`${entityType} with ID ${entityId} archived successfully`);
 
 			// Optionally, update the UI by removing or updating the entity in the respective state
 			switch (entityType) {
@@ -248,7 +248,7 @@ const Maintenance = () => {
 			});
 			const data = await response.json();
 			setCategories(data);
-			console.log(data);
+			// console.log(data);
 		} catch (error) {
 			setCategories([]);
 			console.error("Failed to fetch categories:", error);
@@ -298,7 +298,6 @@ const Maintenance = () => {
 			});
 
 			if (response.ok) {
-				const data = await response.json();
 				toast.success("Material added successfully.");
 				setNewMaterial({ name: "", price: "" }); // Reset input
 				await fetchMaterials(); // Refresh the list
@@ -465,7 +464,7 @@ const Maintenance = () => {
 			} else {
 				updatedItems[rowIndex][key] = value;
 			}
-			console.log("Updated Item:", updatedItems[rowIndex]); // Log the updated item
+			// console.log("Updated Item:", updatedItems[rowIndex]); // Log the updated item
 			setItems(updatedItems);
 		};
 
@@ -752,7 +751,7 @@ const Maintenance = () => {
 											? categories.map((category) => ({
 													id: category._id,
 													name: category.name,
-											  }))
+											}))
 											: []
 									}
 									onEdit={handleEditItem}
@@ -783,7 +782,7 @@ const Maintenance = () => {
 														categories.find(
 															(cat) => cat._id === type.categoryId
 														)?.name || "N/A",
-											  }))
+												}))
 											: []
 									}
 									onEdit={handleEditItem}
@@ -807,7 +806,7 @@ const Maintenance = () => {
 													name: color.name,
 													rgb: color.rgb,
 													hex: color.hex,
-											  }))
+											}))
 											: []
 									}
 									onEdit={handleEditItem}
@@ -830,7 +829,7 @@ const Maintenance = () => {
 													id: material._id,
 													name: material.name,
 													price: material.price,
-											  }))
+											}))
 											: []
 									}
 									onEdit={handleEditItem}
@@ -864,7 +863,7 @@ const Maintenance = () => {
 														furnitureTypes.find(
 															(type) => type._id === size.furnitureTypeId
 														)?.name || "N/A",
-											  }))
+											}))
 											: []
 									}
 									onEdit={handleEditItem}

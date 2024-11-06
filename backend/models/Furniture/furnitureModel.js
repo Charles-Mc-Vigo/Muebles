@@ -9,11 +9,6 @@ const furnitureSchema = new mongoose.Schema({
   materials: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Materials' }],
   colors: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Colors' }],
   sizes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Size' }],
-  stocks:{
-    type:Number,
-    required:true,
-    default:0
-  },
   price: { type: Number, required: true },
 
   isArchived:{
