@@ -55,7 +55,7 @@ const Header = ({ isLogin, cartCount }) => {
   };
 
   return (
-    <header className=" w-full bg-white shadow-md ">
+    <header className=" w-full bg-white shadow-xl rounded-xl ">
       {/* Desktop Header */}
       <div className="hidden lg:block">
         <div className="max-w-7xl mx-auto px-4 py-4">
@@ -162,7 +162,7 @@ const Header = ({ isLogin, cartCount }) => {
         </div>
       </div>
       {/* Second Navigation Bar */}
-      <nav className="hidden md:flex justify-center space-x-8 py-0 bg-white text-lg">
+      <nav className="hidden md:flex justify-center space-x-8 py-0  text-lg ">
         <Link className="text-black py-2 hover:underline m-2" to="/home">
           All Furnitures
         </Link>

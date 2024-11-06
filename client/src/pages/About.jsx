@@ -18,9 +18,11 @@ const About = () => {
   return (
     <div className="bg-gray-50 font-poppins">
       <Header isLogin={true} cartCount={true} />
-
+      <div>
+        
+      </div>
       {/* About Section */}
-      <section className="bg-white rounded-lg shadow-md p-6 sm:p-8 w-full h-auto flex flex-col justify-center items-center mt-40">
+      <section className="bg-white rounded-lg shadow-md p-6 sm:p-8 w-full h-auto flex flex-col justify-center items-center ">
         <div className="mb-6 sm:mb-8 text-left flex flex-col justify-center items-center">
           <h2 className="text-2xl sm:text-3xl font-semibold text-black mb-4 text-center">
             About Us
@@ -116,9 +118,9 @@ const About = () => {
 
       {/* Core Values */}
       <section className="bg-white rounded-lg shadow-md p-4 sm:p-6 border-b-2 w-full h-auto max-w-8xl mx-auto space-y-8 text-justify">
-        <div className="flex flex-col md:flex-row justify-between space-y-8 md:space-x-8">
+        <div className="flex flex-col md:flex-row justify-between  space-y-8 md:space-x-8">
           {/* Left Side */}
-          <div className="grid grid-cols-1 gap-8 w-full md:w-1/2">
+          <div className="grid grid-cols-1 gap-8 w-full md:w-1/2 items-center">
             <div className="flex items-start">
               <img
                 src="/Advertisement/aboutsicon/Integrity.png"
