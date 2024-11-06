@@ -286,7 +286,7 @@ const Cart = () => {
                 <h1 className="text-2xl ml-2">JCKAME</h1>
               </div>
               <div>
-                <ul className="divide-y divide-gray-300">
+                <ul className="divide-y divide-gray-300 ">
                   {items.map((item) => (
                     <li
                       key={item.furnitureId?._id}
@@ -294,7 +294,7 @@ const Cart = () => {
                     >
                       {item.furnitureId && (
                         <>
-                          <img
+                          <img 
                             src={
                               item.furnitureId.images &&
                               item.furnitureId.images.length > 0
@@ -302,7 +302,7 @@ const Cart = () => {
                                 : "fallback-image-url.jpg"
                             }
                             alt={item.furnitureId.name}
-                            className="w-32 h-32 object-cover mr-4"
+                            className="w-32 h-32 object-contain mr-4"
                           />
                           <div className="flex-1">
                             <h3 className="text-lg font-medium">
@@ -496,13 +496,13 @@ const Cart = () => {
 
                   {/* Image Upload Section */}
                   <div className="flex-1 max-w-md  pt-5">
-                    <h2 className="text-2xl font-semibold text-green-700 mb-4">
+                    <h2 className="text-2xl font-semibold text-teal-600 mb-4">
                       Upload Proof of Payment
                     </h2>
                     <input
                       type="file"
                       onChange={handleFileUpload}
-                      className="mb-4 w-full border border-gray-300 rounded-md px-3 py-2 text-gray-600 focus:border-green-500 focus:ring-green-500"
+                      className="mb-4 w-full border border-gray-300 rounded-md px-3 py-2 text-gray-600 focus:border-teal-600 focus:ring-teal-500"
                     />
                     {uploadMessage && <p>{uploadMessage}</p>}
                   </div>
