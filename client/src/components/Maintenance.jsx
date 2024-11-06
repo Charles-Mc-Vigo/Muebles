@@ -409,7 +409,8 @@ const Maintenance = () => {
 					}
 				);
 				if (!response.ok) {
-					throw new Error(response.message);
+					const errorData = await response.json();
+					throw new Error(errorData.message || "Failed to add category.");
 				}
 				toast.success("Category added successfully.");
 				await fetchCategories(); // Refresh categories list
@@ -434,26 +435,27 @@ const Maintenance = () => {
 						}),
 					}
 				);
-
-				const errorData = await response.json();
-				if (!errorData.ok) {
-					throw new Error(errorData.message);
+	
+				const responseData = await response.json();
+				if (!response.ok) {
+					throw new Error(responseData.message || "Failed to add furniture type.");
 				}
-				const newFurnitureType = await response.json();
+	
 				setFurnitureTypes((prevTypes) =>
 					Array.isArray(prevTypes)
-						? [...prevTypes, newFurnitureType]
-						: [newFurnitureType]
+						? [...prevTypes, responseData.newFurnitureType]
+						: [responseData.newFurnitureType]
 				);
-				toast.success("Furniture type added successfully.");
+				toast.success(responseData.message);
 				await fetchFurnitureTypes();
 			}
-
+	
 			resetInputFields();
 		} catch (error) {
 			toast.error(error.message);
 		}
 	};
+	
 	const handleEditItem = (rowIndex, key, value) => {
 		const updateItem = (items, setItems) => {
 			const updatedItems = [...items];

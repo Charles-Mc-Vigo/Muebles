@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const multer = require("multer");
+// const multer = require("multer");
 const {
 	createFurniture,
 	getAllFurnitures,
@@ -13,20 +13,20 @@ const {
 
 const {checkAdminAuth} = require('../../middlewares/checkAuth');
 
-// Multer setup for handling image uploads in memory
-const upload = multer({
-	storage: multer.memoryStorage(),
-	limits: {
-		fileSize: 5 * 1024 * 1024, // 5MB file size limit
-	},
-	fileFilter: (req, file, cb) => {
-		if (file.mimetype.startsWith("image/")) {
-			cb(null, true);
-		} else {
-			cb(new Error("Not an image! Please upload only images."), false);
-		}
-	},
-});
+// // Multer setup for handling image uploads in memory
+// const upload = multer({
+// 	storage: multer.memoryStorage(),
+// 	limits: {
+// 		fileSize: 5 * 1024 * 1024, // 5MB file size limit
+// 	},
+// 	fileFilter: (req, file, cb) => {
+// 		if (file.mimetype.startsWith("image/")) {
+// 			cb(null, true);
+// 		} else {
+// 			cb(new Error("Not an image! Please upload only images."), false);
+// 		}
+// 	},
+// });
 
 // Get all furnitures
 // GET - /api/furnitures
@@ -38,11 +38,11 @@ router.get("/archived", checkAdminAuth, ArchivedFurnitures);
 
 // Create new furniture
 // POST - /api/furnitures/add
-router.post("/add", upload.array("images", 5), checkAdminAuth, createFurniture);
+router.post("/add", checkAdminAuth, createFurniture);
 
 // Update furniture
 // PUT - /api/furnitures/:furnitureId
-router.put("/edit/:furnitureId", upload.array("images", 5), checkAdminAuth, updateFurniture);
+router.put("/edit/:furnitureId", checkAdminAuth, updateFurniture);
 
 // Archive furniture
 // DELETE - /api/furnitures/archived/:furnitureId
