@@ -35,9 +35,6 @@ exports.getAllFurnitures = async (req, res) => {
 			{ path: "sizes", select: "label height width depth -_id" },
 		]);
 
-    if(furnitures.length === 0){
-      return res.status(400).json({error:"No furniture found!"})
-    }
 		
 		// Return the fetched furnitures
 		res.status(200).json(furnitures);
