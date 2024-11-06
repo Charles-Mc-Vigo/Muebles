@@ -12,7 +12,7 @@ import Footer from "../components/Footer";
 const Cart = () => {
 	const [items, setItems] = useState([]);
 	const [deliveryMode, setDeliveryMode] = useState("delivery");
-	const [user, setUser] = useState(null);
+	const [user, setUser] = useState({ addresses: [] }); // Ensure `addresses` is an empty array by default
 	const [selectedAddress, setSelectedAddress] = useState(null);
 	const [count, setCount] = useState(0);
 	const [totalAmount, setTotalAmount] = useState(0);
@@ -24,122 +24,121 @@ const Cart = () => {
 	const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
 	const navigate = useNavigate();
 
+	const shippingFees = {
+		Boac: 500,
+		Mogpog: 700,
+		Gasan: 500,
+		Buenavista: 800,
+		Santa_Cruz: 3000,
+		Torrijos: 3000,
+	};
 
-  const shippingFees = {
-    Boac: 500,
-    Mogpog: 700,
-    Gasan: 500,
-    Buenavista: 800,
-    Santa_Cruz: 3000,
-    Torrijos: 3000,
-  };
+	// Fetch cart items from the API
+	const fetchCartItems = async () => {
+		try {
+			const response = await fetch("http://localhost:3000/api/cart", {
+				method: "GET",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				credentials: "include",
+			});
+			const data = await response.json();
+			if (!data.ok) {
+				toast.error(data.error);
+			}
+			if (data.cart && data.cart.items.length > 0) {
+				setItems(data.cart.items);
+				setCount(data.cart.count);
+				setTotalAmount(data.cart.totalAmount);
+				setUser(data.cart.userId);
 
-  // Fetch cart items from the API
-  const fetchCartItems = async () => {
-    try {
-      const response = await fetch("http://localhost:3000/api/cart", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-      });
-      const data = await response.json();
-      if (!data.ok) {
-        toast.error(data.error);
-      }
-      if (data.cart && data.cart.items.length > 0) {
-        setItems(data.cart.items);
-        setCount(data.cart.count);
-        setTotalAmount(data.cart.totalAmount);
-        setUser(data.cart.userId);
+				const defaultAddress = data.cart.userId.addresses?.find(
+					(address) => address.isDefault
+				);
+				if (defaultAddress) {
+					setSelectedAddress(defaultAddress._id);
+				}
+			} else {
+				setItems([]);
+				setCount(0);
+				setTotalAmount(0);
+				setUser({ addresses: [] });
+			}
+			setLoading(false);
+		} catch (error) {
+			setError(error.message);
+			setLoading(false);
+		}
+	};
 
-        const defaultAddress = data.cart.userId.addresses.find(
-          (address) => address.isDefault
-        );
-        if (defaultAddress) {
-          setSelectedAddress(defaultAddress._id);
-        }
-      } else {
-        setItems([]);
-        setCount(0);
-        setTotalAmount(0);
-        setUser("");
-      }
-      setLoading(false);
-    } catch (error) {
-      setError(error.message);
-      setLoading(false);
-    }
-  };
+	useEffect(() => {
+		fetchCartItems();
+	}, []);
 
-  useEffect(() => {
-    fetchCartItems();
-  }, []);
+	useEffect(() => {
+		// Calculate and set shipping fee based on selected address
+		if (user?.addresses?.length > 0 && selectedAddress) {
+			const address = user.addresses.find(
+				(address) => address._id === selectedAddress
+			);
+			const fee = shippingFees[address?.municipality] || 0;
+			setShippingFee(fee);
+		} else {
+			setShippingFee(0); // Reset if no address is selected
+		}
+	}, [selectedAddress, user]);
 
-  useEffect(() => {
-    // Calculate and set shipping fee based on selected address
-    if (selectedAddress) {
-      const address = user.addresses.find(
-        (address) => address._id === selectedAddress
-      );
-      const fee = shippingFees[address.municipality] || 0;
-      setShippingFee(fee);
-    } else {
-      setShippingFee(0); // Reset if no address is selected
-    }
-  }, [selectedAddress, user]);
+	// Calculate total price
+	const totalWithShipping = (totalAmount + shippingFee).toFixed(2);
 
-  // Calculate total price
-  const totalWithShipping = (totalAmount + shippingFee).toFixed(2);
+	const handlePaymentMethodClick = (method) => {
+		setSelectedPaymentMethod(method);
+	};
 
-  const handlePaymentMethodClick = (method) => {
-    setSelectedPaymentMethod(method);
-  };
+	const handleFileUpload = (event) => {
+		const file = event.target.files[0];
+		setProofOfPayment(file);
+		setUploadMessage(`Selected file: ${file.name}`);
+	};
 
-  const handleFileUpload = (event) => {
-    const file = event.target.files[0];
-    setProofOfPayment(file);
-    setUploadMessage(`Selected file: ${file.name}`);
-  };
+	const checkout = async () => {
+		if (!selectedPaymentMethod) {
+			toast.error("Please select a payment method before checking out.");
+			return;
+		}
+		if (!proofOfPayment) {
+			toast.error("Please upload proof of payment before checking out.");
+			return;
+		}
+		const addressToSend = user.addresses.find(
+			(address) => address._id === selectedAddress
+		);
+		// Create FormData to include both file and payment method
+		const formData = new FormData();
+		formData.append("proofOfPayment", proofOfPayment);
+		formData.append("paymentMethod", selectedPaymentMethod);
+		formData.append("shippingAddress", JSON.stringify(addressToSend));
+		formData.append("deliveryMode", deliveryMode);
 
-  const checkout = async () => {
-    if (!selectedPaymentMethod) {
-      toast.error("Please select a payment method before checking out.");
-      return;
-    }
-    if (!proofOfPayment) {
-      toast.error("Please upload proof of payment before checking out.");
-      return;
-    }
-    const addressToSend = user.addresses.find(
-      (address) => address._id === selectedAddress
-    );
-    // Create FormData to include both file and payment method
-    const formData = new FormData();
-    formData.append("proofOfPayment", proofOfPayment);
-    formData.append("paymentMethod", selectedPaymentMethod);
-    formData.append("shippingAddress", JSON.stringify(addressToSend));
-    formData.append("deliveryMode", deliveryMode);
-
-    try {
-      const response = await fetch("http://localhost:3000/api/orders/create", {
-        method: "POST",
-        body: formData,
-        credentials: "include",
-      });
-      const data = await response.json();
-      if (!data.ok) {
-        toast.error(data.error);
-      }
-      const orderId = data.order._id;
-      navigate(`/order-details/${orderId}`);
-      await fetchCartItems();
-    } catch (error) {
-      setError(error.message);
-      setLoading(false);
-    }
-  };
+		try {
+			const response = await fetch("http://localhost:3000/api/orders/create", {
+				method: "POST",
+				body: formData,
+				credentials: "include",
+			});
+			const data = await response.json();
+			if (!data.ok) {
+				toast.error(data.error);
+			}
+			const orderId = data.order._id;
+			navigate(`/order-details/${orderId}`);
+			await fetchCartItems();
+		} catch (error) {
+			setError(error.message);
+			setLoading(false);
+		}
+	};
 
 	// Handle updating the quantity of an item in the cart
 	const updateQuantity = async (furnitureId, newQuantity) => {
@@ -169,73 +168,73 @@ const Cart = () => {
 		}
 	};
 
-  // Handle removing an item from the cart
-  const removeItem = async (furnitureId) => {
-    try {
-      const response = await fetch(
-        `http://localhost:3000/api/cart/${furnitureId}`,
-        {
-          method: "DELETE",
-          credentials: "include",
-        }
-      );
-      if (!response.ok) {
-        throw new Error("Failed to remove item");
-      }
-      fetchCartItems();
-    } catch (error) {
-      console.error("Error removing item:", error);
-      toast.error("Error removing item");
-    }
-  };
+	// Handle removing an item from the cart
+	const removeItem = async (furnitureId) => {
+		try {
+			const response = await fetch(
+				`http://localhost:3000/api/cart/${furnitureId}`,
+				{
+					method: "DELETE",
+					credentials: "include",
+				}
+			);
+			if (!response.ok) {
+				throw new Error("Failed to remove item");
+			}
+			fetchCartItems();
+		} catch (error) {
+			console.error("Error removing item:", error);
+			toast.error("Error removing item");
+		}
+	};
 
-  // Handle clearing the entire cart
-  const clearCart = async () => {
-    try {
-      const response = await fetch("http://localhost:3000/api/cart", {
-        method: "DELETE",
-        credentials: "include",
-      });
-      if (!response.ok) {
-        throw new Error("Failed to clear cart");
-      }
-      fetchCartItems();
-    } catch (error) {
-      console.error("Error clearing cart:", error);
-      toast.error("Error clearing cart");
-    }
-  };
+	// Handle clearing the entire cart
+	const clearCart = async () => {
+		try {
+			const response = await fetch("http://localhost:3000/api/cart", {
+				method: "DELETE",
+				credentials: "include",
+			});
+			if (!response.ok) {
+				throw new Error("Failed to clear cart");
+			}
+			fetchCartItems();
+		} catch (error) {
+			console.error("Error clearing cart:", error);
+			toast.error("Error clearing cart");
+		}
+	};
 
-  if (loading) {
-    return <div>Loading cart items...</div>;
-  }
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
-  return (
-    <div className="flex flex-col min-h-screen">
-      <Header isLogin={true} cartCount={true} />
-      <main className="flex-grow w-2/4 mx-auto p-4 mt-5">
-        <div className="flex items-center mb-4 gap-5 border-b-2 border-teal-600">
-          <button
-            onClick={() => navigate(-1)}
-            className="text-gray-500 mr-2 hover:text-teal-600"
-          >
-            <IoMdArrowRoundBack size={40} />
-          </button>
-          <h2 className="text-2xl font-semibold text-teal-600">Your Cart</h2>
-          <button
-            onClick={clearCart}
-            className="text-teal-600 hover:text-teal-800 font-semibold text-xl px-4 py-2 rounded ml-auto"
-          >
-            Clear Cart
-          </button>
-        </div>
-        {items.length === 0 ? (
-          <p className="text-center font-bold text-2xl text-teal-600">
-            Your cart is empty.
-          </p>
-        ) : (
+	if (loading) {
+		return <div>Loading cart items...</div>;
+	}
+	if (error) {
+		return <div>Error: {error}</div>;
+	}
+	return (
+		<div className="flex flex-col min-h-screen">
+			<Header isLogin={true} cartCount={true} />
+			<main className="flex-grow w-2/4 mx-auto p-4 mt-5">
+				<div className="flex items-center mb-4 gap-5 border-b-2 border-teal-600">
+					<button
+						onClick={() => navigate(-1)}
+						className="text-gray-500 mr-2 hover:text-teal-600"
+					>
+						<IoMdArrowRoundBack size={40} />
+					</button>
+					<h2 className="text-2xl font-semibold text-teal-600">Your Cart</h2>
+					<button
+						onClick={clearCart}
+						className="text-teal-600 hover:text-teal-800 font-semibold text-xl px-4 py-2 rounded ml-auto"
+					>
+						Clear Cart
+					</button>
+				</div>
+				{items.length === 0 ? (
+					<p className="text-center font-bold text-2xl text-teal-600">
+						Your cart is empty.
+					</p>
+				) : (
           <>
             {/* Customer Information*/}
             <div className="bg-white shadow-2xl mt-2 border-t rounded-2xl">
@@ -542,12 +541,12 @@ const Cart = () => {
               </div>
             </div>
           </>
-        )}
-      </main>
-      <ToastContainer />
-      <Footer />
-    </div>
-  );
+				)}
+			</main>
+			<ToastContainer />
+			<Footer />
+		</div>
+	);
 };
 
 export default Cart;

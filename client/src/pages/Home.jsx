@@ -25,23 +25,18 @@ const Home = () => {
 					method: "GET",
 					credentials: "include",
 				});
-				if (!response.ok) throw new Error("Failed to fetch furniture sets");
 				const data = await response.json();
-
 				if (Array.isArray(data)) {
 					setFurnitureData(data);
 				} else if (data?.furnitures) {
 					setFurnitureData(data.furnitures);
-				} else {
-					throw new Error("Invalid data format received");
 				}
 				setLoading(false);
 			} catch (error) {
-				setError(error.message);
+				setError("Failed to fetch furniture sets");
 				setLoading(false);
 			}
 		};
-
 		const fetchCategories = async () => {
 			try {
 				const response = await fetch("http://localhost:3000/api/categories");
@@ -51,7 +46,6 @@ const Home = () => {
 				console.error("Failed to fetch categories:", error);
 			}
 		};
-
 		fetchFurnitureData();
 		fetchCategories();
 	}, []);
@@ -64,17 +58,16 @@ const Home = () => {
 				credentials: "include",
 			});
 			if (!response.ok) throw new Error("Failed to fetch cart count");
-
 			const data = await response.json();
-			setCartCount(data.cart.count || 0); // Update cart count based on API response
+			setCartCount(data.cart.count || 0);
 		} catch (error) {
 			console.error("Error fetching cart count:", error);
 		}
 	};
 
 	const handCartRefresh = async () => {
-		await fetchCartCount()
-	}
+		await fetchCartCount();
+	};
 
 	useEffect(() => {
 		fetchCartCount(); // Fetch cart count when the component mounts
@@ -95,6 +88,7 @@ const Home = () => {
 	const loadMore = () => {
 		setVisibleCount((prevCount) => prevCount + 8);
 	};
+
 	const showToast = (message, type) => {
 		toast[type](message);
 	};
@@ -144,31 +138,33 @@ const Home = () => {
 	const FilterContent = () => (
 		<div className="space-y-6">
 			<h1 className="text-xl font-bold">Filters</h1>
-
 			<div>
 				<h2 className="text-lg font-semibold mb-3">Categories</h2>
 				<ul className="space-y-2">
-					{categories.map((category) => (
-						<li key={category._id} className="flex items-center">
-							<input
-								type="checkbox"
-								id={`category-${category._id}`}
-								value={category.name}
-								checked={selectedCategories.has(category.name)}
-								onChange={handleCheckboxChange}
-								className="w-4 h-4 rounded border-gray-300 text-teal-600 focus:ring-teal-500"
-							/>
-							<label
-								htmlFor={`category-${category._id}`}
-								className="ml-2 text-sm"
-							>
-								{category.name}
-							</label>
-						</li>
-					))}
+					{categories.length > 0 ? (
+						categories.map((category) => (
+							<li key={category._id} className="flex items-center">
+								<input
+									type="checkbox"
+									id={`category-${category._id}`}
+									value={category.name}
+									checked={selectedCategories.has(category.name)}
+									onChange={handleCheckboxChange}
+									className="w-4 h-4 rounded border-gray-300 text-teal-600 focus:ring-teal-500"
+								/>
+								<label
+									htmlFor={`category-${category._id}`}
+									className="ml-2 text-sm"
+								>
+									{category.name}
+								</label>
+							</li>
+						))
+					) : (
+						<li className="text-gray-500 text-sm">No categories available.</li>
+					)}
 				</ul>
 			</div>
-
 			<div>
 				<h2 className="text-lg font-semibold mb-3">Price Range</h2>
 				<input
@@ -196,7 +192,6 @@ const Home = () => {
 				autoClose={3000}
 				hideProgressBar
 			/>
-
 			{/* Hero Section */}
 			<section className="relative w-full h-48 sm:h-64 md:h-80">
 				<img
@@ -210,7 +205,6 @@ const Home = () => {
 					</h1>
 				</div>
 			</section>
-
 			{/* Main Content */}
 			<div className="flex flex-col md:flex-row flex-1 max-w-7xl mx-auto w-full px-4 py-6 gap-6">
 				{/* Filter Button (Mobile) */}
@@ -221,84 +215,57 @@ const Home = () => {
 				>
 					<FaFilter className="text-xl" />
 				</button>
-
 				{/* Filter Sidebar */}
 				<aside
-					className={`
-          fixed md:static inset-0 z-40 
-          ${isFilterOpen ? "block" : "hidden"} 
-          md:block w-full md:w-64 lg:w-72
-        `}
+					className={`fixed md:static inset-0 z-40 ${isFilterOpen ? "block" : "hidden"} md:block w-full md:w-64 lg:w-72`}
 				>
-					{/* Mobile Filter Overlay */}
+					<div className="md:hidden fixed inset-0 bg-black bg-opacity-50" onClick={toggleFilter} />
 					<div
-						className="md:hidden fixed inset-0 bg-black bg-opacity-50"
-						onClick={toggleFilter}
-					/>
-
-					{/* Filter Content */}
-					<div
-						className={`
-            fixed md:static right-0 top-0 h-full w-72
-            bg-white p-6 overflow-y-auto
-            transform transition-transform duration-300
-            ${isFilterOpen ? "translate-x-0" : "translate-x-full"}
-            md:transform-none
-          `}
+						className={`fixed md:static right-0 top-0 h-full w-72 bg-white p-6 overflow-y-auto transform transition-transform duration-300 ${isFilterOpen ? "translate-x-0" : "translate-x-full"} md:transform-none`}
 					>
-						{/* Close Button (Mobile) */}
-						<button
-							onClick={toggleFilter}
-							className="md:hidden absolute top-4 right-4 text-gray-500 hover:text-gray-700"
-						>
+						<button onClick={toggleFilter} className="md:hidden absolute top-4 right-4 text-gray-500 hover:text-gray-700">
 							<FaTimes className="text-xl" />
 						</button>
-
 						<FilterContent />
 					</div>
 				</aside>
-
 				{/* Products Grid */}
 				<main className="flex-1">
-					<h2 className="text-2xl md:text-3xl font-bold text-center mb-8">
-						Furniture Sets
-					</h2>
-
+					<h2 className="text-2xl md:text-3xl font-bold text-center mb-8">Furniture Sets</h2>
 					<div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-						{furnitureData.slice(0, visibleCount).map((furniture) => (
-							<ProductCard
-								key={furniture._id}
-								id={furniture._id}
-								images={furniture.images}
-								name={furniture.name}
-								price={furniture.price}
-								description={furniture.description}
-								showViewDetails={true}
-								showAddToCart={true}
-								showUpdateButton={false}
-								showToast={showToast}
-								onAddToCart={() => {
-									incrementCartCount(); // Increment local cart count
-									fetchCartCount(); // Refresh cart count from API
-								}}
-								onRefresh={handCartRefresh}
-							/>
-						))}
+						{furnitureData.length > 0 ? (
+							furnitureData.slice(0, visibleCount).map((furniture) => (
+								<ProductCard
+									key={furniture._id}
+									id={furniture._id}
+									images={furniture.images}
+									name={furniture.name}
+									price={furniture.price}
+									description={furniture.description}
+									showViewDetails={true}
+									showAddToCart={true}
+									showUpdateButton={false}
+									showToast={showToast}
+									onAddToCart={() => {
+										incrementCartCount(); // Increment local cart count
+										fetchCartCount(); // Refresh cart count from API
+									}}
+									onRefresh={handCartRefresh}
+								/>
+							))
+						) : (
+							<p className="text-center col-span-full text-gray-500">No furniture sets available at the moment.</p>
+						)}
 					</div>
-
 					{visibleCount < furnitureData.length && (
 						<div className="text-center mt-8">
-							<button
-								onClick={loadMore}
-								className="bg-teal-600 text-white px-6 py-2 rounded-md hover:bg-teal-700 transition-colors"
-							>
+							<button onClick={loadMore} className="bg-teal-600 text-white px-6 py-2 rounded-md hover:bg-teal-700 transition-colors">
 								Load More
 							</button>
 						</div>
 					)}
 				</main>
 			</div>
-
 			<Footer />
 		</div>
 	);
