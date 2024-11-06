@@ -136,7 +136,7 @@ const Maintenance = () => {
 	const [colors, setColors] = useState([]);
 	const [sizes, setSizes] = useState([]);
 	const [materials, setMaterials] = useState([]);
-	const [newMaterial, setNewMaterial] = useState({ name: "", stocks: "" });
+	const [newMaterial, setNewMaterial] = useState({ name: "", price: "" });
 	const [selectedFilter, setSelectedFilter] = useState("");
 	const [selectedFurnitureType, setSelectedFurnitureType] = useState("");
 	const [selectedCategory, setSelectedCategory] = useState("");
@@ -282,8 +282,8 @@ const Maintenance = () => {
 	};
 
 	const handleAddNewMaterial = async () => {
-		const { name, stocks } = newMaterial;
-		if (!name || !stocks) {
+		const { name, price } = newMaterial;
+		if (!name || !price) {
 			toast.error("Please provide valid name and stocks.");
 			return;
 		}
@@ -294,13 +294,13 @@ const Maintenance = () => {
 					"Content-Type": "application/json",
 				},
 				credentials: "include",
-				body: JSON.stringify({ name, stocks }),
+				body: JSON.stringify({ name, price }),
 			});
 
 			if (response.ok) {
 				const data = await response.json();
 				toast.success("Material added successfully.");
-				setNewMaterial({ name: "", stocks: "" }); // Reset input
+				setNewMaterial({ name: "", price: "" }); // Reset input
 				await fetchMaterials(); // Refresh the list
 			} else {
 				const errorData = await response.json();
@@ -719,13 +719,13 @@ const Maintenance = () => {
 										setNewMaterial({ ...newMaterial, name: e.target.value })
 								)}
 								{renderInputField(
-									"Stocks",
-									"stocks",
-									newMaterial.stocks,
+									"Price",
+									"price",
+									newMaterial.price,
 									(e) =>
 										setNewMaterial({
 											...newMaterial,
-											stocks: e.target.value,
+											price: e.target.value,
 										}),
 									"number"
 								)}
@@ -823,13 +823,13 @@ const Maintenance = () => {
 							<h2 className="text-2xl font-bold mb-4">Furniture Materials</h2>
 							<div className="max-h-96 overflow-y-auto">
 								<Table
-									headers={["Material Name", "Stocks"]}
+									headers={["Material Name", "Price"]}
 									data={
 										Array.isArray(materials)
 											? materials.map((material) => ({
 													id: material._id,
 													name: material.name,
-													stocks: material.stocks,
+													price: material.price,
 											  }))
 											: []
 									}
