@@ -141,6 +141,7 @@ const Maintenance = () => {
 	const [selectedFurnitureType, setSelectedFurnitureType] = useState("");
 	const [selectedCategory, setSelectedCategory] = useState("");
 	const [newItemName, setNewItemName] = useState("");
+	const [ect, setECT] = useState("");
 	const [newSize, setNewSize] = useState(initialSizeState);
 	const [newColor, setNewColor] = useState(initialColorState);
 
@@ -207,10 +208,10 @@ const Maintenance = () => {
 			// Optionally, update the UI by removing or updating the entity in the respective state
 			switch (entityType) {
 				case "sizes":
-					setSizes((prevSizes) => 
-					prevSizes.filter((size) => size._id !== entityId)
-				);
-				break;
+					setSizes((prevSizes) =>
+						prevSizes.filter((size) => size._id !== entityId)
+					);
+					break;
 				case "categories":
 					setCategories((prevCategories) =>
 						prevCategories.filter((category) => category._id !== entityId)
@@ -428,6 +429,7 @@ const Maintenance = () => {
 						credentials: "include",
 						body: JSON.stringify({
 							name: newItemName,
+							ECT: ect,
 							categoryId: selectedCategory,
 						}),
 					}
@@ -628,6 +630,12 @@ const Maintenance = () => {
 									newItemName,
 									(e) => setNewItemName(e.target.value)
 								)}
+								{renderInputField(
+									"Estimated Completion Time (ECT)",
+									"ect",
+									ect,
+									(e) => setECT(e.target.value) // Update ECT state
+								)}
 							</>
 						)}
 						{selectedFilter === "Furniture Size" && (
@@ -758,12 +766,17 @@ const Maintenance = () => {
 							<h2 className="text-2xl font-bold mb-4">Furniture Types</h2>
 							<div className="max-h-96 overflow-y-auto">
 								<Table
-									headers={["Furniture Type", "Category"]}
+									headers={[
+										"Furniture Type",
+										"Estimated Completion Time (ECT)",
+										"Category",
+									]}
 									data={
 										Array.isArray(furnitureTypes)
 											? furnitureTypes.map((type) => ({
 													id: type._id,
 													name: type.name,
+													ECT: type.ECT,
 													category:
 														categories.find(
 															(cat) => cat._id === type.categoryId
@@ -830,7 +843,13 @@ const Maintenance = () => {
 							<h2 className="text-2xl font-bold mb-4">Furniture Sizes</h2>
 							<div className="max-h-96 overflow-y-auto">
 								<Table
-									headers={["Size Label", "Height","Width","Depth","Furniture Type"]}
+									headers={[
+										"Size Label",
+										"Height",
+										"Width",
+										"Depth",
+										"Furniture Type",
+									]}
 									data={
 										Array.isArray(sizes)
 											? sizes.map((size) => ({
@@ -840,9 +859,9 @@ const Maintenance = () => {
 													width: size.width,
 													depth: size.depth,
 													furnitureTypes:
-													furnitureTypes.find(
-														(type) => type._id === size.furnitureTypeId
-													)?.name || "N/A",
+														furnitureTypes.find(
+															(type) => type._id === size.furnitureTypeId
+														)?.name || "N/A",
 											  }))
 											: []
 									}
