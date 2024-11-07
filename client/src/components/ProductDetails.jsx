@@ -6,13 +6,11 @@ import {
 	FaArrowRight,
 	FaArrowLeft,
 } from "react-icons/fa";
-import { IoReturnUpBack } from "react-icons/io5";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Header from "./Header";
 import Footer from "./Footer";
 import { IoChevronBackSharp } from "react-icons/io5";
-import { Link } from "react-router-dom";
 
 function ProductDetails({ admin }) {
 	const { id } = useParams();

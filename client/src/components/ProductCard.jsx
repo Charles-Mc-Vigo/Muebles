@@ -9,7 +9,7 @@ const ProductCard = ({
 	name,
 	price,
 	description,
-	showAddToCart,
+	showPreOrder,
 	showUpdateButton,
 	showArchiveButton,
 	showUnArchivedButton,
@@ -87,13 +87,12 @@ const ProductCard = ({
 				</div>
 			</Link>
 			<div className="mt-4 flex flex-col">
-				{showAddToCart && (
+				{showPreOrder && (
 					<button
-						onClick={(e) => e.stopPropagation()}
 						disabled
-						className="bg-gray-400 text-white py-2 rounded-md transition-colors duration-300 text-center w-full cursor-not-allowed"
+						className="bg-teal-500 text-white font-semibold py-2 rounded-md text-center w-full hover:bg-teal-300"
 					>
-						Buy (Unavailable)
+						Pre-order
 					</button>
 				)}
 				{showUpdateButton && (

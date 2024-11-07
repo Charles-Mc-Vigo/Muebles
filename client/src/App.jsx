@@ -39,7 +39,6 @@ import EditUserProfile from "./components/EditUserProfile";
 import EditAdminProfile from "./components/EditAdminProfile";
 
 import ViewOrder from "./components/ViewOrder";
-import DirectOrder from "./pages/DirectOrder";
 import AddNewAddress from "./components/AddNewAddress";
 import ViewUserOrder from "./components/ViewUserOrder";
 import ViewPendingRequest from "./pages/ViewPendingRequest";
@@ -70,10 +69,6 @@ export default function App() {
 					<Route
 						path="/my-profile/edit"
 						element={<ProtectedRoute element={EditUserProfile} />}
-					/>
-					<Route
-						path="/direct-order/:furnitureId"
-						element={<ProtectedRoute element={DirectOrder} />}
 					/>
 					<Route
 						path="/address/new"

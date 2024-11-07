@@ -243,7 +243,7 @@ const Home = () => {
 									price={furniture.price}
 									description={furniture.description}
 									showViewDetails={true}
-									showAddToCart={true}
+									showPreOrder={true}
 									showUpdateButton={false}
 									showToast={showToast}
 									onAddToCart={() => {
