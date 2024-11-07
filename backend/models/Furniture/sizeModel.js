@@ -7,15 +7,15 @@ const sizeSchema = new mongoose.Schema({
   },
   width: {
     type: Number,
-    required: true
   },
   height: {
     type: Number,
-    required: true 
+  },
+  length: {
+    type: Number,
   },
   depth: {
     type: Number,
-    required: true
   },
   furnitureTypeId: { 
     type: mongoose.Schema.ObjectId, 

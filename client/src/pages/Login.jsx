@@ -123,7 +123,7 @@ export default function Login() {
 				</div>
 			</div>
 			<Footer />
-			<ToastContainer position="bottom-right" />
+			<ToastContainer />
 		</>
 	);
 }

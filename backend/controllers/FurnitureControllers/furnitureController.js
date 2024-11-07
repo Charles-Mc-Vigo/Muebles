@@ -21,7 +21,7 @@ const upload = multer({
       cb(new Error('Not an image! Please upload only images.'), false);
     }
   },
-}).array("images", 5); // Allow up to 5 image uploads
+}).array("images"); // Allow up to 5 image uploads
 
 exports.createFurniture = async (req, res) => {
   upload(req, res, async (err) => {
@@ -37,10 +37,6 @@ exports.createFurniture = async (req, res) => {
         images = req.files.map(file => file.buffer.toString('base64'));
       } else if (req.body.images) {
         images = req.body.images;
-      }
-
-      if (images.length < 5) {
-        return res.status(400).json({ error: "At least 5 images are required!" });
       }
 
       const {
@@ -222,10 +218,6 @@ exports.updateFurniture = async (req, res) => {
         } else {
           return res.status(400).json({ error: "Images must be an array!" });
         }
-      }
-
-      if (images.length < 5) {
-        return res.status(400).json({ error: "At least 5 images are required!" });
       }
 
       const {

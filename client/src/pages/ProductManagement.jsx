@@ -4,7 +4,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { ClipLoader } from "react-spinners";
 
 const ProductManagement = () => {
-	const [loading, setLoading] = useState(true);
+	const [loading, setLoading] = useState(false);
 	const [furnitureData, setFurnitureData] = useState([]);
 	const [selectedCategory, setSelectedCategory] = useState("");
 	const [selectedFurnitureType, setSelectedFurnitureType] = useState("");
@@ -203,11 +203,6 @@ const ProductManagement = () => {
 	const handleFileChange = (e) => {
 		const files = Array.from(e.target.files);
 
-		if (files.length > 5) {
-			toast.error("You can only upload a maximum of 5 images.");
-			return;
-		}
-
 		const readFileAsDataURL = (file) => {
 			return new Promise((resolve, reject) => {
 				const reader = new FileReader();
@@ -248,7 +243,7 @@ const ProductManagement = () => {
 	
 	const handleSubmit = async (e) => {
 		e.preventDefault();
-	
+		setLoading(true)
 		const formData = new FormData();
 		// Append all fields to the FormData object
 		formData.append("name", newFurniture.name);
@@ -297,15 +292,16 @@ const ProductManagement = () => {
 					sizes: [],
 					price: "",
 				});
+				selectedCategory("");
+				selectedFurnitureType("");
 				fetchData();
-			} else {
-				const errorData = await response.json(); // Make sure the server returns JSON even on error
-				toast.error(errorData.message || "Failed to add furniture");
 			}
+			
 		} catch (error) {
 			console.error("Error adding new Furniture:", error);
 			toast.error("Failed to add new Furniture");
 		}
+		setLoading(false)
 	};
 	
 
@@ -509,10 +505,11 @@ const ProductManagement = () => {
 						/>
 						<button
 							onClick={handleSubmit}
-							type="submit"
+							type="submit"	
+							disabled={loading}
 							className="bg-blue-500 text-white p-2 rounded w-full"
 						>
-							Add Product
+						{loading ? "Loading...":"Add Product"}
 						</button>
 					</form>
 				</div>
