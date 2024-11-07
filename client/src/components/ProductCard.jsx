@@ -2,6 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useNavigate } from "react-router-dom";
 
 const ProductCard = ({
 	id,
@@ -24,6 +25,7 @@ const ProductCard = ({
 	};
 
 	const maxDescriptionLength = 60;
+	const navigate = useNavigate();
 
 	const archiveItem = async (e) => {
 		e.stopPropagation();
@@ -89,7 +91,7 @@ const ProductCard = ({
 			<div className="mt-4 flex flex-col">
 				{showPreOrder && (
 					<button
-						disabled
+						onClick={()=> navigate(`/pre-order/${id}`)}
 						className="bg-teal-500 text-white font-semibold py-2 rounded-md text-center w-full hover:bg-teal-300"
 					>
 						Pre-order

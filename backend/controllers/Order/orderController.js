@@ -6,7 +6,7 @@ const orderController = {
 	// Create new order from cart
 	createOrder: async (req, res) => {
 		try {
-			const { paymentMethod, shippingAddress, deliveryMode } = req.body; // Extract deliveryMode
+			const { paymentMethod, shippingAddress, deliveryMode } = req.body;
 			const userId = req.user._id;
 
 			if (!paymentMethod) {
@@ -15,7 +15,7 @@ const orderController = {
 				});
 			}
 
-			if (["GCash", "Maya", "COD"].includes(paymentMethod) && !req.file) {
+			if (["GCash", "Maya"].includes(paymentMethod) && !req.file) {
 				return res.status(400).json({
 					error: "Please upload proof of payment for the selected method.",
 				});
@@ -72,6 +72,17 @@ const orderController = {
 			});
 		}
 	},
+
+	// preOrder: async(req, res) => {
+	// 	try {
+
+	// 		const {funitureId, quantity = 1, material, color, paymentMethod, shippingAddress, deliveryMode} = req.body;
+
+	// 	} catch (error) {
+	// 		console.log("Error creating pre-order:",error);
+	// 		res.status(500).json({message:"Server error!"});
+	// 	}
+	// },
 
 	// Get user's orders
 	getUserOrders: async (req, res) => {
@@ -229,15 +240,6 @@ const orderController = {
 			});
 		}
 	},
-
-	// preOrder: async(req, res) => {
-	// 	try {
-			
-	// 	} catch (error) {
-	// 		console.log("Error creating pre-order:",error);
-	// 		res.status(500).json({message:"Server error!"});
-	// 	}
-	// }
 };
 
 module.exports = orderController;
