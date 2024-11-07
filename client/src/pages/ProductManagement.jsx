@@ -232,30 +232,57 @@ const ProductManagement = () => {
 			});
 	};
 
+	// const handleFileChange = (e) => {
+	// 	const files = Array.from(e.target.files);
+	
+	// 	if (files.length > 5) {
+	// 		toast.error("You can only upload a maximum of 5 images.");
+	// 		return;
+	// 	}
+	
+	// 	setNewFurniture((prev) => ({
+	// 		...prev,
+	// 		images: files, // store the selected files directly
+	// 	}));
+	// };
+	
 	const handleSubmit = async (e) => {
 		e.preventDefault();
-
-		console.log(newFurniture);
+	
+		const formData = new FormData();
+		// Append all fields to the FormData object
+		formData.append("name", newFurniture.name);
+		formData.append("category", newFurniture.category);
+		formData.append("furnitureType", newFurniture.furnitureType);
+		formData.append("description", newFurniture.description);
+		formData.append("price", newFurniture.price);
+	
+		// Append materials, colors, and sizes (arrays)
+		newFurniture.materials.forEach((material) => {
+			formData.append("materials[]", material);
+		});
+		newFurniture.colors.forEach((color) => {
+			formData.append("colors[]", color);
+		});
+		newFurniture.sizes.forEach((size) => {
+			formData.append("sizes[]", size);
+		});
+	
+		// Append each image to FormData (files)
+		newFurniture.images.forEach((file, index) => {
+			formData.append("images", file); // "images" is the field name in the backend
+		});
+	
 		try {
 			const response = await fetch("http://localhost:3000/api/furnitures/add", {
 				method: "POST",
 				headers: {
-					"Content-Type": "application/json",
+					// "Content-Type": "multipart/form-data", <-- do not set this manually
 				},
 				credentials: "include",
-				body: JSON.stringify({
-					images: newFurniture.images,
-					name: newFurniture.name,
-					category: newFurniture.category,
-					furnitureType: newFurniture.furnitureType,
-					description: newFurniture.description,
-					materials: newFurniture.materials,
-					colors: newFurniture.colors,
-					sizes: newFurniture.sizes,
-					price: newFurniture.price,
-				}),
+				body: formData,
 			});
-
+	
 			if (response.ok) {
 				const data = await response.json();
 				toast.success(data.message);
@@ -280,6 +307,7 @@ const ProductManagement = () => {
 			toast.error("Failed to add new Furniture");
 		}
 	};
+	
 
 	return (
 		<div className="container mx-auto p-4">

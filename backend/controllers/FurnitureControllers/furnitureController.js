@@ -23,73 +23,6 @@ const upload = multer({
   },
 }).array("images", 5); // Allow up to 5 image uploads
 
-
-// Get all furnitures or furniture by ID
-exports.getAllFurnitures = async (req, res) => {
-	try {
-		const furnitures = await Furniture.find().populate([
-			{ path: "category", select: "name -_id" },
-			{ path: "furnitureType", select: "name -_id" },
-			{ path: "materials", select: "name -_id" },
-			{ path: "colors", select: "name hex -_id" },
-			{ path: "sizes", select: "label height width depth -_id" },
-		]);
-
-		
-		// Return the fetched furnitures
-		res.status(200).json(furnitures);
-	} catch (error) {
-		console.error(error);
-		res.status(500).json({ message: "Server error!" });
-	}
-};
-
-
-
-exports.ArchivedFurnitures = async (req, res) => {
-	try {
-			const archivedFurnitures = await Furniture.find({ isArchived: true }).populate([
-					{ path: "category", select: "name -_id" },
-					{ path: "furnitureType", select: "name -_id" },
-					{ path: "materials", select: "name -_id" },
-					{ path: "colors", select: "name -_id" },
-					{ path: "sizes", select: "label -_id" },
-			]);
-
-			if (archivedFurnitures.length === 0) {
-					return res.status(400).json({ error: "No archived furnitures found!" });
-			}
-
-			res.status(200).json(archivedFurnitures);
-	} catch (error) {
-			console.error("Error displaying archived furnitures: ", error);
-			res.status(500).json({ message: "Server error!" });
-	}
-};
-
-// Get Furniture By ID
-exports.getFurnitureById = async (req, res) => {
-	try {
-		const { furnitureId } = req.params;
-		const furniture = await Furniture.findById(furnitureId).populate([
-			{ path: "category", select: "name -_id" },
-			{ path: "furnitureType", select: "name -_id" },
-			{ path: "materials", select: "name -_id" },
-			{ path: "colors", select: "name hex -_id" },
-			{ path: "sizes", select: "label -_id" },
-		]);
-
-		if (!furniture) {
-			return res.status(404).json({ error: "Furniture not found!" });
-		}
-
-		res.status(200).json(furniture);
-	} catch (error) {
-		console.error("Error in finding furniture by ID: ", error);
-		res.status(500).json({ error: "Server error!" });
-	}
-};
-
 exports.createFurniture = async (req, res) => {
   upload(req, res, async (err) => {
     if (err instanceof multer.MulterError) {
@@ -193,6 +126,73 @@ exports.createFurniture = async (req, res) => {
     }
   });
 };
+
+// Get all furnitures or furniture by ID
+exports.getAllFurnitures = async (req, res) => {
+	try {
+		const furnitures = await Furniture.find().populate([
+			{ path: "category", select: "name -_id" },
+			{ path: "furnitureType", select: "name -_id" },
+			{ path: "materials", select: "name -_id" },
+			{ path: "colors", select: "name hex -_id" },
+			{ path: "sizes", select: "label height width depth -_id" },
+		]);
+
+		
+		// Return the fetched furnitures
+		res.status(200).json(furnitures);
+	} catch (error) {
+		console.error(error);
+		res.status(500).json({ message: "Server error!" });
+	}
+};
+
+
+
+exports.ArchivedFurnitures = async (req, res) => {
+	try {
+			const archivedFurnitures = await Furniture.find({ isArchived: true }).populate([
+					{ path: "category", select: "name -_id" },
+					{ path: "furnitureType", select: "name -_id" },
+					{ path: "materials", select: "name -_id" },
+					{ path: "colors", select: "name -_id" },
+					{ path: "sizes", select: "label -_id" },
+			]);
+
+			if (archivedFurnitures.length === 0) {
+					return res.status(400).json({ error: "No archived furnitures found!" });
+			}
+
+			res.status(200).json(archivedFurnitures);
+	} catch (error) {
+			console.error("Error displaying archived furnitures: ", error);
+			res.status(500).json({ message: "Server error!" });
+	}
+};
+
+// Get Furniture By ID
+exports.getFurnitureById = async (req, res) => {
+	try {
+		const { furnitureId } = req.params;
+		const furniture = await Furniture.findById(furnitureId).populate([
+			{ path: "category", select: "name -_id" },
+			{ path: "furnitureType", select: "name -_id" },
+			{ path: "materials", select: "name -_id" },
+			{ path: "colors", select: "name hex -_id" },
+			{ path: "sizes", select: "label -_id" },
+		]);
+
+		if (!furniture) {
+			return res.status(404).json({ error: "Furniture not found!" });
+		}
+
+		res.status(200).json(furniture);
+	} catch (error) {
+		console.error("Error in finding furniture by ID: ", error);
+		res.status(500).json({ error: "Server error!" });
+	}
+};
+
 
 
 exports.updateFurniture = async (req, res) => {
