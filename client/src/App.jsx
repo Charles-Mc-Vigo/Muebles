@@ -44,6 +44,7 @@ import AddNewAddress from "./components/AddNewAddress";
 import ViewUserOrder from "./components/ViewUserOrder";
 import ViewPendingRequest from "./pages/ViewPendingRequest";
 import ErrorBoundary from "./components/ErrorBoundary";
+import LoadingSpinner from "./components/LoadingSpinner";
 
 
 export default function App() {
@@ -200,6 +201,7 @@ export default function App() {
 					<Route path="/logout" element={<ProtectedRoute element={Logout} />} />
 				</Routes>
 			</BrowserRouter>
+			<LoadingSpinner/>
 		</ErrorBoundary>
 	);
 }

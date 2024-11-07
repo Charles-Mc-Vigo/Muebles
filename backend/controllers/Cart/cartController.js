@@ -74,9 +74,9 @@ exports.addToCart = async (req, res) => {
 		const existingItemIndex = cart.items.findIndex(
 			(item) =>
 				item.furnitureId.toString() === furnitureId &&
-				item.material === material &&
-				item.color === color &&
-				item.size === size
+				item.material.toString() === material &&
+				item.color.toString === color &&
+				item.size.toString() === size
 		);
 
 		if (existingItemIndex > -1) {
@@ -96,6 +96,7 @@ exports.addToCart = async (req, res) => {
 		cart.totalAmount = await calculateTotalAmount(cart.items);
 
 		await cart.save();
+		console.log(cart)
 
 		// Populate furniture details
 		await cart.populate([
