@@ -5,14 +5,14 @@ const FurnitureType = require("../../models/Furniture/furnitureTypeModel");
 // Add a new size
 exports.addSize = async (req, res) => {
 	try {
-		const { label, height, width, depth, furnitureTypeId } = req.body;
+		const { label, height, length, width, depth, furnitureTypeId } = req.body;
 
-		if (!label || !height || !width || !depth || !furnitureTypeId) {
+		if (!label || !furnitureTypeId) {
 			return res
 				.status(400)
 				.json({
 					message:
-						"All fields are required: label, width, depth, and furnitureTypeId.",
+						"Size label and furnitureTypeId is required",
 				});
 		}
 
@@ -40,7 +40,7 @@ exports.addSize = async (req, res) => {
 				});
 		}
 
-		const newSize = new Size({ label, width, height, depth, furnitureTypeId });
+		const newSize = new Size({ label, width, length, height, depth, furnitureTypeId });
 		await newSize.save();
 		res
 			.status(201)
@@ -120,16 +120,17 @@ exports.UpdateSize = async (req, res) => {
 
 		if (!existingSize) return res.status(404).json({ message: "Size not found!" });
 
-		const { label, height, width, depth } = req.body;
+		const { label, height, length, width, depth } = req.body;
 
-		// Check if no fields were provided in the request body
-		if (label === undefined && height === undefined && width === undefined && depth === undefined) {
-			return res.status(400).json({ message: "At least one field is required to update: label, height, width, or depth" });
-		}
+		// // Check if no fields were provided in the request body
+		// if (label === undefined && length === undefined && height === undefined && width === undefined && depth === undefined) {
+		// 	return res.status(400).json({ message: "At least one field is required to update: label, height, width, or depth" });
+		// }
 
 		// Only update fields that are provided in the request body
 		if (label !== undefined && existingSize.label !== label) existingSize.label = label;
 		if (height !== undefined && existingSize.height !== height) existingSize.height = height;
+		if (length !== undefined && existingSize.length !== length) existingSize.length = length;
 		if (width !== undefined && existingSize.width !== width) existingSize.width = width;
 		if (depth !== undefined && existingSize.depth !== depth) existingSize.depth = depth;
 
@@ -137,6 +138,7 @@ exports.UpdateSize = async (req, res) => {
 		if (
 			existingSize.label === label &&
 			existingSize.height === height &&
+			existingSize.length === length &&
 			existingSize.width === width &&
 			existingSize.depth === depth
 		) {

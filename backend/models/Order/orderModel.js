@@ -108,7 +108,7 @@ orderSchema.statics.createFromCart = async function(cartId, paymentMethod, proof
       shippingFee: shippingFee,
       totalAmount: cart.totalAmount + shippingFee,
       proofOfPayment: proofOfPayment,
-      deliveryMode: deliveryMode // Include delivery mode in order data
+      deliveryMode: deliveryMode
   };
 
   return this.create(orderData);

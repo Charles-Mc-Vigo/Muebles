@@ -3,13 +3,13 @@ const Materials = require('../../models/Furniture/materialsModel');
 // Add new material
 exports.addMaterials = async (req, res) => {
   try {
-    const { name, stocks } = req.body;
+    const { name, price } = req.body;
 
-    if (!name || !stocks) {
+    if (!name || !price) {
       return res.status(401).json({ message: "Material's name and stocks are required!" });
     }
 
-    const newMaterial = new Materials({ name, stocks });
+    const newMaterial = new Materials({ name, price });
     await newMaterial.save();
     return res.status(201).json({ message: `${newMaterial.name} added successfully!` });
   } catch (error) {
@@ -104,18 +104,18 @@ exports.editMaterial = async (req, res) => {
     const material = await Materials.findById(materialId);
     if (!material) return res.status(404).json({ message: "Material not found!" });
 
-    const { name, stocks } = req.body;
-    if (!name || !stocks) return res.status(400).json({ message: "All fields are required! : name, stocks" });
+    const { name, price } = req.body;
+    if (!name || !price) return res.status(400).json({ message: "All fields are required! : name, stocks" });
 
     // Check if any changes were made
-    if (name === undefined && stocks === undefined) {
+    if (name === undefined && price === undefined) {
       return res.status(400).json({ message: "No changes made!" });
     }
 
     material.name = name;
-    material.stocks = stocks;
+    material.price = price;
     if (name !== undefined && material.name !== name) material.name = name;
-    if (stocks !== undefined && material.stocks !== stocks) material.stocks = stocks;
+    if (price !== undefined && material.price !== price) material.price = price;
 
 
     await material.save();

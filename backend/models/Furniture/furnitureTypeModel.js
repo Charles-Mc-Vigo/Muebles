@@ -6,6 +6,11 @@ const furnitureTypeSchema = new mongoose.Schema({
     required:true,
     unique:true
   },
+  ECT:{
+    type:Number,
+    required:true,
+    default:1
+  },
   categoryId:{
     type:mongoose.Schema.ObjectId,
     ref:'Category',

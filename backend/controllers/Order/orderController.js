@@ -1,7 +1,6 @@
 const Order = require("../../models/Order/orderModel");
 const Cart = require("../../models/Cart/cartModel");
 const User = require("../../models/User/userModel");
-const Furniture = require("../../models/Furniture/furnitureModel");
 
 const orderController = {
 	// Create new order from cart
@@ -190,84 +189,6 @@ const orderController = {
 		}
 	},
 
-	createDirectOrder: async (req, res) => {
-    try {
-        const { items, paymentMethod, shippingAddress, deliveryMode } = req.body; // Expecting items to be included in the request body
-        const userId = req.user._id;
-
-        // Fetch the user from the database
-        const user = await User.findById(userId);
-        if (!user) return res.status(404).json({ message: "User not found" });
-
-        // Validate the payment method
-        if (!paymentMethod) {
-            return res.status(400).json({
-                error: "Please select a payment method to proceed.",
-            });
-        }
-
-        // Validate proof of payment for certain payment methods
-        if (["GCash", "Maya", "COD"].includes(paymentMethod) && !req.file) {
-            return res.status(400).json({
-                error: "Please upload proof of payment for the selected method.",
-            });
-        }
-
-        // Handle proof of payment if provided
-        let proofOfPayment;
-        if (req.file) {
-            proofOfPayment = req.file.buffer.toString("base64");
-        }
-
-        // Parse and validate shipping address
-        const shippingAddressObj = JSON.parse(shippingAddress);
-        if (!shippingAddressObj || !shippingAddressObj.municipality) {
-            return res.status(400).json({
-                error: "Invalid shipping address.",
-            });
-        }
-        const municipality = shippingAddressObj.municipality;
-
-        // Calculate shipping fee
-        const shippingFees = {
-            Boac: 500,
-            Mogpog: 700,
-            Gasan: 500,
-            Buenavista: 800,
-            Santa_Cruz: 3000,
-            Torrijos: 3000,
-        };
-        const shippingFee = shippingFees[municipality] || 0; // Default to 0 if municipality is not listed
-
-        // Create the order
-        const orderData = {
-            userId: userId,
-            items: items, // Expecting items to be an array of item objects
-            paymentMethod,
-            shippingAddress: shippingAddressObj,
-            proofOfPayment,
-            deliveryMode,
-        };
-
-        const order = await Order.createDirectOrder(orderData); // Use the orderData object
-
-        // Optionally, update the user with the new order
-        await User.findByIdAndUpdate(userId, {
-            $push: { orders: order._id },
-        });
-
-        // Respond with success message and order details
-        res.status(201).json({ success: "Order placed successfully!", order });
-    } catch (error) {
-        console.error("Error creating order:", error);
-        res.status(500).json({
-            error: "Error creating order",
-        });
-    }
-},
-
-	
-
 	// Admin: Update order status
 	updateOrderStatus: async (req, res) => {
 		try {
@@ -308,6 +229,15 @@ const orderController = {
 			});
 		}
 	},
+
+	// preOrder: async(req, res) => {
+	// 	try {
+			
+	// 	} catch (error) {
+	// 		console.log("Error creating pre-order:",error);
+	// 		res.status(500).json({message:"Server error!"});
+	// 	}
+	// }
 };
 
 module.exports = orderController;

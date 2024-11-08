@@ -18,7 +18,7 @@ function ProductDetails({ admin }) {
 	const { id } = useParams();
 	const navigate = useNavigate();
 	const [furnitureData, setFurnitureData] = useState(null);
-	const [loading, setLoading] = useState(true);
+	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState(null);
 	const [selectedColor, setSelectedColor] = useState(null);
 	const [selectedMaterial, setSelectedMaterial] = useState(null);
@@ -26,6 +26,7 @@ function ProductDetails({ admin }) {
 	const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
 	useEffect(() => {
+		setLoading(true);
 		const fetchFurnitureDetails = async () => {
 			try {
 				const response = await fetch(
@@ -80,7 +81,7 @@ function ProductDetails({ admin }) {
 	};
 	const addToCart = async (e) => {
 		e.preventDefault();
-
+		setLoading(true);
 		// Ensure all options are selected
 		if (!selectedColor || !selectedMaterial || !selectedSize) {
 			toast.error("Please select color, material, and size.");
@@ -116,9 +117,9 @@ function ProductDetails({ admin }) {
 			console.error("Error adding item to cart:", error);
 			toast.error("Error adding item to cart. Please try again.");
 		}
+		setLoading(false);
 	};
 
-	if (loading) return <div className="text-center">Loading...</div>;
 	if (error) return <div className="text-red-500 text-center">{error}</div>;
 	if (!furnitureData)
 		return <div className="text-center">No furniture found</div>;
@@ -302,19 +303,12 @@ function ProductDetails({ admin }) {
 						<div className="mt-4 flex gap-4">
 							<button
 								onClick={addToCart}
-								className="text-black bg-teal-600 hover:bg-teal-800 border border-teal-600 text-xl font-semibold px-4 rounded-md transition-colors duration-300 flex-1 py-2"
+								disabled={loading}
+								className="text-teal-500 hover:bg-teal-500 hover:text-white border border-teal-500 text-xl font-semibold px-4 rounded-md transition-colors duration-300 flex-1 py-2"
 							>
-								Add to Cart
+								{loading ? "Adding...":"Add to cart"}
 							</button>
 
-							<Link
-								to={`/direct-order/${id}`}
-								className="bg-teal-600 text-black text-xl font-semibold px-4 rounded-md flex-1 py-2 text-center cursor-not-allowed opacity-50"
-								aria-disabled="true"
-								tabIndex={-1}
-							>
-								Buy
-							</Link>
 						</div>
 					</div>
 				</div>

@@ -17,7 +17,7 @@ export default function SignUp() {
 		email: "",
 		password: "",
 		confirmPassword: "",
-		agreeToTerms: false, // Changed to false for proper checkbox handling
+		agreeToTerms: false,
 	});
 	const [zipCode, setZipcode] = useState("");
 	const [availableBarangays, setAvailableBarangays] = useState([]);
@@ -303,14 +303,14 @@ export default function SignUp() {
 			});
 			const data = await response.json();
 			if (!response.ok) {
-				throw new Error(data.message || "Sign up failed");
+				setLoading(false)
+				throw new Error(data.error);
 			}
 			if (!data.newUser || !data.newUser._id) {
 				throw new Error("Invalid response from server");
 			}
 			toast.success(
-				data.message ||
-					"Sign up successful! Please check your email to verify your account."
+				data.success
 			);
 			navigate(`/verify-account/${data.newUser._id}`);
 		} catch (error) {
@@ -378,7 +378,7 @@ export default function SignUp() {
 							</select>
 							<input
 								type="tel"
-								placeholder="+639XXXXXXXXX"
+								placeholder="09XXXXXXXXX"
 								id="phoneNumber"
 								required
 								className="bg-slate-100 p-3 rounded-lg"
