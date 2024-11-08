@@ -11,6 +11,9 @@ const orderSchema = new mongoose.Schema(
       type:mongoose.Schema.Types.ObjectId,
       ref:"Furniture"
     },
+		material:{type:String},
+		color:{type:String},
+		size:{type:String},
 		orderNumber: {
 			type: String,
 			unique: true,
@@ -34,6 +37,7 @@ const orderSchema = new mongoose.Schema(
 				material: { type: String },
 				color: { type: String },
 				size: { type: String },
+				ECT:{type:Number}
 			},
 		],
 		shippingAddress: {
@@ -46,9 +50,13 @@ const orderSchema = new mongoose.Schema(
 			type: String,
 			required: true,
 		},
+		paymentOption:{
+			type:String,
+			require:true,
+		},
 		paymentMethod: {
 			type: String,
-			enum: ["COD", "GCash", "Maya"],
+			enum: ["GCash", "Maya"],
 			required: true,
 		},
 		proofOfPayment: {
@@ -63,6 +71,9 @@ const orderSchema = new mongoose.Schema(
     deliveryMode:{
       type:String,
     },
+		expectedDelivery:{
+			type:Number
+		},
 		subtotal: Number,
 		shippingFee: Number,
 		totalAmount: Number,

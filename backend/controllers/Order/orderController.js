@@ -30,6 +30,7 @@ const orderController = {
 			if (!cart || cart.items.length === 0) {
 				return res.status(400).json({ error: "Cart is empty" });
 			}
+			console.log(cart)
 
 			const shippingAddressObj = JSON.parse(shippingAddress);
 			const municipality = shippingAddressObj.municipality;
@@ -51,7 +52,7 @@ const orderController = {
 				proofOfPayment,
 				shippingAddressObj,
 				shippingFee,
-				deliveryMode // Pass delivery mode
+				deliveryMode
 			);
 
 			await Cart.findByIdAndUpdate(cart._id, {
@@ -73,16 +74,39 @@ const orderController = {
 		}
 	},
 
-	// preOrder: async(req, res) => {
-	// 	try {
+	preOrder: async(req, res) => {
+		try {
 
-	// 		const {funitureId, quantity = 1, material, color, paymentMethod, shippingAddress, deliveryMode} = req.body;
+			const {funitureId, quantity = 1, material, color, size,  paymentOption, paymentMethod, shippingAddress, deliveryMode} = req.body;
+			const userId = req.user._id;
+			const user = await User.findById(userId);
+			if(!user) return res.status(404).json({message:"User not found!"});
 
-	// 	} catch (error) {
-	// 		console.log("Error creating pre-order:",error);
-	// 		res.status(500).json({message:"Server error!"});
-	// 	}
-	// },
+			const preOrder = new Order({
+				user:userId,
+				furniture:funitureId,
+				material:material,
+				size:size,
+				color:color,
+				quantity: quantity,
+				shippingAddress:shippingAddress,
+				paymentOption:paymentOption,
+				paymentMethod : paymentMethod,
+				proofOfPayment,
+				deliveryMode:deliveryMode,
+				subtotal,
+				shippingFee,
+				totalAmount,
+			})
+
+			console.log(preOrder);
+			return res.status(201).json({message:"Pre-order was created!", preOrder})
+
+		} catch (error) {
+			console.log("Error creating pre-order:",error);
+			res.status(500).json({message:"Server error!"});
+		}
+	},
 
 	// Get user's orders
 	getUserOrders: async (req, res) => {

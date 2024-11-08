@@ -81,7 +81,7 @@ const OrderDetails = () => {
             Order Summary
           </h2>
           <div className="gap-2 text-gray-600 border-t border-teal-500 p-2">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 items-baseline rounded-md border-teal-500 p-2 shadow-xl border-t">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 items-baseline rounded-md border-teal-500 p-2 shadow-md">
               <p className="font-base flex items-baseline">
                 <span className="font-semibold text-black text-lg md:text-xl">
                   Order ID:
@@ -174,7 +174,7 @@ const OrderDetails = () => {
               orderItems.map((item) => (
                 <li
                   key={item._id}
-                  className="flex flex-col md:flex-row justify-between items-start md:items-center py-4 border-b border-gray-200"
+                  className="flex flex-col md:flex-row justify-between items-start md:items-center py-4 border-b border-gray-200 mb-5"
                 >
                   <div className="flex items-start md:items-center">
                     {item.furniture.images.length > 0 && (
@@ -191,14 +191,11 @@ const OrderDetails = () => {
                       <p className="text-gray-800">Color: {item.color}</p>
                       <p className="text-gray-800">Material: {item.material}</p>
                       <p className="text-gray-800">Size: {item.size}</p>
-                      <p className="text-gray-600">
-                        Quantity: {item.quantity} x ₱{item.price.toFixed(2)}
-                      </p>
                     </div>
                   </div>
                   <div className="mt-4 md:mt-0">
                     <p className="text-lg font-medium text-teal-700">
-                      Total: ₱{(item.price * item.quantity).toFixed(2)}
+                      PHP {(item.price * item.quantity).toFixed(2)} X <span> {item.quantity} </span>
                     </p>
                   </div>
                 </li>
@@ -209,7 +206,7 @@ const OrderDetails = () => {
               </li>
             )}
           </div>
-          <div className="bg-white shadow-xl border-t border-teal-400 rounded-xl p-4 md:p-6 m-2">
+          <div className="bg-white border border-teal-400 rounded-xl p-4 md:p-6">
             <h1>Delivery Option: {order.deliveryMode}</h1>
             <h1>Subtotal: ₱{order.subtotal.toFixed(2)}</h1>
             <h1>Shipping Fee: ₱{order.shippingFee.toFixed(2)}</h1>

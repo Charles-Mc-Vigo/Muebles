@@ -45,35 +45,35 @@ const ProductManagement = () => {
 					},
 					credentials: "include",
 				}),
-				fetch("http://localhost:3000/api/furniture-types",{
+				fetch("http://localhost:3000/api/furniture-types", {
 					method: "GET",
 					headers: {
 						"Content-Type": "application/json",
 					},
 					credentials: "include",
 				}),
-				fetch("http://localhost:3000/api/categories",{
+				fetch("http://localhost:3000/api/categories", {
 					method: "GET",
 					headers: {
 						"Content-Type": "application/json",
 					},
 					credentials: "include",
 				}),
-				fetch("http://localhost:3000/api/materials",{
+				fetch("http://localhost:3000/api/materials", {
 					method: "GET",
 					headers: {
 						"Content-Type": "application/json",
 					},
 					credentials: "include",
 				}),
-				fetch("http://localhost:3000/api/colors",{
+				fetch("http://localhost:3000/api/colors", {
 					method: "GET",
 					headers: {
 						"Content-Type": "application/json",
 					},
 					credentials: "include",
 				}),
-				fetch("http://localhost:3000/api/sizes",{
+				fetch("http://localhost:3000/api/sizes", {
 					method: "GET",
 					headers: {
 						"Content-Type": "application/json",
@@ -229,21 +229,21 @@ const ProductManagement = () => {
 
 	// const handleFileChange = (e) => {
 	// 	const files = Array.from(e.target.files);
-	
+
 	// 	if (files.length > 5) {
 	// 		toast.error("You can only upload a maximum of 5 images.");
 	// 		return;
 	// 	}
-	
+
 	// 	setNewFurniture((prev) => ({
 	// 		...prev,
 	// 		images: files, // store the selected files directly
 	// 	}));
 	// };
-	
+
 	const handleSubmit = async (e) => {
 		e.preventDefault();
-		setLoading(true)
+		setLoading(true);
 		const formData = new FormData();
 		// Append all fields to the FormData object
 		formData.append("name", newFurniture.name);
@@ -251,7 +251,7 @@ const ProductManagement = () => {
 		formData.append("furnitureType", newFurniture.furnitureType);
 		formData.append("description", newFurniture.description);
 		formData.append("price", newFurniture.price);
-	
+
 		// Append materials, colors, and sizes (arrays)
 		newFurniture.materials.forEach((material) => {
 			formData.append("materials[]", material);
@@ -262,12 +262,12 @@ const ProductManagement = () => {
 		newFurniture.sizes.forEach((size) => {
 			formData.append("sizes[]", size);
 		});
-	
+
 		// Append each image to FormData (files)
 		newFurniture.images.forEach((file, index) => {
 			formData.append("images", file); // "images" is the field name in the backend
 		});
-	
+
 		try {
 			const response = await fetch("http://localhost:3000/api/furnitures/add", {
 				method: "POST",
@@ -277,7 +277,7 @@ const ProductManagement = () => {
 				credentials: "include",
 				body: formData,
 			});
-	
+
 			if (response.ok) {
 				const data = await response.json();
 				toast.success(data.message);
@@ -296,14 +296,12 @@ const ProductManagement = () => {
 				selectedFurnitureType("");
 				fetchData();
 			}
-			
 		} catch (error) {
 			console.error("Error adding new Furniture:", error);
 			toast.error("Failed to add new Furniture");
 		}
-		setLoading(false)
+		setLoading(false);
 	};
-	
 
 	return (
 		<div className="container mx-auto p-4">
@@ -466,8 +464,7 @@ const ProductManagement = () => {
 												{size.label.charAt(0).toUpperCase() +
 													size.label.slice(1)}{" "}
 												<span className="text-gray-500 italic">
-													( {size.height} X {size.width} X {size.length} X{" "}
-													{size.depth} )
+													( {size.height} X {size.width} X {size.depth} )
 												</span>
 											</span>
 										</label>
@@ -505,11 +502,11 @@ const ProductManagement = () => {
 						/>
 						<button
 							onClick={handleSubmit}
-							type="submit"	
+							type="submit"
 							disabled={loading}
 							className="bg-blue-500 text-white p-2 rounded w-full"
 						>
-						{loading ? "Loading...":"Add Product"}
+							{loading ? "Loading..." : "Add Product"}
 						</button>
 					</form>
 				</div>
@@ -586,7 +583,7 @@ const ProductManagement = () => {
 											? furniture.sizes.map((size) => (
 													<span key={size._id} className="block">
 														{size.label} <br /> ({size.height} X {size.width} X{" "}
-														{size.depth} )
+														{size.depth})
 													</span>
 											  ))
 											: "N/A"}

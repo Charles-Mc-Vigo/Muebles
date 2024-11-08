@@ -128,7 +128,7 @@ exports.getAllFurnitures = async (req, res) => {
 	try {
 		const furnitures = await Furniture.find().populate([
 			{ path: "category", select: "name -_id" },
-			{ path: "furnitureType", select: "name -_id" },
+			{ path: "furnitureType", select: "name ECT -_id" },
 			{ path: "materials", select: "name -_id" },
 			{ path: "colors", select: "name hex -_id" },
 			{ path: "sizes", select: "label height width depth -_id" },
@@ -172,7 +172,7 @@ exports.getFurnitureById = async (req, res) => {
 		const { furnitureId } = req.params;
 		const furniture = await Furniture.findById(furnitureId).populate([
 			{ path: "category", select: "name -_id" },
-			{ path: "furnitureType", select: "name -_id" },
+			{ path: "furnitureType", select: "name ECT -_id" },
 			{ path: "materials", select: "name -_id" },
 			{ path: "colors", select: "name hex -_id" },
 			{ path: "sizes", select: "label -_id" },

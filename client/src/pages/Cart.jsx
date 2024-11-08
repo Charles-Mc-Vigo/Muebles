@@ -12,13 +12,14 @@ import Footer from "../components/Footer";
 const Cart = () => {
 	const [items, setItems] = useState([]);
 	const [deliveryMode, setDeliveryMode] = useState("delivery");
-	const [user, setUser] = useState({ addresses: [] }); // Ensure `addresses` is an empty array by default
+	const [user, setUser] = useState({ addresses: [] });
 	const [selectedAddress, setSelectedAddress] = useState(null);
 	const [count, setCount] = useState(0);
 	const [totalAmount, setTotalAmount] = useState(0);
 	const [shippingFee, setShippingFee] = useState(0);
 	const [proofOfPayment, setProofOfPayment] = useState(null);
 	const [uploadMessage, setUploadMessage] = useState("");
+	const [expectedDeliveryDate, setExpectedDeliveryDate] = useState(null);
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState(null);
 	const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
@@ -33,6 +34,26 @@ const Cart = () => {
 		Torrijos: 3000,
 	};
 
+	useEffect(() => {
+    if (items.length > 0) {
+        // Get the highest ECT value among the items
+        const maxECT = Math.max(...items.map(item => item.ECT || 0));
+
+        console.log("Max ECT among items:", maxECT);
+
+        // Calculate the expected delivery date based on the max ECT
+        const estimatedDelivery = new Date();
+        estimatedDelivery.setDate(estimatedDelivery.getDate() + maxECT);
+
+        // Set the expected delivery date in the state
+        setExpectedDeliveryDate(estimatedDelivery);
+        console.log("Calculated expected delivery date:", estimatedDelivery.toDateString());
+    } else {
+        setExpectedDeliveryDate(null);
+    }
+}, [items]);
+
+
 	// Fetch cart items from the API
 	const fetchCartItems = async () => {
 		try {
@@ -44,7 +65,7 @@ const Cart = () => {
 				credentials: "include",
 			});
 			const data = await response.json();
-      // console.log(data)
+			// console.log(data)
 			if (!data.ok) {
 				toast.error(data.error);
 			}
@@ -102,6 +123,7 @@ const Cart = () => {
 		setProofOfPayment(file);
 		setUploadMessage(`Selected file: ${file.name}`);
 	};
+
 
 	const checkout = async () => {
 		if (!selectedPaymentMethod) {
@@ -307,14 +329,18 @@ const Cart = () => {
 														<h3 className="text-lg font-medium">
 															{item.furnitureId.name}
 														</h3>
+														<p className="text-gray-600">Color: {item.color}</p>
 														<p className="text-gray-600">
-															Color: {item.color}
-														</p>
-                            <p className="text-gray-600">
 															Material: {item.material}
 														</p>
 														<p className="text-gray-600">
 															Price: ₱{item.furnitureId.price}
+														</p>
+														<br />
+														<br />
+														<p className="bg-slate-200 p-2 w-max font-semibold">
+															Estimated Completion Time (ECT) :{" "}
+															{item.ECT} Days
 														</p>
 													</div>
 													<div className="flex items-center">
@@ -397,15 +423,6 @@ const Cart = () => {
 										Pick Up
 									</label>
 								</div>
-
-								<div className="ml-6 mb-2 ">
-									<h1 className="font-semibold text-xl">
-										ESTIMATED DELIVERY DATE
-									</h1>
-									<p className="text-base ">
-										It will take 10years to deliver your product bye :){" "}
-									</p>
-								</div>
 							</div>
 						</div>
 
@@ -449,22 +466,6 @@ const Cart = () => {
 												className="w-12 h-12 object-contain rounded"
 											/>
 										</button>
-
-										{/* Cash on delivery payment (commented out) */}
-										{/* <button
-                          value="COD"
-                          onClick={() => handlePaymentMethodClick("COD")}
-                          className={`px-8 py-4 rounded ${
-                            selectedPaymentMethod === "COD"
-                              ? "bg-yellow-700"
-                              : "bg-yellow-500"
-                          } text-white`}
-                        >
-                          <div className="flex justify-center items-center gap-2">
-                            <FaTruck size={30} />
-                            <span className="font-semibold">COD</span>
-                          </div>
-                        </button> */}
 									</div>
 									{selectedPaymentMethod && (
 										<p className="mt-5 text-gray-600">
@@ -515,6 +516,12 @@ const Cart = () => {
 										<span>Shipping Fee:</span>
 										<span>₱{shippingFee.toFixed(2)}</span>
 									</div>
+									{expectedDeliveryDate && (
+										<div className="flex justify-between">
+											<span>Expected Delivery Date:</span>
+											<span>{expectedDeliveryDate.toLocaleDateString()}</span>
+										</div>
+									)}
 								</div>
 							</div>
 							<div className="border-t border-teal-600 pt-4 mt-5">
