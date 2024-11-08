@@ -43,7 +43,6 @@ import AddNewAddress from "./components/AddNewAddress";
 import ViewUserOrder from "./components/ViewUserOrder";
 import ViewPendingRequest from "./pages/ViewPendingRequest";
 import ErrorBoundary from "./components/ErrorBoundary";
-import LoadingSpinner from "./components/LoadingSpinner";
 import PreOrder from "./pages/PreOrder";
 
 export default function App() {
@@ -96,7 +95,7 @@ export default function App() {
 					/>
 					<Route
 						path="/pre-order/:furnitureId"
-						element={<ProtectedRoute element={PreOrder}/>}
+						element={<ProtectedRoute element={PreOrder} />}
 					/>
 					<Route path="/cart" element={<ProtectedRoute element={Cart} />} />
 					<Route path="/delivery-info" element={<DeliveryInfo />} />
@@ -200,7 +199,6 @@ export default function App() {
 					<Route path="/logout" element={<ProtectedRoute element={Logout} />} />
 				</Routes>
 			</BrowserRouter>
-			<LoadingSpinner />
 		</ErrorBoundary>
 	);
 }

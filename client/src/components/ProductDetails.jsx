@@ -77,6 +77,7 @@ function ProductDetails({ admin }) {
 			prevIndex === furnitureData.images.length - 1 ? 0 : prevIndex + 1
 		);
 	};
+
 	const addToCart = async (e) => {
 		e.preventDefault();
 		setLoading(true);
@@ -85,7 +86,6 @@ function ProductDetails({ admin }) {
 			toast.error("Please select color, material, and size.");
 			return;
 		}
-
 		const item = {
 			furnitureId: id,
 			quantity: 1,
@@ -93,7 +93,6 @@ function ProductDetails({ admin }) {
 			material: selectedMaterial,
 			size: selectedSize,
 		};
-
 		try {
 			const response = await fetch("http://localhost:3000/api/cart", {
 				method: "POST",
@@ -103,13 +102,10 @@ function ProductDetails({ admin }) {
 				credentials: "include",
 				body: JSON.stringify(item),
 			});
-
 			const data = await response.json();
-
 			if (!data.ok) {
 				toast.error(data.error);
 			}
-
 			toast.success(data.success);
 		} catch (error) {
 			console.error("Error adding item to cart:", error);
@@ -127,7 +123,6 @@ function ProductDetails({ admin }) {
 		const toggleAccordion = () => {
 			setIsOpen(!isOpen);
 		};
-
 		return (
 			<div className="border-b border-gray-300">
 				<button
@@ -166,11 +161,11 @@ function ProductDetails({ admin }) {
 		{
 			question: "How do I care for wooden furniture?",
 			answer: [
-				"1.Wooden Furniture Care Guide",
-				"2.Clean Gently",
-				"3.Avoid Direct Sunlight",
-				"4.Use Protective Surfaces",
-				"5.Polish Occasionally",
+				"1. Wooden Furniture Care Guide",
+				"2. Clean Gently",
+				"3. Avoid Direct Sunlight",
+				"4. Use Protective Surfaces",
+				"5. Polish Occasionally",
 				"6. Control Humidity",
 			],
 		},
@@ -178,49 +173,43 @@ function ProductDetails({ admin }) {
 
 	return (
 		<section className="bg-white">
-			<Header isLogin={true} cartCount={true}/>
+			<Header isLogin={true} cartCount={true} />
 			{/* Right side Image */}
-			<div className="container mx-auto p-5 flex flex-col lg:flex-row">
-				<div className="flex flex-col lg:flex-row lg:w-full justify-center mt-10">
-					<div className="flex flex-col lg:w-[800px] lg:h-[800px] p-2 bg-white rounded-xl shadow-xl shadow-gray-300 relative">
-						<button
-							onClick={() => navigate(-1)}
-							className="text-teal-600 hover:text-teal-900 mb-4 lg:mb-0 lg:mr-5"
-						>
-							<IoChevronBackSharp size={50} />
-						</button>
-						<div className="flex-grow flex flex-col items-center p-4 ">
-							<div className="flex-grow flex items-center justify-center ">
+			<div className="p-5 flex flex-col lg:flex-row">
+				<div className="flex flex-col lg:flex-row lg:w-full justify-center p-5">
+					<div className="flex flex-col rounded-xl p-5 shadow-lg shadow-gray-300">
+						<div className="flex flex-col p-5 items-center h-full w-full">
+							<div className="flex flex-col p-5 justify-evenly w-full h-full">
 								{furnitureData.images && furnitureData.images.length > 0 && (
 									<img
 										src={`data:image/jpeg;base64,${furnitureData.images[currentImageIndex]}`}
 										alt={furnitureData.name}
-										className="w-3/4 h-full object-contain"
+										className="w-full h-96 mx-auto object-contain" // Set fixed width and height
 									/>
 								)}
-							</div>
-							<div className="flex items-center justify-center space-x-4">
-								<button onClick={handlePreviousImage}>
-									<FaArrowLeft size={30} />
-								</button>
-								<div className="flex space-x-2">
-									{furnitureData.images.map((image, index) => (
-										<img
-											key={index}
-											src={`data:image/jpeg;base64,${image}`}
-											alt={`Image ${index + 1} of ${furnitureData.name}`}
-											className={`w-20 h-20 object-contain rounded cursor-pointer transition ${
-												currentImageIndex === index
-													? "border-blue-500"
-													: "border-gray-300"
-											}`}
-											onClick={() => handleThumbnailClick(index)}
-										/>
-									))}
+								<div className="flex items-center justify-center space-x-4">
+									<button onClick={handlePreviousImage}>
+										<FaArrowLeft size={30} />
+									</button>
+									<div className="flex space-x-2 p-5">
+										{furnitureData.images.map((image, index) => (
+											<img
+												key={index}
+												src={`data:image/jpeg;base64,${image}`}
+												alt={`Image ${index + 1} of ${furnitureData.name}`}
+												className={`w-20 h-20 object-contain rounded cursor-pointer transition ${
+													currentImageIndex === index
+														? "border-blue-500"
+														: "border-gray-300"
+												}`}
+												onClick={() => handleThumbnailClick(index)}
+											/>
+										))}
+									</div>
+									<button onClick={handleNextImage}>
+										<FaArrowRight size={30} />
+									</button>
 								</div>
-								<button onClick={handleNextImage}>
-									<FaArrowRight size={30} />
-								</button>
 							</div>
 						</div>
 					</div>
@@ -304,14 +293,12 @@ function ProductDetails({ admin }) {
 								disabled={loading}
 								className="text-teal-500 hover:bg-teal-500 hover:text-white border border-teal-500 text-xl font-semibold px-4 rounded-md transition-colors duration-300 flex-1 py-2"
 							>
-								{loading ? "Adding...":"Add to cart"}
+								{loading ? "Adding..." : "Add to cart"}
 							</button>
-
 						</div>
 					</div>
 				</div>
 			</div>
-
 			{/* Advertisement Section */}
 			<div
 				className="w-full mb-5 max-w-[1829px] p-10 mt-5 rounded-lg shadow-lg mx-auto"
@@ -336,7 +323,6 @@ function ProductDetails({ admin }) {
 					Founded in Marinduque, 2003
 				</p>
 			</div>
-
 			<div
 				className="w-full h-full mb-5 max-w-[1829px] max-h-[500px] p-10 mt-5 rounded-lg shadow-lg mx-auto"
 				style={{ backgroundColor: "#ecede4" }}
