@@ -11,6 +11,9 @@ const orderSchema = new mongoose.Schema(
       type:mongoose.Schema.Types.ObjectId,
       ref:"Furniture"
     },
+		material:{type:String},
+		color:{type:String},
+		size:{type:String},
 		orderNumber: {
 			type: String,
 			unique: true,
@@ -34,6 +37,7 @@ const orderSchema = new mongoose.Schema(
 				material: { type: String },
 				color: { type: String },
 				size: { type: String },
+				ECT:{type:Number}
 			},
 		],
 		shippingAddress: {
@@ -46,9 +50,13 @@ const orderSchema = new mongoose.Schema(
 			type: String,
 			required: true,
 		},
+		paymentOption:{
+			type:String,
+			require:true,
+		},
 		paymentMethod: {
 			type: String,
-			enum: ["COD", "GCash", "Maya"],
+			enum: ["GCash", "Maya"],
 			required: true,
 		},
 		proofOfPayment: {
@@ -63,6 +71,9 @@ const orderSchema = new mongoose.Schema(
     deliveryMode:{
       type:String,
     },
+		expectedDelivery:{
+			type:String
+		},
 		subtotal: Number,
 		shippingFee: Number,
 		totalAmount: Number,
@@ -85,7 +96,7 @@ orderSchema.pre("save", async function (next) {
 	next();
 });
 
-orderSchema.statics.createFromCart = async function(cartId, paymentMethod, proofOfPayment, shippingAddress, shippingFee, deliveryMode) {
+orderSchema.statics.createFromCart = async function(cartId, paymentMethod, proofOfPayment, shippingAddress, shippingFee, deliveryMode, expectedDelivery) {
   const cart = await mongoose.model('Cart').findById(cartId)
       .populate('userId')
       .populate('items.furnitureId');
@@ -108,7 +119,8 @@ orderSchema.statics.createFromCart = async function(cartId, paymentMethod, proof
       shippingFee: shippingFee,
       totalAmount: cart.totalAmount + shippingFee,
       proofOfPayment: proofOfPayment,
-      deliveryMode: deliveryMode
+      deliveryMode: deliveryMode,
+			expectedDelivery:expectedDelivery
   };
 
   return this.create(orderData);

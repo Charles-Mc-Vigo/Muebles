@@ -17,17 +17,19 @@ const cartSchema = new mongoose.Schema({
         type: Number,
         required: true,
         min: 1,
-        default: 1 // Set a default quantity of 1 when adding a new item
+        default: 1
       },
-      material: { type: String }, // new field
-      color: { type: String },    // new field
-      size: { type: String }
+      material: { type: String },
+      color: { type: String },
+      size: { type: String },
+      ECT:{type:Number}
     },
   ],
   count: {
     type: Number,
     default: 0
   },
+  expectedDelivery:{type:String},
   totalAmount: {
     type: Number,
     default: 0 // Initial total amount set to 0

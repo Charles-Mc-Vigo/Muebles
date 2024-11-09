@@ -12,13 +12,14 @@ import Footer from "../components/Footer";
 const Cart = () => {
 	const [items, setItems] = useState([]);
 	const [deliveryMode, setDeliveryMode] = useState("delivery");
-	const [user, setUser] = useState({ addresses: [] }); // Ensure `addresses` is an empty array by default
+	const [user, setUser] = useState({ addresses: [] });
 	const [selectedAddress, setSelectedAddress] = useState(null);
 	const [count, setCount] = useState(0);
 	const [totalAmount, setTotalAmount] = useState(0);
 	const [shippingFee, setShippingFee] = useState(0);
 	const [proofOfPayment, setProofOfPayment] = useState(null);
 	const [uploadMessage, setUploadMessage] = useState("");
+	const [expectedDeliveryDate, setExpectedDeliveryDate] = useState(null);
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState(null);
 	const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
@@ -33,6 +34,46 @@ const Cart = () => {
 		Torrijos: 3000,
 	};
 
+	useEffect(() => {
+		if (items.length > 0) {
+			// Get the highest ECT value among the items
+			const maxECT = Math.max(...items.map((item) => item.ECT || 0));
+
+			console.log("Max ECT among items:", maxECT);
+
+			// Calculate the expected delivery date based on the max ECT
+			const startDeliveryDate = new Date();
+			startDeliveryDate.setDate(startDeliveryDate.getDate() + maxECT);
+
+			const endDeliveryDate = new Date(startDeliveryDate);
+			endDeliveryDate.setDate(endDeliveryDate.getDate() + 2);
+
+			const formatDeliveryDates = (startDate, endDate) => {
+				const options = { month: "short", year: "numeric" };
+				const monthAndYear = startDate.toLocaleDateString("en-US", options); // e.g., "Dec 2024"
+				const startDay = startDate.getDate();
+				const endDay = endDate.getDate();
+				return `${startDay} - ${endDay} ${monthAndYear}`;
+			};
+
+			//ito ay para sa pag debug lang. di ko tinanggal kase ayaw ko
+			// console.log("Estimated Delivery Date:", startDeliveryDate);
+			// console.log("End Delivery Date:", endDeliveryDate);
+			// console.log("Formatted Date:", formatDeliveryDates(startDeliveryDate, endDeliveryDate));
+
+			const estimatedDelivery = formatDeliveryDates(
+				startDeliveryDate,
+				endDeliveryDate
+			);
+
+			// Set the expected delivery date in the state
+			setExpectedDeliveryDate(estimatedDelivery);
+			console.log("Calculated expected delivery date:", estimatedDelivery);
+		} else {
+			setExpectedDeliveryDate(null);
+		}
+	}, [items]);
+
 	// Fetch cart items from the API
 	const fetchCartItems = async () => {
 		try {
@@ -44,7 +85,7 @@ const Cart = () => {
 				credentials: "include",
 			});
 			const data = await response.json();
-      // console.log(data)
+			// console.log(data)
 			if (!data.ok) {
 				toast.error(data.error);
 			}
@@ -121,7 +162,11 @@ const Cart = () => {
 		formData.append("paymentMethod", selectedPaymentMethod);
 		formData.append("shippingAddress", JSON.stringify(addressToSend));
 		formData.append("deliveryMode", deliveryMode);
-
+		formData.append("expectedDelivery", expectedDeliveryDate);
+		// Log FormData contents
+		for (const [key, value] of formData.entries()) {
+			console.log(`${key}:`, value);
+		}
 		try {
 			const response = await fetch("http://localhost:3000/api/orders/create", {
 				method: "POST",
@@ -307,10 +352,8 @@ const Cart = () => {
 														<h3 className="text-lg font-medium">
 															{item.furnitureId.name}
 														</h3>
+														<p className="text-gray-600">Color: {item.color}</p>
 														<p className="text-gray-600">
-															Color: {item.color}
-														</p>
-                            <p className="text-gray-600">
 															Material: {item.material}
 														</p>
 														<p className="text-gray-600">
@@ -397,14 +440,13 @@ const Cart = () => {
 										Pick Up
 									</label>
 								</div>
-
-								<div className="ml-6 mb-2 ">
-									<h1 className="font-semibold text-xl">
-										ESTIMATED DELIVERY DATE
-									</h1>
-									<p className="text-base ">
-										It will take 10years to deliver your product bye :){" "}
-									</p>
+								<div className="bg-slate-100 p-2 px-4 rounded m-2">
+									{expectedDeliveryDate && (
+										<div className="flex justify-between">
+											<span>Expected Delivery:</span>
+											<span>{expectedDeliveryDate}</span>
+										</div>
+									)}
 								</div>
 							</div>
 						</div>
@@ -449,22 +491,6 @@ const Cart = () => {
 												className="w-12 h-12 object-contain rounded"
 											/>
 										</button>
-
-										{/* Cash on delivery payment (commented out) */}
-										{/* <button
-                          value="COD"
-                          onClick={() => handlePaymentMethodClick("COD")}
-                          className={`px-8 py-4 rounded ${
-                            selectedPaymentMethod === "COD"
-                              ? "bg-yellow-700"
-                              : "bg-yellow-500"
-                          } text-white`}
-                        >
-                          <div className="flex justify-center items-center gap-2">
-                            <FaTruck size={30} />
-                            <span className="font-semibold">COD</span>
-                          </div>
-                        </button> */}
 									</div>
 									{selectedPaymentMethod && (
 										<p className="mt-5 text-gray-600">
@@ -530,10 +556,10 @@ const Cart = () => {
 										Continue Shopping
 									</button>
 									<button
-										className="bg-teal-500 text-white px-4 py-2 rounded-xl hover:bg-teal-800"
+										className="bg-teal-500 text-white px-4 py-2 rounded hover:bg-teal-800"
 										onClick={checkout}
 									>
-										Place Order
+										Checkout
 									</button>
 								</div>
 							</div>

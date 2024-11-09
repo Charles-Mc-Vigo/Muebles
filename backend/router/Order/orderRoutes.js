@@ -8,6 +8,7 @@ const upload = multer({ storage: storage });
 
 // User routes - protected with checkUserAuth
 router.post("/create", checkUserAuth, upload.single("proofOfPayment"), orderController.createOrder);
+router.post("/pre-order/create", checkUserAuth, upload.single("proofOfPayment"), orderController.createOrder);
 router.get('/my-orders', checkUserAuth, orderController.getUserOrders);
 router.get('/details/:orderId', checkUserAuth, orderController.getOrderDetails);
 router.put('/cancel/:orderId', checkUserAuth, orderController.cancelOrder);

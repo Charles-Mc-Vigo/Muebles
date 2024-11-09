@@ -10,7 +10,8 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Header from "./Header";
 import Footer from "./Footer";
-import { IoChevronBackSharp } from "react-icons/io5";
+import { IoMdArrowRoundBack } from "react-icons/io";
+import LoadingSpinner from "./LoadingSpinner";
 
 function ProductDetails({ admin }) {
 	const { id } = useParams();
@@ -80,7 +81,6 @@ function ProductDetails({ admin }) {
 
 	const addToCart = async (e) => {
 		e.preventDefault();
-		setLoading(true);
 		// Ensure all options are selected
 		if (!selectedColor || !selectedMaterial || !selectedSize) {
 			toast.error("Please select color, material, and size.");
@@ -92,7 +92,9 @@ function ProductDetails({ admin }) {
 			color: selectedColor,
 			material: selectedMaterial,
 			size: selectedSize,
+			ECT:furnitureData.furnitureType.ECT
 		};
+		// console.log(item)
 		try {
 			const response = await fetch("http://localhost:3000/api/cart", {
 				method: "POST",
@@ -172,164 +174,181 @@ function ProductDetails({ admin }) {
 	];
 
 	return (
-		<section className="bg-white">
-			<Header isLogin={true} cartCount={true} />
-			{/* Right side Image */}
-			<div className="p-5 flex flex-col lg:flex-row">
-				<div className="flex flex-col lg:flex-row lg:w-full justify-center p-5">
-					<div className="flex flex-col rounded-xl p-5 shadow-lg shadow-gray-300">
-						<div className="flex flex-col p-5 items-center h-full w-full">
-							<div className="flex flex-col p-5 justify-evenly w-full h-full">
-								{furnitureData.images && furnitureData.images.length > 0 && (
-									<img
-										src={`data:image/jpeg;base64,${furnitureData.images[currentImageIndex]}`}
-										alt={furnitureData.name}
-										className="w-full h-96 mx-auto object-contain" // Set fixed width and height
-									/>
-								)}
-								<div className="flex items-center justify-center space-x-4">
-									<button onClick={handlePreviousImage}>
-										<FaArrowLeft size={30} />
-									</button>
-									<div className="flex space-x-2 p-5">
-										{furnitureData.images.map((image, index) => (
-											<img
-												key={index}
-												src={`data:image/jpeg;base64,${image}`}
-												alt={`Image ${index + 1} of ${furnitureData.name}`}
-												className={`w-20 h-20 object-contain rounded cursor-pointer transition ${
-													currentImageIndex === index
-														? "border-blue-500"
-														: "border-gray-300"
+		<>
+			{loading ? (
+				<LoadingSpinner/>
+			) : (
+				<section className="bg-white">
+					<Header isLogin={true} cartCount={true} />
+					{/* Right side Image */}
+					<div className="p-5 flex flex-col lg:flex-row">
+						<div className="flex flex-col lg:flex-row lg:w-full justify-center p-5">
+							<div className="flex flex-col rounded-xl p-5 shadow-lg shadow-gray-300">
+								<button
+									onClick={() => navigate(-1)}
+									className="text-gray-500 mr-2 hover:text-teal-600"
+								>
+									<IoMdArrowRoundBack size={40} />
+								</button>
+								<div className="flex flex-col p-5 items-center h-full w-full">
+									<div className="flex flex-col p-5 justify-evenly w-full h-full">
+										{furnitureData.images &&
+											furnitureData.images.length > 0 && (
+												<img
+													src={`data:image/jpeg;base64,${furnitureData.images[currentImageIndex]}`}
+													alt={furnitureData.name}
+													className="w-full h-96 mx-auto object-contain" // Set fixed width and height
+												/>
+											)}
+										<div className="flex items-center justify-center space-x-4">
+											<button onClick={handlePreviousImage}>
+												<FaArrowLeft size={30} />
+											</button>
+											<div className="flex space-x-2 p-5">
+												{furnitureData.images.map((image, index) => (
+													<img
+														key={index}
+														src={`data:image/jpeg;base64,${image}`}
+														alt={`Image ${index + 1} of ${furnitureData.name}`}
+														className={`w-20 h-20 object-contain rounded cursor-pointer transition ${
+															currentImageIndex === index
+																? "border-blue-500"
+																: "border-gray-300"
+														}`}
+														onClick={() => handleThumbnailClick(index)}
+													/>
+												))}
+											</div>
+											<button onClick={handleNextImage}>
+												<FaArrowRight size={30} />
+											</button>
+										</div>
+									</div>
+								</div>
+							</div>
+							{/* Product details */}
+							<div className="flex-1 lg:max-w-[400px] p-5 bg-white border-gray-300 rounded-lg shadow-lg ml-0 lg:ml-5">
+								<h1 className="text-3xl font-bold">{furnitureData.name}</h1>
+								<div className="mt-2">
+									<p className="border-b-2 py-2 border-gray-400">
+										Price : PHP {furnitureData.price}
+									</p>
+									<p className="border-b-2 py-2 border-gray-400">
+										Estimated Completion Time (ECT):  {furnitureData.furnitureType.ECT} Days
+									</p>
+								</div>
+								<div className="mb-4 rounded-md p-2">
+									<label className="block font-semibold">
+										Colors: {selectedColor || "None"}
+									</label>
+									<div className="flex flex-wrap gap-2">
+										{furnitureData.colors?.map((color) => (
+											<div
+												key={color._id}
+												onClick={() => handleColorClick(color)}
+												className={`w-16 h-16 rounded-full border cursor-pointer relative flex items-center justify-center transition-transform transform hover:scale-110 ${
+													selectedColor === color.name
+														? "bg-teal-600 text-black"
+														: "text-black"
 												}`}
-												onClick={() => handleThumbnailClick(index)}
-											/>
+												style={{ backgroundColor: color.hex }}
+											></div>
 										))}
 									</div>
-									<button onClick={handleNextImage}>
-										<FaArrowRight size={30} />
+								</div>
+								<div className="mt-4">
+									<h2 className="text-lg font-semibold">Materials</h2>
+									<div className="flex space-x-2 flex-wrap">
+										{furnitureData.materials?.map((material) => (
+											<span
+												key={material.id}
+												onClick={() => handleMaterialClick(material)}
+												className={`border border-black px-2 py-1 rounded-md  cursor-pointer transition ${
+													selectedMaterial === material.name
+														? "bg-teal-600 text-black"
+														: "text-black"
+												}`}
+											>
+												{material.name}
+											</span>
+										))}
+									</div>
+								</div>
+								<div className="mt-4">
+									<h2 className="text-lg font-semibold">Sizes</h2>
+									<div className="flex space-x-2 flex-wrap">
+										{furnitureData.sizes?.map((size) => (
+											<span
+												key={size.id}
+												onClick={() => handleSizeClick(size)}
+												className={`border px-2 py-1 rounded-md cursor-pointer transition ${
+													selectedSize === size.label
+														? "bg-teal-600 text-black"
+														: "text-black"
+												}`}
+											>
+												{size.label}
+											</span>
+										))}
+									</div>
+								</div>
+								<div className="mt-4 text-justify text-base">
+									{/* Ensure the FAQ container is flexible */}
+									{faqItems.map((item, index) => (
+										<FAQAccordion
+											key={index}
+											question={item.question}
+											answer={item.answer}
+										/>
+									))}
+								</div>
+								<div className="mt-4 flex gap-4">
+									<button
+										onClick={addToCart}
+										disabled={loading}
+										className="text-teal-500 hover:bg-teal-500 hover:text-white border border-teal-500 text-xl font-semibold px-4 rounded-md transition-colors duration-300 flex-1 py-2"
+									>
+										{loading ? "Adding..." : "Add to cart"}
 									</button>
 								</div>
 							</div>
 						</div>
 					</div>
-					{/* Product details */}
-					<div className="flex-1 lg:max-w-[400px] p-5 bg-white border-gray-300 rounded-lg shadow-lg ml-0 lg:ml-5">
-						<h1 className="text-3xl font-bold">{furnitureData.name}</h1>
-						<div className="mt-2">
-							<h2 className="text-lg font-semibold">Price</h2>
-							<p className="border-b-2 border-gray-400">
-								₱ {furnitureData.price}
-							</p>
-						</div>
-						<div className="mb-4 rounded-md p-2">
-							<label className="block font-semibold">
-								Colors: {selectedColor || "None"}
-							</label>
-							<div className="flex flex-wrap gap-2">
-								{furnitureData.colors?.map((color) => (
-									<div
-										key={color._id}
-										onClick={() => handleColorClick(color)}
-										className={`w-16 h-16 rounded-full border cursor-pointer relative flex items-center justify-center transition-transform transform hover:scale-110 ${
-											selectedColor === color.name
-												? "bg-teal-600 text-black"
-												: "text-black"
-										}`}
-										style={{ backgroundColor: color.hex }}
-									></div>
-								))}
-							</div>
-						</div>
-						<div className="mt-4">
-							<h2 className="text-lg font-semibold">Materials</h2>
-							<div className="flex space-x-2 flex-wrap">
-								{furnitureData.materials?.map((material) => (
-									<span
-										key={material.id}
-										onClick={() => handleMaterialClick(material)}
-										className={`border border-black px-2 py-1 rounded-md  cursor-pointer transition ${
-											selectedMaterial === material.name
-												? "bg-teal-600 text-black"
-												: "text-black"
-										}`}
-									>
-										{material.name}
-									</span>
-								))}
-							</div>
-						</div>
-						<div className="mt-4">
-							<h2 className="text-lg font-semibold">Sizes</h2>
-							<div className="flex space-x-2 flex-wrap">
-								{furnitureData.sizes?.map((size) => (
-									<span
-										key={size.id}
-										onClick={() => handleSizeClick(size)}
-										className={`border px-2 py-1 rounded-md cursor-pointer transition ${
-											selectedSize === size.label
-												? "bg-teal-600 text-black"
-												: "text-black"
-										}`}
-									>
-										{size.label}
-									</span>
-								))}
-							</div>
-						</div>
-						<div className="mt-4 text-justify text-base">
-							{/* Ensure the FAQ container is flexible */}
-							{faqItems.map((item, index) => (
-								<FAQAccordion
-									key={index}
-									question={item.question}
-									answer={item.answer}
-								/>
-							))}
-						</div>
-						<div className="mt-4 flex gap-4">
-							<button
-								onClick={addToCart}
-								disabled={loading}
-								className="text-teal-500 hover:bg-teal-500 hover:text-white border border-teal-500 text-xl font-semibold px-4 rounded-md transition-colors duration-300 flex-1 py-2"
-							>
-								{loading ? "Adding..." : "Add to cart"}
-							</button>
-						</div>
+					{/* Advertisement Section */}
+					<div
+						className="w-full mb-5 max-w-[1829px] p-10 mt-5 rounded-lg shadow-lg mx-auto"
+						style={{ backgroundColor: "#ecede4" }}
+					>
+						<h2 className="text-2xl font-bold mb-4 text-center">
+							Sustainable Furniture for a Greener Tomorrow
+						</h2>
+						<p className="text-lg text-gray-700 mb-6 text-justify">
+							Transform your house with furniture designed with nature in mind.
+							Our items are composed of carefully sourced materials and built to
+							last, reducing waste while promoting sustainability. For every
+							tree we use, we give back a hundredfold to reforestation efforts,
+							ensuring a greener future. From the warmth of natural wood to the
+							long-lasting durability of eco-friendly paints, our furniture
+							combines style and environmental responsibility. Join us in making
+							a positive contribution by designing a beautiful home while
+							protecting nature for future generations.
+						</p>
+						<p className="text-base font-bold text-center text-teal-600">
+							JCKAME
+						</p>
+						<p className="text-sm text-center text-gray-500">
+							Founded in Marinduque, 2003
+						</p>
 					</div>
-				</div>
-			</div>
-			{/* Advertisement Section */}
-			<div
-				className="w-full mb-5 max-w-[1829px] p-10 mt-5 rounded-lg shadow-lg mx-auto"
-				style={{ backgroundColor: "#ecede4" }}
-			>
-				<h2 className="text-2xl font-bold mb-4 text-center">
-					Sustainable Furniture for a Greener Tomorrow
-				</h2>
-				<p className="text-lg text-gray-700 mb-6 text-justify">
-					Transform your house with furniture designed with nature in mind. Our
-					items are composed of carefully sourced materials and built to last,
-					reducing waste while promoting sustainability. For every tree we use,
-					we give back a hundredfold to reforestation efforts, ensuring a
-					greener future. From the warmth of natural wood to the long-lasting
-					durability of eco-friendly paints, our furniture combines style and
-					environmental responsibility. Join us in making a positive
-					contribution by designing a beautiful home while protecting nature for
-					future generations.
-				</p>
-				<p className="text-base font-bold text-center text-teal-600">JCKAME</p>
-				<p className="text-sm text-center text-gray-500">
-					Founded in Marinduque, 2003
-				</p>
-			</div>
-			<div
-				className="w-full h-full mb-5 max-w-[1829px] max-h-[500px] p-10 mt-5 rounded-lg shadow-lg mx-auto"
-				style={{ backgroundColor: "#ecede4" }}
-			></div>
-			<ToastContainer />
-			<Footer />
-		</section>
+					<div
+						className="w-full h-full mb-5 max-w-[1829px] max-h-[500px] p-10 mt-5 rounded-lg shadow-lg mx-auto"
+						style={{ backgroundColor: "#ecede4" }}
+					></div>
+					<ToastContainer />
+					<Footer />
+				</section>
+			)}
+		</>
 	);
 }
 
