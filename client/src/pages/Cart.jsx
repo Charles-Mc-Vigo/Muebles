@@ -35,24 +35,44 @@ const Cart = () => {
 	};
 
 	useEffect(() => {
-    if (items.length > 0) {
-        // Get the highest ECT value among the items
-        const maxECT = Math.max(...items.map(item => item.ECT || 0));
+		if (items.length > 0) {
+			// Get the highest ECT value among the items
+			const maxECT = Math.max(...items.map((item) => item.ECT || 0));
 
-        console.log("Max ECT among items:", maxECT);
+			console.log("Max ECT among items:", maxECT);
 
-        // Calculate the expected delivery date based on the max ECT
-        const estimatedDelivery = new Date();
-        estimatedDelivery.setDate(estimatedDelivery.getDate() + maxECT);
+			// Calculate the expected delivery date based on the max ECT
+			const startDeliveryDate = new Date();
+			startDeliveryDate.setDate(startDeliveryDate.getDate() + maxECT);
 
-        // Set the expected delivery date in the state
-        setExpectedDeliveryDate(estimatedDelivery);
-        console.log("Calculated expected delivery date:", estimatedDelivery.toDateString());
-    } else {
-        setExpectedDeliveryDate(null);
-    }
-}, [items]);
+			const endDeliveryDate = new Date(startDeliveryDate);
+			endDeliveryDate.setDate(endDeliveryDate.getDate() + 2);
 
+			const formatDeliveryDates = (startDate, endDate) => {
+				const options = { month: "short", year: "numeric" };
+				const monthAndYear = startDate.toLocaleDateString("en-US", options); // e.g., "Dec 2024"
+				const startDay = startDate.getDate();
+				const endDay = endDate.getDate();
+				return `${startDay} - ${endDay} ${monthAndYear}`;
+			};
+
+			//ito ay para sa pag debug lang. di ko tinanggal kase ayaw ko
+			// console.log("Estimated Delivery Date:", startDeliveryDate);
+			// console.log("End Delivery Date:", endDeliveryDate);
+			// console.log("Formatted Date:", formatDeliveryDates(startDeliveryDate, endDeliveryDate));
+
+			const estimatedDelivery = formatDeliveryDates(
+				startDeliveryDate,
+				endDeliveryDate
+			);
+
+			// Set the expected delivery date in the state
+			setExpectedDeliveryDate(estimatedDelivery);
+			console.log("Calculated expected delivery date:", estimatedDelivery);
+		} else {
+			setExpectedDeliveryDate(null);
+		}
+	}, [items]);
 
 	// Fetch cart items from the API
 	const fetchCartItems = async () => {
@@ -124,7 +144,6 @@ const Cart = () => {
 		setUploadMessage(`Selected file: ${file.name}`);
 	};
 
-
 	const checkout = async () => {
 		if (!selectedPaymentMethod) {
 			toast.error("Please select a payment method before checking out.");
@@ -143,7 +162,11 @@ const Cart = () => {
 		formData.append("paymentMethod", selectedPaymentMethod);
 		formData.append("shippingAddress", JSON.stringify(addressToSend));
 		formData.append("deliveryMode", deliveryMode);
-
+		formData.append("expectedDelivery", expectedDeliveryDate);
+		// Log FormData contents
+		for (const [key, value] of formData.entries()) {
+			console.log(`${key}:`, value);
+		}
 		try {
 			const response = await fetch("http://localhost:3000/api/orders/create", {
 				method: "POST",
@@ -336,12 +359,6 @@ const Cart = () => {
 														<p className="text-gray-600">
 															Price: ₱{item.furnitureId.price}
 														</p>
-														<br />
-														<br />
-														<p className="bg-slate-200 p-2 w-max font-semibold">
-															Estimated Completion Time (ECT) :{" "}
-															{item.ECT} Days
-														</p>
 													</div>
 													<div className="flex items-center">
 														<button
@@ -422,6 +439,14 @@ const Cart = () => {
 										/>
 										Pick Up
 									</label>
+								</div>
+								<div className="bg-slate-100 p-2 px-4 rounded m-2">
+									{expectedDeliveryDate && (
+										<div className="flex justify-between">
+											<span>Expected Delivery:</span>
+											<span>{expectedDeliveryDate}</span>
+										</div>
+									)}
 								</div>
 							</div>
 						</div>
@@ -516,12 +541,6 @@ const Cart = () => {
 										<span>Shipping Fee:</span>
 										<span>₱{shippingFee.toFixed(2)}</span>
 									</div>
-									{expectedDeliveryDate && (
-										<div className="flex justify-between">
-											<span>Expected Delivery Date:</span>
-											<span>{expectedDeliveryDate.toLocaleDateString()}</span>
-										</div>
-									)}
 								</div>
 							</div>
 							<div className="border-t border-teal-600 pt-4 mt-5">
@@ -537,10 +556,10 @@ const Cart = () => {
 										Continue Shopping
 									</button>
 									<button
-										className="bg-teal-500 text-white px-4 py-2 rounded-xl hover:bg-teal-800"
+										className="bg-teal-500 text-white px-4 py-2 rounded hover:bg-teal-800"
 										onClick={checkout}
 									>
-										Place Order
+										Checkout
 									</button>
 								</div>
 							</div>

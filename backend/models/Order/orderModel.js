@@ -72,7 +72,7 @@ const orderSchema = new mongoose.Schema(
       type:String,
     },
 		expectedDelivery:{
-			type:Number
+			type:String
 		},
 		subtotal: Number,
 		shippingFee: Number,
@@ -96,7 +96,7 @@ orderSchema.pre("save", async function (next) {
 	next();
 });
 
-orderSchema.statics.createFromCart = async function(cartId, paymentMethod, proofOfPayment, shippingAddress, shippingFee, deliveryMode) {
+orderSchema.statics.createFromCart = async function(cartId, paymentMethod, proofOfPayment, shippingAddress, shippingFee, deliveryMode, expectedDelivery) {
   const cart = await mongoose.model('Cart').findById(cartId)
       .populate('userId')
       .populate('items.furnitureId');
@@ -119,7 +119,8 @@ orderSchema.statics.createFromCart = async function(cartId, paymentMethod, proof
       shippingFee: shippingFee,
       totalAmount: cart.totalAmount + shippingFee,
       proofOfPayment: proofOfPayment,
-      deliveryMode: deliveryMode
+      deliveryMode: deliveryMode,
+			expectedDelivery:expectedDelivery
   };
 
   return this.create(orderData);

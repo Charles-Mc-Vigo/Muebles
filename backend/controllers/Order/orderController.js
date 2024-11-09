@@ -6,7 +6,7 @@ const orderController = {
 	// Create new order from cart
 	createOrder: async (req, res) => {
 		try {
-			const { paymentMethod, shippingAddress, deliveryMode } = req.body;
+			const { paymentMethod, shippingAddress, deliveryMode, expectedDelivery } = req.body;
 			const userId = req.user._id;
 
 			if (!paymentMethod) {
@@ -31,6 +31,7 @@ const orderController = {
 				return res.status(400).json({ error: "Cart is empty" });
 			}
 			console.log(cart)
+			console.log("Expected delivery: ", cart.expectedDelivery)
 
 			const shippingAddressObj = JSON.parse(shippingAddress);
 			const municipality = shippingAddressObj.municipality;
@@ -52,7 +53,9 @@ const orderController = {
 				proofOfPayment,
 				shippingAddressObj,
 				shippingFee,
-				deliveryMode
+				deliveryMode,
+				expectedDelivery
+				
 			);
 
 			await Cart.findByIdAndUpdate(cart._id, {

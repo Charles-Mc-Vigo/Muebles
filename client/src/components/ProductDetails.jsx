@@ -94,7 +94,7 @@ function ProductDetails({ admin }) {
 			size: selectedSize,
 			ECT:furnitureData.furnitureType.ECT
 		};
-		console.log(item)
+		// console.log(item)
 		try {
 			const response = await fetch("http://localhost:3000/api/cart", {
 				method: "POST",

@@ -29,6 +29,7 @@ const cartSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
+  expectedDelivery:{type:String},
   totalAmount: {
     type: Number,
     default: 0 // Initial total amount set to 0
