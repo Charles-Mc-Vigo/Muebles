@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css"; // Import toast styles
+import { FaEye, FaEyeSlash } from "react-icons/fa"; // Import eye icons
 
 export default function AdminSignUp() {
 	const navigate = useNavigate();
@@ -14,8 +15,9 @@ export default function AdminSignUp() {
 		password: "",
 		confirmPassword: "",
 	});
-
 	const [loading, setLoading] = useState(false);
+	const [showPassword, setShowPassword] = useState(false); // State for password visibility
+	const [showConfirmPassword, setShowConfirmPassword] = useState(false); // State for confirm password visibility
 
 	const handleChange = (e) => {
 		const { id, value } = e.target;
@@ -35,12 +37,10 @@ export default function AdminSignUp() {
 			});
 			const data = await response.json();
 			console.log("Response Data:", data); // Log response for debugging
-
 			if (!response.ok) {
 				toast.error(data.message || "Admin sign up failed");
 				return; // Exit early if there's an error
 			}
-
 			// Check if newAdmin and its ID are present
 			if (!data.newAdmin || !data.newAdmin._id) {
 				throw new Error("No admin ID received from server");
@@ -106,22 +106,40 @@ export default function AdminSignUp() {
 					className="bg-slate-100 p-3 rounded-lg"
 					onChange={handleChange}
 				/>
-				<input
-					type="password"
-					placeholder="Password"
-					id="password"
-					required
-					className="bg-slate-100 p-3 rounded-lg"
-					onChange={handleChange}
-				/>
-				<input
-					type="password"
-					placeholder="Confirm password"
-					id="confirmPassword"
-					required
-					className="bg-slate-100 p-3 rounded-lg"
-					onChange={handleChange}
-				/>
+				<div className="relative">
+					<input
+						type={showPassword ? "text" : "password"}
+						placeholder="Password"
+						id="password"
+						required
+						className="bg-slate-100 p-3 rounded-lg w-full"
+						onChange={handleChange}
+					/>
+					<button
+						type="button"
+						className="absolute right-3 top-1/2 transform -translate-y-1/2"
+						onClick={() => setShowPassword(!showPassword)}
+					>
+						{showPassword ? <FaEyeSlash className="text-gray-500" /> : <FaEye className="text-gray-500" />}
+					</button>
+				</div>
+				<div className="relative">
+					<input
+						type={showConfirmPassword ? "text" : "password"}
+						placeholder="Confirm password"
+						id="confirmPassword"
+						required
+						className="bg-slate-100 p-3 rounded-lg w-full"
+						onChange={handleChange}
+					/>
+					<button
+						type="button"
+						className="absolute right-3 top-1/2 transform -translate-y-1/2"
+						onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+					>
+						{showConfirmPassword ? <FaEyeSlash className="text-gray-500" /> : <FaEye className="text-gray-500" />}
+					</button>
+				</div>
 				<button
 					type="submit"
 					className={`p-3 rounded-lg text-slate-50 font-bold uppercase hover:opacity-80 disabled:opacity-70 ${

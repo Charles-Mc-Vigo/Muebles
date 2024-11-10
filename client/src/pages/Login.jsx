@@ -5,8 +5,10 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import { FaEye, FaEyeSlash } from "react-icons/fa"; // Import eye icons
 
 export default function Login() {
+	const [showPassword, setShowPassword] = useState(false);
 	const [formData, setFormData] = useState({
 		email: "",
 		password: "",
@@ -21,7 +23,7 @@ export default function Login() {
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
-		setLoading(true)
+		setLoading(true);
 		try {
 			const response = await fetch("http://localhost:3000/api/users/login", {
 				method: "POST",
@@ -45,20 +47,15 @@ export default function Login() {
 			console.error("Log in error", error);
 			toast.error(error.message || "Log in failed");
 		}
-		setLoading(true)
+		setLoading(false);
 	};
 
 	return (
 		<>
 			<Header />
 			<div
-				className="min-h-screen flex flex-col justify-center items-center mb-5 mt-40"
-				style={{
-					backgroundImage: "url(/landingimage/login.png)",
-					backgroundSize: "contain",
-					backgroundPosition: "center",
-					backgroundRepeat: "no-repeat",
-				}}
+				className="min-h-screen bg-cover flex flex-col justify-center items-center"
+				style={{ backgroundImage: "url('/landingimage/login.png')" }}
 			>
 				<div className="bg-teal-800 bg-opacity-90 p-10 md:p-12 rounded-lg max-w-lg w-full relative shadow-lg">
 					{/* Back Button */}
@@ -82,16 +79,29 @@ export default function Login() {
 							placeholder="E-mail address"
 							required
 							onChange={handleChange}
-							className="w-full px-4 py-3 text-white bg-transparent border-b-2 border-gray-300 placeholder-gray-300 focus:outline-none focus:border-white transition duration-200"
+							className="bg-slate-100 p-3 rounded w-full"
 						/>
-						<input
-							type="password"
-							id="password"
-							placeholder="Password"
-							required
-							onChange={handleChange}
-							className="w-full mb-5 px-4 py-3 text-white bg-transparent border-b-2 border-gray-300 placeholder-gray-300 focus:outline-none focus:border-white transition duration-200"
-						/>
+						<div className="relative">
+							<input
+								type={showPassword ? "text" : "password"}
+								id="password"
+								placeholder="Password"
+								required
+								onChange={handleChange}
+								className="bg-slate-100 p-3 rounded w-full"
+							/>
+							<button
+								type="button"
+								className="absolute right-3 top-1/2 transform -translate-y-1/2"
+								onClick={() => setShowPassword(!showPassword)}
+							>
+								{showPassword ? (
+									<FaEyeSlash className="text-black" />
+								) : (
+									<FaEye className="text-black" />
+								)}
+							</button>
+						</div>
 						<button
 							type="submit"
 							className={`py-4 px-24 rounded-lg mx-auto text-white font-bold uppercase hover:opacity-80 disabled:opacity-70 ${
