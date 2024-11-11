@@ -186,7 +186,7 @@ const Home = () => {
 	);
 
 	return (
-		<div className="bg-white text-gray-800 flex flex-col min-h-screen">
+		<div className="bg-white text-gray-800 flex flex-col min-h-screen mt-10">
 			<Header isLogin={true} cartCount={cartCount} />
 			<ToastContainer
 				style={{ top: "80px", right: "50px" }}
