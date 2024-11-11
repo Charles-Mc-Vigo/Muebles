@@ -11,7 +11,7 @@ const Footer = () => {
   };
   return (
     <footer className="bg-gray-200 p-10">
-      <div className="container  mx-auto grid grid-cols-1 md:grid-cols-5 gap-15 ">
+      <div className="container mx-auto grid grid-cols-1 md:grid-cols-5 gap-15">
         {/* Information */}
         <div>
           <h3 className="font-bold mb-4">Information</h3>
