@@ -6,7 +6,7 @@ const orderController = {
 	// Create new order from cart
 	createOrder: async (req, res) => {
 		try {
-			const { paymentMethod, shippingAddress, deliveryMode } = req.body; // Extract deliveryMode
+			const { paymentMethod, shippingAddress, deliveryMode, expectedDelivery } = req.body;
 			const userId = req.user._id;
 
 			if (!paymentMethod) {
@@ -15,7 +15,7 @@ const orderController = {
 				});
 			}
 
-			if (["GCash", "Maya", "COD"].includes(paymentMethod) && !req.file) {
+			if (["GCash", "Maya"].includes(paymentMethod) && !req.file) {
 				return res.status(400).json({
 					error: "Please upload proof of payment for the selected method.",
 				});
@@ -30,6 +30,8 @@ const orderController = {
 			if (!cart || cart.items.length === 0) {
 				return res.status(400).json({ error: "Cart is empty" });
 			}
+			console.log(cart)
+			console.log("Expected delivery: ", cart.expectedDelivery)
 
 			const shippingAddressObj = JSON.parse(shippingAddress);
 			const municipality = shippingAddressObj.municipality;
@@ -51,7 +53,9 @@ const orderController = {
 				proofOfPayment,
 				shippingAddressObj,
 				shippingFee,
-				deliveryMode // Pass delivery mode
+				deliveryMode,
+				expectedDelivery
+				
 			);
 
 			await Cart.findByIdAndUpdate(cart._id, {
@@ -70,6 +74,40 @@ const orderController = {
 			res.status(500).json({
 				error: "Error creating order",
 			});
+		}
+	},
+
+	preOrder: async(req, res) => {
+		try {
+
+			const {funitureId, quantity = 1, material, color, size,  paymentOption, paymentMethod, shippingAddress, deliveryMode} = req.body;
+			const userId = req.user._id;
+			const user = await User.findById(userId);
+			if(!user) return res.status(404).json({message:"User not found!"});
+
+			const preOrder = new Order({
+				user:userId,
+				furniture:funitureId,
+				material:material,
+				size:size,
+				color:color,
+				quantity: quantity,
+				shippingAddress:shippingAddress,
+				paymentOption:paymentOption,
+				paymentMethod : paymentMethod,
+				proofOfPayment,
+				deliveryMode:deliveryMode,
+				subtotal,
+				shippingFee,
+				totalAmount,
+			})
+
+			console.log(preOrder);
+			return res.status(201).json({message:"Pre-order was created!", preOrder})
+
+		} catch (error) {
+			console.log("Error creating pre-order:",error);
+			res.status(500).json({message:"Server error!"});
 		}
 	},
 
@@ -229,15 +267,6 @@ const orderController = {
 			});
 		}
 	},
-
-	// preOrder: async(req, res) => {
-	// 	try {
-			
-	// 	} catch (error) {
-	// 		console.log("Error creating pre-order:",error);
-	// 		res.status(500).json({message:"Server error!"});
-	// 	}
-	// }
 };
 
 module.exports = orderController;

@@ -14,7 +14,7 @@ exports.viewCart = async (req, res) => {
 		const cart = await Cart.findOne({ userId: user._id })
 			.populate({
 				path: "items.furnitureId",
-				select: "name description price images stocks colors",
+				select: "name description price images colors furnitureType"
 			})
 			.populate({
 				path: "userId",
@@ -40,7 +40,7 @@ exports.viewCart = async (req, res) => {
 // Add to Cart
 exports.addToCart = async (req, res) => {
 	try {
-		const { furnitureId, quantity = 1, material, color, size } = req.body;
+		const { furnitureId, quantity = 1, material, color, size, ECT } = req.body;
 		const user = await User.findById(req.user._id);
 
 		if (!user) return res.status(404).json({ error: "User not found!" });
@@ -74,9 +74,9 @@ exports.addToCart = async (req, res) => {
 		const existingItemIndex = cart.items.findIndex(
 			(item) =>
 				item.furnitureId.toString() === furnitureId &&
-				item.material.toString() === material &&
-				item.color.toString === color &&
-				item.size.toString() === size
+				item.material === material &&
+				item.color === color &&
+				item.size === size
 		);
 
 		if (existingItemIndex > -1) {
@@ -88,6 +88,7 @@ exports.addToCart = async (req, res) => {
 				material,
 				color,
 				size,
+				ECT,
 			});
 		}
 
@@ -101,7 +102,7 @@ exports.addToCart = async (req, res) => {
 		// Populate furniture details
 		await cart.populate([
 			{ path: "userId", select: "firstname email phoneNumber" }, // Populate specific user details
-			{ path: "items.furnitureId", select: "name description price image" }, // Populate furniture details
+			{ path: "items.furnitureId", select: "name description price image furnitureType" }, // Populate furniture details
 		]);
 
 		res.status(200).json({ success: "Item added to cart successfully", cart });

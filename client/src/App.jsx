@@ -39,11 +39,11 @@ import EditUserProfile from "./components/EditUserProfile";
 import EditAdminProfile from "./components/EditAdminProfile";
 
 import ViewOrder from "./components/ViewOrder";
-import DirectOrder from "./pages/DirectOrder";
 import AddNewAddress from "./components/AddNewAddress";
 import ViewUserOrder from "./components/ViewUserOrder";
 import ViewPendingRequest from "./pages/ViewPendingRequest";
 import ErrorBoundary from "./components/ErrorBoundary";
+import PreOrder from "./pages/PreOrder";
 // import LoadingSpinner from "./components/LoadingSpinner";
 
 
@@ -72,10 +72,6 @@ export default function App() {
 						element={<ProtectedRoute element={EditUserProfile} />}
 					/>
 					<Route
-						path="/direct-order/:furnitureId"
-						element={<ProtectedRoute element={DirectOrder} />}
-					/>
-					<Route
 						path="/address/new"
 						element={<ProtectedRoute element={AddNewAddress} />}
 					/>
@@ -98,6 +94,10 @@ export default function App() {
 					<Route
 						path={`/order-details/:orderId`}
 						element={<ProtectedRoute element={OrderDetails} />}
+					/>
+					<Route
+						path="/pre-order/:furnitureId"
+						element={<ProtectedRoute element={PreOrder} />}
 					/>
 					<Route path="/cart" element={<ProtectedRoute element={Cart} />} />
 					<Route path="/delivery-info" element={<DeliveryInfo />} />
@@ -201,7 +201,6 @@ export default function App() {
 					<Route path="/logout" element={<ProtectedRoute element={Logout} />} />
 				</Routes>
 			</BrowserRouter>
-			{/* <LoadingSpinner/> */}
 		</ErrorBoundary>
 	);
 }
