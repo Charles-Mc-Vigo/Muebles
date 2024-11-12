@@ -55,7 +55,7 @@ const Header = ({ isLogin, cartCount }) => {
   };
 
   return (
-    <header className=" w-full bg-white shadow-md ">
+    <header className="w-full bg-white shadow-md ">
       {/* Desktop Header */}
       <div className="hidden lg:block">
         <div className="max-w-7xl mx-auto px-4 py-4">
