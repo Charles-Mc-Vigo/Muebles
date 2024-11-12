@@ -4,6 +4,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css"; // Import Toastify
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import { FaEye, FaEyeSlash } from "react-icons/fa"; // Import eye icons
 
 export default function SignUp() {
 	const [formData, setFormData] = useState({
@@ -22,6 +23,8 @@ export default function SignUp() {
 	const [zipCode, setZipcode] = useState("");
 	const [availableBarangays, setAvailableBarangays] = useState([]);
 	const [loading, setLoading] = useState(false);
+	const [showPassword, setShowPassword] = useState(false); // State for password visibility
+	const [showConfirmPassword, setShowConfirmPassword] = useState(false); // State for confirm password visibility
 	const navigate = useNavigate();
 
 	const handleChange = (e) => {
@@ -281,7 +284,7 @@ export default function SignUp() {
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
-		setLoading(true)
+		setLoading(true);
 		if (formData.password !== formData.confirmPassword) {
 			toast.error("Passwords do not match");
 			return;
@@ -303,15 +306,13 @@ export default function SignUp() {
 			});
 			const data = await response.json();
 			if (!response.ok) {
-				setLoading(false)
+				setLoading(false);
 				throw new Error(data.error);
 			}
 			if (!data.newUser || !data.newUser._id) {
 				throw new Error("Invalid response from server");
 			}
-			toast.success(
-				data.success
-			);
+			toast.success(data.success);
 			navigate(`/verify-account/${data.newUser._id}`);
 		} catch (error) {
 			console.error("Sign up error:", error.message);
@@ -319,7 +320,7 @@ export default function SignUp() {
 				error.message || "An unexpected error occurred. Please try again."
 			);
 		}
-		setLoading(false)
+		setLoading(false);
 	};
 
 	return (
@@ -448,28 +449,46 @@ export default function SignUp() {
 								onChange={handleChange}
 								value={formData.email}
 							/>
-							<input
-								type="password"
-								placeholder="Password"
-								id="password"
-								required
-								className="bg-slate-100 p-3 rounded-lg"
-								onChange={handleChange}
-								value={formData.password}
-							/>
+							<div className="relative">
+								<input
+									type={showPassword ? "text" : "password"}
+									placeholder="Password"
+									id="password"
+									required
+									className="bg-slate-100 p-3 rounded-lg w-full"
+									onChange={handleChange}
+									value={formData.password}
+								/>
+								<button
+									type="button"
+									className="absolute right-3 top-1/2 transform -translate-y-1/2"
+									onClick={() => setShowPassword(!showPassword)}
+								>
+									{showPassword ? <FaEyeSlash /> : <FaEye />}
+								</button>
+							</div>
 							<label className="italic text-xs">
 								Password must contain at least 8 characters, including 1
 								uppercase letter, 1 lowercase letter, 1 number, and 1 symbol.
 							</label>
-							<input
-								type="password"
-								placeholder="Confirm password"
-								id="confirmPassword"
-								required
-								className="bg-slate-100 p-3 rounded-lg"
-								onChange={handleChange}
-								value={formData.confirmPassword}
-							/>
+							<div className="relative">
+								<input
+									type={showConfirmPassword ? "text" : "password"}
+									placeholder="Confirm password"
+									id="confirmPassword"
+									required
+									className="bg-slate-100 p-3 rounded-lg w-full"
+									onChange={handleChange}
+									value={formData.confirmPassword}
+								/>
+								<button
+									type="button"
+									className="absolute right-3 top-1/2 transform -translate-y-1/2"
+									onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+								>
+									{showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+								</button>
+							</div>
 							<div className="inline-flex items-center">
 								<label
 									className="flex items-center cursor-pointer relative"
