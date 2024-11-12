@@ -3,9 +3,11 @@ import ProductCard from "../components/ProductCard";
 import Footer from "../components/Footer";
 import Header from "../components/Header";
 import { ToastContainer, toast } from "react-toastify";
-import { FaFilter } from "react-icons/fa";
+import { FaFilter, FaTimes } from "react-icons/fa";
 import Select from "react-select";
+import Slider from "react-slider";
 import "react-toastify/dist/ReactToastify.css";
+
 
 const Home = () => {
   // State variables
@@ -18,7 +20,9 @@ const Home = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [selectedFurnitureTypes, setSelectedFurnitureTypes] = useState([]);
+  const [priceRange, setPriceRange] = useState([0, 120000]);
   const itemsPerPage = 8;
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   useEffect(() => {
     const fetchFurnitureData = async () => {
@@ -88,7 +92,7 @@ const Home = () => {
     console.log("Furniture data:", furnitureData);
 
     console.log("Item furniture types:", item.furnitureTypes);
-  console.log("Selected furniture types:", selectedFurnitureTypes);
+    console.log("Selected furniture types:", selectedFurnitureTypes);
 
     const categoryMatch =
       selectedCategories.length === 0 ||
@@ -97,17 +101,19 @@ const Home = () => {
       );
 
     const typeMatch =
-    selectedFurnitureTypes.length === 0 ||
-    (Array.isArray(selectedFurnitureTypes) &&
-      selectedFurnitureTypes.some((type) =>
-        item.furnitureType?.name?.toLowerCase() === type.value.toLowerCase()
-      )
-    );
-    return categoryMatch && typeMatch;
+      selectedFurnitureTypes.length === 0 ||
+      (Array.isArray(selectedFurnitureTypes) &&
+        selectedFurnitureTypes.some(
+          (type) =>
+            item.furnitureType?.name?.toLowerCase() === type.value.toLowerCase()
+        ));
+
+    const priceMatch =
+      item.price >= priceRange[0] && item.price <= priceRange[1];
+
+    return categoryMatch && typeMatch && priceMatch;
   });
   console.log("Furniture data:", furnitureData);
-
-
 
   // Pagination logic
   const totalPages = Math.ceil(filteredFurnitureData.length / itemsPerPage);
@@ -135,6 +141,36 @@ const Home = () => {
     setSelectedFurnitureTypes(selectedOption || []);
     console.log("Selected furniture types:", selectedOption);
   };
+  const handlePriceChange = (value) => {
+    setPriceRange(value);
+  };
+  const customStyles = {
+    option: (provided, state) => ({
+      ...provided,
+      backgroundColor: state.isFocused ? "#38b2ac" : "white", // teal on hover
+      color: state.isFocused ? "white" : "black",
+    }),
+    control: (provided) => ({
+      ...provided,
+      "&:hover": { borderColor: "#38b2ac" }, // Control hover border color
+    }),
+  };
+
+  // Toggle mobile filter
+  const toggleFilter = () => {
+    setIsFilterOpen(!isFilterOpen); // Toggle sidebar visibility
+  };
+  useEffect(() => {
+    // Handle body scroll when filter is open on mobile
+    if (isFilterOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    return () => {
+      document.body.style.overflow = "unset"; // Reset scroll when the component is unmounted or when filter closes
+    };
+  }, [isFilterOpen]);
 
   if (loading) {
     return (
@@ -155,8 +191,12 @@ const Home = () => {
   return (
     <div className="bg-white text-gray-800 flex flex-col min-h-screen">
       <Header isLogin={true} cartCount={cartCount} />
-      <ToastContainer style={{ top: "80px", right: "50px" }} autoClose={3000} hideProgressBar />
-      
+      <ToastContainer
+        style={{ top: "80px", right: "50px" }}
+        autoClose={3000}
+        hideProgressBar
+      />
+
       {/* Hero Section */}
       <section className="relative w-full h-48 sm:h-64 md:h-80">
         <img
@@ -170,98 +210,129 @@ const Home = () => {
           </h1>
         </div>
       </section>
-      
-      {/* Main Content */}
-      <div className="flex flex-col max-w-7xl mx-auto w-full px-4 py-8 border-teal-400 border mt-5 mb-5 shadow-2xl rounded-2xl">
-        
-        {/* Filter Section at the Top */}
-        <div className="flex flex-col md:flex-row items-start gap-6 mb-8">
-          <div className="flex items-center gap-2">
-            <FaFilter className="text-3xl text-teal-600" />
-            <h1 className="text-2xl font-semibold">Filter</h1>
-          </div>
-          <div className="w-full md:w-1/2">
-            <h2 className="text-xl font-semibold mb-2">Categories</h2>
-            <Select
-              isMulti
-              options={categories.map((category) => ({
-                value: category.name,
-                label: category.name,
-              }))}
-              value={selectedCategories}
-              onChange={handleCategoryChange}
-              placeholder="Select Categories"
-            />
-          </div>
-          <div className="w-full md:w-1/2">
-            <h2 className="text-xl font-semibold mb-2">Furniture Types</h2>
-            <Select
-              isMulti
-              options={furnitureTypes.map((type) => ({
-                value: type.name,
-                label: type.name,
-              }))}
-              value={selectedFurnitureTypes}
-              onChange={handleFurnitureTypeChange}
-              placeholder="Select Furniture Types"
-            />
-          </div>
-        </div>
 
-        {/* Products Grid */}
-        <div className="flex flex-col">
-          <h2 className="text-2xl md:text-3xl font-bold text-center mb-8">
-            Furniture Sets
-          </h2>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 md:gap-6">
-            {currentItems.length > 0 ? (
-              currentItems.map((furniture) => (
-                <ProductCard
-                  key={furniture._id}
-                  id={furniture._id}
-                  images={furniture.images}
-                  name={furniture.name}
-                  price={furniture.price}
-                  description={furniture.description}
-                  showViewDetails={true}
-                  showPreOrder={true}
-                  showUpdateButton={false}
-                  showToast={showToast}
-                  onAddToCart={() => {
-                    incrementCartCount();
-                    fetchCartCount();
-                  }}
+      {/* Main Content */}
+      <div className="flex flex-col max-w-7xl mx-auto w-full px-4 py-8 mb-2">
+        <div className="flex flex-col md:flex-row gap-6">
+          <div className="w-full md:w-1/4 bg-white  p-4 ">
+            <div className="flex items-center gap-2 mb-6 mt-2">
+              <FaFilter className="text-3xl text-teal-600" />
+              <h1 className="text-2xl font-semibold">Filter</h1>
+            </div>
+
+            <div className="flex flex-col flex-wrap justify-between w-full">
+              {/* Filter Categories */}
+              <div className="w-full lg:w-5/6 xl:w-3/4 mb-5">
+                <h2 className="text-xl font-semibold mb-2">Categories</h2>
+                <Select
+                  isMulti
+                  options={categories.map((category) => ({
+                    value: category.name,
+                    label: category.name,
+                  }))}
+                  value={selectedCategories}
+                  onChange={handleCategoryChange}
+                  placeholder="Select Categories"
+                  styles={customStyles}
                 />
-              ))
-            ) : (
-              <p className="text-center col-span-full text-gray-500">
-                No furniture sets available at the moment.
-              </p>
+              </div>
+
+              {/* Filter Furniture Types */}
+              <div className="w-full lg:w-5/6 xl:w-3/4 mb-5">
+                <h2 className="text-xl font-semibold mb-2">Furniture Types</h2>
+                <Select
+                  isMulti
+                  options={furnitureTypes.map((type) => ({
+                    value: type.name,
+                    label: type.name,
+                  }))}
+                  value={selectedFurnitureTypes}
+                  onChange={handleFurnitureTypeChange}
+                  placeholder="Select Furniture Types"
+                  styles={customStyles}
+                />
+              </div>
+              <div className="w-full lg:w-5/6 xl:w-3/4">
+                <h1 className="text-xl font-semibold mb-1">Price Range</h1>
+                <Slider
+                  min={0}
+                  max={120000}
+                  step={100}
+                  value={priceRange}
+                  onChange={handlePriceChange}
+                  range
+                  renderTrack={(props, state) => (
+                    <div {...props} className="bg-gray-500" />
+                  )}
+                  renderThumb={(props, state) => (
+                    <div
+                      {...props}
+                      className="bg-teal-600 w-4 h-4 rounded-full border-2"
+                    />
+                  )}
+                />
+                <div className="flex justify-between gap-5 mt-5 items-baseline border-t-2">
+                  <span>₱{priceRange[0]}</span>
+                  <span>₱{priceRange[1]}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          {/* Products Grid */}
+          <div className="flex-1 flex flex-col">
+            <h2 className="text-2xl md:text-3xl font-bold text-center mb-8">
+              Furniture Sets
+            </h2>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 md:gap-6">
+              {currentItems.length > 0 ? (
+                currentItems.map((furniture) => (
+                  <ProductCard
+                    key={furniture._id}
+                    id={furniture._id}
+                    images={furniture.images}
+                    name={furniture.name}
+                    price={furniture.price}
+                    description={furniture.description}
+                    showViewDetails={true}
+                    showPreOrder={true}
+                    showUpdateButton={false}
+                    showToast={showToast}
+                    onAddToCart={() => {
+                      incrementCartCount();
+                      fetchCartCount();
+                    }}
+                  />
+                ))
+              ) : (
+                <p className="text-center col-span-full text-gray-500">
+                  No furniture sets available at the moment.
+                </p>
+              )}
+            </div>
+
+            {/* Pagination */}
+            {filteredFurnitureData.length > itemsPerPage && (
+              <div className="mt-6 flex justify-between">
+                <button
+                  onClick={handlePreviousPage}
+                  className="bg-teal-500 text-white py-2 px-4 rounded-xl hover:bg-teal-700"
+                  disabled={currentPage === 1}
+                >
+                  Previous
+                </button>
+                <span>
+                  Page {currentPage} of {totalPages}
+                </span>
+                <button
+                  onClick={handleNextPage}
+                  className="bg-teal-500 text-white py-2 px-4 rounded-xl hover:bg-teal-700"
+                  disabled={currentPage === totalPages}
+                >
+                  Next
+                </button>
+              </div>
             )}
           </div>
-
-          {/* Pagination */}
-          {filteredFurnitureData.length > itemsPerPage && (
-            <div className="mt-6 flex justify-between">
-              <button
-                onClick={handlePreviousPage}
-                className="bg-teal-500 text-white py-2 px-4 rounded-xl hover:bg-teal-700"
-                disabled={currentPage === 1}
-              >
-                Previous
-              </button>
-              <span>
-                Page {currentPage} of {totalPages}
-              </span>
-              <button
-                onClick={handleNextPage}
-                className="bg-teal-500 text-white py-2 px-4 rounded-xl hover:bg-teal-700"
-                disabled={currentPage === totalPages}
-              >
-                Next
-              </button>
-            </div>
-          )}
         </div>
       </div>
       <Footer />
