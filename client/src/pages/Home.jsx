@@ -4,6 +4,7 @@ import Footer from "../components/Footer";
 import Header from "../components/Header";
 import { ToastContainer, toast } from "react-toastify";
 import { FaFilter } from "react-icons/fa";
+import Select from "react-select";
 import "react-toastify/dist/ReactToastify.css";
 
 const Home = () => {
@@ -85,16 +86,18 @@ const Home = () => {
   const filteredFurnitureData = furnitureData.filter((item) => {
     const categoryMatch =
       selectedCategories.length === 0 ||
-      selectedCategories.includes(item.category);
+      selectedCategories.some((category) =>
+        item.category.name.includes(category.value)
+      );
     const typeMatch =
       selectedFurnitureTypes.length === 0 ||
-      selectedFurnitureTypes.includes(item.furnitureTypes);
+      selectedFurnitureTypes.some((type) =>
+        item.furnitureTypes.some((furnitureType) =>
+          furnitureType.name.includes(type.value)
+        )
+      );
     return categoryMatch && typeMatch;
   });
-  console.log("Furniture Categories:", furnitureData.map((item) => item.category.name));
-  console.log("Furniture types:", furnitureData.map((item) => item.furnitureTypes));
-  console.log("Furniture Data:", furnitureData);
-
 
   // Pagination logic
   const totalPages = Math.ceil(filteredFurnitureData.length / itemsPerPage);
@@ -114,20 +117,12 @@ const Home = () => {
   };
 
   // Filter handlers
-  const handleCategoryChange = (category) => {
-    setSelectedCategories((prevCategories) =>
-      prevCategories.includes(category)
-        ? prevCategories.filter((c) => c !== category)
-        : [...prevCategories, category]
-    );
+  const handleCategoryChange = (selectedOption) => {
+    setSelectedCategories(selectedOption || []);
   };
 
-  const handleFurnitureTypeChange = (type) => {
-    setSelectedFurnitureTypes((prevTypes) =>
-      prevTypes.includes(type)
-        ? prevTypes.filter((t) => t !== type)
-        : [...prevTypes, type]
-    );
+  const handleFurnitureTypeChange = (selectedOption) => {
+    setSelectedFurnitureTypes(selectedOption || []);
   };
 
   if (loading) {
@@ -175,47 +170,32 @@ const Home = () => {
               <FaFilter className="text-3xl text-teal-600" />
               <h1 className="text-justify text-3xl font-semibold">Filter</h1>
             </li>
-            <h2 className="text-3xl font-semibold mb-1 mt-5">Categories</h2>
-            <ul className="space-y-2 text-lg font-bold">
-              {categories.map((category) => (
-                <li key={category._id} className="flex items-center">
-                  <input
-                    type="checkbox"
-                    id={`category-${category._id}`}
-                    value={category.name}
-                    className="w-4 h-4 rounded border-gray-300 text-teal-600 focus:ring-teal-500"
-                    onChange={() => handleCategoryChange(category.name)}
-                  />
-                  <label
-                    htmlFor={`category-${category._id}`}
-                    className="ml-2 text-xl font-medium"
-                  >
-                    {category.name}
-                  </label>
-                </li>
-              ))} 
-            </ul>
             
-            <h2 className="text-2xl font-semibold mb-3">Furniture Types</h2>
-            <ul className="space-y-2">
-              {furnitureTypes.map((type) => (
-                <li key={type._id} className="flex items-center">
-                  <input
-                    type="checkbox"
-                    id={`furniture-type-${type._id}`}
-                    value={type.name}
-                    className="w-4 h-4 rounded border-gray-300 text-teal-600 focus:ring-teal-500"
-                    onChange={() => handleFurnitureTypeChange(type.name)}
-                  />
-                  <label
-                    htmlFor={`furniture-type-${type._id}`}
-                    className="ml-2 text-xl font-medium"
-                  >
-                    {type.name}
-                  </label>
-                </li>
-              ))}
-            </ul>
+            <h2 className="text-3xl font-semibold mb-3 mt-5">Categories</h2>
+            <Select
+              isMulti
+              options={categories.map((category) => ({
+                value: category.name,
+                label: category.name,
+              }))}
+              value={selectedCategories}
+              onChange={handleCategoryChange}
+              placeholder="Select Categories"
+              className="mb-6"
+            />
+            
+            <h2 className="text-3xl font-semibold mb-1 mt-5">Furniture Types</h2>
+            <Select
+              isMulti
+              options={furnitureTypes.map((type) => ({
+                value: type.name,
+                label: type.name,
+              }))}
+              value={selectedFurnitureTypes}
+              onChange={handleFurnitureTypeChange}
+              placeholder="Select Furniture Types"
+              className="mb-6"
+            />
           </ul>
         </aside>
         
@@ -260,9 +240,6 @@ const Home = () => {
             >
               Previous
             </button>
-            <span className="flex items-center justify-center text-lg text-gray-700">
-              Page {currentPage} of {totalPages}
-            </span>
             <button
               onClick={handleNextPage}
               className="bg-teal-600 text-white px-4 py-2 rounded-md hover:bg-teal-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
@@ -273,6 +250,8 @@ const Home = () => {
           </div>
         </main>
       </div>
+      
+      {/* Footer */}
       <Footer />
     </div>
   );
