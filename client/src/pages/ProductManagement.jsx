@@ -165,18 +165,36 @@ const ProductManagement = () => {
 
 	const handleInputChange = (e) => {
 		const { name, value, type, checked } = e.target;
-		if (name === "price" && value < 0) {
-			toast.error("Price cannot be negative");
-			return;
-		}
+
 		if (type === "checkbox") {
 			if (name === "material") {
+				const updatedMaterials = checked
+					? [...newFurniture.materials, value]
+					: newFurniture.materials.filter((material) => material !== value);
+
 				setNewFurniture((prev) => ({
 					...prev,
-					materials: checked
-						? [...prev.materials, value]
-						: prev.materials.filter((material) => material !== value),
+					materials: updatedMaterials,
 				}));
+
+				// Calculate the lowest price from the selected materials
+				const selectedMaterials = materials.filter((material) =>
+					updatedMaterials.includes(material.name)
+				);
+				const lowestPriceMaterial = selectedMaterials.reduce(
+					(min, material) => {
+						return material.price < min ? material.price : min;
+					},
+					Infinity
+				);
+
+				// Set the price to the lowest material price
+				if (lowestPriceMaterial !== Infinity) {
+					setNewFurniture((prev) => ({
+						...prev,
+						price: lowestPriceMaterial,
+					}));
+				}
 			} else if (name === "color") {
 				setNewFurniture((prev) => ({
 					...prev,
@@ -227,20 +245,6 @@ const ProductManagement = () => {
 			});
 	};
 
-	// const handleFileChange = (e) => {
-	// 	const files = Array.from(e.target.files);
-
-	// 	if (files.length > 5) {
-	// 		toast.error("You can only upload a maximum of 5 images.");
-	// 		return;
-	// 	}
-
-	// 	setNewFurniture((prev) => ({
-	// 		...prev,
-	// 		images: files, // store the selected files directly
-	// 	}));
-	// };
-
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 		setLoading(true);
@@ -265,19 +269,23 @@ const ProductManagement = () => {
 
 		// Append each image to FormData (files)
 		newFurniture.images.forEach((file, index) => {
-			formData.append("images", file); // "images" is the field name in the backend
+			formData.append("images", file);
 		});
+
+		// Log FormData content
+		for (let [key, value] of formData.entries()) {
+			console.log(`${key}:`, value);
+		}
 
 		try {
 			const response = await fetch("http://localhost:3000/api/furnitures/add", {
 				method: "POST",
-				headers: {
-					// "Content-Type": "multipart/form-data", <-- do not set this manually
-				},
+				// headers: {
+				// "Content-Type": "multipart/form-data",
+				// },
 				credentials: "include",
 				body: formData,
 			});
-
 			if (response.ok) {
 				const data = await response.json();
 				toast.success(data.message);
@@ -295,10 +303,11 @@ const ProductManagement = () => {
 				selectedCategory("");
 				selectedFurnitureType("");
 				fetchData();
+			}else{
+				toast.error(data.message)
 			}
 		} catch (error) {
 			console.error("Error adding new Furniture:", error);
-			toast.error("Failed to add new Furniture");
 		}
 		setLoading(false);
 	};
@@ -339,7 +348,7 @@ const ProductManagement = () => {
 							required
 							className="border rounded p-2 w-full"
 						>
-							<option value="">Select Type</option>
+							<option value="">Select Furniture type</option>
 							{filteredFurnitureTypes.map((furnitureType) => (
 								<option key={furnitureType._id} value={furnitureType._id}>
 									{furnitureType.name}
@@ -365,17 +374,15 @@ const ProductManagement = () => {
 							required
 							className="border rounded p-2 w-full"
 						/>
-						<input
-							id="price"
-							type="number"
-							name="price"
-							placeholder="Price"
-							value={newFurniture.price}
-							onChange={handleInputChange}
-							required
-							min="0"
-							className="border rounded p-2 w-full"
-						/>
+						<div className="p-2">
+							<p className="italic font-ligth p-2">
+								Note: Price will change base on the lowest price selected
+								material
+							</p>
+							<p id="price" className="border rounded p-2 w-full bg-gray-100">
+								{newFurniture.price || "Select material"}
+							</p>
+						</div>
 
 						<div className="mt-4 mb-4 bg-slate-200 rounded-md px-5 py-2">
 							<label className="block font-semibold">Materials:</label>
@@ -443,7 +450,7 @@ const ProductManagement = () => {
 						{/* Sizes */}
 						<div className="mb-4 bg-slate-200 rounded-md p-2">
 							<label className="block font-semibold my-2 mb-2">
-								Sizes: (Height X Width X Length X Depth)
+								Sizes: <span className="font-light">( Height X Width X Length X Depth )</span>
 							</label>
 							<div className="flex flex-wrap">
 								{filteredSizes.length > 0 ? (
@@ -517,7 +524,6 @@ const ProductManagement = () => {
 				<table className="min-w-full border-collapse border border-gray-200">
 					<thead>
 						<tr className="bg-gray-100">
-							<th className="border border-gray-300 p-2">Furniture Id</th>
 							<th className="border border-gray-300 p-2">Image</th>
 							<th className="border border-gray-300 p-2">Name</th>
 							<th className="border border-gray-300 p-2">Category</th>
@@ -525,7 +531,7 @@ const ProductManagement = () => {
 							<th className="border border-gray-300 p-2">Type</th>
 							<th className="border border-gray-300 p-2">Colors</th>
 							<th className="border border-gray-300 p-2">
-								Sizes <br /> (Height X Width X Depth)
+								Sizes <br /> (Height X Width X Length X Depth)
 							</th>
 							<th className="border border-gray-300 p-2">Materials</th>
 							<th className="border border-gray-300 p-2">Price</th>
@@ -538,9 +544,6 @@ const ProductManagement = () => {
 									key={furniture._id}
 									className="hover:bg-gray-50 transition-colors"
 								>
-									<td className="border border-gray-300 p-2">
-										{furniture._id}
-									</td>
 									<td className="border border-gray-300 p-2 flex justify-center">
 										{furniture.images.length > 0 ? (
 											<img
@@ -582,8 +585,8 @@ const ProductManagement = () => {
 										{furniture.sizes && furniture.sizes.length > 0
 											? furniture.sizes.map((size) => (
 													<span key={size._id} className="block">
-														{size.label} <br /> ({size.height} X {size.width} X{" "}
-														{size.depth})
+														{size.label} <br /> ({size.height} X {size.width} X
+														{size.length} X {size.depth})
 													</span>
 											  ))
 											: "N/A"}

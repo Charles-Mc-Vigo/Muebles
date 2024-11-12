@@ -120,7 +120,7 @@ const Maintenance = () => {
 	const initialSizeState = {
 		label: "",
 		height: "",
-		length:"",
+		length: "",
 		width: "",
 		depth: "",
 		furnitureTypeId: "",
@@ -136,7 +136,11 @@ const Maintenance = () => {
 	const [colors, setColors] = useState([]);
 	const [sizes, setSizes] = useState([]);
 	const [materials, setMaterials] = useState([]);
-	const [newMaterial, setNewMaterial] = useState({ name: "", price: "" });
+	const [newMaterial, setNewMaterial] = useState({
+		name: "",
+		price: "",
+		stock: "",
+	});
 	const [selectedFilter, setSelectedFilter] = useState("");
 	const [selectedFurnitureType, setSelectedFurnitureType] = useState("");
 	const [selectedCategory, setSelectedCategory] = useState("");
@@ -284,8 +288,8 @@ const Maintenance = () => {
 
 	const handleAddNewMaterial = async () => {
 		setLoading(true);
-		const { name, price } = newMaterial;
-		if (!name || !price) {
+		const { name, price, stock } = newMaterial;
+		if (!name || !price || !stock) {
 			toast.error("Please provide valid name and stocks.");
 			return;
 		}
@@ -296,12 +300,12 @@ const Maintenance = () => {
 					"Content-Type": "application/json",
 				},
 				credentials: "include",
-				body: JSON.stringify({ name, price }),
+				body: JSON.stringify({ name, price, stock }),
 			});
 
 			if (response.ok) {
 				toast.success("Material added successfully.");
-				setNewMaterial({ name: "", price: "" }); // Reset input
+				setNewMaterial({ name: "", price: "", stock: "" }); // Reset input
 				await fetchMaterials(); // Refresh the list
 			} else {
 				const errorData = await response.json();
@@ -655,7 +659,7 @@ const Maintenance = () => {
 									"Estimated Completion Time (ECT)",
 									"ect",
 									ect,
-									(e) => setECT(e.target.value) // Update ECT state
+									(e) => setECT(e.target.value)
 								)}
 							</>
 						)}
@@ -755,6 +759,17 @@ const Maintenance = () => {
 										}),
 									"number"
 								)}
+								{renderInputField(
+									"Stock",
+									"stock",
+									newMaterial.stock,
+									(e) =>
+										setNewMaterial({
+											...newMaterial,
+											stock: e.target.value,
+										}),
+									"number"
+								)}
 							</>
 						)}
 						<button
@@ -850,13 +865,14 @@ const Maintenance = () => {
 							<h2 className="text-2xl font-bold mb-4">Furniture Materials</h2>
 							<div className="max-h-96 overflow-y-auto">
 								<Table
-									headers={["Material Name", "Price"]}
+									headers={["Material Name", "Price", "Stocks"]}
 									data={
 										Array.isArray(materials)
 											? materials.map((material) => ({
 													id: material._id,
-													name: material.name || "N/A",
-													price: material.price || "N/A",
+													name: material.name,
+													price: material.price,
+													stock: material.stock,
 											  }))
 											: []
 									}
@@ -886,7 +902,7 @@ const Maintenance = () => {
 													id: size._id,
 													label: size.label || "N/A",
 													heigth: size.height || "N/A",
-													length:size.length || "N/A",
+													length: size.length || "N/A",
 													width: size.width || "N/A",
 													depth: size.depth || "N/A",
 													furnitureTypes:
