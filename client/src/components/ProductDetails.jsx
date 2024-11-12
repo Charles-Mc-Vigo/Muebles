@@ -263,7 +263,7 @@ function ProductDetails({ admin }) {
 											<span
 												key={material.id}
 												onClick={() => handleMaterialClick(material)}
-												className={`border border-black px-2 py-1 rounded-md  cursor-pointer transition ${
+												className={`border font-normal text-xl px-2 py-1 rounded-md  cursor-pointer transition ${
 													selectedMaterial === material.name
 														? "bg-teal-600 text-black"
 														: "text-black"
@@ -281,7 +281,7 @@ function ProductDetails({ admin }) {
 											<span
 												key={size.id}
 												onClick={() => handleSizeClick(size)}
-												className={`border px-2 py-1 rounded-md cursor-pointer transition ${
+												className={`border px-2 py-1 rounded-md font-normal text-base cursor-pointer transition ${
 													selectedSize === size.label
 														? "bg-teal-600 text-black"
 														: "text-black"
