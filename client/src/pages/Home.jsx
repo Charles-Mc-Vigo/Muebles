@@ -89,13 +89,18 @@ const Home = () => {
       selectedCategories.some((category) =>
         item.category.name.includes(category.value)
       );
+
     const typeMatch =
       selectedFurnitureTypes.length === 0 ||
-      selectedFurnitureTypes.some((type) =>
-        item.furnitureTypes.some((furnitureType) =>
-          furnitureType.name.includes(type.value)
+      (Array.isArray(selectedFurnitureTypes) &&
+        selectedFurnitureTypes.some((type) =>
+          Array.isArray(item.furnitureTypes) &&
+          item.furnitureTypes.some((furnitureType) =>
+            furnitureType.name.includes(type.value)
+          )
         )
       );
+
     return categoryMatch && typeMatch;
   });
 
@@ -161,17 +166,16 @@ const Home = () => {
       </section>
       
       {/* Main Content */}
-      <div className="flex flex-col md:flex-row flex-1 max-w-7xl mx-auto w-full px-2 py-2 gap-2">
+      <div className="flex flex-col max-w-7xl mx-auto w-full px-4 py-8 border-teal-400 border mt-5 mb-5 shadow-2xl rounded-2xl">
         
-        {/* Filter Section */}
-        <aside className="w-full md:w-64 lg:w-72 p-6 mt-16 mb-5">
-          <ul className="flex flex-col items-start gap-2">
-            <li className="flex items-center gap-2">
-              <FaFilter className="text-3xl text-teal-600" />
-              <h1 className="text-justify text-3xl font-semibold">Filter</h1>
-            </li>
-            
-            <h2 className="text-3xl font-semibold mb-3 mt-5">Categories</h2>
+        {/* Filter Section at the Top */}
+        <div className="flex flex-col md:flex-row items-start gap-6 mb-8">
+          <div className="flex items-center gap-2">
+            <FaFilter className="text-3xl text-teal-600" />
+            <h1 className="text-2xl font-semibold">Filter</h1>
+          </div>
+          <div className="w-full md:w-1/2">
+            <h2 className="text-xl font-semibold mb-2">Categories</h2>
             <Select
               isMulti
               options={categories.map((category) => ({
@@ -181,10 +185,10 @@ const Home = () => {
               value={selectedCategories}
               onChange={handleCategoryChange}
               placeholder="Select Categories"
-              className="mb-6"
             />
-            
-            <h2 className="text-3xl font-semibold mb-1 mt-5">Furniture Types</h2>
+          </div>
+          <div className="w-full md:w-1/2">
+            <h2 className="text-xl font-semibold mb-2">Furniture Types</h2>
             <Select
               isMulti
               options={furnitureTypes.map((type) => ({
@@ -194,13 +198,12 @@ const Home = () => {
               value={selectedFurnitureTypes}
               onChange={handleFurnitureTypeChange}
               placeholder="Select Furniture Types"
-              className="mb-6"
             />
-          </ul>
-        </aside>
-        
+          </div>
+        </div>
+
         {/* Products Grid */}
-        <main className="flex-1 mt-5 mb-5 py-2 px-2">
+        <div className="flex flex-col">
           <h2 className="text-2xl md:text-3xl font-bold text-center mb-8">
             Furniture Sets
           </h2>
@@ -231,27 +234,30 @@ const Home = () => {
             )}
           </div>
 
-          {/* Pagination Controls */}
-          <div className="flex justify-center mt-8 gap-4">
-            <button
-              onClick={handlePreviousPage}
-              className="bg-teal-600 text-white px-4 py-2 rounded-md hover:bg-teal-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
-              disabled={currentPage === 1}
-            >
-              Previous
-            </button>
-            <button
-              onClick={handleNextPage}
-              className="bg-teal-600 text-white px-4 py-2 rounded-md hover:bg-teal-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
-              disabled={currentPage === totalPages}
-            >
-              Next
-            </button>
-          </div>
-        </main>
+          {/* Pagination */}
+          {filteredFurnitureData.length > itemsPerPage && (
+            <div className="mt-6 flex justify-between">
+              <button
+                onClick={handlePreviousPage}
+                className="bg-teal-500 text-white py-2 px-4 rounded-xl hover:bg-teal-700"
+                disabled={currentPage === 1}
+              >
+                Previous
+              </button>
+              <span>
+                Page {currentPage} of {totalPages}
+              </span>
+              <button
+                onClick={handleNextPage}
+                className="bg-teal-500 text-white py-2 px-4 rounded-xl hover:bg-teal-700"
+                disabled={currentPage === totalPages}
+              >
+                Next
+              </button>
+            </div>
+          )}
+        </div>
       </div>
-      
-      {/* Footer */}
       <Footer />
     </div>
   );

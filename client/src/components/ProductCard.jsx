@@ -28,7 +28,7 @@ const ProductCard = ({
       : desc;
   };
 
-  const maxnameLength = 10;
+  const maxnameLength = 15;
   const maxDescriptionLength = 60;
   const navigate = useNavigate();
 
@@ -76,7 +76,7 @@ const ProductCard = ({
   };
 
   return (
-    <div className="bg-white  border-2 rounded-md shadow-lg transition-transform transform hover:scale-105 p-3 flex flex-col justify-between w-auto">
+    <div className="bg-white  border rounded-md shadow-lg transition-transform transform hover:scale-105 p-3 border-teal-400 flex flex-col justify-between w-auto">
       <Link to={`/furnitures/${id}`} className="flex-grow">
         {/* Ensure images is defined and has items before rendering */}
         {images && Array.isArray(images) && images.length > 0 && (
