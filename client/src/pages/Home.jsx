@@ -50,6 +50,7 @@ const Home = () => {
           "http://localhost:3000/api/furniture-types"
         );
         const data = await response.json();
+        console.log("Fetched furniture types:", data); // Add this line
         setFurnitureTypes(data);
       } catch (error) {
         console.error("Failed to fetch furniture types:", error);
@@ -84,6 +85,11 @@ const Home = () => {
 
   // Filtered furniture data
   const filteredFurnitureData = furnitureData.filter((item) => {
+    console.log("Furniture data:", furnitureData);
+
+    console.log("Item furniture types:", item.furnitureTypes);
+  console.log("Selected furniture types:", selectedFurnitureTypes);
+
     const categoryMatch =
       selectedCategories.length === 0 ||
       selectedCategories.some((category) =>
@@ -91,18 +97,17 @@ const Home = () => {
       );
 
     const typeMatch =
-      selectedFurnitureTypes.length === 0 ||
-      (Array.isArray(selectedFurnitureTypes) &&
-        selectedFurnitureTypes.some((type) =>
-          Array.isArray(item.furnitureTypes) &&
-          item.furnitureTypes.some((furnitureType) =>
-            furnitureType.name.includes(type.value)
-          )
-        )
-      );
-
+    selectedFurnitureTypes.length === 0 ||
+    (Array.isArray(selectedFurnitureTypes) &&
+      selectedFurnitureTypes.some((type) =>
+        item.furnitureType?.name?.toLowerCase() === type.value.toLowerCase()
+      )
+    );
     return categoryMatch && typeMatch;
   });
+  console.log("Furniture data:", furnitureData);
+
+
 
   // Pagination logic
   const totalPages = Math.ceil(filteredFurnitureData.length / itemsPerPage);
@@ -128,6 +133,7 @@ const Home = () => {
 
   const handleFurnitureTypeChange = (selectedOption) => {
     setSelectedFurnitureTypes(selectedOption || []);
+    console.log("Selected furniture types:", selectedOption);
   };
 
   if (loading) {
