@@ -82,7 +82,7 @@ const ProductCard = ({
 				)}
 				<div>
 					<h3 className="text-xl font-bold text-gray-800">{name}</h3>
-					<p className="mt-2 text-lg text-green-600">₱ {price}</p>
+					<p className="mt-2 text-lg text-green-600">{price}</p>
 					<p className="mt-2 text-gray-500">
 						{truncateDescription(description, maxDescriptionLength)}
 					</p>
