@@ -315,7 +315,7 @@ function ProductDetails({ admin }) {
 						</div>
 					</div>
 					{/* Advertisement Section */}
-					<div
+					{/* <div
 						className="w-full mb-5 max-w-[1829px] p-10 mt-5 rounded-lg shadow-lg mx-auto"
 						style={{ backgroundColor: "#ecede4" }}
 					>
@@ -339,7 +339,7 @@ function ProductDetails({ admin }) {
 						<p className="text-sm text-center text-gray-500">
 							Founded in Marinduque, 2003
 						</p>
-					</div>
+					</div> */}
 					<div
 						className="w-full h-full mb-5 max-w-[1829px] max-h-[500px] p-10 mt-5 rounded-lg shadow-lg mx-auto"
 						style={{ backgroundColor: "#ecede4" }}
