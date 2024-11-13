@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import ProductCard from "../components/ProductCard";
 import Footer from "../components/Footer";
 import Header from "../components/Header";
@@ -7,7 +7,6 @@ import { FaFilter, FaTimes } from "react-icons/fa";
 import Select from "react-select";
 import Slider from "react-slider";
 import "react-toastify/dist/ReactToastify.css";
-
 
 const Home = () => {
   // State variables
@@ -33,12 +32,13 @@ const Home = () => {
         });
         const data = await response.json();
         setFurnitureData(Array.isArray(data) ? data : data?.furnitures || []);
-        setLoading(false);
       } catch (error) {
         setError("Failed to fetch furniture sets");
+      } finally {
         setLoading(false);
       }
     };
+
     const fetchCategories = async () => {
       try {
         const response = await fetch("http://localhost:3000/api/categories");
@@ -48,13 +48,13 @@ const Home = () => {
         console.error("Failed to fetch categories:", error);
       }
     };
+
     const fetchFurnitureTypes = async () => {
       try {
         const response = await fetch(
           "http://localhost:3000/api/furniture-types"
         );
         const data = await response.json();
-        console.log("Fetched furniture types:", data); // Add this line
         setFurnitureTypes(data);
       } catch (error) {
         console.error("Failed to fetch furniture types:", error);
@@ -88,32 +88,26 @@ const Home = () => {
   const incrementCartCount = () => setCartCount((prevCount) => prevCount + 1);
 
   // Filtered furniture data
-  const filteredFurnitureData = furnitureData.filter((item) => {
-    console.log("Furniture data:", furnitureData);
-
-    console.log("Item furniture types:", item.furnitureTypes);
-    console.log("Selected furniture types:", selectedFurnitureTypes);
-
-    const categoryMatch =
-      selectedCategories.length === 0 ||
-      selectedCategories.some((category) =>
-        item.category.name.includes(category.value)
-      );
-
-    const typeMatch =
-      selectedFurnitureTypes.length === 0 ||
-      (Array.isArray(selectedFurnitureTypes) &&
-        selectedFurnitureTypes.some(
-          (type) =>
-            item.furnitureType?.name?.toLowerCase() === type.value.toLowerCase()
-        ));
-
-    const priceMatch =
-      item.price >= priceRange[0] && item.price <= priceRange[1];
-
-    return categoryMatch && typeMatch && priceMatch;
-  });
-  console.log("Furniture data:", furnitureData);
+  const filteredFurnitureData = useMemo(() => {
+    return furnitureData.filter((item) => {
+      const categoryMatch =
+        selectedCategories.length === 0 ||
+        selectedCategories.some((category) =>
+          item.category.name.includes(category.value)
+        );
+      const typeMatch =
+        selectedFurnitureTypes.length === 0 ||
+        (Array.isArray(selectedFurnitureTypes) &&
+          selectedFurnitureTypes.some(
+            (type) =>
+              item.furnitureType?.name?.toLowerCase() ===
+              type.value.toLowerCase()
+          ));
+      const priceMatch =
+        item.price >= priceRange[0] && item.price <= priceRange[1];
+      return categoryMatch && typeMatch && priceMatch;
+    });
+  }, [furnitureData, selectedCategories, selectedFurnitureTypes, priceRange]);
 
   // Pagination logic
   const totalPages = Math.ceil(filteredFurnitureData.length / itemsPerPage);
@@ -139,36 +133,40 @@ const Home = () => {
 
   const handleFurnitureTypeChange = (selectedOption) => {
     setSelectedFurnitureTypes(selectedOption || []);
-    console.log("Selected furniture types:", selectedOption);
   };
+
   const handlePriceChange = (value) => {
     setPriceRange(value);
   };
+
   const customStyles = {
     option: (provided, state) => ({
       ...provided,
-      backgroundColor: state.isFocused ? "#38b2ac" : "white", // teal on hover
+      backgroundColor: state.isFocused ? "#38b2ac" : "white",
       color: state.isFocused ? "white" : "black",
     }),
     control: (provided) => ({
       ...provided,
-      "&:hover": { borderColor: "#38b2ac" }, // Control hover border color
+      width: "70%",
+      minWidth: "200px",
+      maxWidth: "100px",
+      "&:hover": { borderColor: "#38b2ac" },
     }),
   };
 
   // Toggle mobile filter
   const toggleFilter = () => {
-    setIsFilterOpen(!isFilterOpen); // Toggle sidebar visibility
+    setIsFilterOpen(!isFilterOpen);
   };
+
   useEffect(() => {
-    // Handle body scroll when filter is open on mobile
     if (isFilterOpen) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "unset";
     }
     return () => {
-      document.body.style.overflow = "unset"; // Reset scroll when the component is unmounted or when filter closes
+      document.body.style.overflow = "unset";
     };
   }, [isFilterOpen]);
 
@@ -181,12 +179,75 @@ const Home = () => {
   }
 
   if (error) {
+    showToast(error, "error"); // Show toast notification on error
     return (
       <div className="min-h-screen flex items-center justify-center text-red-600">
         <p>Error: {error}</p>
       </div>
     );
   }
+
+  const FilterContent = () => (
+    <div className="flex flex-col flex-wrap justify-between w-full">
+      {/* Filter Categories */}
+
+      <div className="w-full lg:w-3/4 xl:w-2/3 mb-5  p-2">
+        <h2 className="text-xl text-justify font-semibold mb-2">Categories</h2>
+        <Select
+          isMulti
+          options={categories.map((category) => ({
+            value: category.name,
+            label: category.name,
+          }))}
+          value={selectedCategories}
+          onChange={handleCategoryChange}
+          placeholder="Select Categories"
+          styles={customStyles}
+        />
+      </div>
+      {/* Filter Furniture Types */}
+      <div className="w-full lg:w-5/6 xl:w-3/4 mb-5  p-2">
+        <h2 className="text-xl font-semibold mb-2 whitespace-nowrap ">
+          Furniture Types
+        </h2>
+        <Select
+          isMulti
+          options={furnitureTypes.map((type) => ({
+            value: type.name,
+            label: type.name,
+          }))}
+          value={selectedFurnitureTypes}
+          onChange={handleFurnitureTypeChange}
+          placeholder="Select Furniture Types"
+          styles={customStyles}
+        />
+      </div>
+      <div className="w-full lg:w-5/6 xl:w-3/4">
+        <h1 className="text-xl font-semibold mb-1">Price Range</h1>
+        <Slider
+          min={0}
+          max={120000}
+          step={100}
+          value={priceRange}
+          onChange={handlePriceChange}
+          range
+          renderTrack={(props, state) => (
+            <div {...props} className="bg-gray-500" />
+          )}
+          renderThumb={(props, state) => (
+            <div
+              {...props}
+              className="bg-teal-600 w-4 h-4 rounded-full border-2"
+            />
+          )}
+        />
+        <div className="flex justify-between gap-5 mt-5 items-baseline border-t-2">
+          <span>₱{priceRange[0]}</span>
+          <span>₱{priceRange[1]}</span>
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <div className="bg-white text-gray-800 flex flex-col min-h-screen">
@@ -196,7 +257,6 @@ const Home = () => {
         autoClose={3000}
         hideProgressBar
       />
-
       {/* Hero Section */}
       <section className="relative w-full h-48 sm:h-64 md:h-80">
         <img
@@ -210,74 +270,53 @@ const Home = () => {
           </h1>
         </div>
       </section>
-
       {/* Main Content */}
       <div className="flex flex-col max-w-7xl mx-auto w-full px-4 py-8 mb-2">
-        <div className="flex flex-col md:flex-row gap-6">
-          <div className="w-full md:w-1/4 bg-white  p-4 ">
-            <div className="flex items-center gap-2 mb-6 mt-2">
-              <FaFilter className="text-3xl text-teal-600" />
-              <h1 className="text-2xl font-semibold">Filter</h1>
-            </div>
-
-            <div className="flex flex-col flex-wrap justify-between w-full">
-              {/* Filter Categories */}
-              <div className="w-full lg:w-5/6 xl:w-3/4 mb-5">
-                <h2 className="text-xl font-semibold mb-2">Categories</h2>
-                <Select
-                  isMulti
-                  options={categories.map((category) => ({
-                    value: category.name,
-                    label: category.name,
-                  }))}
-                  value={selectedCategories}
-                  onChange={handleCategoryChange}
-                  placeholder="Select Categories"
-                  styles={customStyles}
-                />
+        {/* Filter Button (Mobile) */}
+        <button
+          onClick={toggleFilter}
+          className="md:hidden fixed bottom-4 right-4 z-30 bg-teal-600 text-white p-4 rounded-full shadow-lg"
+          aria-label="Toggle filters"
+        >
+          <FaFilter className="text-xl" />
+        </button>
+        <div className="flex flex-col md:flex-row gap-6 ">
+          <aside
+            className={`fixed md:static inset-0 z-40 ${
+              isFilterOpen ? "block" : "hidden"
+            } md:block w-full md:w-64 lg:w-72`}
+          >
+            <div
+              className="md:hidden fixed inset-0 bg-black bg-opacity-50"
+              onClick={toggleFilter}
+            />
+            <div
+              className={`fixed md:static right-0 top-0 h-full w-72 bg-white border-teal-500 border-l-2 rounded-l-xl p-2 items-baseline overflow-y-auto transform transition-transform duration-300 ${
+                isFilterOpen ? "translate-x-0" : "translate-x-full"
+              } md:transform-none`}
+            >
+              <div className="flex items-center p-2 justify-between">
+                <h1 className="text-3xl font-semibold text-teal-600 ">JCKAME</h1>
+                <button
+                  onClick={toggleFilter}
+                  className="md:hidden text-teal-500 hover:text-teal-800"
+                >
+                  <FaTimes className="text-3xl" />
+                </button>
               </div>
 
-              {/* Filter Furniture Types */}
-              <div className="w-full lg:w-5/6 xl:w-3/4 mb-5">
-                <h2 className="text-xl font-semibold mb-2">Furniture Types</h2>
-                <Select
-                  isMulti
-                  options={furnitureTypes.map((type) => ({
-                    value: type.name,
-                    label: type.name,
-                  }))}
-                  value={selectedFurnitureTypes}
-                  onChange={handleFurnitureTypeChange}
-                  placeholder="Select Furniture Types"
-                  styles={customStyles}
-                />
-              </div>
-              <div className="w-full lg:w-5/6 xl:w-3/4">
-                <h1 className="text-xl font-semibold mb-1">Price Range</h1>
-                <Slider
-                  min={0}
-                  max={120000}
-                  step={100}
-                  value={priceRange}
-                  onChange={handlePriceChange}
-                  range
-                  renderTrack={(props, state) => (
-                    <div {...props} className="bg-gray-500" />
-                  )}
-                  renderThumb={(props, state) => (
-                    <div
-                      {...props}
-                      className="bg-teal-600 w-4 h-4 rounded-full border-2"
-                    />
-                  )}
-                />
-                <div className="flex justify-between gap-5 mt-5 items-baseline border-t-2">
-                  <span>₱{priceRange[0]}</span>
-                  <span>₱{priceRange[1]}</span>
+              {/* FilterSection in Main */}
+              <div className="mt-5 p-2 gap-2 flex-col">
+                <div className="flex items-baseline mb-2">
+                  <FaFilter className="text-2xl mb-1 text-teal-600 " />
+                  <h1 className="text-2xl text-justify font-semibold px-2">
+                    Filter
+                  </h1>
                 </div>
+                <FilterContent />
               </div>
             </div>
-          </div>
+          </aside>
           {/* Products Grid */}
           <div className="flex-1 flex flex-col">
             <h2 className="text-2xl md:text-3xl font-bold text-center mb-8">
@@ -309,7 +348,6 @@ const Home = () => {
                 </p>
               )}
             </div>
-
             {/* Pagination */}
             {filteredFurnitureData.length > itemsPerPage && (
               <div className="mt-6 flex justify-between">

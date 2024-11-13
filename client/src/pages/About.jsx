@@ -22,7 +22,7 @@ const About = () => {
         
       </div>
       {/* About Section */}
-      <section className="bg-white rounded-lg shadow-md p-6 sm:p-8 w-full h-auto flex flex-col justify-center items-center ">
+      <section className="bg-white rounded-lg shadow-md p-6 sm:p-8 w-full h-auto flex flex-col justify-center items-center my-5">
         <div className="mb-6 sm:mb-8 text-left flex flex-col justify-center items-center">
           <h2 className="text-2xl sm:text-3xl font-semibold text-black mb-4 text-center">
             About Us
