@@ -1,5 +1,60 @@
 const mongoose = require("mongoose");
 
+const preOrderSchema = new mongoose.Schema({
+	user: {
+		type: mongoose.Schema.Types.ObjectId,
+		ref: "User",
+		required: true,
+	},
+	furniture:{
+		type:mongoose.Schema.Types.ObjectId,
+		ref:"Furniture"
+	},
+	material:{type:String},
+	color:{type:String},
+	size:{type:String},
+	quantity:{type:Number},
+	orderNumber: {
+		type: String,
+		unique: true,
+	},
+	shippingAddress: {
+		streetAddress: String,
+		municipality: String,
+		barangay: String,
+		zipCode: Number,
+	},
+	paymentOption:{
+		type:String,
+		require:true,
+	},
+	paymentMethod: {
+		type: String,
+		enum: ["GCash", "Maya"],
+		required: true,
+	},
+	proofOfPayment: {
+		type: String,
+		required: true,
+	},
+	orderStatus: {
+		type: String,
+		enum: ["pending", "confirmed", "delivered", "cancelled"],
+		default: "pending",
+	},
+	deliveryMode:{
+		type:String,
+	},
+	expectedDelivery:{
+		type:String
+	},
+	subtotal: Number,
+	shippingFee: Number,
+	totalAmount: Number,
+},{
+	timestamps: true,
+})
+
 const orderSchema = new mongoose.Schema(
 	{
 		user: {
@@ -125,5 +180,7 @@ orderSchema.statics.createFromCart = async function(cartId, paymentMethod, proof
 
   return this.create(orderData);
 };
+
 const Order = mongoose.model("Order", orderSchema);
-module.exports = Order;
+const PreOrder = mongoose.model("PreOrder", preOrderSchema);
+module.exports = {Order,PreOrder};

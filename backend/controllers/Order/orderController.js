@@ -1,12 +1,17 @@
 const Order = require("../../models/Order/orderModel");
 const Cart = require("../../models/Cart/cartModel");
 const User = require("../../models/User/userModel");
+const Furniture = require('../../models/Furniture/furnitureModel');
+const Materials = require('../../models/Furniture/materialsModel');
+const FurnitureType = require('../../models/Furniture/furnitureTypeModel')
+const Category = require('../../models/Furniture/categoryModel');
 
 const orderController = {
 	// Create new order from cart
 	createOrder: async (req, res) => {
 		try {
-			const { paymentMethod, shippingAddress, deliveryMode, expectedDelivery } = req.body;
+			const { paymentMethod, shippingAddress, deliveryMode, expectedDelivery } =
+				req.body;
 			const userId = req.user._id;
 
 			if (!paymentMethod) {
@@ -30,8 +35,8 @@ const orderController = {
 			if (!cart || cart.items.length === 0) {
 				return res.status(400).json({ error: "Cart is empty" });
 			}
-			console.log(cart)
-			console.log("Expected delivery: ", cart.expectedDelivery)
+			console.log(cart);
+			console.log("Expected delivery: ", cart.expectedDelivery);
 
 			const shippingAddressObj = JSON.parse(shippingAddress);
 			const municipality = shippingAddressObj.municipality;
@@ -55,7 +60,6 @@ const orderController = {
 				shippingFee,
 				deliveryMode,
 				expectedDelivery
-				
 			);
 
 			await Cart.findByIdAndUpdate(cart._id, {
@@ -77,37 +81,104 @@ const orderController = {
 		}
 	},
 
-	preOrder: async(req, res) => {
+	preOrder: async (req, res) => {
 		try {
+			const {
+				furnitureId,
+				quantity = 1,
+				material,
+				color,
+				size,
+				paymentOption,
+				paymentMethod,
+				shippingAddress,
+				deliveryMode,
+				proofOfPayment,
+			} = req.body;
 
-			const {funitureId, quantity = 1, material, color, size,  paymentOption, paymentMethod, shippingAddress, deliveryMode} = req.body;
 			const userId = req.user._id;
 			const user = await User.findById(userId);
-			if(!user) return res.status(404).json({message:"User not found!"});
+			if (!user) return res.status(404).json({ message: "User not found!" });
 
-			const preOrder = new Order({
-				user:userId,
-				furniture:funitureId,
-				material:material,
-				size:size,
-				color:color,
+			// Calculate subtotal based on furniture price (assuming you have a way to get the price)
+			const furniture = await Furniture.findById(furnitureId);
+			if (!furniture)
+				return res.status(404).json({ message: "Furniture not found!" });
+
+			const furnitureCategoryId = furniture.category;
+			const furnitureFurnitureType = furniture.furnitureType;
+
+			const category = await Category.findById(furnitureCategoryId);
+			const furnitureType = await FurnitureType.findById(furnitureFurnitureType);
+
+
+			// const furnitureType = await FurnitureType.findById(category._id);
+
+			// res.status(200).json({message:`${furnitureType.name} found`, furnitureType});
+
+			// res.status(200).json({message:`${category.name} found`, category});
+
+			// const furnitureTypeECT = await FurnitureType({name:{$in:{furniture.category}}})
+
+			if(!["Full_Payment","Partial_Payment"].includes(paymentOption)){
+				return res.status(400).json({message:"Please select only valid payment options!"})
+			}
+
+			const selectedMaterial = await Materials.findOne({name:{$in:material}});
+			// res.status(201).json(selectedMaterial)
+
+			const subtotal = selectedMaterial * quantity;
+
+
+			// const subtotal = furniture.price * quantity;
+
+			// Calculate shipping fee (you can adjust this logic as needed)
+			const shippingFees = {
+				Boac: 500,
+				Mogpog: 700,
+				Gasan: 500,
+				Buenavista: 800,
+				Santa_Cruz: 3000,
+				Torrijos: 3000,
+			};
+			const shippingAddressObj = JSON.parse(shippingAddress);
+			const municipality = shippingAddressObj.municipality;
+			const shippingFee = shippingFees[municipality] || 0;
+
+			// Calculate total amount
+			const totalAmount = subtotal + shippingFee;
+
+			// const proofOfPayment = req.file
+			// 	? req.file.buffer.toString("base64")
+			// 	: null;
+
+			const preOrder = new Order.PreOrder({
+				user: userId,
+				furniture: furnitureId,
+				material: material,
+				size: size,
+				color: color,
 				quantity: quantity,
-				shippingAddress:shippingAddress,
-				paymentOption:paymentOption,
-				paymentMethod : paymentMethod,
-				proofOfPayment,
-				deliveryMode:deliveryMode,
-				subtotal,
-				shippingFee,
-				totalAmount,
-			})
+				shippingAddress: shippingAddressObj,
+				paymentOption: paymentOption,
+				paymentMethod: paymentMethod,
+				proofOfPayment: proofOfPayment,
+				deliveryMode: deliveryMode,
+				subtotal: subtotal,
+				shippingFee: shippingFee,
+				totalAmount: totalAmount,
+				expectedDelivery:furnitureType.ECT,
+			});
+
+			// await preOrder.save(); // Save the pre-order to the database
 
 			console.log(preOrder);
-			return res.status(201).json({message:"Pre-order was created!", preOrder})
-
+			return res
+				.status(201)
+				.json({ message: "Pre-order was created!", preOrder });
 		} catch (error) {
-			console.log("Error creating pre-order:",error);
-			res.status(500).json({message:"Server error!"});
+			console.log("Error creating pre-order:", error);
+			res.status(500).json({ message: "Server error!" });
 		}
 	},
 
