@@ -44,6 +44,8 @@ import ViewUserOrder from "./components/ViewUserOrder";
 import ViewPendingRequest from "./pages/ViewPendingRequest";
 import ErrorBoundary from "./components/ErrorBoundary";
 import PreOrder from "./pages/PreOrder";
+// import LoadingSpinner from "./components/LoadingSpinner";
+
 
 export default function App() {
 	return (

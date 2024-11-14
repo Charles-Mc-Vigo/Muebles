@@ -54,8 +54,13 @@ export default function Login() {
 		<>
 			<Header />
 			<div
-				className="min-h-screen bg-cover flex flex-col justify-center items-center"
-				style={{ backgroundImage: "url('/landingimage/login.png')" }}
+				className="min-h-screen flex flex-col justify-center items-center mb-5 mt-5"
+				style={{
+					backgroundImage: "url(/landingimage/login.png)",
+					backgroundSize: "contain",
+					backgroundPosition: "center",
+					backgroundRepeat: "no-repeat",
+				}}
 			>
 				<div className="bg-teal-800 bg-opacity-90 p-10 md:p-12 rounded-lg max-w-lg w-full relative shadow-lg">
 					{/* Back Button */}

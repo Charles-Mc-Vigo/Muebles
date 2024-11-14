@@ -5,70 +5,75 @@ import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
 
 const ProductCard = ({
-	id,
-	images,
-	name,
-	price,
-	description,
-	showPreOrder,
-	showUpdateButton,
-	showArchiveButton,
-	showUnArchivedButton,
-	onArchiveSuccess,
-	onUnArchiveSuccess,
+  id,
+  images,
+  name,
+  price,
+  description,
+  showPreOrder,
+  showUpdateButton,
+  showArchiveButton,
+  showUnArchivedButton,
+  onArchiveSuccess,
+  onUnArchiveSuccess,
 }) => {
-	// Function to truncate the description
-	const truncateDescription = (desc, maxLength) => {
-		return desc.length > maxLength
-			? `${desc.substring(0, maxLength)}...`
-			: desc;
-	};
+  // Function to truncate the description
+  const truncateDescription = (desc, maxLength) => {
+    // Ensure description is a string before checking its length
+    if (typeof desc !== "string") {
+      return "";
+    }
+    return desc.length > maxLength
+      ? `${desc.substring(0, maxLength)}...`
+      : desc;
+  };
 
-	const maxDescriptionLength = 60;
-	const navigate = useNavigate();
+  const maxnameLength = 15;
+  const maxDescriptionLength = 60;
+  const navigate = useNavigate();
 
-	const archiveItem = async (e) => {
-		e.stopPropagation();
-		if (!window.confirm("Are you sure you want to archive this item?")) return;
+  const archiveItem = async (e) => {
+    e.stopPropagation();
+    if (!window.confirm("Are you sure you want to archive this item?")) return;
 
-		try {
-			const response = await fetch(
-				`http://localhost:3000/api/furnitures/archive/${id}`,
-				{
-					method: "DELETE",
-					headers: { "Content-Type": "application/json" },
-					credentials: "include",
-				}
-			);
-			const data = await response.json();
-			toast.success(data.success);
-			onArchiveSuccess();
-		} catch (error) {
-			toast.error("Error archiving item. Please try again.");
-		}
-	};
+    try {
+      const response = await fetch(
+        `http://localhost:3000/api/furnitures/archive/${id}`,
+        {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+        }
+      );
+      const data = await response.json();
+      toast.success(data.success);
+      onArchiveSuccess();
+    } catch (error) {
+      toast.error("Error archiving item. Please try again.");
+    }
+  };
 
-	const unarchiveItem = async (e) => {
-		e.stopPropagation();
-		if (!window.confirm("Are you sure you want to unarchive this item?"))
-			return;
+  const unarchiveItem = async (e) => {
+    e.stopPropagation();
+    if (!window.confirm("Are you sure you want to unarchive this item?"))
+      return;
 
-		try {
-			const response = await fetch(
-				`http://localhost:3000/api/furnitures/unarchive/${id}`,
-				{
-					method: "POST",
-					headers: { "Content-Type": "application/json" },
-					credentials: "include",
-				}
-			);
-			const data = await response.json();
-			toast.success(data.success);
-			onUnArchiveSuccess();
-		} catch (error) {
-			toast.error("Error unarchiving item. Please try again.");
-		}
-	};
+    try {
+      const response = await fetch(
+        `http://localhost:3000/api/furnitures/unarchive/${id}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+        }
+      );
+      const data = await response.json();
+      toast.success(data.success);
+      onUnArchiveSuccess();
+    } catch (error) {
+      toast.error("Error unarchiving item. Please try again.");
+    }
+  };
 
 	return (
 		<div className="bg-white border-2 rounded-md shadow-lg transition-transform transform hover:scale-105 p-6 flex flex-col justify-between w-auto">

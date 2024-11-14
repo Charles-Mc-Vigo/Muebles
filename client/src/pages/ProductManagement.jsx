@@ -277,6 +277,7 @@ const ProductManagement = () => {
 			console.log(`${key}:`, value);
 		}
 
+		
 		try {
 			const response = await fetch("http://localhost:3000/api/furnitures/add", {
 				method: "POST",
@@ -306,6 +307,8 @@ const ProductManagement = () => {
 			}else{
 				toast.error(data.message)
 			}
+
+			
 		} catch (error) {
 			console.error("Error adding new Furniture:", error);
 		}
@@ -376,11 +379,10 @@ const ProductManagement = () => {
 						/>
 						<div className="p-2">
 							<p className="italic font-ligth p-2">
-								Note: Price will change base on the lowest price selected
-								material
+								Note: Furniture price will change base on the material cost.
 							</p>
 							<p id="price" className="border rounded p-2 w-full bg-gray-100">
-								{newFurniture.price || "Select material"}
+								{newFurniture.price || "Please select the available materials for this furniture"}
 							</p>
 						</div>
 
