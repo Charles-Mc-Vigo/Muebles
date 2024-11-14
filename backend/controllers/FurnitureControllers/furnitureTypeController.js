@@ -35,7 +35,7 @@ exports.AddFurnitureType = async (req, res) => {
 // Get All Furniture Types
 exports.GetFurnitureType = async (req, res) => {
   try {
-    const furnitureType = await FurnitureType.find({isArchived:false});
+    const furnitureType = await FurnitureType.find({isArchived:false}).populate("name ECT")
     if (furnitureType.length === 0) {
       return res.status(200).json({ message: "No furniture type found!" });
     }

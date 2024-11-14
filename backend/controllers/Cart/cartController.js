@@ -97,7 +97,7 @@ exports.addToCart = async (req, res) => {
 		cart.totalAmount = await calculateTotalAmount(cart.items);
 
 		await cart.save();
-		console.log(cart)
+		// console.log(cart)
 
 		// Populate furniture details
 		await cart.populate([

@@ -39,7 +39,7 @@ const Cart = () => {
 			// Get the highest ECT value among the items
 			const maxECT = Math.max(...items.map((item) => item.ECT || 0));
 
-			console.log("Max ECT among items:", maxECT);
+			// console.log("Max ECT among items:", maxECT);
 
 			// Calculate the expected delivery date based on the max ECT
 			const startDeliveryDate = new Date();
@@ -167,23 +167,23 @@ const Cart = () => {
 		for (const [key, value] of formData.entries()) {
 			console.log(`${key}:`, value);
 		}
-		try {
-			const response = await fetch("http://localhost:3000/api/orders/create", {
-				method: "POST",
-				body: formData,
-				credentials: "include",
-			});
-			const data = await response.json();
-			if (!data.ok) {
-				toast.error(data.error);
-			}
-			const orderId = data.order._id;
-			navigate(`/order-details/${orderId}`);
-			await fetchCartItems();
-		} catch (error) {
-			setError(error.message);
-			setLoading(false);
-		}
+		// try {
+		// 	const response = await fetch("http://localhost:3000/api/orders/create", {
+		// 		method: "POST",
+		// 		body: formData,
+		// 		credentials: "include",
+		// 	});
+		// 	const data = await response.json();
+		// 	if (!data.ok) {
+		// 		toast.error(data.error);
+		// 	}
+		// 	const orderId = data.order._id;
+		// 	navigate(`/order-details/${orderId}`);
+		// 	await fetchCartItems();
+		// } catch (error) {
+		// 	setError(error.message);
+		// 	setLoading(false);
+		// }
 	};
 
 	// Handle updating the quantity of an item in the cart
