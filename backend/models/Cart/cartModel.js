@@ -32,7 +32,7 @@ const cartSchema = new mongoose.Schema({
   expectedDelivery:{type:String},
   totalAmount: {
     type: Number,
-    default: 0 // Initial total amount set to 0
+    default: 0
   }
 }, { timestamps: true });
 

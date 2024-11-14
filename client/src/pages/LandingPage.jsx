@@ -7,7 +7,7 @@ const  LandingPage = () => {
 	return(
 		<div>
 			<div> 
-			<Header isLogin={true}  /> </div>
+			<Header /> </div>
 			<div>
 				<Hero/>
 			</div>

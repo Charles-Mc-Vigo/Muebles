@@ -208,6 +208,7 @@ const OrderDetails = () => {
 						)}
 					</div>
 					<div className="bg-white border flex flex-col border-teal-400 rounded-xl p-4 md:p-6 text-right gap-2">
+						<h1>Payment Option: {order.paymentOption}</h1>
 						<h1>Delivery Option: {order.deliveryMode}</h1>
 						<h1>Expected Delivery: {order.expectedDelivery}</h1>
 						<h1>Subtotal: PHP {order.subtotal.toFixed(2)}</h1>
@@ -253,7 +254,7 @@ const OrderDetails = () => {
 								</div>
 								<div>
 									<button
-										onClick={() => navigate('/home')}
+										onClick={() => navigate("/home")}
 										className="bg-blue-500 text-white px-4 py-2 rounded"
 									>
 										Continue Shopping
