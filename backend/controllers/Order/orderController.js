@@ -93,7 +93,6 @@ const orderController = {
 				paymentMethod,
 				shippingAddress,
 				deliveryMode,
-				proofOfPayment,
 			} = req.body;
 
 			const userId = req.user._id;
@@ -125,9 +124,12 @@ const orderController = {
 			}
 
 			const selectedMaterial = await Materials.findOne({name:{$in:material}});
-			// res.status(201).json(selectedMaterial)
+			// res.status(201).json(selectedMaterial.price);
 
-			const subtotal = selectedMaterial * quantity;
+			const subtotal = selectedMaterial.price * quantity;
+			// res.status(201).json(subtotal);
+			
+
 
 
 			// const subtotal = furniture.price * quantity;
@@ -147,10 +149,14 @@ const orderController = {
 
 			// Calculate total amount
 			const totalAmount = subtotal + shippingFee;
+			// res.status(201).json(shippingFee);
 
-			// const proofOfPayment = req.file
-			// 	? req.file.buffer.toString("base64")
-			// 	: null;
+
+			let proofOfPayment;
+			if (req.file) {
+				proofOfPayment = req.file.buffer.toString("base64");
+			}
+			
 
 			const preOrder = new Order.PreOrder({
 				user: userId,
