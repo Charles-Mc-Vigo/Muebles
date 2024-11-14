@@ -155,8 +155,8 @@ const Cart = () => {
 				credentials: "include",
 			});
 
-			if(!response.ok){
-				throw new Error(response.message)
+			if (!response.ok) {
+				throw new Error(response.message);
 			}
 			const data = await response.json();
 			if (!data.ok) {
@@ -424,7 +424,7 @@ const Cart = () => {
 								<div className="bg-slate-100 p-2 px-4 rounded m-2">
 									{expectedDeliveryDate && (
 										<div className="flex justify-between">
-											<span>Expected Delivery:</span>
+											<span className="font-semibold">Expected Delivery:</span>
 											<span>{expectedDeliveryDate}</span>
 										</div>
 									)}
@@ -433,9 +433,24 @@ const Cart = () => {
 						</div>
 						{/* Payment method selection */}
 						<div className="shadow-xl border-t-2 mb-2 p-6 rounded-xl">
-							<div className="flex flex-col">
-								<h3 className="text-lg font-semibold mb-2">Payment Options:</h3>
-								<label className="flex items-center">
+							<div className="flex flex-col bg-slate-100 p-5">
+								<div className="bg-slate-50">
+									<p>
+										<strong>Partial Payment</strong> (3-Month Plan) <br /> Pay
+										in installments over 3 months with no interest if paid
+										within this period. Interest applies to any unpaid balance
+										after 3 months.
+									</p>
+									<br />
+									<p>
+										<strong>Full Payment</strong> <br /> Pay the entire amount
+										upfront with no additional charges.
+									</p>
+								</div>
+
+
+								<h3 className="text-lg font-semibold mt-5 mb-2">Payment Options:</h3>
+								<label className="flex items-center mb-2">
 									<input
 										type="radio"
 										value="Partial Payment"
@@ -461,7 +476,9 @@ const Cart = () => {
 						<div className="shadow-xl border-t-2 mb-2 p-6 rounded-xl">
 							<div className="flex-1 flex-col w-auto h-auto">
 								<div className="pt-5">
-									<h3 className="text-lg font-semibold mb-2">Payment Methods:</h3>
+									<h3 className="text-lg font-semibold mb-2">
+										Payment Methods:
+									</h3>
 									<div className="flex gap-4">
 										{/* Gcash payment */}
 										<button
