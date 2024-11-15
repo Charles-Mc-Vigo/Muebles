@@ -64,7 +64,7 @@ const OrderDetails = () => {
 
 	return (
 		<div>
-			<Header />
+			<Header isLogin={true} cartCount={true}/>
 			<div className="max-w-4xl mx-auto p-4 md:p-8 bg-white shadow-xl rounded-xl mt-5 mb-5 border-2">
 				<div className="flex items-center justify-between mb-6">
 					<button onClick={() => navigate(-1)} className="text-gray-500">

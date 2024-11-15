@@ -129,17 +129,19 @@ const orderSchema = new mongoose.Schema(
 		expectedDelivery:{
 			type:String
 		},
+		remainingBalance:{
+			type:Number
+		},
 		subtotal: Number,
 		shippingFee: Number,
 		totalAmount: Number,
-
 	},
 	{
 		timestamps: true,
 	}
 );
 
-// Generate simple order number
+// order number
 orderSchema.pre("save", async function (next) {
 	if (!this.orderNumber) {
 		const date = new Date();
@@ -156,8 +158,24 @@ orderSchema.statics.createFromCart = async function(cartId, paymentMethod, proof
       .populate('userId')
       .populate('items.furnitureId');
   if (!cart) throw new Error('Cart not found');
-	// console.log(shippingFee)
 
+	console.log("From the model. Payment option is ", paymentOption);
+
+	//calculation para sa partial payment ksksks
+	let partialPayment
+	let remainingHalf
+	let partialPaymentplusShippingFee
+	if(paymentOption === "Partial Payment"){
+		partialPayment = cart.totalAmount / 2;
+		remainingHalf = partialPayment;
+		partialPaymentplusShippingFee = partialPayment + shippingFee;
+		console.log(`Cart total is ${cart.totalAmount} divided by 2 = ${partialPayment}`)
+		console.log("total amount ng partial payment plus shipping fee", partialPaymentplusShippingFee);
+		
+	}
+
+
+	
   const orderData = {
       user: cart.userId._id,
       items: cart.items.map(item => ({
@@ -173,12 +191,14 @@ orderSchema.statics.createFromCart = async function(cartId, paymentMethod, proof
       paymentMethod: paymentMethod,
       subtotal: cart.totalAmount,
       shippingFee: shippingFee,
-      totalAmount: cart.totalAmount + shippingFee,
+			totalAmount: paymentOption === "Partial Payment" ? partialPaymentplusShippingFee : (cart.totalAmount + shippingFee),
+			remainingBalance: remainingHalf,
       proofOfPayment: proofOfPayment,
       deliveryMode: deliveryMode,
 			expectedDelivery:expectedDelivery,
 			paymentOption: paymentOption
   };
+
 
   return this.create(orderData);
 };

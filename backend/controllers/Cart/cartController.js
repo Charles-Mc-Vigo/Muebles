@@ -101,8 +101,8 @@ exports.addToCart = async (req, res) => {
 
 		// Populate furniture details
 		await cart.populate([
-			{ path: "userId", select: "firstname email phoneNumber" }, // Populate specific user details
-			{ path: "items.furnitureId", select: "name description price image furnitureType" }, // Populate furniture details
+			{ path: "userId", select: "firstname email phoneNumber" },
+			{ path: "items.furnitureId", select: "name description price image furnitureType" },
 		]);
 
 		res.status(200).json({ success: "Item added to cart successfully", cart });

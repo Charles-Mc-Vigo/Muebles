@@ -14,6 +14,15 @@ const orderController = {
 				req.body;
 			const userId = req.user._id;
 
+			// res.status(200).json(paymentOption)
+			//decision kung if partial or payment
+			if(paymentOption === "Partial Payment"){
+				console.log("Payment option is Partial payment")
+			}else{
+				console.log("Payment option is Full payment")
+
+			}
+
 			if (!paymentMethod) {
 				return res.status(400).json({
 					error: "Please select a payment method to proceed.",
@@ -64,15 +73,15 @@ const orderController = {
 				expectedDelivery,
 			);
 
-			await Cart.findByIdAndUpdate(cart._id, {
-				items: [],
-				count: 0,
-				totalAmount: 0,
-			});
+			// await Cart.findByIdAndUpdate(cart._id, {
+			// 	items: [],
+			// 	count: 0,
+			// 	totalAmount: 0,
+			// });
 
-			await User.findByIdAndUpdate(userId, {
-				$push: { orders: order._id, proofOfPayment },
-			});
+			// await User.findByIdAndUpdate(userId, {
+			// 	$push: { orders: order._id, proofOfPayment },
+			// });
 
 			res.status(201).json({ success: "Order placed successfully!", order });
 		} catch (error) {
