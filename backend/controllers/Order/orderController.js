@@ -1,10 +1,10 @@
 const Order = require("../../models/Order/orderModel");
 const Cart = require("../../models/Cart/cartModel");
 const User = require("../../models/User/userModel");
-// const Furniture = require('../../models/Furniture/furnitureModel');
-// const Materials = require('../../models/Furniture/materialsModel');
-// const FurnitureType = require('../../models/Furniture/furnitureTypeModel')
-// const Category = require('../../models/Furniture/categoryModel');
+const Furniture = require('../../models/Furniture/furnitureModel');
+const Materials = require('../../models/Furniture/materialsModel');
+const FurnitureType = require('../../models/Furniture/furnitureTypeModel')
+const Category = require('../../models/Furniture/categoryModel');
 
 const orderController = {
 	// Create new order from cart
@@ -92,112 +92,113 @@ const orderController = {
 		}
 	},
 
-	// preOrder: async (req, res) => {
-	// 	try {
-	// 		const {
-	// 			furnitureId,
-	// 			quantity = 1,
-	// 			material,
-	// 			color,
-	// 			size,
-	// 			paymentOption,
-	// 			paymentMethod,
-	// 			shippingAddress,
-	// 			deliveryMode,
-	// 		} = req.body;
+	preOrder: async (req, res) => {
+		try {
+			const {
+				furnitureId,
+				quantity = 1,
+				material,
+				color,
+				size,
+				paymentOption,
+				paymentMethod,
+				shippingAddress,
+				deliveryMode,
+				expectedDelivery
+			} = req.body;
 
-	// 		const userId = req.user._id;
-	// 		const user = await User.findById(userId);
-	// 		if (!user) return res.status(404).json({ message: "User not found!" });
+			const userId = req.user._id;
+			const user = await User.findById(userId);
+			if (!user) return res.status(404).json({ message: "User not found!" });
 
-	// 		// Calculate subtotal based on furniture price (assuming you have a way to get the price)
-	// 		const furniture = await Furniture.findById(furnitureId);
-	// 		if (!furniture)
-	// 			return res.status(404).json({ message: "Furniture not found!" });
+			// Calculate subtotal based on furniture price (assuming you have a way to get the price)
+			const furniture = await Furniture.findById(furnitureId);
+			if (!furniture)
+				return res.status(404).json({ message: "Furniture not found!" });
 
-	// 		const furnitureCategoryId = furniture.category;
-	// 		const furnitureFurnitureType = furniture.furnitureType;
+			const furnitureCategoryId = furniture.category;
+			const furnitureFurnitureType = furniture.furnitureType;
 
-	// 		const category = await Category.findById(furnitureCategoryId);
-	// 		const furnitureType = await FurnitureType.findById(furnitureFurnitureType);
+			const category = await Category.findById(furnitureCategoryId);
+			const furnitureType = await FurnitureType.findById(furnitureFurnitureType);
 
 
-	// 		// const furnitureType = await FurnitureType.findById(category._id);
+			// const furnitureType = await FurnitureType.findById(category._id);
 
-	// 		// res.status(200).json({message:`${furnitureType.name} found`, furnitureType});
+			// res.status(200).json({message:`${furnitureType.name} found`, furnitureType});
 
-	// 		// res.status(200).json({message:`${category.name} found`, category});
+			// res.status(200).json({message:`${category.name} found`, category});
 
-	// 		// const furnitureTypeECT = await FurnitureType({name:{$in:{furniture.category}}})
+			// const furnitureTypeECT = await FurnitureType({name:{$in:{furniture.category}}})
 
-	// 		if(!["full_payment","partial_payment"].includes(paymentOption)){
-	// 			return res.status(400).json({message:"Please select only valid payment options!"})
-	// 		}
+			if(!["Partial Payment","Full Payment"].includes(paymentOption)){
+				return res.status(400).json({message:"Please select only valid payment options!"})
+			}
 
-	// 		const selectedMaterial = await Materials.findOne({name:{$in:material}});
-	// 		// res.status(201).json(selectedMaterial.price);
+			const selectedMaterial = await Materials.findOne({name:{$in:material}});
+			// res.status(201).json(selectedMaterial.price);
 
-	// 		const subtotal = selectedMaterial.price * quantity;
-	// 		// res.status(201).json(subtotal);
+			const subtotal = selectedMaterial.price * quantity;
+			// res.status(201).json(subtotal);
 			
 
 
 
-	// 		// const subtotal = furniture.price * quantity;
+			// const subtotal = furniture.price * quantity;
 
-	// 		// Calculate shipping fee (you can adjust this logic as needed)
-	// 		const shippingFees = {
-	// 			Boac: 500,
-	// 			Mogpog: 700,
-	// 			Gasan: 500,
-	// 			Buenavista: 800,
-	// 			Santa_Cruz: 3000,
-	// 			Torrijos: 3000,
-	// 		};
-	// 		const shippingAddressObj = JSON.parse(shippingAddress);
-	// 		const municipality = shippingAddressObj.municipality;
-	// 		const shippingFee = shippingFees[municipality] || 0;
+			// Calculate shipping fee (you can adjust this logic as needed)
+			const shippingFees = {
+				Boac: 500,
+				Mogpog: 700,
+				Gasan: 500,
+				Buenavista: 800,
+				Santa_Cruz: 3000,
+				Torrijos: 3000,
+			};
+			const shippingAddressObj = JSON.parse(shippingAddress);
+			const municipality = shippingAddressObj.municipality;
+			const shippingFee = shippingFees[municipality] || 0;
 
-	// 		// Calculate total amount
-	// 		const totalAmount = subtotal + shippingFee;
-	// 		// res.status(201).json(shippingFee);
+			// Calculate total amount
+			const totalAmount = subtotal + shippingFee;
+			// res.status(201).json(shippingFee);
 
 
-	// 		let proofOfPayment;
-	// 		if (req.file) {
-	// 			proofOfPayment = req.file.buffer.toString("base64");
-	// 		}
+			let proofOfPayment;
+			if (req.file) {
+				proofOfPayment = req.file.buffer.toString("base64");
+			}
 			
 
-	// 		const preOrder = new Order.PreOrder({
-	// 			user: userId,
-	// 			furniture: furnitureId,
-	// 			material: material,
-	// 			size: size,
-	// 			color: color,
-	// 			quantity: quantity,
-	// 			shippingAddress: shippingAddressObj,
-	// 			paymentOption: paymentOption,
-	// 			paymentMethod: paymentMethod,
-	// 			proofOfPayment,
-	// 			deliveryMode: deliveryMode,
-	// 			subtotal: subtotal,
-	// 			shippingFee: shippingFee,
-	// 			totalAmount: totalAmount,
-	// 			expectedDelivery:furnitureType.ECT,
-	// 		});
+			const preOrder = await Order.preOrder(
+				userId,
+				furnitureId,
+				material,
+				color,
+				size,
+				quantity,
+				paymentMethod,
+				proofOfPayment,
+				paymentOption,
+				shippingAddress,
+				shippingFee,
+				deliveryMode,
+				expectedDelivery,
+				subtotal,
+				totalAmount,
+			);
 
-	// 		// await preOrder.save(); // Save the pre-order to the database
+			// await preOrder.save(); // Save the pre-order to the database
 
-	// 		console.log(preOrder);
-	// 		return res
-	// 			.status(201)
-	// 			.json({ message: "Pre-order was created!", preOrder });
-	// 	} catch (error) {
-	// 		console.log("Error creating pre-order:", error);
-	// 		res.status(500).json({ message: "Server error!" });
-	// 	}
-	// },
+			console.log(preOrder);
+			return res
+				.status(201)
+				.json({ message: "Pre-order was created!", preOrder });
+		} catch (error) {
+			console.log("Error creating pre-order:", error);
+			res.status(500).json({ message: "Server error!" });
+		}
+	},
 
 	// Get user's orders
 	getUserOrders: async (req, res) => {
