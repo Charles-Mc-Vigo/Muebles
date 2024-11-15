@@ -247,6 +247,8 @@ function ProductDetails({ admin }) {
 										{furnitureData.furnitureType.ECT} Days
 									</p>
 								</div>
+
+								{/* color */}
 								<div className="mb-4 rounded-md p-2">
 									<label className="block font-semibold">
 										Colors: {selectedColor || "None"}
