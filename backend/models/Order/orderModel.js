@@ -103,7 +103,6 @@ const orderSchema = new mongoose.Schema(
 		},
 		phoneNumber: {
 			type: String,
-			required: true,
 		},
 		paymentOption:{
 			type:String,
@@ -129,17 +128,24 @@ const orderSchema = new mongoose.Schema(
 		expectedDelivery:{
 			type:String
 		},
+		remainingBalance:{
+			type:Number
+		},
 		subtotal: Number,
 		shippingFee: Number,
 		totalAmount: Number,
-
+		type:{
+			type:String,
+			enum: ["cart","pre-order"],
+			required:true
+		}
 	},
 	{
 		timestamps: true,
 	}
 );
 
-// Generate simple order number
+// order number
 orderSchema.pre("save", async function (next) {
 	if (!this.orderNumber) {
 		const date = new Date();
@@ -151,13 +157,71 @@ orderSchema.pre("save", async function (next) {
 	next();
 });
 
+orderSchema.statics.preOrder = async function(userId, furnitureId, material, color, size, quantity,paymentMethod, proofOfPayment, paymentOption,shippingAddress, shippingFee, deliveryMode, expectedDelivery) {
+
+
+	// //calculation para sa partial payment ksksks
+	// let partialPayment
+	// let remainingHalf
+	// let partialPaymentplusShippingFee
+	// if(paymentOption === "Partial Payment"){
+	// 	partialPayment = cart.totalAmount / 2;
+	// 	remainingHalf = partialPayment;
+	// 	partialPaymentplusShippingFee = partialPayment + shippingFee;
+	// 	console.log(`Cart total is ${cart.totalAmount} divided by 2 = ${partialPayment}`)
+	// 	console.log("total amount ng partial payment plus shipping fee", partialPaymentplusShippingFee);
+		
+	// }
+
+
+	
+  const preOrderData = {
+      user: userId,
+			furniture:furnitureId,
+			material:material,
+			color:color,
+			size:size,
+			quantity:quantity,
+      paymentMethod: paymentMethod,
+      proofOfPayment: proofOfPayment,
+			paymentOption: paymentOption,
+      shippingAddress: shippingAddress,
+      shippingFee: shippingFee,
+      // phoneNumber: userId.phoneNumber,
+			// totalAmount: paymentOption === "Partial Payment" ? partialPaymentplusShippingFee : (cart.totalAmount + shippingFee),
+			// remainingBalance: remainingHalf,
+      deliveryMode: deliveryMode,
+			expectedDelivery:expectedDelivery,
+			type:"pre-order",
+  };
+
+
+  return this.create(preOrderData);
+};
+
 orderSchema.statics.createFromCart = async function(cartId, paymentMethod, proofOfPayment, paymentOption,shippingAddress, shippingFee, deliveryMode, expectedDelivery) {
   const cart = await mongoose.model('Cart').findById(cartId)
       .populate('userId')
       .populate('items.furnitureId');
   if (!cart) throw new Error('Cart not found');
-	// console.log(shippingFee)
 
+	console.log("From the model. Payment option is ", paymentOption);
+
+	//calculation para sa partial payment ksksks
+	let partialPayment
+	let remainingHalf
+	let partialPaymentplusShippingFee
+	if(paymentOption === "Partial Payment"){
+		partialPayment = cart.totalAmount / 2;
+		remainingHalf = partialPayment;
+		partialPaymentplusShippingFee = partialPayment + shippingFee;
+		console.log(`Cart total is ${cart.totalAmount} divided by 2 = ${partialPayment}`)
+		console.log("total amount ng partial payment plus shipping fee", partialPaymentplusShippingFee);
+		
+	}
+
+
+	
   const orderData = {
       user: cart.userId._id,
       items: cart.items.map(item => ({
@@ -173,16 +237,18 @@ orderSchema.statics.createFromCart = async function(cartId, paymentMethod, proof
       paymentMethod: paymentMethod,
       subtotal: cart.totalAmount,
       shippingFee: shippingFee,
-      totalAmount: cart.totalAmount + shippingFee,
+			totalAmount: paymentOption === "Partial Payment" ? partialPaymentplusShippingFee : (cart.totalAmount + shippingFee),
+			remainingBalance: remainingHalf,
       proofOfPayment: proofOfPayment,
       deliveryMode: deliveryMode,
 			expectedDelivery:expectedDelivery,
-			paymentOption: paymentOption
+			paymentOption: paymentOption,
+			type:"cart"
   };
+
 
   return this.create(orderData);
 };
 
 const Order = mongoose.model("Order", orderSchema);
-// const PreOrder = mongoose.model("PreOrder", preOrderSchema);
 module.exports = Order;

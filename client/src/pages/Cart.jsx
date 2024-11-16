@@ -111,7 +111,12 @@ const Cart = () => {
 		}
 	}, [selectedAddress, user]);
 
-	const totalWithShipping = (totalAmount + shippingFee).toFixed(2);
+	const totalWithShipping =
+		paymentOption === "Partial Payment"
+			? (totalAmount / 2 + shippingFee).toFixed(2) // Half of the total amount plus shipping fee
+			: (totalAmount + shippingFee).toFixed(2); // Full payment total
+
+	const partialPaymentAmount = (totalAmount / 2 + shippingFee).toFixed(2); // Calculate partial payment amount
 
 	const handlePaymentMethodClick = (method) => {
 		setSelectedPaymentMethod(method);
@@ -438,9 +443,9 @@ const Cart = () => {
 								<div className="bg-slate-50">
 									<p>
 										<strong>Partial Payment</strong> (3-Month Plan) <br /> Pay
-										in installments over 3 months with no interest if paid
-										within this period. Interest applies to any unpaid balance
-										after 3 months.
+										in installments with 50% down payment and remaining balance
+										can be paid over a minimum of 3 months. 3% Interest applies
+										only if payments are not made on time.
 									</p>
 									<br />
 									<p>
@@ -449,8 +454,9 @@ const Cart = () => {
 									</p>
 								</div>
 
-
-								<h3 className="text-lg font-semibold mt-5 mb-2">Payment Options:</h3>
+								<h3 className="text-lg font-semibold mt-5 mb-2">
+									Payment Options:
+								</h3>
 								<label className="flex items-center mb-2">
 									<input
 										type="radio"
@@ -562,13 +568,29 @@ const Cart = () => {
 										<span>Shipping Fee:</span>
 										<span>₱{shippingFee.toFixed(2)}</span>
 									</div>
+									{/* payable amount dito */}
+									<div className="mt-5">
+									{paymentOption === "Partial Payment" ? (
+										<div className="flex justify-between">
+											<h3 className="text-lg font-semibold">Partial Payment (50%):</h3>
+											<p className="font-bold">
+												PHP {partialPaymentAmount}
+											</p>
+										</div>
+									) : (
+										<div className="flex justify-between">
+											<h3 className="text-lg font-semibold">Total Payment:</h3>
+											<p className="font-bold">
+												PHP {totalWithShipping}
+											</p>
+										</div>
+									)}
+									</div>
 								</div>
 							</div>
+
+							{/* For payment. need design improvement */}
 							<div className="border-t border-teal-600 pt-4 mt-5">
-								<div className="flex justify-between items-center mb-4">
-									<h3 className="text-lg font-semibold">Total Payment:</h3>
-									<p className="text-lg font-semibold">₱{totalWithShipping}</p>
-								</div>
 								<div className="flex justify-between mb-4">
 									<button
 										onClick={() => navigate(-1)}

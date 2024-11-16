@@ -24,7 +24,7 @@ function ProductDetails({ admin }) {
 	const [selectedSize, setSelectedSize] = useState(null);
 	const [currentImageIndex, setCurrentImageIndex] = useState(0);
 	const [price, setPrice] = useState("");
-    const [ECT, setECT] = useState(null)
+	const [ECT, setECT] = useState(null);
 
 	// console.log(price);
 
@@ -46,7 +46,7 @@ function ProductDetails({ admin }) {
 				const data = await response.json();
 				setFurnitureData(data);
 				setPrice(data.price || 0);
-                setECT(data.furnitureType.ECT);
+				setECT(data.furnitureType.ECT);
 			} catch (error) {
 				setError(error.message);
 			} finally {
@@ -65,7 +65,7 @@ function ProductDetails({ admin }) {
 	const handleMaterialClick = (material) => {
 		setSelectedMaterial(material.name);
 		setPrice(material.price);
-        // console.log(price)
+		// console.log(price)
 	};
 
 	// console.log(selectedMaterial);
@@ -102,10 +102,10 @@ function ProductDetails({ admin }) {
 			material: selectedMaterial,
 			size: selectedSize,
 			price: price,
-            ECT: ECT,
+			ECT: ECT,
 		};
 
-        // console.log(item)
+		// console.log(item)
 		try {
 			const response = await fetch("http://localhost:3000/api/cart", {
 				method: "POST",
@@ -247,6 +247,8 @@ function ProductDetails({ admin }) {
 										{furnitureData.furnitureType.ECT} Days
 									</p>
 								</div>
+
+								{/* color */}
 								<div className="mb-4 rounded-md p-2">
 									<label className="block font-semibold">
 										Colors: {selectedColor || "None"}
