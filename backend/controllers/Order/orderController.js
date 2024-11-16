@@ -1,26 +1,30 @@
 const Order = require("../../models/Order/orderModel");
 const Cart = require("../../models/Cart/cartModel");
 const User = require("../../models/User/userModel");
-const Furniture = require('../../models/Furniture/furnitureModel');
-const Materials = require('../../models/Furniture/materialsModel');
-const FurnitureType = require('../../models/Furniture/furnitureTypeModel')
-const Category = require('../../models/Furniture/categoryModel');
+const Furniture = require("../../models/Furniture/furnitureModel");
+const Materials = require("../../models/Furniture/materialsModel");
+const FurnitureType = require("../../models/Furniture/furnitureTypeModel");
+const Category = require("../../models/Furniture/categoryModel");
 
 const orderController = {
 	// Create new order from cart
 	createOrder: async (req, res) => {
 		try {
-			const { paymentMethod, shippingAddress, deliveryMode, expectedDelivery, paymentOption } =
-				req.body;
+			const {
+				paymentMethod,
+				shippingAddress,
+				deliveryMode,
+				expectedDelivery,
+				paymentOption,
+			} = req.body;
 			const userId = req.user._id;
 
 			// res.status(200).json(paymentOption)
 			//decision kung if partial or payment
-			if(paymentOption === "Partial Payment"){
-				console.log("Payment option is Partial payment")
-			}else{
-				console.log("Payment option is Full payment")
-
+			if (paymentOption === "Partial Payment") {
+				console.log("Payment option is Partial payment");
+			} else {
+				console.log("Payment option is Full payment");
 			}
 
 			if (!paymentMethod) {
@@ -70,7 +74,7 @@ const orderController = {
 				shippingAddress,
 				shippingFee,
 				deliveryMode,
-				expectedDelivery,
+				expectedDelivery
 			);
 
 			// await Cart.findByIdAndUpdate(cart._id, {
@@ -97,14 +101,14 @@ const orderController = {
 			const {
 				furnitureId,
 				quantity = 1,
-				material,
 				color,
+				material,
 				size,
-				paymentOption,
 				paymentMethod,
-				shippingAddress,
+				paymentOption,
 				deliveryMode,
-				expectedDelivery
+				shippingAddress,
+				expectedDelivery,
 			} = req.body;
 
 			const userId = req.user._id;
@@ -120,8 +124,9 @@ const orderController = {
 			const furnitureFurnitureType = furniture.furnitureType;
 
 			const category = await Category.findById(furnitureCategoryId);
-			const furnitureType = await FurnitureType.findById(furnitureFurnitureType);
-
+			const furnitureType = await FurnitureType.findById(
+				furnitureFurnitureType
+			);
 
 			// const furnitureType = await FurnitureType.findById(category._id);
 
@@ -131,18 +136,19 @@ const orderController = {
 
 			// const furnitureTypeECT = await FurnitureType({name:{$in:{furniture.category}}})
 
-			if(!["Partial Payment","Full Payment"].includes(paymentOption)){
-				return res.status(400).json({message:"Please select only valid payment options!"})
+			if (!["Partial Payment", "Full Payment"].includes(paymentOption)) {
+				return res
+					.status(400)
+					.json({ message: "Please select only valid payment options!" });
 			}
 
-			const selectedMaterial = await Materials.findOne({name:{$in:material}});
+			const selectedMaterial = await Materials.findOne({
+				name: { $in: material },
+			});
 			// res.status(201).json(selectedMaterial.price);
 
 			const subtotal = selectedMaterial.price * quantity;
 			// res.status(201).json(subtotal);
-			
-
-
 
 			// const subtotal = furniture.price * quantity;
 
@@ -163,16 +169,14 @@ const orderController = {
 			const totalAmount = subtotal + shippingFee;
 			// res.status(201).json(shippingFee);
 
-
 			let proofOfPayment;
 			if (req.file) {
 				proofOfPayment = req.file.buffer.toString("base64");
 			}
-			
 
 			const preOrder = await Order.preOrder(
-				userId,
-				furnitureId,
+				user,
+				furniture,
 				material,
 				color,
 				size,
@@ -185,10 +189,14 @@ const orderController = {
 				deliveryMode,
 				expectedDelivery,
 				subtotal,
-				totalAmount,
+				totalAmount
 			);
 
-			// await preOrder.save(); // Save the pre-order to the database
+			await preOrder.save(); // Save the pre-order to the database
+
+			await User.findByIdAndUpdate(userId, {
+				$push: { orders: preOrder._id, proofOfPayment },
+			});
 
 			console.log(preOrder);
 			return res
@@ -223,10 +231,11 @@ const orderController = {
 		try {
 			const { orderId } = req.params;
 			const userId = req.user._id;
-			const order = await Order.findById(orderId)
-				.populate("user")
-				.populate("items.furniture");
 
+			// Fetch the order
+			const order = await Order.findById(orderId).populate("user"); // Always populate user first
+
+			// Check if the order exists
 			if (!order) {
 				return res.status(404).json({
 					error: "Order not found",
@@ -240,9 +249,17 @@ const orderController = {
 				});
 			}
 
+			// Conditionally populate based on order type
+			if (order.type === "Pre-Order") {
+				await order.populate("furniture"); // Populate order.furniture for Pre-Orders
+			} else {
+				await order.populate("items.furniture"); // Populate items.furniture for other types
+			}
+
+			// Send the populated order as response
 			res.status(200).json(order);
 		} catch (error) {
-			console.log("Error fetching order : ", error);
+			console.log("Error fetching order: ", error);
 			res.status(500).json({
 				error: "Server error!",
 			});

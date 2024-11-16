@@ -18,7 +18,7 @@ const PreOrder = () => {
 	const [selectedColor, setSelectedColor] = useState(null);
 	const [selectedMaterial, setSelectedMaterial] = useState(null);
 	const [selectedSize, setSelectedSize] = useState(null);
-	const [selectedDeliveryMode, setSelectedDeliveryMode] = useState("Delivery")
+	const [selectedDeliveryMode, setSelectedDeliveryMode] = useState("Delivery");
 	const [quantity, setQuantity] = useState(1);
 	const [shippingFee, setShippingFee] = useState(0);
 	const [proofOfPayment, setProofOfPayment] = useState(null);
@@ -31,6 +31,7 @@ const PreOrder = () => {
 	const [userInformationVisible, setUserInformationVisible] = useState(false);
 	const [paymentOptionVisible, setPaymentOptionVisible] = useState(false);
 	const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
+	const [price, setPrice] = useState(0);
 
 	const shippingFees = {
 		Boac: 500,
@@ -50,6 +51,18 @@ const PreOrder = () => {
 		event.stopPropagation();
 	};
 
+	useEffect(() => {
+		if (user?.addresses?.length > 0 && selectedAddress) {
+			const address = user.addresses.find(
+				(address) => address._id === selectedAddress
+			);
+			const fee = shippingFees[address?.municipality] || 0;
+			setShippingFee(fee);
+		} else {
+			setShippingFee(0);
+		}
+	}, [selectedAddress]);
+
 	// Fetch furniture data and user data
 	useEffect(() => {
 		const fetchUser = async () => {
@@ -64,6 +77,7 @@ const PreOrder = () => {
 				}
 				const user = await response.json();
 				setUser(user);
+				console.log(user)
 
 				const defaultAddress = user.addresses?.find(
 					(address) => address.isDefault
@@ -72,7 +86,7 @@ const PreOrder = () => {
 					setSelectedAddress(defaultAddress._id);
 				}
 
-				console.log(defaultAddress)
+				console.log(defaultAddress);
 			} catch (error) {
 				setError(error.message);
 			} finally {
@@ -95,6 +109,7 @@ const PreOrder = () => {
 				}
 				const newFurniture = await response.json();
 				setFurnitureData(newFurniture);
+				setExpectedDeliveryDate(newFurniture.furnitureType.ECT);
 				console.log(newFurniture);
 			} catch (error) {
 				setError(error.message);
@@ -105,6 +120,15 @@ const PreOrder = () => {
 		fetchUser();
 		fetchFurnitureDetails();
 	}, [furnitureId]);
+
+	const totalAmount = price * quantity;
+
+	const totalWithShipping =
+		paymentOption === "Partial Payment"
+			? (totalAmount / 2 + shippingFee).toFixed(2)
+			: (totalAmount + shippingFee).toFixed(2);
+
+	const partialPaymentAmount = (totalAmount / 2 + shippingFee).toFixed(2);
 
 	const handlePaymentMethodClick = (method, event) => {
 		event.stopPropagation();
@@ -117,13 +141,38 @@ const PreOrder = () => {
 	const handleMaterialClick = (material) => {
 		setSelectedMaterial(material.name);
 		setPrice(material.price);
-		// console.log(price)
 	};
 
 	// console.log(selectedMaterial);
 	const handleSizeClick = (size) => {
 		setSelectedSize(size.label);
 	};
+
+	useEffect(() => {
+		if (furnitureData) {
+			const startDeliveryDate = new Date();
+			startDeliveryDate.setDate(
+				startDeliveryDate.getDate() + furnitureData.furnitureType.ECT
+			);
+
+			const endDeliveryDate = new Date(startDeliveryDate);
+			endDeliveryDate.setDate(endDeliveryDate.getDate() + 2); // Adding 2 days for delivery window
+
+			const formatDeliveryDates = (startDate, endDate) => {
+				const options = { month: "short", year: "numeric" };
+				const monthAndYear = startDate.toLocaleDateString("en-US", options);
+				const startDay = startDate.getDate();
+				const endDay = endDate.getDate();
+				return `${startDay} - ${endDay} ${monthAndYear}`;
+			};
+
+			const estimatedDelivery = formatDeliveryDates(
+				startDeliveryDate,
+				endDeliveryDate
+			);
+			setExpectedDeliveryDate(estimatedDelivery);
+		}
+	}, [furnitureData]); // Run this effect when furnitureData is available
 
 	useEffect(() => {
 		if (user?.addresses?.length > 0 && selectedAddress) {
@@ -138,11 +187,6 @@ const PreOrder = () => {
 	}, [selectedAddress, user]);
 
 	const preOrder = async () => {
-		if (!proofOfPayment) {
-			toast.error("Please upload proof of payment before checking out.");
-			return;
-		}
-
 		if (!selectedColor || !selectedMaterial || !selectedSize) {
 			toast.error(
 				"Please select color, material and size before checking out."
@@ -155,10 +199,17 @@ const PreOrder = () => {
 			return;
 		}
 
+		if (!proofOfPayment) {
+			toast.error("Please upload proof of payment before checking out.");
+			return;
+		}
+
 		const addressToSend = user.addresses.find(
 			(address) => address._id === selectedAddress
 		);
 		const formData = new FormData();
+		// formData.append("furnitureId", JSON.stringify(furnitureData._id));
+		formData.append("furnitureId", furnitureId);
 		formData.append("quantity", quantity);
 		formData.append("color", selectedColor);
 		formData.append("material", selectedMaterial);
@@ -166,27 +217,27 @@ const PreOrder = () => {
 		formData.append("proofOfPayment", proofOfPayment);
 		formData.append("paymentMethod", selectedPaymentMethod);
 		formData.append("paymentOption", paymentOption);
-		formData.append("deliveryMode",selectedDeliveryMode);
+		formData.append("deliveryMode", selectedDeliveryMode);
 		formData.append("shippingAddress", JSON.stringify(addressToSend));
 		formData.append("expectedDelivery", expectedDeliveryDate);
 		for (const [key, value] of formData.entries()) {
 			console.log(`${key}:`, value);
 		}
 		try {
-			// const response = await fetch("http://localhost:3000/api/orders/create", {
-			// 	method: "POST",
-			// 	body: formData,
-			// 	credentials: "include",
-			// });
-			// if (!response.ok) {
-			// 	throw new Error(response.message);
-			// }
-			// const data = await response.json();
-			// if (!data.ok) {
-			// 	toast.error(data.error);
-			// }
-			// const orderId = data.order._id;
-			// navigate(`/order-details/${orderId}`);
+			const response = await fetch("http://localhost:3000/api/orders/pre-order/create", {
+				method: "POST",
+				body: formData,
+				credentials: "include",
+			});
+			if (!response.ok) {
+				throw new Error(response.message);
+			}
+			const data = await response.json();
+			if (!data.ok) {
+				toast.error(data.error);
+			}
+			const orderId = data.preOrder._id;
+			navigate(`/order-details/${orderId}`);
 		} catch (error) {
 			setError(error.message);
 			setLoading(false);
@@ -453,94 +504,41 @@ const PreOrder = () => {
 											</span>
 										))}
 									</div>
-								</div>
-							</div>
 
-							{/* Delivery Option */}
-							<div className="mt-5 border-t-2 border-gray-300 pt-5">
-								<h1 className="font-semibold mb-4">
-									Delivery Mode:
-								</h1>
-								<div className="flex justify-end gap-4">
-									<button
-										onClick={(event) => {
-											event.stopPropagation();
-											setSelectedDeliveryMode("Delivery");
-										}}
-										className={`flex items-center gap-2 px-4 py-2 rounded-md transition-all duration-200 ${
-											selectedDeliveryMode === "Delivery"
-												? "bg-teal-600 text-white"
-												: "border border-teal-600 text-teal-600 hover:bg-teal-50"
-										}`}
-									>
-										<svg
-											xmlns="http://www.w3.org/2000/svg"
-											className="h-5 w-5"
-											fill="none"
-											viewBox="0 0 24 24"
-											stroke="currentColor"
-										>
-											<path
-												strokeLinecap="round"
-												strokeLinejoin="round"
-												strokeWidth={2}
-												d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-											/>
-										</svg>
-										Delivery
-									</button>
-
-									<button
-										onClick={(event) => {
-											event.stopPropagation();
-											setSelectedDeliveryMode("Pick Up");
-										}}
-										className={`flex items-center gap-2 px-4 py-2 rounded-md transition-all duration-200 ${
-											selectedDeliveryMode === "Pick Up"
-												? "bg-teal-600 text-white"
-												: "border border-teal-600 text-teal-600 hover:bg-teal-50"
-										}`}
-									>
-										<svg
-											xmlns="http://www.w3.org/2000/svg"
-											className="h-5 w-5"
-											fill="none"
-											viewBox="0 0 24 24"
-											stroke="currentColor"
-										>
-											<path
-												strokeLinecap="round"
-												strokeLinejoin="round"
-												strokeWidth={2}
-												d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"
-											/>
-										</svg>
-										Pick Up
-									</button>
-								</div>
-
-								{/* Additional information based on selected mode */}
-								{selectedDeliveryMode === "Delivery" && (
-									<div className="mt-4 p-4 bg-slate-100 rounded-md">
-										<p className="text-gray-600">
-											Delivery fee will be calculated based on your location.
-										</p>
-										<p className="text-sm text-gray-500 mt-2">
-											Estimated delivery time: 3-5 business days
-										</p>
+									<div className="mt-5 border border-teal-600 p-5">
+										<h1 className="font-semibold mb-2">Payment Details</h1>
+										<div className="font-normal">
+											<div className="flex justify-between">
+												<span>Items total:</span>
+												<span>₱{price.toFixed(2)}</span>
+											</div>
+											<div className="flex justify-between">
+												<span>Shipping Fee:</span>
+												<span>₱{shippingFee.toFixed(2)}</span>
+											</div>
+											{/* payable amount dito */}
+											<div className="mt-5">
+												{paymentOption === "Partial Payment" ? (
+													<div className="flex justify-between">
+														<h3 className="text-lg font-semibold">
+															Partial Payment (50%):
+														</h3>
+														<p className="font-bold">
+															PHP {partialPaymentAmount}
+														</p>
+													</div>
+												) : (
+													<div className="flex justify-between">
+														<h3 className="text-lg font-semibold">
+															Total Payment:
+														</h3>
+														<p className="font-bold">PHP {totalWithShipping}</p>
+													</div>
+												)}
+											</div>
+										</div>
 									</div>
-								)}
-
-								{selectedDeliveryMode === "Pick Up" && (
-									<div className="mt-4 p-4 bg-slate-100 rounded-md">
-										<p className="text-gray-600">
-											Pick up location: Our Store, Main Street
-										</p>
-										<p className="text-sm text-gray-500 mt-2">
-											Available pick up time: Monday-Saturday, 9:00 AM - 6:00 PM
-										</p>
-									</div>
-								)}
+								</div>
 							</div>
 
 							{/* payment option */}
@@ -681,7 +679,95 @@ const PreOrder = () => {
 								</div>
 							</div>
 
+							{/* Delivery Option */}
+							<div className="mt-5 border-t-2 border-gray-300 pt-5">
+								<h1 className="font-semibold mb-4">Delivery Mode:</h1>
+								<div className="flex justify-end gap-4">
+									<button
+										onClick={(event) => {
+											event.stopPropagation();
+											setSelectedDeliveryMode("Delivery");
+										}}
+										className={`flex items-center gap-2 px-4 py-2 rounded-md transition-all duration-200 ${
+											selectedDeliveryMode === "Delivery"
+												? "bg-teal-600 text-white"
+												: "border border-teal-600 text-teal-600 hover:bg-teal-50"
+										}`}
+									>
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											className="h-5 w-5"
+											fill="none"
+											viewBox="0 0 24 24"
+											stroke="currentColor"
+										>
+											<path
+												strokeLinecap="round"
+												strokeLinejoin="round"
+												strokeWidth={2}
+												d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+											/>
+										</svg>
+										Delivery
+									</button>
+
+									<button
+										onClick={(event) => {
+											event.stopPropagation();
+											setSelectedDeliveryMode("Pick Up");
+										}}
+										className={`flex items-center gap-2 px-4 py-2 rounded-md transition-all duration-200 ${
+											selectedDeliveryMode === "Pick Up"
+												? "bg-teal-600 text-white"
+												: "border border-teal-600 text-teal-600 hover:bg-teal-50"
+										}`}
+									>
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											className="h-5 w-5"
+											fill="none"
+											viewBox="0 0 24 24"
+											stroke="currentColor"
+										>
+											<path
+												strokeLinecap="round"
+												strokeLinejoin="round"
+												strokeWidth={2}
+												d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"
+											/>
+										</svg>
+										Pick Up
+									</button>
+								</div>
+
+								{/* Additional information based on selected mode */}
+								{selectedDeliveryMode === "Delivery" && (
+									<div className="mt-4 p-4 bg-slate-100 rounded-md">
+										<p className="text-gray-600">
+											Delivery fee will be calculated based on your location.
+										</p>
+										<p className="text-sm text-gray-500 mt-2">
+											Estimated delivery time: {expectedDeliveryDate || "N/A"}
+										</p>
+									</div>
+								)}
+
+								{selectedDeliveryMode === "Pick Up" && (
+									<div className="mt-4 p-4 bg-slate-100 rounded-md">
+										<p className="text-gray-600">
+											Pick up location: Our Store, Main Street
+										</p>
+										<p className="text-sm text-gray-500 mt-2">
+											Available pick up time: Monday-Saturday, 9:00 AM - 6:00 PM
+										</p>
+									</div>
+								)}
+							</div>
+
 							{/* order details */}
+							<div className="mt-5">
+								<h1>Order details</h1>
+							</div>
 
 							<div className="mt-4 flex gap-4">
 								<button
