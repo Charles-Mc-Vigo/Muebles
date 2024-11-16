@@ -18,6 +18,7 @@ const PreOrder = () => {
 	const [selectedColor, setSelectedColor] = useState(null);
 	const [selectedMaterial, setSelectedMaterial] = useState(null);
 	const [selectedSize, setSelectedSize] = useState(null);
+	const [selectedDeliveryMode, setSelectedDeliveryMode] = useState("Delivery")
 	const [quantity, setQuantity] = useState(1);
 	const [shippingFee, setShippingFee] = useState(0);
 	const [proofOfPayment, setProofOfPayment] = useState(null);
@@ -63,6 +64,15 @@ const PreOrder = () => {
 				}
 				const user = await response.json();
 				setUser(user);
+
+				const defaultAddress = user.addresses?.find(
+					(address) => address.isDefault
+				);
+				if (defaultAddress) {
+					setSelectedAddress(defaultAddress._id);
+				}
+
+				console.log(defaultAddress)
 			} catch (error) {
 				setError(error.message);
 			} finally {
@@ -132,6 +142,19 @@ const PreOrder = () => {
 			toast.error("Please upload proof of payment before checking out.");
 			return;
 		}
+
+		if (!selectedColor || !selectedMaterial || !selectedSize) {
+			toast.error(
+				"Please select color, material and size before checking out."
+			);
+			return;
+		}
+
+		if (!selectedPaymentMethod) {
+			toast.error("Please select payment method checking out.");
+			return;
+		}
+
 		const addressToSend = user.addresses.find(
 			(address) => address._id === selectedAddress
 		);
@@ -143,6 +166,7 @@ const PreOrder = () => {
 		formData.append("proofOfPayment", proofOfPayment);
 		formData.append("paymentMethod", selectedPaymentMethod);
 		formData.append("paymentOption", paymentOption);
+		formData.append("deliveryMode",selectedDeliveryMode);
 		formData.append("shippingAddress", JSON.stringify(addressToSend));
 		formData.append("expectedDelivery", expectedDeliveryDate);
 		for (const [key, value] of formData.entries()) {
@@ -432,13 +456,100 @@ const PreOrder = () => {
 								</div>
 							</div>
 
+							{/* Delivery Option */}
+							<div className="mt-5 border-t-2 border-gray-300 pt-5">
+								<h1 className="font-semibold mb-4">
+									Delivery Mode:
+								</h1>
+								<div className="flex justify-end gap-4">
+									<button
+										onClick={(event) => {
+											event.stopPropagation();
+											setSelectedDeliveryMode("Delivery");
+										}}
+										className={`flex items-center gap-2 px-4 py-2 rounded-md transition-all duration-200 ${
+											selectedDeliveryMode === "Delivery"
+												? "bg-teal-600 text-white"
+												: "border border-teal-600 text-teal-600 hover:bg-teal-50"
+										}`}
+									>
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											className="h-5 w-5"
+											fill="none"
+											viewBox="0 0 24 24"
+											stroke="currentColor"
+										>
+											<path
+												strokeLinecap="round"
+												strokeLinejoin="round"
+												strokeWidth={2}
+												d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+											/>
+										</svg>
+										Delivery
+									</button>
+
+									<button
+										onClick={(event) => {
+											event.stopPropagation();
+											setSelectedDeliveryMode("Pick Up");
+										}}
+										className={`flex items-center gap-2 px-4 py-2 rounded-md transition-all duration-200 ${
+											selectedDeliveryMode === "Pick Up"
+												? "bg-teal-600 text-white"
+												: "border border-teal-600 text-teal-600 hover:bg-teal-50"
+										}`}
+									>
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											className="h-5 w-5"
+											fill="none"
+											viewBox="0 0 24 24"
+											stroke="currentColor"
+										>
+											<path
+												strokeLinecap="round"
+												strokeLinejoin="round"
+												strokeWidth={2}
+												d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"
+											/>
+										</svg>
+										Pick Up
+									</button>
+								</div>
+
+								{/* Additional information based on selected mode */}
+								{selectedDeliveryMode === "Delivery" && (
+									<div className="mt-4 p-4 bg-slate-100 rounded-md">
+										<p className="text-gray-600">
+											Delivery fee will be calculated based on your location.
+										</p>
+										<p className="text-sm text-gray-500 mt-2">
+											Estimated delivery time: 3-5 business days
+										</p>
+									</div>
+								)}
+
+								{selectedDeliveryMode === "Pick Up" && (
+									<div className="mt-4 p-4 bg-slate-100 rounded-md">
+										<p className="text-gray-600">
+											Pick up location: Our Store, Main Street
+										</p>
+										<p className="text-sm text-gray-500 mt-2">
+											Available pick up time: Monday-Saturday, 9:00 AM - 6:00 PM
+										</p>
+									</div>
+								)}
+							</div>
+
 							{/* payment option */}
 							<div
 								onClick={togglePaymentOptionVisibility}
 								className="mt-5 rounded shadow-md p-5"
 							>
 								<div>
-									<h1 className="flex justify-between">
+									<h1 className="flex justify-between font-semibold">
 										Payment Options{" "}
 										<span className="text-2xl">
 											{paymentOptionVisible ? " - " : " + "}
@@ -446,27 +557,29 @@ const PreOrder = () => {
 									</h1>
 									{paymentOptionVisible ? (
 										<div>
-											<div className="flex justify-end gap-5 py-2">
+											<div className="flex justify-end gap-5 py-5">
 												<span
-													onClick={(event) =>
-														setSelectedPaymentOption("Partial Payment",event)
-													}
-													className={`cursor-pointer font-semibold ${
+													onClick={(event) => {
+														event.stopPropagation();
+														setSelectedPaymentOption("Partial Payment");
+													}}
+													className={`cursor-pointer border border-teal-600 p-2 rounded font-semibold ${
 														paymentOption === "Partial Payment"
-															? "text-teal-600"
-															: "text-black"
+															? "text-white bg-teal-600 border-none"
+															: "text-teal-500"
 													}`}
 												>
 													Partial Payment
 												</span>
 												<span
-													onClick={(event) =>
-														setSelectedPaymentOption("Full Payment",event)
-													}
-													className={`cursor-pointer font-semibold ${
+													onClick={(event) => {
+														event.stopPropagation();
+														setSelectedPaymentOption("Full Payment");
+													}}
+													className={`cursor-pointer border border-teal-600 p-2 rounded font-semibold ${
 														paymentOption === "Full Payment"
-															? "text-teal-600"
-															: "text-black"
+															? "text-white bg-teal-600 border-none"
+															: "text-teal-500"
 													}`}
 												>
 													Full Payment
@@ -474,55 +587,63 @@ const PreOrder = () => {
 											</div>
 											{/* Payment method */}
 											<div>
-												<div>
-													<h3 className="text-lg font-semibold mb-2">
-														Payment Methods:
-													</h3>
-													<div className="flex justify-end text-center bg-slate-200 p-5 gap-5">
-														{/* Gcash payment */}
-														<button
-															value="GCash"
-															onClick={(event) =>
-																handlePaymentMethodClick("GCash", event)
-															}
-															className={`rounded ${
-																selectedPaymentMethod === "GCash"
-																	? "bg-slate-200"
-																	: "bg-slate-200"
-															} text-black`}
-														>
-															<img
-																src="/payment-icon/gcash.png"
-																alt="gcash"
-																className="w-20 h-20 object-contain rounded"
-															/>
-														</button>
-														{/* Maya payment */}
-														<button
-															value="Maya"
-															onClick={(event) =>
-																handlePaymentMethodClick("Maya", event)
-															}
-															className={`rounded text-white ${
-																selectedPaymentMethod === "Maya"
-																	? "bg-slate-400"
-																	: "bg-gray-300"
-															}`}
-														>
-															<img
-																src="/payment-icon/maya.jpg"
-																alt="maya"
-																className="w-full h-20 object-contain rounded"
-															/>
-														</button>
-													</div>
-													{selectedPaymentMethod && (
-														<p className="mt-5 text-gray-600">
-															Selected Payment Method:{" "}
-															<strong>{selectedPaymentMethod}</strong>
-														</p>
-													)}
+												<h3 className="text-lg font-semibold mb-2">
+													Payment Methods:
+												</h3>
+												<div className="flex justify-end text-center bg-slate-200 p-5 gap-5">
+													{/* Gcash payment */}
+													<button
+														value="GCash"
+														onClick={(event) =>
+															handlePaymentMethodClick("GCash", event)
+														}
+														className={`rounded relative p-2 transition-all duration-200 ${
+															selectedPaymentMethod === "GCash"
+																? "border-2 border-teal-600 bg-white shadow-lg transform scale-105"
+																: "border border-gray-300 bg-slate-200 hover:border-teal-400"
+														}`}
+													>
+														<img
+															src="/payment-icon/gcash.png"
+															alt="gcash"
+															className="w-20 h-20 object-contain rounded"
+														/>
+														{selectedPaymentMethod === "GCash" && (
+															<div className="absolute -top-2 -right-2 w-6 h-6 bg-teal-600 rounded-full flex items-center justify-center">
+																<span className="text-white text-sm">✓</span>
+															</div>
+														)}
+													</button>
+													{/* Maya payment */}
+													<button
+														value="Maya"
+														onClick={(event) =>
+															handlePaymentMethodClick("Maya", event)
+														}
+														className={`rounded relative p-2 transition-all duration-200 ${
+															selectedPaymentMethod === "Maya"
+																? "border-2 border-teal-600 bg-white shadow-lg transform scale-105"
+																: "border border-gray-300 bg-slate-200 hover:border-teal-400"
+														}`}
+													>
+														<img
+															src="/payment-icon/maya.jpg"
+															alt="maya"
+															className="w-20 h-20 object-contain rounded"
+														/>
+														{selectedPaymentMethod === "Maya" && (
+															<div className="absolute -top-2 -right-2 w-6 h-6 bg-teal-600 rounded-full flex items-center justify-center">
+																<span className="text-white text-sm">✓</span>
+															</div>
+														)}
+													</button>
 												</div>
+												{selectedPaymentMethod && (
+													<p className="mt-5 text-gray-600">
+														Selected Payment Method:{" "}
+														<strong>{selectedPaymentMethod}</strong>
+													</p>
+												)}
 											</div>
 											{/* QR code for payment */}
 											<div className="mt-5 bg-slate-200 p-5">
