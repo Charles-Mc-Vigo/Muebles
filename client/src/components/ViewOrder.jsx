@@ -46,7 +46,7 @@ const ViewOrder = () => {
   }, []);
 
   return (
-    <div className="  bg-gray-500 w-full min-h-screen">
+    <div className="  bg-gray-900 w-full min-h-screen">
       <Header />
       <div className="container mx-auto p-6 bg-gray-100 w-full min-h-screen mt-5 mb-5">
         <button onClick={() => navigate(-1)} className="text-gray-500">

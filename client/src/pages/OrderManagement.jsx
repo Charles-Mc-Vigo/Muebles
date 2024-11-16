@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { Link } from "react-router-dom";
 
 const OrderManagement = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate(); // Initialize navigate function
 
   const fetchOrder = async () => {
     setLoading(true);
@@ -22,7 +21,7 @@ const OrderManagement = () => {
       const ordersData = await response.json();
       setOrders(ordersData.orders || []);
     } catch (error) {
-      console.log("Error fetching orders", error);
+      console.error("Error fetching orders:", error);
     } finally {
       setLoading(false);
     }
@@ -31,6 +30,49 @@ const OrderManagement = () => {
   useEffect(() => {
     fetchOrder();
   }, []);
+
+  const handleStatusChange = async (orderId, newStatus) => {
+    try {
+      console.log(`Updating Order ID: ${orderId} to Status: ${newStatus}`);
+      const response = await fetch(
+        `http://localhost:3000/api/admin/update/${orderId}`,
+        {
+          method: "PUT",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ status: newStatus }),
+        }
+      );
+      if (!response.ok) {
+        throw new Error("Failed to update order status");
+      }
+      setOrders((prevOrders) =>
+        prevOrders.map((order) =>
+          order._id === orderId ? { ...order, orderStatus: newStatus } : order
+        )
+      );
+      console.log(`Order ID: ${orderId} successfully updated to ${newStatus}`);
+    } catch (error) {
+      console.error("Error updating order status:", error);
+    }
+  };
+
+  const handleUpdateClick = (orderId) => {
+    const selectElement = document.getElementById(`status-select-${orderId}`);
+    const newStatus = selectElement.value; 
+    handleStatusChange(orderId, newStatus); 
+  };
+
+  const handleSelectChange = (orderId, event) => {
+    const newStatus = event.target.value;
+    setOrders((prevOrders) =>
+      prevOrders.map((order) =>
+        order._id === orderId ? { ...order, orderStatus: newStatus } : order
+      )
+    );
+  };
 
   return (
     <div className="container mx-auto p-6 bg-gray-100 min-h-screen">
@@ -85,29 +127,30 @@ const OrderManagement = () => {
                   {new Date(order.createdAt).toLocaleDateString("en-US")}
                 </td>
                 <td className="py-3 px-4 border-b text-gray-600">
-                  <span
-                    className={`px-3 py-1 text-sm rounded-full ${
-                      order.orderStatus === "pending"
-                        ? "bg-yellow-200 text-yellow-800"
-                        : order.orderStatus === "confirmed"
-                        ? "bg-blue-200 text-blue-800"
-                        : order.orderStatus === "delivered"
-                        ? "bg-green-200 text-green-800"
-                        : "bg-red-200 text-red-800"
-                    }`}
+                  <select
+                    id={`status-select-${order._id}`} 
+                    value={order.orderStatus} 
+                    onChange={(e) => handleSelectChange(order._id, e)} 
+                    className="border rounded p-1"
                   >
-                    {order.orderStatus.charAt(0).toUpperCase() +
-                      order.orderStatus.slice(1)}
-                  </span>
+                    <option value="pending">Pending</option>
+                    <option value="confirmed">Confirmed</option>
+                    <option value="delivered">Delivered</option>
+                    <option value="cancelled">Cancelled</option>
+                  </select>
                 </td>
-
-                {/* Removed Link wrapper and used navigate directly */}
-                <td className="py-3 px-4 border-b text-gray-600">
-                  <button
-                    onClick={() => navigate(`/orders/${order._id}`)} // Navigate to order details
+                <td className="py-3 px-4 border-b text-gray-600 flex space-x-2">
+                  <Link
+                    to={`/order/${order._id}`}
                     className="text-green-500 hover:underline"
                   >
                     View
+                  </Link>
+                  <button
+                    onClick={() => handleUpdateClick(order._id)} 
+                    className="text-blue-500 hover:underline"
+                  >
+                    Update
                   </button>
                 </td>
               </tr>

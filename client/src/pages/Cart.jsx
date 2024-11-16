@@ -498,7 +498,7 @@ const Cart = () => {
 											} text-white p-2`}
 										>
 											<img
-												src="/payment-icon/gcash"
+												src="/payment-icon/gcash.jpg"
 												alt="gcash"
 												className="w-20 h-20 object-contain rounded"
 											/>
