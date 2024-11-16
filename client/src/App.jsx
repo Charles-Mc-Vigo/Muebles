@@ -44,6 +44,7 @@ import ViewUserOrder from "./components/ViewUserOrder";
 import ViewPendingRequest from "./pages/ViewPendingRequest";
 import ErrorBoundary from "./components/ErrorBoundary";
 import PreOrder from "./pages/PreOrder";
+import ViewCustomerOrder from "./pages/ViewCustomerOrder";
 // import LoadingSpinner from "./components/LoadingSpinner";
 
 
@@ -192,6 +193,13 @@ export default function App() {
 							<ProtectedRoute element={ProductManagement} adminOnly={true} />
 						}
 					/>
+					<Route
+						path="/customer-order"
+						element={
+							<ProtectedRoute element={ViewCustomerOrder} adminOnly={true} />
+						}
+					/>
+
 					<Route
 						path="/product-customization"
 						element={

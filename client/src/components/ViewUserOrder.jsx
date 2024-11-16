@@ -61,7 +61,7 @@ const ViewUserOrder = () => {
 	const orderItems = Array.isArray(order.items) ? order.items : [];
 
 	return (
-		<div className="max-w-4xl mx-auto p-8 bg-white shadow-md rounded-md mt-10">
+		<div className="max-w-4xl mx-auto p-8 bg-black shadow-md rounded-md mt-10">
 			<div className="flex items-center justify-between mb-6">
 				<button onClick={() => navigate(-1)} className="text-gray-500">
 					<IoMdArrowRoundBack size={30} />
@@ -153,7 +153,7 @@ const ViewUserOrder = () => {
 			</div>
 			{/* Display the proof of payment with thank you message */}
 			{order.proofOfPayment && (
-				<div className="border-b pb-6 mb-6">
+				<div className="border-b pb-6 mb-6 ">
 					<h2 className="text-2xl font-semibold text-green-700 mb-4">
 						Proof of Payment
 					</h2>
