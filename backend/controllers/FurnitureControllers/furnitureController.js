@@ -12,7 +12,7 @@ const Size = require("../../models/Furniture/sizeModel");
 const upload = multer({ 
   storage: multer.memoryStorage(),
   limits: {
-    fileSize: 50 * 1024 * 1024, // 5MB file size limit
+    fileSize: 50 * 1024 * 1024,
   },
   fileFilter: (req, file, cb) => {
     if (file.mimetype.startsWith('image/')) {
@@ -21,7 +21,7 @@ const upload = multer({
       cb(new Error('Not an image! Please upload only images.'), false);
     }
   },
-}).array("images"); // Allow up to 5 image uploads
+}).array("images");
 
 exports.createFurniture = async (req, res) => {
   upload(req, res, async (err) => {
@@ -58,7 +58,6 @@ exports.createFurniture = async (req, res) => {
       if (!name) missingFields.push("name");
       if (!materials || materials.length === 0) missingFields.push("materials");
       if (!colors || colors.length === 0) missingFields.push("colors");
-      if (!price) missingFields.push("price");
       if (!sizes || sizes.length === 0) missingFields.push("sizes");
       if (missingFields.length > 0) {
         return res.status(400).json({
@@ -97,7 +96,6 @@ exports.createFurniture = async (req, res) => {
         });
       }
 
-
       // Create new furniture item
       const newFurniture = new Furniture({
         images,
@@ -129,7 +127,7 @@ exports.getAllFurnitures = async (req, res) => {
 		const furnitures = await Furniture.find().populate([
 			{ path: "category", select: "name -_id" },
 			{ path: "furnitureType", select: "name ECT -_id" },
-			{ path: "materials", select: "name -_id" },
+			{ path: "materials", select: "name price -_id" },
 			{ path: "colors", select: "name hex -_id" },
 			{ path: "sizes", select: "label height width depth -_id" },
 		]);
@@ -173,7 +171,7 @@ exports.getFurnitureById = async (req, res) => {
 		const furniture = await Furniture.findById(furnitureId).populate([
 			{ path: "category", select: "name -_id" },
 			{ path: "furnitureType", select: "name ECT -_id" },
-			{ path: "materials", select: "name -_id" },
+			{ path: "materials", select: "name price -_id" },
 			{ path: "colors", select: "name hex -_id" },
 			{ path: "sizes", select: "label -_id" },
 		]);

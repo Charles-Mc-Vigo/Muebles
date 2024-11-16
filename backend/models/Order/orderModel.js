@@ -1,5 +1,60 @@
 const mongoose = require("mongoose");
 
+// const preOrderSchema = new mongoose.Schema({
+// 	user: {
+// 		type: mongoose.Schema.Types.ObjectId,
+// 		ref: "User",
+// 		required: true,
+// 	},
+// 	furniture:{
+// 		type:mongoose.Schema.Types.ObjectId,
+// 		ref:"Furniture"
+// 	},
+// 	material:{type:String},
+// 	color:{type:String},
+// 	size:{type:String},
+// 	quantity:{type:Number},
+// 	orderNumber: {
+// 		type: String,
+// 		unique: true,
+// 	},
+// 	shippingAddress: {
+// 		streetAddress: String,
+// 		municipality: String,
+// 		barangay: String,
+// 		zipCode: Number,
+// 	},
+// 	paymentOption:{
+// 		type:String,
+// 		require:true,
+// 	},
+// 	paymentMethod: {
+// 		type: String,
+// 		enum: ["GCash", "Maya"],
+// 		required: true,
+// 	},
+// 	proofOfPayment: {
+// 		type: String,
+// 		required: true,
+// 	},
+// 	orderStatus: {
+// 		type: String,
+// 		enum: ["pending", "confirmed", "delivered", "cancelled"],
+// 		default: "pending",
+// 	},
+// 	deliveryMode:{
+// 		type:String,
+// 	},
+// 	expectedDelivery:{
+// 		type:String
+// 	},
+// 	subtotal: Number,
+// 	shippingFee: Number,
+// 	totalAmount: Number,
+// },{
+// 	timestamps: true,
+// })
+
 const orderSchema = new mongoose.Schema(
 	{
 		user: {
@@ -96,11 +151,12 @@ orderSchema.pre("save", async function (next) {
 	next();
 });
 
-orderSchema.statics.createFromCart = async function(cartId, paymentMethod, proofOfPayment, shippingAddress, shippingFee, deliveryMode, expectedDelivery) {
+orderSchema.statics.createFromCart = async function(cartId, paymentMethod, proofOfPayment, paymentOption,shippingAddress, shippingFee, deliveryMode, expectedDelivery) {
   const cart = await mongoose.model('Cart').findById(cartId)
       .populate('userId')
       .populate('items.furnitureId');
   if (!cart) throw new Error('Cart not found');
+	// console.log(shippingFee)
 
   const orderData = {
       user: cart.userId._id,
@@ -110,7 +166,7 @@ orderSchema.statics.createFromCart = async function(cartId, paymentMethod, proof
           price: item.furnitureId.price,
           material: item.material,
           color: item.color,
-          size: item.size,
+          size: item.size
       })),
       shippingAddress: shippingAddress,
       phoneNumber: cart.userId.phoneNumber,
@@ -120,10 +176,13 @@ orderSchema.statics.createFromCart = async function(cartId, paymentMethod, proof
       totalAmount: cart.totalAmount + shippingFee,
       proofOfPayment: proofOfPayment,
       deliveryMode: deliveryMode,
-			expectedDelivery:expectedDelivery
+			expectedDelivery:expectedDelivery,
+			paymentOption: paymentOption
   };
 
   return this.create(orderData);
 };
+
 const Order = mongoose.model("Order", orderSchema);
+// const PreOrder = mongoose.model("PreOrder", preOrderSchema);
 module.exports = Order;

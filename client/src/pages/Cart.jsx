@@ -23,8 +23,8 @@ const Cart = () => {
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState(null);
 	const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
+	const [paymentOption, setSelectedPaymentOption] = useState("Partial Payment");
 	const navigate = useNavigate();
-
 	const shippingFees = {
 		Boac: 500,
 		Mogpog: 700,
@@ -36,45 +36,28 @@ const Cart = () => {
 
 	useEffect(() => {
 		if (items.length > 0) {
-			// Get the highest ECT value among the items
 			const maxECT = Math.max(...items.map((item) => item.ECT || 0));
-
-			console.log("Max ECT among items:", maxECT);
-
-			// Calculate the expected delivery date based on the max ECT
 			const startDeliveryDate = new Date();
 			startDeliveryDate.setDate(startDeliveryDate.getDate() + maxECT);
-
 			const endDeliveryDate = new Date(startDeliveryDate);
 			endDeliveryDate.setDate(endDeliveryDate.getDate() + 2);
-
 			const formatDeliveryDates = (startDate, endDate) => {
 				const options = { month: "short", year: "numeric" };
-				const monthAndYear = startDate.toLocaleDateString("en-US", options); // e.g., "Dec 2024"
+				const monthAndYear = startDate.toLocaleDateString("en-US", options);
 				const startDay = startDate.getDate();
 				const endDay = endDate.getDate();
 				return `${startDay} - ${endDay} ${monthAndYear}`;
 			};
-
-			//ito ay para sa pag debug lang. di ko tinanggal kase ayaw ko
-			// console.log("Estimated Delivery Date:", startDeliveryDate);
-			// console.log("End Delivery Date:", endDeliveryDate);
-			// console.log("Formatted Date:", formatDeliveryDates(startDeliveryDate, endDeliveryDate));
-
 			const estimatedDelivery = formatDeliveryDates(
 				startDeliveryDate,
 				endDeliveryDate
 			);
-
-			// Set the expected delivery date in the state
 			setExpectedDeliveryDate(estimatedDelivery);
-			console.log("Calculated expected delivery date:", estimatedDelivery);
 		} else {
 			setExpectedDeliveryDate(null);
 		}
 	}, [items]);
 
-	// Fetch cart items from the API
 	const fetchCartItems = async () => {
 		try {
 			const response = await fetch("http://localhost:3000/api/cart", {
@@ -85,7 +68,6 @@ const Cart = () => {
 				credentials: "include",
 			});
 			const data = await response.json();
-			// console.log(data)
 			if (!data.ok) {
 				toast.error(data.error);
 			}
@@ -94,7 +76,6 @@ const Cart = () => {
 				setCount(data.cart.count);
 				setTotalAmount(data.cart.totalAmount);
 				setUser(data.cart.userId);
-
 				const defaultAddress = data.cart.userId.addresses?.find(
 					(address) => address.isDefault
 				);
@@ -119,7 +100,6 @@ const Cart = () => {
 	}, []);
 
 	useEffect(() => {
-		// Calculate and set shipping fee based on selected address
 		if (user?.addresses?.length > 0 && selectedAddress) {
 			const address = user.addresses.find(
 				(address) => address._id === selectedAddress
@@ -127,11 +107,10 @@ const Cart = () => {
 			const fee = shippingFees[address?.municipality] || 0;
 			setShippingFee(fee);
 		} else {
-			setShippingFee(0); // Reset if no address is selected
+			setShippingFee(0);
 		}
 	}, [selectedAddress, user]);
 
-	// Calculate total price
 	const totalWithShipping = (totalAmount + shippingFee).toFixed(2);
 
 	const handlePaymentMethodClick = (method) => {
@@ -156,23 +135,29 @@ const Cart = () => {
 		const addressToSend = user.addresses.find(
 			(address) => address._id === selectedAddress
 		);
-		// Create FormData to include both file and payment method
 		const formData = new FormData();
 		formData.append("proofOfPayment", proofOfPayment);
+		formData.append("paymentOption", paymentOption);
 		formData.append("paymentMethod", selectedPaymentMethod);
 		formData.append("shippingAddress", JSON.stringify(addressToSend));
 		formData.append("deliveryMode", deliveryMode);
 		formData.append("expectedDelivery", expectedDeliveryDate);
-		// Log FormData contents
-		for (const [key, value] of formData.entries()) {
-			console.log(`${key}:`, value);
-		}
+
+		// // Log FormData contents
+		// for (const [key, value] of formData.entries()) {
+		// 	console.log(`${key}:`, value);
+		// }
+
 		try {
 			const response = await fetch("http://localhost:3000/api/orders/create", {
 				method: "POST",
 				body: formData,
 				credentials: "include",
 			});
+
+			if (!response.ok) {
+				throw new Error(response.message);
+			}
 			const data = await response.json();
 			if (!data.ok) {
 				toast.error(data.error);
@@ -186,7 +171,6 @@ const Cart = () => {
 		}
 	};
 
-	// Handle updating the quantity of an item in the cart
 	const updateQuantity = async (furnitureId, newQuantity) => {
 		if (newQuantity < 1) {
 			toast.error("Quantity cannot be less than 1");
@@ -214,7 +198,6 @@ const Cart = () => {
 		}
 	};
 
-	// Handle removing an item from the cart
 	const removeItem = async (furnitureId) => {
 		try {
 			const response = await fetch(
@@ -234,7 +217,6 @@ const Cart = () => {
 		}
 	};
 
-	// Handle clearing the entire cart
 	const clearCart = async () => {
 		setLoading(true);
 		try {
@@ -259,6 +241,7 @@ const Cart = () => {
 	if (error) {
 		return <div>Error: {error}</div>;
 	}
+
 	return (
 		<div className="flex flex-col min-h-screen">
 			<Header isLogin={true} cartCount={true} />
@@ -285,7 +268,7 @@ const Cart = () => {
 					</p>
 				) : (
 					<>
-						{/* Customer Information*/}
+						{/* Customer Information */}
 						<div className="bg-white shadow-2xl mt-2 border-t rounded-2xl">
 							<div className="mt-2 p-2 flex items-center text-black font-medium">
 								<div className="flex flex-grow mr-2">
@@ -322,9 +305,8 @@ const Cart = () => {
 								</button>
 							</div>
 						</div>
-
-						{/* Product information & delivery*/}
-						<div className=" py-4 mt-2 bg-white rounded-xl border-t ">
+						{/* Product information & delivery */}
+						<div className="py-4 mt-2 bg-white rounded-xl border-t ">
 							<div className="flex text-2xl font-semibold border-b border-teal-500">
 								<BsShop className="text-2xl text-teal-600 ml-2" />
 								<h1 className="text-2xl ml-2">JCKAME</h1>
@@ -409,7 +391,6 @@ const Cart = () => {
 									))}
 								</ul>
 							</div>
-
 							{/* Delivery Method  */}
 							<div className="flex flex-col pl-2  border rounded-xl shadow-xl border-teal-500">
 								<div className="flex items-center text-xl font-semibold ml-4 mb-5 px-3 py-2">
@@ -443,18 +424,58 @@ const Cart = () => {
 								<div className="bg-slate-100 p-2 px-4 rounded m-2">
 									{expectedDeliveryDate && (
 										<div className="flex justify-between">
-											<span>Expected Delivery:</span>
+											<span className="font-semibold">Expected Delivery:</span>
 											<span>{expectedDeliveryDate}</span>
 										</div>
 									)}
 								</div>
 							</div>
 						</div>
+						{/* Payment method selection */}
+						<div className="shadow-xl border-t-2 mb-2 p-6 rounded-xl">
+							<div className="flex flex-col bg-slate-100 p-5">
+								<div className="bg-slate-50">
+									<p>
+										<strong>Partial Payment</strong> (3-Month Plan) <br /> Pay
+										in installments over 3 months with no interest if paid
+										within this period. Interest applies to any unpaid balance
+										after 3 months.
+									</p>
+									<br />
+									<p>
+										<strong>Full Payment</strong> <br /> Pay the entire amount
+										upfront with no additional charges.
+									</p>
+								</div>
 
-						{/* payment method  */}
+
+								<h3 className="text-lg font-semibold mt-5 mb-2">Payment Options:</h3>
+								<label className="flex items-center mb-2">
+									<input
+										type="radio"
+										value="Partial Payment"
+										checked={paymentOption === "Partial Payment"}
+										onChange={() => setSelectedPaymentOption("Partial Payment")}
+										className="mr-2"
+									/>
+									Partial Payment
+								</label>
+								<label className="flex items-center">
+									<input
+										type="radio"
+										value="Full Payment"
+										checked={paymentOption === "Full Payment"}
+										onChange={() => setSelectedPaymentOption("Full Payment")}
+										className="mr-2"
+									/>
+									Full Payment
+								</label>
+							</div>
+						</div>
+						{/* Payment method  */}
 						<div className="shadow-xl border-t-2 mb-2 p-6 rounded-xl">
 							<div className="flex-1 flex-col w-auto h-auto">
-								<div className="  pt-5">
+								<div className="pt-5">
 									<h3 className="text-lg font-semibold mb-2">
 										Payment Methods:
 									</h3>
@@ -470,7 +491,7 @@ const Cart = () => {
 											} text-white p-2`}
 										>
 											<img
-												src="/payment-icon/gcash.png"
+												src="/payment-icon/gcash"
 												alt="gcash"
 												className="w-20 h-20 object-contain rounded"
 											/>
@@ -502,7 +523,7 @@ const Cart = () => {
 							</div>
 							{/* QR code for payment */}
 							<div className="mt-5">
-								<h1 className="text-xl font-semibold mb-2">Scan the QrCode</h1>
+								<h1 className="text-xl font-semibold mb-2">Scan the QR Code</h1>
 								<div className="flex items-start gap-8">
 									{/* QR Code Section */}
 									<div className="flex flex-col items-center">
@@ -512,9 +533,8 @@ const Cart = () => {
 											className="w-40 h-40 object-contain"
 										/>
 									</div>
-
 									{/* Image Upload Section */}
-									<div className="flex-1 max-w-md  pt-5">
+									<div className="flex-1 max-w-md pt-5">
 										<h2 className="text-2xl font-semibold text-teal-600 mb-4">
 											Upload Proof of Payment
 										</h2>

@@ -23,9 +23,14 @@ function ProductDetails({ admin }) {
 	const [selectedMaterial, setSelectedMaterial] = useState(null);
 	const [selectedSize, setSelectedSize] = useState(null);
 	const [currentImageIndex, setCurrentImageIndex] = useState(0);
+	const [price, setPrice] = useState("");
+    const [ECT, setECT] = useState(null)
+
+	// console.log(price);
 
 	useEffect(() => {
 		setLoading(true);
+
 		const fetchFurnitureDetails = async () => {
 			try {
 				const response = await fetch(
@@ -40,6 +45,8 @@ function ProductDetails({ admin }) {
 				}
 				const data = await response.json();
 				setFurnitureData(data);
+				setPrice(data.price || 0);
+                setECT(data.furnitureType.ECT);
 			} catch (error) {
 				setError(error.message);
 			} finally {
@@ -51,14 +58,17 @@ function ProductDetails({ admin }) {
 
 	const handleColorClick = (color) => {
 		setSelectedColor(color.name);
-		setSelectedMaterial(null);
-		setSelectedSize(null);
+		// setSelectedMaterial(null);
+		// setSelectedSize(null);
 	};
 
 	const handleMaterialClick = (material) => {
 		setSelectedMaterial(material.name);
+		setPrice(material.price);
+        // console.log(price)
 	};
 
+	// console.log(selectedMaterial);
 	const handleSizeClick = (size) => {
 		setSelectedSize(size.label);
 	};
@@ -81,7 +91,6 @@ function ProductDetails({ admin }) {
 
 	const addToCart = async (e) => {
 		e.preventDefault();
-		// Ensure all options are selected
 		if (!selectedColor || !selectedMaterial || !selectedSize) {
 			toast.error("Please select color, material, and size.");
 			return;
@@ -92,9 +101,11 @@ function ProductDetails({ admin }) {
 			color: selectedColor,
 			material: selectedMaterial,
 			size: selectedSize,
-			ECT:furnitureData.furnitureType.ECT
+			price: price,
+            ECT: ECT,
 		};
-		// console.log(item)
+
+        // console.log(item)
 		try {
 			const response = await fetch("http://localhost:3000/api/cart", {
 				method: "POST",
@@ -176,11 +187,10 @@ function ProductDetails({ admin }) {
 	return (
 		<>
 			{loading ? (
-				<LoadingSpinner/>
+				<LoadingSpinner />
 			) : (
 				<section className="bg-white">
 					<Header isLogin={true} cartCount={true} />
-					{/* Right side Image */}
 					<div className="p-5 flex flex-col lg:flex-row">
 						<div className="flex flex-col lg:flex-row lg:w-full justify-center p-5">
 							<div className="flex flex-col rounded-xl p-5 shadow-lg shadow-gray-300">
@@ -197,7 +207,7 @@ function ProductDetails({ admin }) {
 												<img
 													src={`data:image/jpeg;base64,${furnitureData.images[currentImageIndex]}`}
 													alt={furnitureData.name}
-													className="w-full h-96 mx-auto object-contain" // Set fixed width and height
+													className="w-full h-96 mx-auto object-contain"
 												/>
 											)}
 										<div className="flex items-center justify-center space-x-4">
@@ -226,15 +236,15 @@ function ProductDetails({ admin }) {
 									</div>
 								</div>
 							</div>
-							{/* Product details */}
 							<div className="flex-1 lg:max-w-[400px] p-5 bg-white border-gray-300 rounded-lg shadow-lg ml-0 lg:ml-5">
 								<h1 className="text-3xl font-bold">{furnitureData.name}</h1>
 								<div className="mt-2">
 									<p className="border-b-2 py-2 border-gray-400">
-										Price : PHP {furnitureData.price}
+										Price : {price}
 									</p>
 									<p className="border-b-2 py-2 border-gray-400">
-										Estimated Completion Time (ECT):  {furnitureData.furnitureType.ECT} Days
+										Estimated Completion Time (ECT):{" "}
+										{furnitureData.furnitureType.ECT} Days
 									</p>
 								</div>
 								<div className="mb-4 rounded-md p-2">
@@ -263,7 +273,7 @@ function ProductDetails({ admin }) {
 											<span
 												key={material.id}
 												onClick={() => handleMaterialClick(material)}
-												className={`border font-normal text-xl px-2 py-1 rounded-md  cursor-pointer transition ${
+												className={`border border-black px-2 py-1 rounded-md  cursor-pointer transition ${
 													selectedMaterial === material.name
 														? "bg-teal-600 text-black"
 														: "text-black"
@@ -281,7 +291,7 @@ function ProductDetails({ admin }) {
 											<span
 												key={size.id}
 												onClick={() => handleSizeClick(size)}
-												className={`border px-2 py-1 rounded-md font-normal text-base cursor-pointer transition ${
+												className={`border px-2 py-1 rounded-md cursor-pointer transition ${
 													selectedSize === size.label
 														? "bg-teal-600 text-black"
 														: "text-black"
@@ -293,7 +303,6 @@ function ProductDetails({ admin }) {
 									</div>
 								</div>
 								<div className="mt-4 text-justify text-base">
-									{/* Ensure the FAQ container is flexible */}
 									{faqItems.map((item, index) => (
 										<FAQAccordion
 											key={index}
@@ -314,8 +323,7 @@ function ProductDetails({ admin }) {
 							</div>
 						</div>
 					</div>
-					{/* Advertisement Section */}
-					{/* <div
+					<div
 						className="w-full mb-5 max-w-[1829px] p-10 mt-5 rounded-lg shadow-lg mx-auto"
 						style={{ backgroundColor: "#ecede4" }}
 					>
@@ -339,7 +347,7 @@ function ProductDetails({ admin }) {
 						<p className="text-sm text-center text-gray-500">
 							Founded in Marinduque, 2003
 						</p>
-					</div> */}
+					</div>
 					<div
 						className="w-full h-full mb-5 max-w-[1829px] max-h-[500px] p-10 mt-5 rounded-lg shadow-lg mx-auto"
 						style={{ backgroundColor: "#ecede4" }}

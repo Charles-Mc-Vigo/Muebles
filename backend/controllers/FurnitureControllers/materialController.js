@@ -3,13 +3,13 @@ const Materials = require('../../models/Furniture/materialsModel');
 // Add new material
 exports.addMaterials = async (req, res) => {
   try {
-    const { name, price } = req.body;
+    const { name, price, stock} = req.body;
 
-    if (!name || !price) {
-      return res.status(401).json({ message: "Material's name and stocks are required!" });
+    if (!name || !price || !stock) {
+      return res.status(401).json({ message: "Material's name price and stocks are required!" });
     }
 
-    const newMaterial = new Materials({ name, price });
+    const newMaterial = new Materials({ name, price, stock});
     await newMaterial.save();
     return res.status(201).json({ message: `${newMaterial.name} added successfully!` });
   } catch (error) {
@@ -37,9 +37,21 @@ exports.getSpecificMaterial = async (req, res) => {
 exports.getMaterials = async (req, res) => {
   try {
     const materials = await Materials.find({ isArchived: false });
+
     if (materials.length === 0) {
       return res.status(200).json({ message: "No materials found!" });
     }
+
+    // // Check each material and ensure the 'stock' property is present
+    // materials.forEach((material) => {
+    //   if (material.stock == null) {
+    //     material.stock = 1; 
+    //   }
+    //   if (material.price == null) {
+    //     material.price = 0; 
+    //   }
+    // });
+
 
     return res.status(200).json(materials);
   } catch (error) {
@@ -47,6 +59,7 @@ exports.getMaterials = async (req, res) => {
     return res.status(500).json({ message: "Server error" });
   }
 };
+
 
 // Get all archived materials
 exports.ArchivedMaterials = async (req, res) => {
@@ -104,19 +117,27 @@ exports.editMaterial = async (req, res) => {
     const material = await Materials.findById(materialId);
     if (!material) return res.status(404).json({ message: "Material not found!" });
 
-    const { name, price } = req.body;
-    if (!name || !price) return res.status(400).json({ message: "All fields are required! : name, stocks" });
+    if(material.stock == null){
+      material.stock = 1;
+    }
+    if(material.price == null){
+      material.price = 0;
+    }
+
+    const { name, price, stock } = req.body;
 
     // Check if any changes were made
-    if (name === undefined && price === undefined) {
+    if (name === undefined && price === undefined && stock === undefined) {
       return res.status(400).json({ message: "No changes made!" });
     }
 
     material.name = name;
     material.price = price;
+    material.stock = stock;
+
     if (name !== undefined && material.name !== name) material.name = name;
     if (price !== undefined && material.price !== price) material.price = price;
-
+    if (stock !== undefined && material.stock !== stock) material.stock = stock;
 
     await material.save();
     return res.status(200).json({ message: `${material.name} has been edited successfully!` });
