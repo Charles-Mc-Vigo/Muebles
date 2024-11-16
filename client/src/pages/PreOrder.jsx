@@ -18,6 +18,7 @@ const PreOrder = () => {
 	const [selectedColor, setSelectedColor] = useState(null);
 	const [selectedMaterial, setSelectedMaterial] = useState(null);
 	const [selectedSize, setSelectedSize] = useState(null);
+	const [quantity, setQuantity] = useState(1);
 	const [shippingFee, setShippingFee] = useState(0);
 	const [proofOfPayment, setProofOfPayment] = useState(null);
 	const [uploadMessage, setUploadMessage] = useState("");
@@ -27,6 +28,8 @@ const PreOrder = () => {
 	const [paymentOption, setSelectedPaymentOption] = useState("Partial Payment");
 	const [currentImageIndex, setCurrentImageIndex] = useState(0);
 	const [userInformationVisible, setUserInformationVisible] = useState(false);
+	const [paymentOptionVisible, setPaymentOptionVisible] = useState(false);
+	const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
 
 	const shippingFees = {
 		Boac: 500,
@@ -35,6 +38,15 @@ const PreOrder = () => {
 		Buenavista: 800,
 		Santa_Cruz: 3000,
 		Torrijos: 3000,
+	};
+	const togglePaymentOptionVisibility = (event) => {
+		event.stopPropagation();
+		setPaymentOptionVisible((prev) => !prev);
+	};
+
+	// Prevent toggle from closing when clicking inside it
+	const handleInnerClick = (event) => {
+		event.stopPropagation();
 	};
 
 	// Fetch furniture data and user data
@@ -84,6 +96,11 @@ const PreOrder = () => {
 		fetchFurnitureDetails();
 	}, [furnitureId]);
 
+	const handlePaymentMethodClick = (method, event) => {
+		event.stopPropagation();
+		setSelectedPaymentMethod(method);
+	};
+
 	const handleColorClick = (color) => {
 		setSelectedColor(color.name);
 	};
@@ -119,7 +136,12 @@ const PreOrder = () => {
 			(address) => address._id === selectedAddress
 		);
 		const formData = new FormData();
+		formData.append("quantity", quantity);
+		formData.append("color", selectedColor);
+		formData.append("material", selectedMaterial);
+		formData.append("size", selectedSize);
 		formData.append("proofOfPayment", proofOfPayment);
+		formData.append("paymentMethod", selectedPaymentMethod);
 		formData.append("paymentOption", paymentOption);
 		formData.append("shippingAddress", JSON.stringify(addressToSend));
 		formData.append("expectedDelivery", expectedDeliveryDate);
@@ -148,6 +170,7 @@ const PreOrder = () => {
 	};
 
 	const handleFileUpload = (event) => {
+		event.stopPropagation(); // Prevent the click event from bubbling up
 		const file = event.target.files[0];
 		setProofOfPayment(file);
 		setUploadMessage(`Selected file: ${file.name}`);
@@ -258,7 +281,9 @@ const PreOrder = () => {
 											className="cursor-pointer border-b-2 border-gray-400 text-black flex justify-between items-center mt-2"
 										>
 											<span className="font-semibold">User Information</span>
-											<span>{userInformationVisible ? "-" : "+"}</span>
+											<span className="text-2xl">
+												{userInformationVisible ? "-" : "+"}
+											</span>
 										</div>
 										{userInformationVisible && (
 											<div className="bg-slate-200 p-2 flex flex-col gap-2">
@@ -282,13 +307,13 @@ const PreOrder = () => {
 							</div>
 
 							{/* Address Section Below */}
-							<div className="text-base flex font-medium p-5 justify-between items-center">
+							<div className="text-base flex font-medium py-5 justify-between items-center">
 								<h1>Delivery Address</h1>
 								{user.addresses && user.addresses.length > 0 ? (
 									user.addresses
 										.filter((address) => address.isDefault)
 										.map((defaultAddress, index) => (
-											<p key={index} className="tracking-wide p-2">
+											<p key={index} className="tracking-wide font-light p-2">
 												{defaultAddress.streetAddress},{" "}
 												{defaultAddress.barangay}, {defaultAddress.municipality}
 												, {defaultAddress.zipCode}
@@ -307,12 +332,42 @@ const PreOrder = () => {
 
 							{/* product details */}
 							<div className="border border-teal-600 rounded-md p-5 flex flex-col gap-5">
-								{/* colors */}
-								<div className="border-b-2 border-gray-300 py-4">
+								{/* Product Quantity */}
+								<div className="flex justify-between border-b-2 border-gray-300">
 									<label className="flex justify-between font-semibold mb-5">
-										Color <span className="font-normal">{selectedColor || "Select color"}</span>
+										Quantity
 									</label>
-									<div className="flex justify-end flex-wrap gap-2">
+									<div className="flex items-center gap-2 mb-5">
+										<button
+											onClick={() =>
+												setQuantity((prev) => Math.max(prev - 1, 1))
+											}
+											className="border border-teal-600 bg-white text-teal-600 px-3 py-1 rounded-l-md hover:bg-teal-600 hover:text-white transition"
+										>
+											-
+										</button>
+										<span className="border border-teal-600 text-teal-600 px-5 py-1">
+											{quantity}
+										</span>
+										<button
+											onClick={() =>
+												setQuantity((prev) => Math.min(prev + 1, 10))
+											}
+											className="border border-teal-600 bg-white text-teal-600 px-3 py-1 rounded-r-md hover:bg-teal-600 hover:text-white transition"
+										>
+											+
+										</button>
+									</div>
+								</div>
+								{/* Colors */}
+								<div className="border-b-2 border-gray-300">
+									<label className="flex justify-between font-semibold mb-5">
+										Colors{" "}
+										<span className="font-normal">
+											{selectedColor || "Select color"}
+										</span>
+									</label>
+									<div className="flex justify-end flex-wrap mb-5 gap-2">
 										{furnitureData.colors?.map((color) => (
 											<div
 												key={color._id}
@@ -327,18 +382,22 @@ const PreOrder = () => {
 										))}
 									</div>
 								</div>
-
-								{/* materials */}
-								<div className="border-b-2 border-gray-300 py-4">
-									<h2 className="flex justify-between mb-5 font-semibold">Materials <span className="font-normal">{selectedMaterial || "Select material"}</span></h2>
-									<div className="flex justify-end space-x-2 flex-wrap">
+								{/* Materials */}
+								<div className="border-b-2 border-gray-300">
+									<h2 className="flex justify-between mb-5 font-semibold">
+										Materials{" "}
+										<span className="font-normal">
+											{selectedMaterial || "Select material"}
+										</span>
+									</h2>
+									<div className="flex justify-end space-x-2 mb-5 flex-wrap">
 										{furnitureData.materials?.map((material) => (
 											<span
 												key={material.id}
 												onClick={() => handleMaterialClick(material)}
-												className={`border border-teal-600 hover:bg-teal-600 hover:text-white px-2 py-1 rounded-md  cursor-pointer transition ${
+												className={`border border-teal-600 hover:bg-teal-600 hover:text-white px-2 py-1 rounded-md cursor-pointer transition ${
 													selectedMaterial === material.name
-														? "bg-teal-600 text-black"
+														? "bg-teal-600 text-white"
 														: "text-teal-600"
 												}`}
 											>
@@ -347,10 +406,14 @@ const PreOrder = () => {
 										))}
 									</div>
 								</div>
-
-								{/* sizes */}
-								<div className="">
-									<h2 className="flex justify-between font-semibold mb-5">Sizes <span className="font-normal">{selectedSize || "Select size"}</span></h2>
+								{/* Sizes */}
+								<div>
+									<h2 className="flex justify-between font-semibold mb-5">
+										Sizes{" "}
+										<span className="font-normal">
+											{selectedSize || "Select size"}
+										</span>
+									</h2>
 									<div className="flex justify-end space-x-2 flex-wrap">
 										{furnitureData.sizes?.map((size) => (
 											<span
@@ -358,7 +421,7 @@ const PreOrder = () => {
 												onClick={() => handleSizeClick(size)}
 												className={`border px-2 py-1 rounded-md border-teal-600 hover:bg-teal-600 hover:text-white cursor-pointer transition ${
 													selectedSize === size.label
-														? "bg-teal-600 text-black"
+														? "bg-teal-600 text-white"
 														: "text-teal-600"
 												}`}
 											>
@@ -370,44 +433,135 @@ const PreOrder = () => {
 							</div>
 
 							{/* payment option */}
-							<div className="mt-4">
-								<h2 className="text-lg font-semibold">Payment Options</h2>
-								<div className="flex space-x-2 flex-wrap">
-									<label>
-										<input
-											type="radio"
-											value="Partial Payment"
-											checked={paymentOption === "Partial Payment"}
-											onChange={() =>
-												setSelectedPaymentOption("Partial Payment")
-											}
-										/>
-										Partial Payment
-									</label>
-									<label>
-										<input
-											type="radio"
-											value="Full Payment"
-											checked={paymentOption === "Full Payment"}
-											onChange={() => setSelectedPaymentOption("Full Payment")}
-										/>
-										Full Payment
-									</label>
+							<div
+								onClick={togglePaymentOptionVisibility}
+								className="mt-5 rounded shadow-md p-5"
+							>
+								<div>
+									<h1 className="flex justify-between">
+										Payment Options{" "}
+										<span className="text-2xl">
+											{paymentOptionVisible ? " - " : " + "}
+										</span>
+									</h1>
+									{paymentOptionVisible ? (
+										<div>
+											<div className="flex justify-end gap-5 py-2">
+												<span
+													onClick={(event) =>
+														setSelectedPaymentOption("Partial Payment",event)
+													}
+													className={`cursor-pointer font-semibold ${
+														paymentOption === "Partial Payment"
+															? "text-teal-600"
+															: "text-black"
+													}`}
+												>
+													Partial Payment
+												</span>
+												<span
+													onClick={(event) =>
+														setSelectedPaymentOption("Full Payment",event)
+													}
+													className={`cursor-pointer font-semibold ${
+														paymentOption === "Full Payment"
+															? "text-teal-600"
+															: "text-black"
+													}`}
+												>
+													Full Payment
+												</span>
+											</div>
+											{/* Payment method */}
+											<div>
+												<div>
+													<h3 className="text-lg font-semibold mb-2">
+														Payment Methods:
+													</h3>
+													<div className="flex justify-end text-center bg-slate-200 p-5 gap-5">
+														{/* Gcash payment */}
+														<button
+															value="GCash"
+															onClick={(event) =>
+																handlePaymentMethodClick("GCash", event)
+															}
+															className={`rounded ${
+																selectedPaymentMethod === "GCash"
+																	? "bg-slate-200"
+																	: "bg-slate-200"
+															} text-black`}
+														>
+															<img
+																src="/payment-icon/gcash.png"
+																alt="gcash"
+																className="w-20 h-20 object-contain rounded"
+															/>
+														</button>
+														{/* Maya payment */}
+														<button
+															value="Maya"
+															onClick={(event) =>
+																handlePaymentMethodClick("Maya", event)
+															}
+															className={`rounded text-white ${
+																selectedPaymentMethod === "Maya"
+																	? "bg-slate-400"
+																	: "bg-gray-300"
+															}`}
+														>
+															<img
+																src="/payment-icon/maya.jpg"
+																alt="maya"
+																className="w-full h-20 object-contain rounded"
+															/>
+														</button>
+													</div>
+													{selectedPaymentMethod && (
+														<p className="mt-5 text-gray-600">
+															Selected Payment Method:{" "}
+															<strong>{selectedPaymentMethod}</strong>
+														</p>
+													)}
+												</div>
+											</div>
+											{/* QR code for payment */}
+											<div className="mt-5 bg-slate-200 p-5">
+												<h1 className="text-xl font-semibold mb-2">
+													Scan the QR Code
+												</h1>
+												<div className="flex items-start gap-8">
+													{/* QR Code Section */}
+													<div className="flex flex-col items-center">
+														<img
+															src="/payment-icon/qrcode.png"
+															alt="qrcode"
+															className="w-40 h-40 object-contain"
+														/>
+													</div>
+													{/* Image Upload Section */}
+													<div className="flex-1 max-w-md pt-5">
+														<h2 className="font-semibold text-teal-600 mb-4">
+															Upload Proof of Payment
+														</h2>
+														<input
+															type="file"
+															onClick={handleInnerClick}
+															onChange={handleFileUpload}
+															className="mb-4 w-full border border-gray-300 rounded-md px-3 py-2 text-gray-600 focus:border-teal-600 focus:ring-teal-500"
+														/>
+														{uploadMessage && <p>{uploadMessage}</p>}
+													</div>
+												</div>
+											</div>
+										</div>
+									) : (
+										!paymentOptionVisible
+									)}
 								</div>
 							</div>
 
-							{/* proof of payment */}
-							<div className="mt-4">
-								<h2 className="text-lg font-semibold">
-									Upload Proof of Payment
-								</h2>
-								<input
-									type="file"
-									onChange={handleFileUpload}
-									className="mb-4 w-full border border-gray-300 rounded-md px-3 py-2 text-gray-600 focus:border-teal-600 focus:ring-teal-500"
-								/>
-								{uploadMessage && <p>{uploadMessage}</p>}
-							</div>
+							{/* order details */}
+
 							<div className="mt-4 flex gap-4">
 								<button
 									onClick={preOrder}
