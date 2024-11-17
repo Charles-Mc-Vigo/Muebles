@@ -64,7 +64,7 @@ const OrderDetails = () => {
 
 	return (
 		<div>
-			<Header isLogin={true} cartCount={true}/>
+			<Header isLogin={true} cartCount={true} />
 			<div className="max-w-4xl mx-auto p-4 md:p-8 bg-white shadow-xl rounded-xl mt-5 mb-5 border-2">
 				<div className="flex items-center justify-between mb-6">
 					<button onClick={() => navigate(-1)} className="text-gray-500">
@@ -77,8 +77,8 @@ const OrderDetails = () => {
 
 				{/* Order Summary */}
 				<div className="pb-6 mb-2">
-					<h2 className="text-xl md:text-2xl ml-2 font-semibold text-teal-700 mb-4">
-						Order Summary
+					<h2 className="flex justify-between text-xl md:text-2xl ml-2 font-semibold text-teal-700 mb-4">
+						Order Summary <span>Type: {order.type}</span>
 					</h2>
 					<div className="gap-2 text-gray-600 border-t border-teal-500 p-2">
 						<div className="grid grid-cols-1 sm:grid-cols-2 gap-2 items-baseline rounded-md border-teal-500 p-2 shadow-md">
@@ -164,63 +164,110 @@ const OrderDetails = () => {
 					</div>
 				</div>
 
-				{/* Item Details */}
-				<div className="border-t shadow-xl border-teal-400 bg-white rounded-xl mb-5 p-4 md:p-5">
-					<h2 className="text-xl md:text-2xl font-semibold text-teal-700 mb-4">
-						Items
-					</h2>
-					<div>
-						{orderItems.length > 0 ? (
-							orderItems.map((item) => (
-								<li
-									key={item._id}
-									className="flex flex-col md:flex-row justify-between items-start md:items-center py-4 border-b border-gray-200 mb-5"
-								>
-									<div className="flex items-start md:items-center">
-										{item.furniture.images.length > 0 && (
-											<img
-												src={`data:image/jpeg;base64,${item.furniture.images[0]}`}
-												alt={item.furniture.name}
-												className="w-24 h-24 md:w-32 md:h-32 object-contain mr-4 rounded-md"
-											/>
-										)}
-										<div>
-											<p className="font-semibold text-gray-800">
-												{item.furniture.name}
-											</p>
-											<p className="text-gray-800">Color: {item.color}</p>
-											<p className="text-gray-800">Material: {item.material}</p>
-											<p className="text-gray-800">Size: {item.size}</p>
+				{order.type === "Cart" ? (
+					<div className="border-t shadow-xl border-teal-400 bg-white rounded-xl mb-5 p-4 md:p-5">
+						<h2 className="text-xl md:text-2xl font-semibold text-teal-700 mb-4">
+							Items
+						</h2>
+						<div>
+							{orderItems.length > 0 ? (
+								orderItems.map((item) => (
+									<li
+										key={item._id}
+										className="flex flex-col md:flex-row justify-between items-start md:items-center py-4 border-b border-gray-200 mb-5"
+									>
+										<div className="flex items-start md:items-center">
+											{item.furniture.images.length > 0 && (
+												<img
+													src={`data:image/jpeg;base64,${item.furniture.images[0]}`}
+													alt={item.furniture.name}
+													className="w-24 h-24 md:w-32 md:h-32 object-contain mr-4 rounded-md"
+												/>
+											)}
+											<div>
+												<p className="font-semibold text-gray-800">
+													{item.furniture.name}
+												</p>
+												<p className="text-gray-800">Color: {item.color}</p>
+												<p className="text-gray-800">
+													Material: {item.material}
+												</p>
+												<p className="text-gray-800">Size: {item.size}</p>
+											</div>
 										</div>
-									</div>
-									<div className="mt-4 md:mt-0">
-										<p className="text-lg font-medium text-teal-700">
-											PHP {(item.price * item.quantity).toFixed(2)} X{" "}
-											<span> {item.quantity} </span>
-										</p>
-									</div>
+										<div className="mt-4 md:mt-0">
+											<p className="text-lg font-medium text-teal-700">
+												PHP {(item.price * item.quantity).toFixed(2)} X{" "}
+												<span> {item.quantity} </span>
+											</p>
+										</div>
+									</li>
+								))
+							) : (
+								<li className="py-4 text-gray-600">
+									No items found for this order.
 								</li>
-							))
-						) : (
-							<li className="py-4 text-gray-600">
-								No items found for this order.
-							</li>
-						)}
-					</div>
-					<div className="bg-white border flex flex-col border-teal-400 rounded-xl p-4 md:p-6 text-right gap-2">
-						<h1>Payment Option: {order.paymentOption}</h1>
-						<h1>Delivery Option: {order.deliveryMode}</h1>
-						<h1>Expected Delivery: {order.expectedDelivery}</h1>
-						<h1>Subtotal: PHP {order.subtotal.toFixed(2)}</h1>
-						<h1>Shipping Fee: ₱{order.shippingFee.toFixed(2)}</h1>
-						<div className="flex justify-end">
-							<p className="text-xl font-semibold mt-4 text-teal-700 pr-2 pb-2">
-								Total: ₱
-								{order.totalAmount ? order.totalAmount.toFixed(2) : "0.00"}
-							</p>
+							)}
+						</div>
+						<div className="bg-white border flex flex-col border-teal-400 rounded-xl p-4 md:p-6 text-right gap-2">
+							<h1>Payment Option: {order.paymentOption}</h1>
+							<h1>Delivery Option: {order.deliveryMode}</h1>
+							<h1>Expected Delivery: {order.expectedDelivery}</h1>
+							{/* <h1>Subtotal: PHP {order.subtotal.toFixed(2)}</h1> */}
+							<h1>Shipping Fee: ₱{order.shippingFee.toFixed(2)}</h1>
+							<div className="flex justify-end">
+								<p className="text-xl font-semibold mt-4 text-teal-700 pr-2 pb-2">
+									Total: ₱
+									{order.totalAmount ? order.totalAmount.toFixed(2) : "0.00"}
+								</p>
+							</div>
 						</div>
 					</div>
-				</div>
+				) : (
+					<div className="border-t shadow-xl border-teal-400 bg-white rounded-xl mb-5 p-4 md:p-5">
+						<h2 className="text-xl md:text-2xl font-semibold text-teal-700 mb-4">
+							Items
+						</h2>
+						<div>
+							<div className="flex items-start md:items-center">
+								{order.furniture.images.length > 0 && (
+									<img
+										src={`data:image/jpeg;base64,${order.furniture.images[0]}`}
+										alt={order.furniture.name}
+										className="w-24 h-24 md:w-32 md:h-32 object-contain mr-4 rounded-md"
+									/>
+								)}
+								<div>
+									<p className="font-semibold text-gray-800">
+										{order.furniture.name}
+									</p>
+									<p className="text-gray-800">Color: {order.color}</p>
+									<p className="text-gray-800">Material: {order.material}</p>
+									<p className="text-gray-800">Size: {order.size}</p>
+								</div>
+							</div>
+							<div className="mt-4 md:mt-0">
+								<p className="text-lg font-medium text-teal-700">
+									PHP {(order.price * order.quantity).toFixed(2)} X{" "}
+									<span> {order.quantity} </span>
+								</p>
+							</div>
+						</div>
+						<div className="bg-white border flex flex-col border-teal-400 rounded-xl p-4 md:p-6 text-right gap-2">
+							<h1>Payment Option: {order.paymentOption}</h1>
+							<h1>Delivery Option: {order.deliveryMode}</h1>
+							<h1>Expected Delivery: {order.expectedDelivery}</h1>
+							{/* <h1>Subtotal: PHP {order.subtotal.toFixed(2)}</h1> */}
+							<h1>Shipping Fee: ₱{order.shippingFee.toFixed(2)}</h1>
+							<div className="flex justify-end">
+								<p className="text-xl font-semibold mt-4 text-teal-700 pr-2 pb-2">
+									Total: ₱
+									{order.totalAmount ? order.totalAmount.toFixed(2) : "0.00"}
+								</p>
+							</div>
+						</div>
+					</div>
+				)}
 
 				{/* Proof of Payment */}
 				{order.proofOfPayment && (

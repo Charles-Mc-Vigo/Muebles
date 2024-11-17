@@ -136,7 +136,7 @@ const orderSchema = new mongoose.Schema(
 		totalAmount: Number,
 		type:{
 			type:String,
-			enum: ["cart","pre-order"],
+			enum: ["Cart","Pre-Order"],
 			required:true
 		}
 	},
@@ -157,7 +157,7 @@ orderSchema.pre("save", async function (next) {
 	next();
 });
 
-orderSchema.statics.preOrder = async function(userId, furnitureId, material, color, size, quantity,paymentMethod, proofOfPayment, paymentOption,shippingAddress, shippingFee, deliveryMode, expectedDelivery) {
+orderSchema.statics.preOrder = async function(user, furniture, material, color, size, quantity,paymentMethod, proofOfPayment, paymentOption,shippingAddress, shippingFee, deliveryMode, expectedDelivery) {
 
 
 	// //calculation para sa partial payment ksksks
@@ -176,8 +176,8 @@ orderSchema.statics.preOrder = async function(userId, furnitureId, material, col
 
 	
   const preOrderData = {
-      user: userId,
-			furniture:furnitureId,
+      user: user,
+			furniture:furniture,
 			material:material,
 			color:color,
 			size:size,
@@ -192,7 +192,7 @@ orderSchema.statics.preOrder = async function(userId, furnitureId, material, col
 			// remainingBalance: remainingHalf,
       deliveryMode: deliveryMode,
 			expectedDelivery:expectedDelivery,
-			type:"pre-order",
+			type:"Pre-Order",
   };
 
 
@@ -243,7 +243,7 @@ orderSchema.statics.createFromCart = async function(cartId, paymentMethod, proof
       deliveryMode: deliveryMode,
 			expectedDelivery:expectedDelivery,
 			paymentOption: paymentOption,
-			type:"cart"
+			type:"Cart"
   };
 
 
