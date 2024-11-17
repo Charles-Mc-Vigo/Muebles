@@ -69,10 +69,12 @@ const orderSchema = new mongoose.Schema(
 		material:{type:String},
 		color:{type:String},
 		size:{type:String},
+		quantity:{type:Number},
 		orderNumber: {
 			type: String,
 			unique: true,
 		},
+		
 		items: [
 			{
 				furniture: {
@@ -157,7 +159,7 @@ orderSchema.pre("save", async function (next) {
 	next();
 });
 
-orderSchema.statics.preOrder = async function(user, furniture, material, color, size, quantity,paymentMethod, proofOfPayment, paymentOption,shippingAddress, shippingFee, deliveryMode, expectedDelivery) {
+orderSchema.statics.preOrder = async function(user, furniture, material, color, size, quantity, paymentMethod, proofOfPayment, paymentOption,shippingAddress, shippingFee, deliveryMode, expectedDelivery,subtotal,totalAmount) {
 
 
 	// //calculation para sa partial payment ksksks
@@ -192,6 +194,8 @@ orderSchema.statics.preOrder = async function(user, furniture, material, color, 
 			// remainingBalance: remainingHalf,
       deliveryMode: deliveryMode,
 			expectedDelivery:expectedDelivery,
+			subtotal:subtotal,
+			totalAmount:totalAmount,
 			type:"Pre-Order",
   };
 

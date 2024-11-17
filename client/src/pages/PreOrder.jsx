@@ -77,7 +77,7 @@ const PreOrder = () => {
 				}
 				const user = await response.json();
 				setUser(user);
-				console.log(user)
+				console.log(user);
 
 				const defaultAddress = user.addresses?.find(
 					(address) => address.isDefault
@@ -156,7 +156,7 @@ const PreOrder = () => {
 			);
 
 			const endDeliveryDate = new Date(startDeliveryDate);
-			endDeliveryDate.setDate(endDeliveryDate.getDate() + 2); // Adding 2 days for delivery window
+			endDeliveryDate.setDate(endDeliveryDate.getDate() + 2);
 
 			const formatDeliveryDates = (startDate, endDate) => {
 				const options = { month: "short", year: "numeric" };
@@ -210,25 +210,28 @@ const PreOrder = () => {
 		const formData = new FormData();
 		// formData.append("furnitureId", JSON.stringify(furnitureData._id));
 		formData.append("furnitureId", furnitureId);
-		formData.append("quantity", quantity);
 		formData.append("color", selectedColor);
 		formData.append("material", selectedMaterial);
 		formData.append("size", selectedSize);
-		formData.append("proofOfPayment", proofOfPayment);
+		formData.append("quantity", quantity);
 		formData.append("paymentMethod", selectedPaymentMethod);
+		formData.append("proofOfPayment", proofOfPayment);
 		formData.append("paymentOption", paymentOption);
-		formData.append("deliveryMode", selectedDeliveryMode);
 		formData.append("shippingAddress", JSON.stringify(addressToSend));
+		formData.append("deliveryMode", selectedDeliveryMode);
 		formData.append("expectedDelivery", expectedDeliveryDate);
 		for (const [key, value] of formData.entries()) {
 			console.log(`${key}:`, value);
 		}
 		try {
-			const response = await fetch("http://localhost:3000/api/orders/pre-order/create", {
-				method: "POST",
-				body: formData,
-				credentials: "include",
-			});
+			const response = await fetch(
+				"http://localhost:3000/api/orders/pre-order/create",
+				{
+					method: "POST",
+					body: formData,
+					credentials: "include",
+				}
+			);
 			if (!response.ok) {
 				throw new Error(response.message);
 			}
@@ -338,7 +341,7 @@ const PreOrder = () => {
 								<div className="flex flex-col justify-evenly w-full">
 									{/* furniture information */}
 									<div>
-										<h1>{furnitureData.name}</h1>
+										<h1 className="text-3xl mb-2 py-5">{furnitureData.name}</h1>
 										<p className="flex justify-between">
 											<span>Estimated Completion Time: </span>
 											<span>
@@ -348,7 +351,7 @@ const PreOrder = () => {
 									</div>
 
 									{/* User Information Accordion */}
-									<div>
+									<div className="mt-2 py-2 bg-slate-200">
 										<div
 											onClick={() =>
 												setUserInformationVisible(!userInformationVisible)
@@ -426,7 +429,7 @@ const PreOrder = () => {
 										</span>
 										<button
 											onClick={() =>
-												setQuantity((prev) => Math.min(prev + 1, 10))
+												setQuantity((prev) => Math.min(prev + 1))
 											}
 											className="border border-teal-600 bg-white text-teal-600 px-3 py-1 rounded-r-md hover:bg-teal-600 hover:text-white transition"
 										>
@@ -509,7 +512,7 @@ const PreOrder = () => {
 										<h1 className="font-semibold mb-2">Payment Details</h1>
 										<div className="font-normal">
 											<div className="flex justify-between">
-												<span>Items total:</span>
+												<span>Furniture Price (<i>based on material</i>):</span>
 												<span>₱{price.toFixed(2)}</span>
 											</div>
 											<div className="flex justify-between">
@@ -583,6 +586,23 @@ const PreOrder = () => {
 													Full Payment
 												</span>
 											</div>
+
+											{paymentOption === "Partial Payment" && (
+												<div className="p-5 bg-slate-200 mb-5">
+													<strong>Partial Payment (3-Month Plan)</strong> Pay in installments
+													with 50% down payment and remaining balance can be
+													paid over a minimum of 3 months. 3% Interest applies
+													only if payments are not made on time.
+												</div>
+											)}
+
+											{paymentOption === "Full Payment" && (
+												<div className="p-5 bg-slate-200 mb-5">
+													<strong>Full Payment Pay</strong> the entire amount upfront with no
+													additional charges.
+												</div>
+											)}
+
 											{/* Payment method */}
 											<div>
 												<h3 className="text-lg font-semibold mb-2">

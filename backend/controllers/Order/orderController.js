@@ -99,8 +99,8 @@ const orderController = {
 	preOrder: async (req, res) => {
 		try {
 			const {
+				quantity,
 				furnitureId,
-				quantity = 1,
 				color,
 				material,
 				size,
@@ -148,6 +148,7 @@ const orderController = {
 			// res.status(201).json(selectedMaterial.price);
 
 			const subtotal = selectedMaterial.price * quantity;
+			console.log("Subtotal of the item: ",subtotal)
 			// res.status(201).json(subtotal);
 
 			// const subtotal = furniture.price * quantity;
@@ -164,9 +165,10 @@ const orderController = {
 			const shippingAddressObj = JSON.parse(shippingAddress);
 			const municipality = shippingAddressObj.municipality;
 			const shippingFee = shippingFees[municipality] || 0;
-
+			
 			// Calculate total amount
 			const totalAmount = subtotal + shippingFee;
+			console.log(`Shipping fee is ${shippingFee} + ${subtotal} = total amount of ${totalAmount}`)
 			// res.status(201).json(shippingFee);
 
 			let proofOfPayment;

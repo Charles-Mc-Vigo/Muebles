@@ -78,23 +78,23 @@ const OrderDetails = () => {
 				{/* Order Summary */}
 				<div className="pb-6 mb-2">
 					<h2 className="flex justify-between text-xl md:text-2xl ml-2 font-semibold text-teal-700 mb-4">
-						Order Summary <span>Type: {order.type}</span>
+						Order Summary <span>{order.type}</span>
 					</h2>
-					<div className="gap-2 text-gray-600 border-t border-teal-500 p-2">
+					<div className="gap-2 text-gray-600 border-t border-teal-500 p-5">
 						<div className="grid grid-cols-1 sm:grid-cols-2 gap-2 items-baseline rounded-md border-teal-500 p-2 shadow-md">
 							<p className="font-base flex items-baseline">
-								<span className="font-semibold text-black text-lg md:text-xl">
+								<span className="font-semibold text-black">
 									Order ID:
 								</span>
-								<span className="text-base ml-1 text-black">
+								<span className="ml-2 text-black">
 									{order.orderNumber}
 								</span>
 							</p>
 							<p className="flex items-baseline">
-								<span className="font-semibold text-gray-800 text-lg md:text-xl">
+								<span className="font-semibold text-gray-800">
 									Date:
 								</span>
-								<span className="text-black text-base ml-1">
+								<span className="text-black ml-2">
 									{new Date(order.createdAt).toLocaleDateString("en-US", {
 										year: "numeric",
 										month: "long",
@@ -103,16 +103,16 @@ const OrderDetails = () => {
 								</span>
 							</p>
 							<p className="flex items-baseline">
-								<span className="font-semibold text-gray-800 text-lg">
+								<span className="font-semibold text-gray-800">
 									Payment Method:
 								</span>
-								<span className="text-black text-base ml-1">
+								<span className="text-black ml-2">
 									{order.paymentMethod || "N/A"}
 								</span>
 							</p>
 							<p>
-								<span className="font-semibold text-gray-800 text-lg">
-									Status:
+								<span className="font-semibold text-gray-800">
+									Status: {""}
 								</span>
 								<span
 									className={`${
@@ -127,28 +127,28 @@ const OrderDetails = () => {
 
 							{/* Customer Details */}
 							<div className="flex items-baseline">
-								<h1 className="font-semibold text-lg md:text-xl text-black">
+								<h1 className="font-semibold text-black">
 									Client:
 								</h1>
-								<p className="ml-1 text-base text-black">
+								<p className="ml-2 text-black">
 									{order.user.firstname} {order.user.lastname}
 								</p>
 							</div>
 							<div className="flex">
-								<h1 className="font-semibold text-lg text-black">Email:</h1>
-								<p className="ml-1 text-base text-black">{order.user.email}</p>
+								<h1 className="font-semibold text-black">Email:</h1>
+								<p className="ml-2 text-black">{order.user.email}</p>
 							</div>
 							<div className="flex">
-								<h1 className="font-semibold text-lg text-black">
+								<h1 className="font-semibold text-black">
 									Phone Number:
 								</h1>
-								<p className="ml-1 text-black text-base">
+								<p className="ml-2 text-black">
 									{order.user.phoneNumber}
 								</p>
 							</div>
 							<div className="flex items-baseline">
-								<h1 className="font-semibold text-lg text-black">Address:</h1>
-								<p className="ml-1 text-base text-black">
+								<h1 className="font-semibold text-black">Address:</h1>
+								<p className="ml-2 text-black">
 									{order.user.addresses
 										.filter((address) => address.isDefault)
 										.map((defaultAddress, index) => (
@@ -226,31 +226,26 @@ const OrderDetails = () => {
 				) : (
 					<div className="border-t shadow-xl border-teal-400 bg-white rounded-xl mb-5 p-4 md:p-5">
 						<h2 className="text-xl md:text-2xl font-semibold text-teal-700 mb-4">
-							Items
+							Item
 						</h2>
 						<div>
-							<div className="flex items-start md:items-center">
+							<div className="flex items-start md:items-center mb-5">
 								{order.furniture.images.length > 0 && (
 									<img
 										src={`data:image/jpeg;base64,${order.furniture.images[0]}`}
 										alt={order.furniture.name}
-										className="w-24 h-24 md:w-32 md:h-32 object-contain mr-4 rounded-md"
+										className="w-38 h-38 object-contain mr-4 rounded-md"
 									/>
 								)}
-								<div>
+								<div className="flex p-5 flex-col gap-2">
 									<p className="font-semibold text-gray-800">
 										{order.furniture.name}
 									</p>
-									<p className="text-gray-800">Color: {order.color}</p>
-									<p className="text-gray-800">Material: {order.material}</p>
-									<p className="text-gray-800">Size: {order.size}</p>
+									<p>Material: {order.material}</p>
+									<p>Color: {order.color}</p>
+									<p>Size: {order.size}</p>
+									<p className="font-semibold text-lg mt-5">Subtotal: <span className="font-normal">{order.subtotal} x {order.quantity}</span> </p>
 								</div>
-							</div>
-							<div className="mt-4 md:mt-0">
-								<p className="text-lg font-medium text-teal-700">
-									PHP {(order.price * order.quantity).toFixed(2)} X{" "}
-									<span> {order.quantity} </span>
-								</p>
 							</div>
 						</div>
 						<div className="bg-white border flex flex-col border-teal-400 rounded-xl p-4 md:p-6 text-right gap-2">
