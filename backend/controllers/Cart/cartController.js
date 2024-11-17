@@ -40,7 +40,7 @@ exports.viewCart = async (req, res) => {
 // Add to Cart
 exports.addToCart = async (req, res) => {
 	try {
-		const { furnitureId, quantity = 1, material, color, size, ECT } = req.body;
+		const { furnitureId, quantity = 1, material, color, size, price, ECT } = req.body;
 		const user = await User.findById(req.user._id);
 
 		if (!user) return res.status(404).json({ error: "User not found!" });
@@ -76,7 +76,9 @@ exports.addToCart = async (req, res) => {
 				item.furnitureId.toString() === furnitureId &&
 				item.material === material &&
 				item.color === color &&
-				item.size === size
+				item.size === size &&
+				item.price === price &&
+				item.ECT === ECT 
 		);
 
 		if (existingItemIndex > -1) {
@@ -88,6 +90,7 @@ exports.addToCart = async (req, res) => {
 				material,
 				color,
 				size,
+				price,
 				ECT,
 			});
 		}

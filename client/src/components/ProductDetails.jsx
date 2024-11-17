@@ -23,7 +23,7 @@ function ProductDetails({ admin }) {
 	const [selectedMaterial, setSelectedMaterial] = useState(null);
 	const [selectedSize, setSelectedSize] = useState(null);
 	const [currentImageIndex, setCurrentImageIndex] = useState(0);
-	const [price, setPrice] = useState("");
+	const [price, setPrice] = useState(null);
 	const [ECT, setECT] = useState(null);
 
 	// console.log(price);
@@ -65,7 +65,7 @@ function ProductDetails({ admin }) {
 	const handleMaterialClick = (material) => {
 		setSelectedMaterial(material.name);
 		setPrice(material.price);
-		// console.log(price)
+		console.log(price)
 	};
 
 	// console.log(selectedMaterial);
@@ -104,6 +104,8 @@ function ProductDetails({ admin }) {
 			price: price,
 			ECT: ECT,
 		};
+
+		console.log(item)
 
 		// console.log(item)
 		try {
@@ -275,10 +277,10 @@ function ProductDetails({ admin }) {
 											<span
 												key={material.id}
 												onClick={() => handleMaterialClick(material)}
-												className={`border border-black px-2 py-1 rounded-md  cursor-pointer transition ${
+												className={`border border-teal-600 px-2 py-1 rounded-md  cursor-pointer transition ${
 													selectedMaterial === material.name
-														? "bg-teal-600 text-black"
-														: "text-black"
+														? "bg-teal-600 text-white"
+														: "text-teal-600"
 												}`}
 											>
 												{material.name}
@@ -293,10 +295,10 @@ function ProductDetails({ admin }) {
 											<span
 												key={size.id}
 												onClick={() => handleSizeClick(size)}
-												className={`border px-2 py-1 rounded-md cursor-pointer transition ${
+												className={`border px-2 py-1 border-teal-600 rounded-md cursor-pointer transition ${
 													selectedSize === size.label
-														? "bg-teal-600 text-black"
-														: "text-black"
+														? "bg-teal-600 text-white"
+														: "text-teal-600"
 												}`}
 											>
 												{size.label}

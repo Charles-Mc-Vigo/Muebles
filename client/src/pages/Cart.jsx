@@ -95,6 +95,8 @@ const Cart = () => {
 		}
 	};
 
+	// console.log(items);
+
 	useEffect(() => {
 		fetchCartItems();
 	}, []);
@@ -128,7 +130,7 @@ const Cart = () => {
 		setUploadMessage(`Selected file: ${file.name}`);
 	};
 
-	const checkout = async () => {
+	const preOrderFromCart = async () => {
 		if (!selectedPaymentMethod) {
 			toast.error("Please select a payment method before checking out.");
 			return;
@@ -167,7 +169,9 @@ const Cart = () => {
 			if (!data.ok) {
 				toast.error(data.error);
 			}
+			
 			const orderId = data.order._id;
+			await clearCart();
 			navigate(`/order-details/${orderId}`);
 			await fetchCartItems();
 		} catch (error) {
@@ -344,7 +348,7 @@ const Cart = () => {
 															Material: {item.material}
 														</p>
 														<p className="text-gray-600">
-															Price: ₱{item.furnitureId.price}
+															Price: ₱{item.price}
 														</p>
 													</div>
 													<div className="flex items-center">
@@ -380,9 +384,9 @@ const Cart = () => {
 													</div>
 													<p className="ml-4 text-lg font-medium">
 														₱
-														{(
-															parseFloat(item.furnitureId.price) * item.quantity
-														).toFixed(2)}
+														{(parseFloat(item.price) * item.quantity).toFixed(
+															2
+														)}
 													</p>
 													<button
 														className="ml-4 text-teal-600 hover:teal-red-800"
@@ -478,79 +482,83 @@ const Cart = () => {
 								</label>
 							</div>
 						</div>
-						{/* Payment method  */}
-						<div className="shadow-xl border-t-2 mb-2 p-6 rounded-xl">
-							<div className="flex-1 flex-col w-auto h-auto">
-								<div className="pt-5">
-									<h3 className="text-lg font-semibold mb-2">
-										Payment Methods:
-									</h3>
-									<div className="flex gap-4">
-										{/* Gcash payment */}
-										<button
-											value="GCash"
-											onClick={() => handlePaymentMethodClick("GCash")}
-											className={`rounded ${
-												selectedPaymentMethod === "GCash"
-													? "bg-blue-500"
-													: "bg-gray-500"
-											} text-white p-2`}
-										>
-											<img
-												src="/payment-icon/gcash"
-												alt="gcash"
-												className="w-20 h-20 object-contain rounded"
-											/>
-										</button>
-										{/* Maya payment */}
-										<button
-											value="Maya"
-											onClick={() => handlePaymentMethodClick("Maya")}
-											className={`px-4 py-2 rounded text-white ${
-												selectedPaymentMethod === "Maya"
-													? "bg-green-400"
-													: "bg-gray-300"
-											}`}
-										>
-											<img
-												src="/payment-icon/maya.jpg"
-												alt="maya"
-												className="w-12 h-12 object-contain rounded"
-											/>
-										</button>
-									</div>
-									{selectedPaymentMethod && (
-										<p className="mt-5 text-gray-600">
-											Selected Payment Method:{" "}
-											<strong>{selectedPaymentMethod}</strong>
-										</p>
+						{/* Payment method */}
+						<div>
+							<h3 className="text-lg font-semibold mb-2">Payment Methods:</h3>
+							<div className="flex justify-end text-center bg-slate-200 p-5 gap-5">
+								{/* Gcash payment */}
+								<button
+									value="GCash"
+									onClick={(event) => handlePaymentMethodClick("GCash", event)}
+									className={`rounded relative p-2 transition-all duration-200 ${
+										selectedPaymentMethod === "GCash"
+											? "border-2 border-teal-600 bg-white shadow-lg transform scale-105"
+											: "border border-gray-300 bg-slate-200 hover:border-teal-400"
+									}`}
+								>
+									<img
+										src="/payment-icon/gcash.png"
+										alt="gcash"
+										className="w-20 h-20 object-contain rounded"
+									/>
+									{selectedPaymentMethod === "GCash" && (
+										<div className="absolute -top-2 -right-2 w-6 h-6 bg-teal-600 rounded-full flex items-center justify-center">
+											<span className="text-white text-sm">✓</span>
+										</div>
 									)}
-								</div>
+								</button>
+								{/* Maya payment */}
+								<button
+									value="Maya"
+									onClick={(event) => handlePaymentMethodClick("Maya", event)}
+									className={`rounded relative p-2 transition-all duration-200 ${
+										selectedPaymentMethod === "Maya"
+											? "border-2 border-teal-600 bg-white shadow-lg transform scale-105"
+											: "border border-gray-300 bg-slate-200 hover:border-teal-400"
+									}`}
+								>
+									<img
+										src="/payment-icon/maya.jpg"
+										alt="maya"
+										className="w-20 h-20 object-contain rounded"
+									/>
+									{selectedPaymentMethod === "Maya" && (
+										<div className="absolute -top-2 -right-2 w-6 h-6 bg-teal-600 rounded-full flex items-center justify-center">
+											<span className="text-white text-sm">✓</span>
+										</div>
+									)}
+								</button>
 							</div>
-							{/* QR code for payment */}
-							<div className="mt-5">
-								<h1 className="text-xl font-semibold mb-2">Scan the QR Code</h1>
-								<div className="flex items-start gap-8">
-									{/* QR Code Section */}
-									<div className="flex flex-col items-center">
-										<img
-											src="/payment-icon/qrcode.png"
-											alt="qrcode"
-											className="w-40 h-40 object-contain"
-										/>
-									</div>
-									{/* Image Upload Section */}
-									<div className="flex-1 max-w-md pt-5">
-										<h2 className="text-2xl font-semibold text-teal-600 mb-4">
-											Upload Proof of Payment
-										</h2>
-										<input
-											type="file"
-											onChange={handleFileUpload}
-											className="mb-4 w-full border border-gray-300 rounded-md px-3 py-2 text-gray-600 focus:border-teal-600 focus:ring-teal-500"
-										/>
-										{uploadMessage && <p>{uploadMessage}</p>}
-									</div>
+							{selectedPaymentMethod && (
+								<p className="mt-5 text-gray-600">
+									Selected Payment Method:{" "}
+									<strong>{selectedPaymentMethod}</strong>
+								</p>
+							)}
+						</div>
+						{/* QR code for payment */}
+						<div className="mt-5 p-5 bg-slate-200">
+							<h1 className="text-xl font-semibold mb-2">Scan the QR Code</h1>
+							<div className="flex items-start gap-8">
+								{/* QR Code Section */}
+								<div className="flex flex-col items-center">
+									<img
+										src="/payment-icon/qrcode.png"
+										alt="qrcode"
+										className="w-40 h-40 object-contain"
+									/>
+								</div>
+								{/* Image Upload Section */}
+								<div className="flex-1 max-w-md pt-5">
+									<h2 className="text-2xl font-semibold text-teal-600 mb-4">
+										Upload Proof of Payment
+									</h2>
+									<input
+										type="file"
+										onChange={handleFileUpload}
+										className="mb-4 w-full border border-gray-300 rounded-md px-3 py-2 text-gray-600 focus:border-teal-600 focus:ring-teal-500"
+									/>
+									{uploadMessage && <p>{uploadMessage}</p>}
 								</div>
 							</div>
 						</div>
@@ -569,21 +577,21 @@ const Cart = () => {
 									</div>
 									{/* payable amount dito */}
 									<div className="mt-5">
-									{paymentOption === "Partial Payment" ? (
-										<div className="flex justify-between">
-											<h3 className="text-lg font-semibold">Partial Payment (50%):</h3>
-											<p className="font-bold">
-												PHP {partialPaymentAmount}
-											</p>
-										</div>
-									) : (
-										<div className="flex justify-between">
-											<h3 className="text-lg font-semibold">Total Payment:</h3>
-											<p className="font-bold">
-												PHP {totalWithShipping}
-											</p>
-										</div>
-									)}
+										{paymentOption === "Partial Payment" ? (
+											<div className="flex justify-between">
+												<h3 className="text-lg font-semibold">
+													Partial Payment (50%):
+												</h3>
+												<p className="font-bold">PHP {partialPaymentAmount}</p>
+											</div>
+										) : (
+											<div className="flex justify-between">
+												<h3 className="text-lg font-semibold">
+													Total Payment:
+												</h3>
+												<p className="font-bold">PHP {totalWithShipping}</p>
+											</div>
+										)}
 									</div>
 								</div>
 							</div>
@@ -599,9 +607,10 @@ const Cart = () => {
 									</button>
 									<button
 										className="bg-teal-500 text-white px-4 py-2 rounded hover:bg-teal-800"
-										onClick={checkout}
+										disabled={loading}
+										onClick={preOrderFromCart}
 									>
-										Checkout
+										{loading ? "Creating Pre-Order...":"Create Pre-Order"}
 									</button>
 								</div>
 							</div>
