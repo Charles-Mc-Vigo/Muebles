@@ -166,8 +166,17 @@ const orderController = {
 			const municipality = shippingAddressObj.municipality;
 			const shippingFee = shippingFees[municipality] || 0;
 
+			let balance;
+			if(paymentOption === "Partial Payment"){
+				balance = subtotal /2;
+			}
+
+			// console.log("Total amount of the furniture is ", subtotal);
+			// console.log("Remaining amount of the furniture is divided by 2 ", balance);
+
 			// Calculate total amount
-			const totalAmount = subtotal + shippingFee;
+			const totalAmount = balance + shippingFee;
+			const remainingBalance = balance;
 			// console.log(
 			// 	`Shipping fee is ${shippingFee} + ${subtotal} = total amount of ${totalAmount}`
 			// );
@@ -193,7 +202,8 @@ const orderController = {
 				deliveryMode,
 				expectedDelivery,
 				subtotal,
-				totalAmount
+				totalAmount,
+				remainingBalance,
 			);
 
 			await preOrder.save();
