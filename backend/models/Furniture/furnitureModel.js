@@ -6,7 +6,7 @@ const furnitureSchema = new mongoose.Schema({
   furnitureType: { type: mongoose.Schema.Types.ObjectId, ref: 'FurnitureType', required: true },
   name: { type: String, required: true },
   description: { type: String, required: true },
-  materials: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Materials' }],
+  materials: [{type:Object}],
   colors: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Colors' }],
   sizes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Size' }],
   price: { type: Number },

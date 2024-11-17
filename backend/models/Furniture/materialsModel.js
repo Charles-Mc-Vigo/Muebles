@@ -1,6 +1,10 @@
 const mongoose = require('mongoose');
 
 const materialSchema = new mongoose.Schema({
+  furnitureTypeId:{
+    type:mongoose.Schema.ObjectId,
+    ref:"FurnitureType",
+  },
   name:{
     type:String,
     required:true,

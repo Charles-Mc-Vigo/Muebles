@@ -140,6 +140,7 @@ const Maintenance = () => {
 		name: "",
 		price: "",
 		stock: "",
+		furnitureTypeId: "",
 	});
 	const [selectedFilter, setSelectedFilter] = useState("");
 	const [selectedFurnitureType, setSelectedFurnitureType] = useState("");
@@ -288,9 +289,13 @@ const Maintenance = () => {
 
 	const handleAddNewMaterial = async () => {
 		setLoading(true);
-		const { name, price, stock } = newMaterial;
-		if (!name || !price || !stock) {
-			toast.error("Please provide valid name and stocks.");
+		const { name, price, stock, furnitureTypeId } = newMaterial; // Include furnitureTypeId
+
+		if (!name || !price || !stock || !furnitureTypeId) {
+			// Check for furnitureTypeId
+			toast.error(
+				"Please provide valid name, price, stock, and select a furniture type."
+			);
 			return;
 		}
 		try {
@@ -300,12 +305,11 @@ const Maintenance = () => {
 					"Content-Type": "application/json",
 				},
 				credentials: "include",
-				body: JSON.stringify({ name, price, stock }),
+				body: JSON.stringify({ name, price, stock, furnitureTypeId }), // Include furnitureTypeId in the body
 			});
-
 			if (response.ok) {
 				toast.success("Material added successfully.");
-				setNewMaterial({ name: "", price: "", stock: "" }); // Reset input
+				setNewMaterial({ name: "", price: "", stock: "", furnitureTypeId: "" }); // Reset input
 				await fetchMaterials(); // Refresh the list
 			} else {
 				const errorData = await response.json();
@@ -430,8 +434,11 @@ const Maintenance = () => {
 				toast.success("Category added successfully.");
 				await fetchCategories(); // Refresh categories list
 			}
+
+			// furniture type
 			if (selectedFilter === "Furniture Types") {
 				if (!selectedCategory) {
+					setLoading(false);
 					toast.error("Please select a category.");
 					return;
 				}
@@ -659,7 +666,14 @@ const Maintenance = () => {
 									"Estimated Completion Time (ECT)",
 									"ect",
 									ect,
-									(e) => setECT(e.target.value)
+									(e) => {
+										const value = e.target.value;
+										// Allow only numeric input
+										if (!isNaN(value) && value.trim() !== 0) {
+											setECT(value);
+										}
+									},
+									"number"
 								)}
 							</>
 						)}
@@ -741,6 +755,30 @@ const Maintenance = () => {
 						)}
 						{selectedFilter === "Furniture Materials" && (
 							<>
+								{/* Add a dropdown to select furniture type */}
+								<div className="mb-4">
+									<label className="block mb-1 font-semibold text-gray-700">
+										Select Furniture Type
+									</label>
+									<select
+										value={newMaterial.furnitureTypeId}
+										onChange={(e) =>
+											setNewMaterial({
+												...newMaterial,
+												furnitureTypeId: e.target.value,
+											})
+										}
+										className="w-full border rounded-lg p-2 shadow-sm focus:ring focus:ring-blue-300"
+									>
+										<option value="">-- Select --</option>
+										{Array.isArray(furnitureTypes) &&
+											furnitureTypes.map((type) => (
+												<option key={type._id} value={type._id}>
+													{type.name}
+												</option>
+											))}
+									</select>
+								</div>
 								{renderInputField(
 									"Material Name",
 									"name",
@@ -753,10 +791,7 @@ const Maintenance = () => {
 									"price",
 									newMaterial.price,
 									(e) =>
-										setNewMaterial({
-											...newMaterial,
-											price: e.target.value,
-										}),
+										setNewMaterial({ ...newMaterial, price: e.target.value }),
 									"number"
 								)}
 								{renderInputField(
@@ -764,10 +799,7 @@ const Maintenance = () => {
 									"stock",
 									newMaterial.stock,
 									(e) =>
-										setNewMaterial({
-											...newMaterial,
-											stock: e.target.value,
-										}),
+										setNewMaterial({ ...newMaterial, stock: e.target.value }),
 									"number"
 								)}
 							</>
@@ -865,7 +897,12 @@ const Maintenance = () => {
 							<h2 className="text-2xl font-bold mb-4">Furniture Materials</h2>
 							<div className="max-h-96 overflow-y-auto">
 								<Table
-									headers={["Material Name", "Price", "Stocks"]}
+									headers={[
+										"Material Name",
+										"Price",
+										"Stocks",
+										"Furniture Type",
+									]}
 									data={
 										Array.isArray(materials)
 											? materials.map((material) => ({
@@ -873,6 +910,11 @@ const Maintenance = () => {
 													name: material.name,
 													price: material.price,
 													stock: material.stock,
+													furnitureTypeId: Array.isArray(furnitureTypes)
+														? furnitureTypes.find(
+																(type) => type._id === material.furnitureTypeId
+														  )?.name || "N/A"
+														: "N/A",
 											  }))
 											: []
 									}
@@ -905,10 +947,11 @@ const Maintenance = () => {
 													length: size.length || "N/A",
 													width: size.width || "N/A",
 													depth: size.depth || "N/A",
-													furnitureTypes:
-														furnitureTypes.find(
-															(type) => type._id === size.furnitureTypeId
-														)?.name || "N/A",
+													furnitureType: Array.isArray(furnitureTypes)
+														? furnitureTypes.find(
+																(type) => type._id === size.furnitureTypeId
+														  )?.name || "N/A"
+														: "N/A",
 											  }))
 											: []
 									}

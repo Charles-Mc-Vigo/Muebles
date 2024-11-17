@@ -76,6 +76,8 @@ exports.createFurniture = async (req, res) => {
         return res.status(400).json({ message: "Invalid furniture type!" });
       }
 
+      
+
       const existingMaterials = await Materials.find({ name: { $in: materials } });
       if (existingMaterials.length !== materials.length) {
         return res.status(400).json({ message: "Some materials are invalid!" });
