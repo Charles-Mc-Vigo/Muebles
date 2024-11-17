@@ -63,8 +63,7 @@ const orderSchema = new mongoose.Schema(
 			required: true,
 		},
     furniture:{
-      type:mongoose.Schema.Types.ObjectId,
-      ref:"Furniture"
+			type:Object
     },
 		material:{type:String},
 		color:{type:String},
