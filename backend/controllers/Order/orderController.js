@@ -21,11 +21,11 @@ const orderController = {
 
 			// res.status(200).json(paymentOption)
 			//decision kung if partial or payment
-			if (paymentOption === "Partial Payment") {
-				console.log("Payment option is Partial payment");
-			} else {
-				console.log("Payment option is Full payment");
-			}
+			// if (paymentOption === "Partial Payment") {
+			// 	console.log("Payment option is Partial payment");
+			// } else {
+			// 	console.log("Payment option is Full payment");
+			// }
 
 			if (!paymentMethod) {
 				return res.status(400).json({
@@ -77,15 +77,15 @@ const orderController = {
 				expectedDelivery
 			);
 
-			// await Cart.findByIdAndUpdate(cart._id, {
-			// 	items: [],
-			// 	count: 0,
-			// 	totalAmount: 0,
-			// });
+			await Cart.findByIdAndUpdate(cart._id, {
+				items: [],
+				count: 0,
+				totalAmount: 0,
+			});
 
-			// await User.findByIdAndUpdate(userId, {
-			// 	$push: { orders: order._id, proofOfPayment },
-			// });
+			await User.findByIdAndUpdate(userId, {
+				$push: { orders: order._id, proofOfPayment },
+			});
 
 			res.status(201).json({ success: "Order placed successfully!", order });
 		} catch (error) {
@@ -99,8 +99,8 @@ const orderController = {
 	preOrder: async (req, res) => {
 		try {
 			const {
+				quantity,
 				furnitureId,
-				quantity = 1,
 				color,
 				material,
 				size,
@@ -148,6 +148,7 @@ const orderController = {
 			// res.status(201).json(selectedMaterial.price);
 
 			const subtotal = selectedMaterial.price * quantity;
+			// console.log("Subtotal of the item: ", subtotal);
 			// res.status(201).json(subtotal);
 
 			// const subtotal = furniture.price * quantity;
@@ -165,8 +166,20 @@ const orderController = {
 			const municipality = shippingAddressObj.municipality;
 			const shippingFee = shippingFees[municipality] || 0;
 
+			let balance;
+			if(paymentOption === "Partial Payment"){
+				balance = subtotal /2;
+			}
+
+			// console.log("Total amount of the furniture is ", subtotal);
+			// console.log("Remaining amount of the furniture is divided by 2 ", balance);
+
 			// Calculate total amount
-			const totalAmount = subtotal + shippingFee;
+			const totalAmount = balance + shippingFee;
+			const remainingBalance = balance;
+			// console.log(
+			// 	`Shipping fee is ${shippingFee} + ${subtotal} = total amount of ${totalAmount}`
+			// );
 			// res.status(201).json(shippingFee);
 
 			let proofOfPayment;
@@ -189,16 +202,17 @@ const orderController = {
 				deliveryMode,
 				expectedDelivery,
 				subtotal,
-				totalAmount
+				totalAmount,
+				remainingBalance,
 			);
 
-			await preOrder.save(); // Save the pre-order to the database
+			await preOrder.save();
 
 			await User.findByIdAndUpdate(userId, {
 				$push: { orders: preOrder._id, proofOfPayment },
 			});
 
-			console.log(preOrder);
+			// console.log(preOrder);
 			return res
 				.status(201)
 				.json({ message: "Pre-order was created!", preOrder });
@@ -212,8 +226,9 @@ const orderController = {
 	getUserOrders: async (req, res) => {
 		try {
 			const userId = req.user._id;
-			const orders = await Order.find({ user: userId })
-				.populate("items.furniture user.firstname")
+			const orders = await Order.find({user: userId})
+				.populate("items.furniture")
+				.populate( "user.firstname")
 				.sort({ createdAt: -1 });
 
 			res.status(200).json(orders);
@@ -251,9 +266,9 @@ const orderController = {
 
 			// Conditionally populate based on order type
 			if (order.type === "Pre-Order") {
-				await order.populate("furniture"); // Populate order.furniture for Pre-Orders
+				await order.populate("furniture");
 			} else {
-				await order.populate("items.furniture"); // Populate items.furniture for other types
+				await order.populate("items.furniture");
 			}
 
 			// Send the populated order as response

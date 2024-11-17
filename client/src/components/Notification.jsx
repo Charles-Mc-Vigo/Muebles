@@ -119,7 +119,7 @@ const Notification = () => {
 					<ul className="text-sm">
 						{notification.requests.map((admin, index) => (
 							<li key={index} className="mb-4">
-								<div className="bg-slate-400 p-2">
+								<div className="bg-slate-100 p-2">
 									<span onClick={() => viewRequest(admin._id)}>
 										{admin.firstname} has a pending approval request.
 									</span>
@@ -129,12 +129,12 @@ const Notification = () => {
 					</ul>
 					<ul className="text-sm">
 						{notification.orders.map((order, index) => (
-							<li key={index} className="mb-4">
-								<div className="bg-slate-200 p-2 rounded">
+							<li key={index} className="mb-5">
+								<div className="bg-slate-50 p-2 rounded">
 									<span onClick={() => viewNewOrder(order._id)}>
 										Order #{order.orderNumber} has been placed.
 									</span>
-									<p className="text-gray-500 text-s mt-1">
+									<p className="text-gray-500 text-s mt-5">
 										Placed on: {new Date(order.createdAt).toLocaleString()}
 									</p>
 								</div>
