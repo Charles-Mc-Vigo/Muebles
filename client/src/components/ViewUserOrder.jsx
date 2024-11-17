@@ -41,27 +41,27 @@ const ViewUserOrder = () => {
     fetchOrder();
   }, [orderId]);
 
-  const handleAccept = async () => {
-    try {
-      const response = await fetch(`http://localhost:3000/api/admin/update/${orderId}`, {
-        method: "PUT",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ status: "accepted" }), // Change status as needed
-      });
-      if (!response.ok) {
-        const errorData = await response.json();
-        toast.error(errorData.error || "Failed to accept the order.");
-        return;
-      }
-      toast.success("Order accepted successfully!");
-      fetchOrder(); // Refresh order details
-    } catch (error) {
-      toast.error("An error occurred while accepting the order.");
-    }
-  };
+//   const handleAccept = async () => {
+//     try {
+//       const response = await fetch(`http://localhost:3000/api/admin/update/${orderId}`, {
+//         method: "PUT",
+//         credentials: "include",
+//         headers: {
+//           "Content-Type": "application/json",
+//         },
+//         body: JSON.stringify({ status: "accepted" }), // Change status as needed
+//       });
+//       if (!response.ok) {
+//         const errorData = await response.json();
+//         toast.error(errorData.error || "Failed to accept the order.");
+//         return;
+//       }
+//       toast.success("Order accepted successfully!");
+//       fetchOrder(); // Refresh order details
+//     } catch (error) {
+//       toast.error("An error occurred while accepting the order.");
+//     }
+//   };
 
   const handleCancel = async () => {
 	try {
