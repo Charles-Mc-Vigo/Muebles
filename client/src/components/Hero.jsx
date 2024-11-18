@@ -21,15 +21,15 @@ export default function Hero() {
   return (
     <div>
       {/* Carousel Section */}
-      <section className="relative h-3/4 ">
+      <section className="relative h-3/4">
         <div className="h-3/4 lg:h-3/4 md:h-1/2 sm:h-1/3 my-5 p-5">
           <Carousel images={images} />
         </div>
 
         <div
-          className="flex flex-col lg:flex-row h-3/4 lg:h-screen items-center lg:items-stretch my-5 p-5 border-2"
+          className="flex flex-col lg:flex-row h-3/4 lg:h-screen items-center lg:items-stretch my-5 p-5 border-2  "
           style={{
-            backgroundImage: "url(./landingimage/Dining29.jpg)",
+            backgroundImage: "url(./landingimage/JCKAME.png)",
             backgroundSize: "cover",
             backgroundPosition: "center",
             backgroundRepeat: "no-repeat",
