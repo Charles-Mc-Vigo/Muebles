@@ -44,9 +44,9 @@ exports.createFurniture = async (req, res) => {
         furnitureType,
         name,
         description,
-        // materials,
+        materials,
         colors,
-        // sizes,
+        sizes,
         // price,
       } = req.body;
 
@@ -56,9 +56,9 @@ exports.createFurniture = async (req, res) => {
       if (!furnitureType) missingFields.push("furnitureType");
       if (!description) missingFields.push("description");
       if (!name) missingFields.push("name");
-      // if (!materials || materials.length === 0) missingFields.push("materials");
+      if (!materials || materials.length === 0) missingFields.push("materials");
       if (!colors || colors.length === 0) missingFields.push("colors");
-      // if (!sizes || sizes.length === 0) missingFields.push("sizes");
+      if (!sizes || sizes.length === 0) missingFields.push("sizes");
       if (missingFields.length > 0) {
         return res.status(400).json({
           message: `The following fields are required: ${missingFields.join(", ")}`,
@@ -76,36 +76,33 @@ exports.createFurniture = async (req, res) => {
         return res.status(404).json({ message: "Furniture type not found!" });
       }
 
-      // const existingMaterials = await Materials.find({ name: { $in: materials } });
-      // if (existingMaterials.length !== materials.length) {
-      //   return res.status(400).json({ message: "Some materials are invalid!" });
-      // }
+      const existingMaterials = await Materials.find({name: {$in:materials},furnitureTypeId:existingFurnitureType._id});
+      if(existingMaterials.length !== materials.length){
+        // console.log(existingMaterials);
+        return res.status(400).json({ message: `Some materials for ${existingFurnitureType.name} is invalid!` });
+      }
+
+      const existingSizes = await Size.find({label:{$in:sizes},furnitureTypeId:existingFurnitureType._id});
+      if(existingSizes.length !== sizes.length){
+        return res.status(400).json({ message: `Some sizes for ${existingFurnitureType.name} is invalid!` });
+      }
 
       const existingColors = await Colors.find({ name: { $in: colors } });
       if (existingColors.length !== colors.length) {
         return res.status(400).json({ message: "Some colors are invalid!" });
       }
 
-      // const existingSize = await Size.find({
-      //   label: { $in: sizes },
-      //   furnitureTypeId: existingFurnitureType._id,
-      // });
-      // if (existingSize.length !== sizes.length) {
-      //   return res.status(400).json({
-      //     message: `Some sizes are invalid for ${existingFurnitureType.name}. Please ensure all sizes are correct.`,
-      //   });
-      // }
 
       // Create new furniture item
       const newFurniture = new Furniture({
         images,
-        category: existingCategory.map((category)=>category._id),
-        furnitureType: existingFurnitureType.map((type)=>type._id),
+        category: existingCategory._id,
+        furnitureType: existingFurnitureType._id,
         name,
         description,
-        // materials: existingMaterials.map((material) => material._id),
+        materials: existingMaterials.map((material) => material._id),
         colors: existingColors.map((color) => color._id),
-        // sizes: existingSize.map((size) => size._id),
+        sizes: existingSizes.map((size) => size._id),
         // price,
       });
 
@@ -115,7 +112,7 @@ exports.createFurniture = async (req, res) => {
         newFurniture,
       });
 
-      console.log(newFurniture)
+      // console.log(newFurniture)
     } catch (error) {
       console.error(error);
       res.status(500).json({ message: "Server error!", error: error.message });
