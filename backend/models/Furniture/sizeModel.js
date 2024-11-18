@@ -5,6 +5,9 @@ const sizeSchema = new mongoose.Schema({
     type: String, 
     required: true
   },
+  price:{
+    type:Number
+  },
   width: {
     type: Number,
   },
