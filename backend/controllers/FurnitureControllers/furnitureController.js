@@ -44,10 +44,10 @@ exports.createFurniture = async (req, res) => {
         furnitureType,
         name,
         description,
-        materials,
+        // materials,
         colors,
-        sizes,
-        price,
+        // sizes,
+        // price,
       } = req.body;
 
       // Validation for required fields
@@ -56,9 +56,9 @@ exports.createFurniture = async (req, res) => {
       if (!furnitureType) missingFields.push("furnitureType");
       if (!description) missingFields.push("description");
       if (!name) missingFields.push("name");
-      if (!materials || materials.length === 0) missingFields.push("materials");
+      // if (!materials || materials.length === 0) missingFields.push("materials");
       if (!colors || colors.length === 0) missingFields.push("colors");
-      if (!sizes || sizes.length === 0) missingFields.push("sizes");
+      // if (!sizes || sizes.length === 0) missingFields.push("sizes");
       if (missingFields.length > 0) {
         return res.status(400).json({
           message: `The following fields are required: ${missingFields.join(", ")}`,
@@ -66,56 +66,56 @@ exports.createFurniture = async (req, res) => {
       }
 
       // Validate and find existing Category, FurnitureType, Materials, Colors
-      const existingCategory = await Category.findById(category);
+      const existingCategory = await Category.findOne({name:category});
       if (!existingCategory) {
-        return res.status(400).json({ message: "Invalid category!" });
+        return res.status(404).json({ message: "Category not found!" });
       }
 
-      const existingFurnitureType = await FurnitureType.findById(furnitureType);
+      const existingFurnitureType = await FurnitureType.findOne({name: furnitureType});
       if (!existingFurnitureType) {
-        return res.status(400).json({ message: "Invalid furniture type!" });
+        return res.status(404).json({ message: "Furniture type not found!" });
       }
 
-      
-
-      const existingMaterials = await Materials.find({ name: { $in: materials } });
-      if (existingMaterials.length !== materials.length) {
-        return res.status(400).json({ message: "Some materials are invalid!" });
-      }
+      // const existingMaterials = await Materials.find({ name: { $in: materials } });
+      // if (existingMaterials.length !== materials.length) {
+      //   return res.status(400).json({ message: "Some materials are invalid!" });
+      // }
 
       const existingColors = await Colors.find({ name: { $in: colors } });
       if (existingColors.length !== colors.length) {
         return res.status(400).json({ message: "Some colors are invalid!" });
       }
 
-      const existingSize = await Size.find({
-        label: { $in: sizes },
-        furnitureTypeId: existingFurnitureType._id,
-      });
-      if (existingSize.length !== sizes.length) {
-        return res.status(400).json({
-          message: `Some sizes are invalid for ${existingFurnitureType.name}. Please ensure all sizes are correct.`,
-        });
-      }
+      // const existingSize = await Size.find({
+      //   label: { $in: sizes },
+      //   furnitureTypeId: existingFurnitureType._id,
+      // });
+      // if (existingSize.length !== sizes.length) {
+      //   return res.status(400).json({
+      //     message: `Some sizes are invalid for ${existingFurnitureType.name}. Please ensure all sizes are correct.`,
+      //   });
+      // }
 
       // Create new furniture item
       const newFurniture = new Furniture({
         images,
-        category: existingCategory._id,
-        furnitureType: existingFurnitureType._id,
+        category: existingCategory.map((category)=>category._id),
+        furnitureType: existingFurnitureType.map((type)=>type._id),
         name,
         description,
-        materials: existingMaterials.map((material) => material._id),
+        // materials: existingMaterials.map((material) => material._id),
         colors: existingColors.map((color) => color._id),
-        sizes: existingSize.map((size) => size._id),
-        price,
+        // sizes: existingSize.map((size) => size._id),
+        // price,
       });
 
-      await newFurniture.save();
+      // await newFurniture.save();
       res.status(201).json({
         message: "New furniture added successfully!",
         newFurniture,
       });
+
+      console.log(newFurniture)
     } catch (error) {
       console.error(error);
       res.status(500).json({ message: "Server error!", error: error.message });
