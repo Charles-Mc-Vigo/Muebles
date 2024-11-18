@@ -22,6 +22,12 @@ const furnitureTypeSchema = new mongoose.Schema({
       ref:"Materials"
     }
   ],
+  sizes:[
+    {
+      type:mongoose.Schema.ObjectId,
+      ref:"Size"
+    }
+  ],
   isArchived:{
     type:Boolean,
     default:false

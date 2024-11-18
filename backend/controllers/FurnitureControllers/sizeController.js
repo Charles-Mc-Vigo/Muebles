@@ -5,14 +5,14 @@ const FurnitureType = require("../../models/Furniture/furnitureTypeModel");
 // Add a new size
 exports.addSize = async (req, res) => {
 	try {
-		const { label, height, length, width, depth, furnitureTypeId } = req.body;
+		const { label, price, height, length, width, depth, furnitureTypeId } = req.body;
 
-		if (!label || !furnitureTypeId) {
+		if (!label || !furnitureTypeId || !price) {
 			return res
 				.status(400)
 				.json({
 					message:
-						"Size label and furnitureTypeId is required",
+						"Size label, price and furnitureTypeId is required",
 				});
 		}
 
@@ -25,11 +25,6 @@ exports.addSize = async (req, res) => {
 				});
 		}
 
-		const furnitureType = await FurnitureType.findById(furnitureTypeId);
-		if (!furnitureType) {
-			return res.status(404).json({ message: "Furniture type not found!" });
-		}
-
 		// Check if the size already exists for the category
 		const existingSize = await Size.findOne({ label, furnitureTypeId });
 		if (existingSize) {
@@ -40,11 +35,20 @@ exports.addSize = async (req, res) => {
 				});
 		}
 
-		const newSize = new Size({ label, width, length, height, depth, furnitureTypeId });
+		const newSize = new Size({ label, price, width, length, height, depth, furnitureTypeId });
 		await newSize.save();
+
+		const furnitureType = await FurnitureType.findById(furnitureTypeId);
+		if (!furnitureType) {
+			return res.status(404).json({ message: "Furniture type not found!" });
+		}
+
+		furnitureType.sizes.addToSet(newSize._id);
+    await furnitureType.save();
+
 		res
 			.status(201)
-			.json({ message: `New size has been added ${furnitureType.name}!`,newSize });
+			.json({ message: `New size has been added ${furnitureType.name}!`, newSize });
 	} catch (error) {
 		console.error("Error adding size:", error);
 		res.status(500).json({ message: "Server error!" });
@@ -120,7 +124,7 @@ exports.UpdateSize = async (req, res) => {
 
 		if (!existingSize) return res.status(404).json({ message: "Size not found!" });
 
-		const { label, height, length, width, depth } = req.body;
+		const { label, price, height, length, width, depth } = req.body;
 
 		// // Check if no fields were provided in the request body
 		// if (label === undefined && length === undefined && height === undefined && width === undefined && depth === undefined) {
@@ -129,6 +133,7 @@ exports.UpdateSize = async (req, res) => {
 
 		// Only update fields that are provided in the request body
 		if (label !== undefined && existingSize.label !== label) existingSize.label = label;
+		if (price !== undefined && existingSize.price !== price) existingSize.price = price;
 		if (height !== undefined && existingSize.height !== height) existingSize.height = height;
 		if (length !== undefined && existingSize.length !== length) existingSize.length = length;
 		if (width !== undefined && existingSize.width !== width) existingSize.width = width;
@@ -137,6 +142,7 @@ exports.UpdateSize = async (req, res) => {
 		// Check if any changes were made
 		if (
 			existingSize.label === label &&
+			existingSize.price === price &&
 			existingSize.height === height &&
 			existingSize.length === length &&
 			existingSize.width === width &&

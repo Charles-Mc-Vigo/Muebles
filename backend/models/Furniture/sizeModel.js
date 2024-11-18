@@ -6,19 +6,25 @@ const sizeSchema = new mongoose.Schema({
     required: true
   },
   price:{
-    type:Number
+    type:Number,
+    require:true,
+    default:0
   },
   width: {
     type: Number,
+    default:0
   },
   height: {
     type: Number,
+    default:0
   },
   length: {
     type: Number,
+    default:0
   },
   depth: {
     type: Number,
+    default:0
   },
   furnitureTypeId: { 
     type: mongoose.Schema.ObjectId, 
