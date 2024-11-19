@@ -39,6 +39,13 @@ const Home = () => {
       }
     };
 
+    console.log("furnitureData",furnitureData)
+    console.log("categories",categories)
+    console.log("furniture types",furnitureTypes)
+    console.log("Current items kuno",currentItems)
+
+
+
     const fetchCategories = async () => {
       try {
         const response = await fetch("http://localhost:3000/api/categories");
@@ -87,24 +94,28 @@ const Home = () => {
   const showToast = (message, type) => toast[type](message);
   const incrementCartCount = () => setCartCount((prevCount) => prevCount + 1);
 
-  // Filtered furniture data
   const filteredFurnitureData = useMemo(() => {
+    if (selectedCategories.length === 0 && selectedFurnitureTypes.length === 0 && priceRange[0] === 0 && priceRange[1] === 120000) {
+      return furnitureData; 
+    }
+  
     return furnitureData.filter((item) => {
       const categoryMatch =
         selectedCategories.length === 0 ||
         selectedCategories.some((category) =>
           item.category.name.includes(category.value)
         );
+  
       const typeMatch =
         selectedFurnitureTypes.length === 0 ||
-        (Array.isArray(selectedFurnitureTypes) &&
-          selectedFurnitureTypes.some(
-            (type) =>
-              item.furnitureType?.name?.toLowerCase() ===
-              type.value.toLowerCase()
-          ));
+        selectedFurnitureTypes.some(
+          (type) =>
+            item.furnitureType?.name?.toLowerCase() === type.value.toLowerCase()
+        );
+  
       const priceMatch =
         item.price >= priceRange[0] && item.price <= priceRange[1];
+  
       return categoryMatch && typeMatch && priceMatch;
     });
   }, [furnitureData, selectedCategories, selectedFurnitureTypes, priceRange]);
@@ -196,8 +207,8 @@ const Home = () => {
         <Select
           isMulti
           options={categories.map((category) => ({
-            value: category.name,
-            label: category.name,
+            value: category?.name,
+            label: category?.name,
           }))}
           value={selectedCategories}
           onChange={handleCategoryChange}
@@ -330,7 +341,7 @@ const Home = () => {
                     id={furniture._id}
                     images={furniture.images}
                     name={furniture.name}
-                    price={furniture.price}
+                    // price={furniture.price}
                     description={furniture.description}
                     showViewDetails={true}
                     showPreOrder={true}

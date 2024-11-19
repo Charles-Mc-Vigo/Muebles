@@ -23,9 +23,79 @@ const ProductManagement = () => {
 		materials: [],
 		colors: [],
 		sizes: [],
-		price: "",
+		// price: "",
 	});
 
+	const fetchData = async () => {
+		setLoading(true);
+		try {
+			const [
+				furnitureResponse,
+				furnitureTypesResponse,
+				categoriesResponse,
+				colorsResponse,
+			] = await Promise.all([
+				fetch("http://localhost:3000/api/furnitures", {
+					method: "GET",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					credentials: "include",
+				}),
+				fetch("http://localhost:3000/api/furniture-types", {
+					method: "GET",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					credentials: "include",
+				}),
+				fetch("http://localhost:3000/api/categories", {
+					method: "GET",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					credentials: "include",
+				}),
+				fetch("http://localhost:3000/api/colors", {
+					method: "GET",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					credentials: "include",
+				}),
+			]);
+
+			if (furnitureResponse.ok) {
+				const furnitureData = await furnitureResponse.json();
+				setFurnitureData(furnitureData || []);
+			} else {
+				throw new Error(furnitureResponse.message || furnitureResponse.error);
+			}
+			if (furnitureTypesResponse.ok) {
+				const furnitureTypesData = await furnitureTypesResponse.json();
+				setFurnitureTypes(furnitureTypesData || []);
+			} else {
+				throw new Error("Failed to fetch furniture types");
+			}
+			if (categoriesResponse.ok) {
+				const categoriesData = await categoriesResponse.json();
+				setCategories(categoriesData || []);
+			} else {
+				throw new Error("Failed to fetch categories");
+			}
+			if (colorsResponse.ok) {
+				const colorsData = await colorsResponse.json();
+				setColors(colorsData || []);
+			} else {
+				throw new Error("Failed to fetch colors");
+			}
+		} catch (error) {
+			console.error("Error fetching data:", error.message);
+			toast.error("Failed to fetch data");
+		} finally {
+			setLoading(false);
+		}
+	};
 	useEffect(() => {
 		const fetchData = async () => {
 			setLoading(true);
@@ -192,7 +262,7 @@ const ProductManagement = () => {
 			});
 	};
 
-	console.log("Material",materials)
+	// console.log("Material",materials)
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
@@ -202,7 +272,7 @@ const ProductManagement = () => {
 		formData.append("category", newFurniture.category);
 		formData.append("furnitureType", newFurniture.furnitureType);
 		formData.append("description", newFurniture.description);
-		formData.append("price", newFurniture.price);
+		// formData.append("price", newFurniture.price);
 		newFurniture.materials.forEach((material) => {
 			formData.append("materials[]", material);
 		});
@@ -216,41 +286,42 @@ const ProductManagement = () => {
 			formData.append("images", file);
 		});
 
-				// Log FormData content
-				for (let [key, value] of formData.entries()) {
-					console.log(`${key}:`, value);
-				}
+		// // Log FormData content
+		// for (let [key, value] of formData.entries()) {
+		// 	console.log(`${key}:`, value);
+		// }
+
+		console.log("Form data", formData);
 
 		try {
-			// const response = await fetch("http://localhost:3000/api/furnitures/add", {
-			// 	method: "POST",
-			// 	credentials: "include",
-			// 	body: formData,
-			// });
-			// if (response.ok) {
-			// 	const data = await response.json();
-			// 	toast.success(data.message);
-			// 	setNewFurniture({
-			// 		images: [],
-			// 		name: "",
-			// 		category: "",
-			// 		furnitureType: "",
-			// 		description: "",
-			// 		materials: [],
-			// 		colors: [],
-			// 		sizes: [],
-			// 		price: "",
-			// 	});
-			// 	setSelectedCategory("");
-			// 	setSelectedFurnitureType("");
-			// 	fetchData(); // Fetch data again to refresh the list
-			// } else {
-			// 	const errorData = await response.json();
-			// 	toast.error(errorData.message);
-			// }
+			const response = await fetch("http://localhost:3000/api/furnitures/add", {
+				method: "POST",
+				credentials: "include",
+				body: formData,
+			});
+			if (response.ok) {
+				const data = await response.json();
+				toast.success(data.message);
+				setNewFurniture({
+					images: [],
+					name: "",
+					category: "",
+					furnitureType: "",
+					description: "",
+					materials: [],
+					colors: [],
+					sizes: [],
+					price: "",
+				});
+				setSelectedCategory("");
+				setSelectedFurnitureType("");
+				fetchData();
+			} else {
+				const errorData = await response.json();
+				toast.error(errorData.message);
+			}
 		} catch (error) {
 			console.error("Error adding new Furniture:", error);
-			toast.error("Failed to add new furniture");
 		} finally {
 			setLoading(false);
 		}
@@ -534,9 +605,12 @@ const ProductManagement = () => {
 											: "N/A"}
 									</td>
 									<td className="border border-gray-300 p-2">
-										{furniture.materials.length > 0
+										{Array.isArray(furniture.materials) &&
+										furniture.materials.length > 0
 											? furniture.materials.map((material) => (
-													<span key={material._id} className="block">
+													<span key={material.name} className="block">
+														{" "}
+														{/* Assuming material.name is unique */}
 														{material.name}
 													</span>
 											  ))

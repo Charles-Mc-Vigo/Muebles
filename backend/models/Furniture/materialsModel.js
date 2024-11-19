@@ -15,7 +15,7 @@ const materialSchema = new mongoose.Schema({
     required: true,
     default: 0,
   },
-  stock: {
+  stocks: {
     type: Number,
     required: true,
     default: 1,

@@ -62,7 +62,7 @@ exports.getSpecificMaterial = async (req, res) => {
 // Get all materials that are not archived
 exports.getMaterials = async (req, res) => {
   try {
-    const materials = await Materials.find({ isArchived: false }).populate("furnitureTypeId");
+    const materials = await Materials.find({ isArchived: false });
 
     if (materials.length === 0) {
       return res.status(200).json({ message: "No materials found!" });
