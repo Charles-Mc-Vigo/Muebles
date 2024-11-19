@@ -227,7 +227,7 @@ const TermsAndConditions = () => {
             </p>
           </div>
         </section>
-
+        
         <section className="flex-1 bg-gray-100 p-4 rounded-lg shadow-md overflow-y-auto sm:p-6 md:p-8 lg:p-10 xl:p-12 w-full sm:w-1/2 mt-4 sm:mt-0">
           <div className="text-justify">
             <h2 className="text-2xl font-semibold mt-6"> DELIVERY</h2>

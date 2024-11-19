@@ -26,7 +26,6 @@ const LandingPage = () => {
           <FAQAccordion />
         </div>
       </div>
-
       <Footer />
     </div>
   );
