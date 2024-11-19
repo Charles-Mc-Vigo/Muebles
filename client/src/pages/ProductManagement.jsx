@@ -10,7 +10,6 @@ const ProductManagement = () => {
 	const [selectedFurnitureType, setSelectedFurnitureType] = useState("");
 	const [categories, setCategories] = useState([]);
 	const [filteredFurnitureTypes, setFilteredFurnitureTypes] = useState([]);
-	const [filteredSizes, setFilteredSizes] = useState([]);
 	const [furnitureTypes, setFurnitureTypes] = useState([]);
 	const [materials, setMaterials] = useState([]);
 	const [colors, setColors] = useState([]);
@@ -35,9 +34,7 @@ const ProductManagement = () => {
 					furnitureResponse,
 					furnitureTypesResponse,
 					categoriesResponse,
-					materialsResponse,
 					colorsResponse,
-					sizesResponse,
 				] = await Promise.all([
 					fetch("http://localhost:3000/api/furnitures", {
 						method: "GET",
@@ -60,21 +57,7 @@ const ProductManagement = () => {
 						},
 						credentials: "include",
 					}),
-					fetch("http://localhost:3000/api/materials", {
-						method: "GET",
-						headers: {
-							"Content-Type": "application/json",
-						},
-						credentials: "include",
-					}),
 					fetch("http://localhost:3000/api/colors", {
-						method: "GET",
-						headers: {
-							"Content-Type": "application/json",
-						},
-						credentials: "include",
-					}),
-					fetch("http://localhost:3000/api/sizes", {
 						method: "GET",
 						headers: {
 							"Content-Type": "application/json",
@@ -89,40 +72,23 @@ const ProductManagement = () => {
 				} else {
 					throw new Error(furnitureResponse.message || furnitureResponse.error);
 				}
-
 				if (furnitureTypesResponse.ok) {
 					const furnitureTypesData = await furnitureTypesResponse.json();
 					setFurnitureTypes(furnitureTypesData || []);
 				} else {
 					throw new Error("Failed to fetch furniture types");
 				}
-
 				if (categoriesResponse.ok) {
 					const categoriesData = await categoriesResponse.json();
 					setCategories(categoriesData || []);
 				} else {
 					throw new Error("Failed to fetch categories");
 				}
-
-				if (materialsResponse.ok) {
-					const materialsData = await materialsResponse.json();
-					setMaterials(materialsData || []);
-				} else {
-					throw new Error("Failed to fetch materials");
-				}
-
 				if (colorsResponse.ok) {
 					const colorsData = await colorsResponse.json();
 					setColors(colorsData || []);
 				} else {
 					throw new Error("Failed to fetch colors");
-				}
-
-				if (sizesResponse.ok) {
-					const sizesData = await sizesResponse.json();
-					setSizes(sizesData || []);
-				} else {
-					throw new Error("Failed to fetch sizes");
 				}
 			} catch (error) {
 				console.error("Error fetching data:", error.message);
@@ -149,51 +115,35 @@ const ProductManagement = () => {
 		setFilteredFurnitureTypes(filteredTypes);
 	};
 
-	const handleFurnitureTypeChange = (e) => {
+	const handleFurnitureTypeChange = async (e) => {
 		const furnitureTypeId = e.target.value;
 		setSelectedFurnitureType(furnitureTypeId);
 		setNewFurniture((prev) => ({
 			...prev,
 			furnitureType: furnitureTypeId,
 		}));
-		const filtered = sizes.filter(
-			(size) => size.furnitureTypeId === furnitureTypeId
+
+		const selectedFurnitureType = furnitureTypes.find(
+			(type) => type._id === furnitureTypeId
 		);
-		setFilteredSizes(filtered);
+		if (selectedFurnitureType) {
+			// Fetch materials and sizes for the selected furniture type
+			setMaterials(selectedFurnitureType.materials);
+			setSizes(selectedFurnitureType.sizes);
+		}
 	};
 
 	const handleInputChange = (e) => {
 		const { name, value, type, checked } = e.target;
-
 		if (type === "checkbox") {
 			if (name === "material") {
 				const updatedMaterials = checked
 					? [...newFurniture.materials, value]
 					: newFurniture.materials.filter((material) => material !== value);
-
 				setNewFurniture((prev) => ({
 					...prev,
 					materials: updatedMaterials,
 				}));
-
-				// Calculate the lowest price from the selected materials
-				const selectedMaterials = materials.filter((material) =>
-					updatedMaterials.includes(material.name)
-				);
-				const lowestPriceMaterial = selectedMaterials.reduce(
-					(min, material) => {
-						return material.price < min ? material.price : min;
-					},
-					Infinity
-				);
-
-				// Set the price to the lowest material price
-				if (lowestPriceMaterial !== Infinity) {
-					setNewFurniture((prev) => ({
-						...prev,
-						price: lowestPriceMaterial,
-					}));
-				}
 			} else if (name === "color") {
 				setNewFurniture((prev) => ({
 					...prev,
@@ -219,7 +169,6 @@ const ProductManagement = () => {
 
 	const handleFileChange = (e) => {
 		const files = Array.from(e.target.files);
-
 		const readFileAsDataURL = (file) => {
 			return new Promise((resolve, reject) => {
 				const reader = new FileReader();
@@ -230,7 +179,6 @@ const ProductManagement = () => {
 				reader.readAsDataURL(file);
 			});
 		};
-
 		Promise.all(files.map(readFileAsDataURL))
 			.then((base64Images) => {
 				setNewFurniture((prev) => ({
@@ -244,18 +192,17 @@ const ProductManagement = () => {
 			});
 	};
 
+	console.log("Material",materials)
+
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 		setLoading(true);
 		const formData = new FormData();
-		// Append all fields to the FormData object
 		formData.append("name", newFurniture.name);
 		formData.append("category", newFurniture.category);
 		formData.append("furnitureType", newFurniture.furnitureType);
 		formData.append("description", newFurniture.description);
 		formData.append("price", newFurniture.price);
-
-		// Append materials, colors, and sizes (arrays)
 		newFurniture.materials.forEach((material) => {
 			formData.append("materials[]", material);
 		});
@@ -265,50 +212,48 @@ const ProductManagement = () => {
 		newFurniture.sizes.forEach((size) => {
 			formData.append("sizes[]", size);
 		});
-
-		// Append each image to FormData (files)
-		newFurniture.images.forEach((file, index) => {
+		newFurniture.images.forEach((file) => {
 			formData.append("images", file);
 		});
 
-		// Log FormData content
-		for (let [key, value] of formData.entries()) {
-			console.log(`${key}:`, value);
-		}
+				// Log FormData content
+				for (let [key, value] of formData.entries()) {
+					console.log(`${key}:`, value);
+				}
 
 		try {
-			const response = await fetch("http://localhost:3000/api/furnitures/add", {
-				method: "POST",
-				// headers: {
-				// "Content-Type": "multipart/form-data",
-				// },
-				credentials: "include",
-				body: formData,
-			});
-			if (response.ok) {
-				const data = await response.json();
-				toast.success(data.message);
-				setNewFurniture({
-					images: [],
-					name: "",
-					category: "",
-					furnitureType: "",
-					description: "",
-					materials: [],
-					colors: [],
-					sizes: [],
-					price: "",
-				});
-				selectedCategory("");
-				selectedFurnitureType("");
-				fetchData();
-			} else {
-				toast.error(data.message);
-			}
+			// const response = await fetch("http://localhost:3000/api/furnitures/add", {
+			// 	method: "POST",
+			// 	credentials: "include",
+			// 	body: formData,
+			// });
+			// if (response.ok) {
+			// 	const data = await response.json();
+			// 	toast.success(data.message);
+			// 	setNewFurniture({
+			// 		images: [],
+			// 		name: "",
+			// 		category: "",
+			// 		furnitureType: "",
+			// 		description: "",
+			// 		materials: [],
+			// 		colors: [],
+			// 		sizes: [],
+			// 		price: "",
+			// 	});
+			// 	setSelectedCategory("");
+			// 	setSelectedFurnitureType("");
+			// 	fetchData(); // Fetch data again to refresh the list
+			// } else {
+			// 	const errorData = await response.json();
+			// 	toast.error(errorData.message);
+			// }
 		} catch (error) {
 			console.error("Error adding new Furniture:", error);
+			toast.error("Failed to add new furniture");
+		} finally {
+			setLoading(false);
 		}
-		setLoading(false);
 	};
 
 	return (
@@ -332,12 +277,11 @@ const ProductManagement = () => {
 							className="border rounded p-2 w-full"
 						>
 							<option value="">Select Category</option>
-							{Array.isArray(categories) &&
-								categories.map((category) => (
-									<option key={category._id} value={category._id}>
-										{category.name}
-									</option>
-								))}
+							{categories.map((category) => (
+								<option key={category._id} value={category._id}>
+									{category.name}
+								</option>
+							))}
 						</select>
 						<select
 							id="furnitureType"
@@ -347,7 +291,7 @@ const ProductManagement = () => {
 							required
 							className="border rounded p-2 w-full"
 						>
-							<option value="">Select Furniture type</option>
+							<option value="">Select Furniture Type</option>
 							{filteredFurnitureTypes.map((furnitureType) => (
 								<option key={furnitureType._id} value={furnitureType._id}>
 									{furnitureType.name}
@@ -374,19 +318,19 @@ const ProductManagement = () => {
 							className="border rounded p-2 w-full"
 						/>
 						<div className="p-2">
-							<p className="italic font-ligth p-2">
-								Note: Furniture price will change base on the material cost.
+							<p className="italic font-light p-2">
+								Note: Furniture price will change based on the material cost.
 							</p>
 							<p id="price" className="border rounded p-2 w-full bg-gray-100">
 								{newFurniture.price ||
 									"Please select the available materials for this furniture"}
 							</p>
 						</div>
-
+						{/* Materials */}
 						<div className="mt-4 mb-4 bg-slate-200 rounded-md px-5 py-2">
 							<label className="block font-semibold">Materials:</label>
 							<div className="flex flex-wrap">
-								{Array.isArray(materials) && materials.length > 0 ? (
+								{materials.length > 0 ? (
 									materials.map((material) => (
 										<label
 											key={material._id}
@@ -411,12 +355,11 @@ const ProductManagement = () => {
 								)}
 							</div>
 						</div>
-
 						{/* Colors */}
 						<div className="mt-4 mb-4 bg-slate-200 rounded-md px-5 py-2">
 							<label className="block font-semibold">Colors:</label>
 							<div className="flex flex-wrap">
-								{Array.isArray(colors) && colors.length > 0 ? (
+								{colors.length > 0 ? (
 									colors.map((color) => (
 										<label
 											key={color._id}
@@ -445,18 +388,17 @@ const ProductManagement = () => {
 								)}
 							</div>
 						</div>
-
 						{/* Sizes */}
 						<div className="mb-4 bg-slate-200 rounded-md p-2">
 							<label className="block font-semibold my-2 mb-2">
 								Sizes:{" "}
 								<span className="font-light">
-									( Height X Width X Length X Depth )
+									(Height X Width X Length X Depth)
 								</span>
 							</label>
 							<div className="flex flex-wrap">
-								{filteredSizes.length > 0 ? (
-									filteredSizes.map((size) => (
+								{sizes.length > 0 ? (
+									sizes.map((size) => (
 										<label
 											key={size._id}
 											className="flex items-center w-1/3 p-2"
@@ -473,7 +415,8 @@ const ProductManagement = () => {
 												{size.label.charAt(0).toUpperCase() +
 													size.label.slice(1)}{" "}
 												<span className="text-gray-500 italic">
-													( {size.height} X {size.width} X {size.depth} )
+													({size.height} X {size.width} X {size.length} X{" "}
+													{size.depth})
 												</span>
 											</span>
 										</label>
@@ -483,20 +426,18 @@ const ProductManagement = () => {
 								)}
 							</div>
 						</div>
-						{/* IMAGE INPUT  */}
+						{/* Image Input */}
 						<div className="mt-4">
 							<label className="block font-semibold">Selected Images:</label>
 							<div className="flex flex-wrap gap-4">
-								{Array.isArray(newFurniture.images) &&
-									newFurniture.images.length > 0 &&
-									newFurniture.images.map((image, index) => (
-										<img
-											key={index}
-											src={`data:image/jpeg;base64,${image}`}
-											alt={`Selected image ${index + 1}`}
-											className="w-16 h-16 object-contain"
-										/>
-									))}
+								{newFurniture.images.map((image, index) => (
+									<img
+										key={index}
+										src={`data:image/jpeg;base64,${image}`}
+										alt={`Selected image ${index + 1}`}
+										className="w-16 h-16 object-contain"
+									/>
+								))}
 							</div>
 						</div>
 						<input
@@ -510,7 +451,6 @@ const ProductManagement = () => {
 							accept="image/*"
 						/>
 						<button
-							onClick={handleSubmit}
 							type="submit"
 							disabled={loading}
 							className="bg-blue-500 text-white p-2 rounded w-full"
@@ -549,7 +489,7 @@ const ProductManagement = () => {
 									<td className="border border-gray-300 p-2 flex justify-center">
 										{furniture.images.length > 0 ? (
 											<img
-												src={`data:image/jpeg;base64,${furniture.images[0]}`} // Display only the first image
+												src={`data:image/jpeg;base64,${furniture.images[0]}`}
 												alt={furniture.name}
 												className="w-16 h-16 object-cover rounded-md"
 											/>
@@ -575,7 +515,7 @@ const ProductManagement = () => {
 										{furniture.furnitureType?.name || "N/A"}
 									</td>
 									<td className="border border-gray-300 p-2">
-										{furniture.colors && furniture.colors.length > 0
+										{furniture.colors.length > 0
 											? furniture.colors.map((color) => (
 													<span key={color._id} className="block">
 														{color.name}
@@ -584,17 +524,17 @@ const ProductManagement = () => {
 											: "N/A"}
 									</td>
 									<td className="border border-gray-300 p-2">
-										{furniture.sizes && furniture.sizes.length > 0
+										{furniture.sizes.length > 0
 											? furniture.sizes.map((size) => (
 													<span key={size._id} className="block">
-														{size.label} <br /> ({size.height} X {size.width} X
+														{size.label} <br /> ({size.height} X {size.width} X{" "}
 														{size.length} X {size.depth})
 													</span>
 											  ))
 											: "N/A"}
 									</td>
 									<td className="border border-gray-300 p-2">
-										{furniture.materials && furniture.materials.length > 0
+										{furniture.materials.length > 0
 											? furniture.materials.map((material) => (
 													<span key={material._id} className="block">
 														{material.name}
@@ -610,7 +550,7 @@ const ProductManagement = () => {
 						) : (
 							<tr>
 								<td
-									colSpan="11"
+									colSpan="9"
 									className="text-center p-4 text-gray-500 font-semibold"
 								>
 									No furniture available

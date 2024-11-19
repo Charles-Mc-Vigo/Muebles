@@ -100,9 +100,9 @@ exports.createFurniture = async (req, res) => {
         furnitureType: existingFurnitureType._id,
         name,
         description,
-        materials: existingMaterials.map((material) => material._id),
-        colors: existingColors.map((color) => color._id),
-        sizes: existingSizes.map((size) => size._id),
+        materials: existingMaterials.map((material) => material.name),
+        colors: existingColors.map((color) => color.name),
+        sizes: existingSizes.map((size) => size.label),
         // price,
       });
 
