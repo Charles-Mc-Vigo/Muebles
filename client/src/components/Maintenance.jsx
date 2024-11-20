@@ -11,7 +11,6 @@ const Table = ({
 	categoriesList,
 }) => {
 	const [editIndex, setEditIndex] = useState(null);
-
 	const handleEditClick = (index) => {
 		setEditIndex(index);
 	};
@@ -121,6 +120,7 @@ const Maintenance = () => {
 	const initialSizeState = {
 		label: "",
 		height: "",
+		length: "",
 		width: "",
 		depth: "",
 		furnitureTypeId: "",
@@ -136,13 +136,20 @@ const Maintenance = () => {
 	const [colors, setColors] = useState([]);
 	const [sizes, setSizes] = useState([]);
 	const [materials, setMaterials] = useState([]);
-	const [newMaterial, setNewMaterial] = useState({ name: "", stocks: "" });
+	const [newMaterial, setNewMaterial] = useState({
+		name: "",
+		price: "",
+		stock: "",
+		furnitureTypeId: "",
+	});
 	const [selectedFilter, setSelectedFilter] = useState("");
 	const [selectedFurnitureType, setSelectedFurnitureType] = useState("");
 	const [selectedCategory, setSelectedCategory] = useState("");
 	const [newItemName, setNewItemName] = useState("");
+	const [ect, setECT] = useState("");
 	const [newSize, setNewSize] = useState(initialSizeState);
 	const [newColor, setNewColor] = useState(initialColorState);
+	const [loading, setLoading] = useState(false);
 
 	const fetchData = async () => {
 		await fetchCategories();
@@ -202,7 +209,7 @@ const Maintenance = () => {
 			}
 
 			toast.success(`Successfully archived ${entityType}`);
-			console.log(`${entityType} with ID ${entityId} archived successfully`);
+			// console.log(`${entityType} with ID ${entityId} archived successfully`);
 
 			// Optionally, update the UI by removing or updating the entity in the respective state
 			switch (entityType) {
@@ -247,7 +254,7 @@ const Maintenance = () => {
 			});
 			const data = await response.json();
 			setCategories(data);
-			console.log(data);
+			// console.log(data);
 		} catch (error) {
 			setCategories([]);
 			console.error("Failed to fetch categories:", error);
@@ -281,9 +288,14 @@ const Maintenance = () => {
 	};
 
 	const handleAddNewMaterial = async () => {
-		const { name, stocks } = newMaterial;
-		if (!name || !stocks) {
-			toast.error("Please provide valid name and stocks.");
+		setLoading(true);
+		const { name, price, stock, furnitureTypeId } = newMaterial; // Include furnitureTypeId
+
+		if (!name || !price || !stock || !furnitureTypeId) {
+			// Check for furnitureTypeId
+			toast.error(
+				"Please provide valid name, price, stock, and select a furniture type."
+			);
 			return;
 		}
 		try {
@@ -293,13 +305,11 @@ const Maintenance = () => {
 					"Content-Type": "application/json",
 				},
 				credentials: "include",
-				body: JSON.stringify({ name, stocks }),
+				body: JSON.stringify({ name, price, stock, furnitureTypeId }), // Include furnitureTypeId in the body
 			});
-
 			if (response.ok) {
-				const data = await response.json();
 				toast.success("Material added successfully.");
-				setNewMaterial({ name: "", stocks: "" }); // Reset input
+				setNewMaterial({ name: "", price: "", stock: "", furnitureTypeId: "" }); // Reset input
 				await fetchMaterials(); // Refresh the list
 			} else {
 				const errorData = await response.json();
@@ -309,9 +319,12 @@ const Maintenance = () => {
 			console.error("Error adding material:", error);
 			toast.error("Failed to add material");
 		}
+		setLoading(false);
 	};
 
 	const handleAddNewSize = async () => {
+		setLoading(true);
+
 		if (!newSize.label || !selectedFurnitureType) {
 			toast.error(
 				"Please enter a valid size name and select a furniture type."
@@ -328,6 +341,7 @@ const Maintenance = () => {
 				body: JSON.stringify({
 					label: newSize.label,
 					height: newSize.height,
+					length: newSize.length,
 					width: newSize.width,
 					depth: newSize.depth,
 					furnitureTypeId: selectedFurnitureType,
@@ -340,12 +354,13 @@ const Maintenance = () => {
 				await fetchSizes();
 			} else {
 				const errorData = await response.json();
-				toast.error(errorData.message);
+				toast.error("Failed to add new size");
 			}
 		} catch (error) {
 			console.error("Error adding size:", error);
 			toast.error("Failed to add size");
 		}
+		setLoading(false);
 	};
 
 	const handleColorChange = (e) => {
@@ -354,6 +369,8 @@ const Maintenance = () => {
 	};
 
 	const handleAddNewColor = async () => {
+		setLoading(true);
+
 		if (!newColor.name || !newColor.rgb || !newColor.hex) {
 			toast.error("Please provide all color details.");
 			return;
@@ -382,9 +399,12 @@ const Maintenance = () => {
 		} catch (error) {
 			toast.error(error.message);
 		}
+		setLoading(false);
 	};
 
 	const handleAddNewItem = async () => {
+		setLoading(true);
+
 		if (
 			!newItemName && 
 			selectedFilter !== "Furniture Size" &&
@@ -405,38 +425,49 @@ const Maintenance = () => {
 					body: JSON.stringify({ name: newItemName }),
 				});
 				if (!response.ok) {
-					throw new Error(response.message);
+					const errorData = await response.json();
+					throw new Error(errorData.message || "Failed to add category.");
 				}
 				toast.success("Category added successfully.");
 				await fetchCategories(); // Refresh categories list
 			}
-	
+
+			// furniture type
 			if (selectedFilter === "Furniture Types") {
 				if (!selectedCategory) {
+					setLoading(false);
 					toast.error("Please select a category.");
 					return;
 				}
-				const response = await fetch("http://localhost:3000/api/furniture-types/add", {
-					method: "POST",
-					headers: {
-						"Content-Type": "application/json",
-					},
-					credentials: "include",
-					body: JSON.stringify({
-						name: newItemName,
-						categoryId: selectedCategory,
-					}),
-				});
-	
-				const errorData = await response.json();
-				if (!errorData.ok) {
-					throw new Error(errorData.message);
-				}
-				const newFurnitureType = await response.json();
-				setFurnitureTypes((prevTypes) =>
-					Array.isArray(prevTypes) ? [...prevTypes, newFurnitureType] : [newFurnitureType]
+				const response = await fetch(
+					"http://localhost:3000/api/furniture-types/add",
+					{
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json",
+						},
+						credentials: "include",
+						body: JSON.stringify({
+							name: newItemName,
+							ECT: ect,
+							categoryId: selectedCategory,
+						}),
+					}
 				);
-				alert("Furniture type added successfully.");
+
+				const responseData = await response.json();
+				if (!response.ok) {
+					throw new Error(
+						responseData.message || "Failed to add furniture type."
+					);
+				}
+
+				setFurnitureTypes((prevTypes) =>
+					Array.isArray(prevTypes)
+						? [...prevTypes, responseData.newFurnitureType]
+						: [responseData.newFurnitureType]
+				);
+				toast.success(responseData.message);
 				await fetchFurnitureTypes();
 			}
 	
@@ -444,9 +475,12 @@ const Maintenance = () => {
 		} catch (error) {
 			toast.error(error.message);
 		}
+		setLoading(false);
 	};
-	
+
 	const handleEditItem = (rowIndex, key, value) => {
+		setLoading(true);
+
 		const updateItem = (items, setItems) => {
 			const updatedItems = [...items];
 			// Check if we are editing "Furniture Types"
@@ -455,8 +489,9 @@ const Maintenance = () => {
 			} else {
 				updatedItems[rowIndex][key] = value;
 			}
-			console.log("Updated Item:", updatedItems[rowIndex]); // Log the updated item
+			// console.log("Updated Item:", updatedItems[rowIndex]); // Log the updated item
 			setItems(updatedItems);
+			setLoading(false);
 		};
 
 		switch (selectedFilter) {
@@ -481,6 +516,7 @@ const Maintenance = () => {
 	};
 
 	const handleSaveItem = async (item) => {
+		setLoading(true);
 		let url = "";
 		if (selectedFilter === "Categories") {
 			url = `http://localhost:3000/api/categories/${item.id}`;
@@ -514,6 +550,7 @@ const Maintenance = () => {
 			console.error("Error updating item:", error);
 			toast.error("Failed to update item");
 		}
+		setLoading(false);
 	};
 
 	const resetInputFields = () => {
@@ -623,6 +660,19 @@ const Maintenance = () => {
 									newItemName,
 									(e) => setNewItemName(e.target.value)
 								)}
+								{renderInputField(
+									"Estimated Completion Time (ECT)",
+									"ect",
+									ect,
+									(e) => {
+										const value = e.target.value;
+										// Allow only numeric input
+										if (!isNaN(value) && value.trim() !== 0) {
+											setECT(value);
+										}
+									},
+									"number"
+								)}
 							</>
 						)}
 						{selectedFilter === "Furniture Size" && (
@@ -650,21 +700,28 @@ const Maintenance = () => {
 									setNewSize({ ...newSize, label: e.target.value })
 								)}
 								{renderInputField(
-									"Height",
+									"Height (inches)",
 									"height",
 									newSize.height,
 									(e) => setNewSize({ ...newSize, height: e.target.value }),
 									"number"
 								)}
 								{renderInputField(
-									"Width",
+									"Width (inches)",
 									"width",
 									newSize.width,
 									(e) => setNewSize({ ...newSize, width: e.target.value }),
 									"number"
 								)}
 								{renderInputField(
-									"Depth",
+									"Length (inches)",
+									"length",
+									newSize.length,
+									(e) => setNewSize({ ...newSize, length: e.target.value }),
+									"number"
+								)}
+								{renderInputField(
+									"Depth (inches)",
 									"depth",
 									newSize.depth,
 									(e) => setNewSize({ ...newSize, depth: e.target.value }),
@@ -696,6 +753,30 @@ const Maintenance = () => {
 						)}
 						{selectedFilter === "Furniture Materials" && (
 							<>
+								{/* Add a dropdown to select furniture type */}
+								<div className="mb-4">
+									<label className="block mb-1 font-semibold text-gray-700">
+										Select Furniture Type
+									</label>
+									<select
+										value={newMaterial.furnitureTypeId}
+										onChange={(e) =>
+											setNewMaterial({
+												...newMaterial,
+												furnitureTypeId: e.target.value,
+											})
+										}
+										className="w-full border rounded-lg p-2 shadow-sm focus:ring focus:ring-blue-300"
+									>
+										<option value="">-- Select --</option>
+										{Array.isArray(furnitureTypes) &&
+											furnitureTypes.map((type) => (
+												<option key={type._id} value={type._id}>
+													{type.name}
+												</option>
+											))}
+									</select>
+								</div>
 								{renderInputField(
 									"Material Name",
 									"name",
@@ -704,23 +785,29 @@ const Maintenance = () => {
 										setNewMaterial({ ...newMaterial, name: e.target.value })
 								)}
 								{renderInputField(
-									"Stocks",
-									"stocks",
-									newMaterial.stocks,
+									"Price",
+									"price",
+									newMaterial.price,
 									(e) =>
-										setNewMaterial({
-											...newMaterial,
-											stocks: e.target.value,
-										}),
+										setNewMaterial({ ...newMaterial, price: e.target.value }),
+									"number"
+								)}
+								{renderInputField(
+									"Stock",
+									"stock",
+									newMaterial.stock,
+									(e) =>
+										setNewMaterial({ ...newMaterial, stock: e.target.value }),
 									"number"
 								)}
 							</>
 						)}
 						<button
 							type="submit"
+							disabled={loading}
 							className="w-full bg-green-800 text-white rounded-lg p-2 font-semibold hover:bg-green-700 transition duration-200"
 						>
-							Add New {selectedFilter}
+							{loading ? `Adding...` : `Add New ${selectedFilter}`}
 						</button>
 					</form>
 				</div>
@@ -736,7 +823,7 @@ const Maintenance = () => {
 										Array.isArray(categories)
 											? categories.map((category) => ({
 													id: category._id,
-													name: category.name,
+													name: category.name || "N/A",
 											  }))
 											: []
 									}
@@ -753,17 +840,22 @@ const Maintenance = () => {
 							<h2 className="text-2xl font-bold mb-4">Furniture Types</h2>
 							<div className="max-h-96 overflow-y-auto">
 								<Table
-									headers={["Furniture Type","Category"]}
+									headers={[
+										"Furniture Type",
+										"Estimated Completion Time (ECT)",
+										"Category",
+									]}
 									data={
 										Array.isArray(furnitureTypes)
 											? furnitureTypes.map((type) => ({
-												id: type._id,
-												name: type.name,
-												category:
-												categories.find(
-													(cat) => cat._id === type.categoryId
-												)?.name || "N/A",
-											}))
+													id: type._id,
+													name: type.name || "N/A",
+													ECT: type.ECT || "N/A",
+													category:
+														categories.find(
+															(cat) => cat._id === type.categoryId
+														)?.name || "N/A",
+											  }))
 											: []
 									}
 									onEdit={handleEditItem}
@@ -784,9 +876,9 @@ const Maintenance = () => {
 										Array.isArray(colors)
 											? colors.map((color) => ({
 													id: color._id,
-													name: color.name,
-													rgb: color.rgb,
-													hex: color.hex,
+													name: color.name || "N/A",
+													rgb: color.rgb || "N/A",
+													hex: color.hex || "N/A",
 											  }))
 											: []
 									}
@@ -803,13 +895,24 @@ const Maintenance = () => {
 							<h2 className="text-2xl font-bold mb-4">Furniture Materials</h2>
 							<div className="max-h-96 overflow-y-auto">
 								<Table
-									headers={["Material Name", "Stocks"]}
+									headers={[
+										"Material Name",
+										"Price",
+										"Stocks",
+										"Furniture Type",
+									]}
 									data={
 										Array.isArray(materials)
 											? materials.map((material) => ({
 													id: material._id,
 													name: material.name,
-													stocks: material.stocks,
+													price: material.price,
+													stock: material.stock,
+													furnitureTypeId: Array.isArray(furnitureTypes)
+														? furnitureTypes.find(
+																(type) => type._id === material.furnitureTypeId
+														  )?.name || "N/A"
+														: "N/A",
 											  }))
 											: []
 									}
@@ -828,6 +931,7 @@ const Maintenance = () => {
 									headers={[
 										"Size Label",
 										"Height",
+										"Length",
 										"Width",
 										"Depth",
 										"Furniture Type",
@@ -836,14 +940,16 @@ const Maintenance = () => {
 										Array.isArray(sizes)
 											? sizes.map((size) => ({
 													id: size._id,
-													label: size.label,
-													heigth: size.height,
-													width: size.width,
-													depth: size.depth,
-													furnitureTypes:
-														furnitureTypes.find(
-															(type) => type._id === size.furnitureTypeId
-														)?.name || "N/A",
+													label: size.label || "N/A",
+													heigth: size.height || "N/A",
+													length: size.length || "N/A",
+													width: size.width || "N/A",
+													depth: size.depth || "N/A",
+													furnitureType: Array.isArray(furnitureTypes)
+														? furnitureTypes.find(
+																(type) => type._id === size.furnitureTypeId
+														  )?.name || "N/A"
+														: "N/A",
 											  }))
 											: []
 									}

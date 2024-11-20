@@ -1,208 +1,261 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-// Shipping fee mapping
-const SHIPPING_FEES = {
-  'Mogpog': 700,
-  'Boac': 500,
-  'Gasan': 500,
-  'Buenavista': 800,
-  'Santa_Cruz': 3000,
-  'Torrijos': 3000
-};
+// const preOrderSchema = new mongoose.Schema({
+// 	user: {
+// 		type: mongoose.Schema.Types.ObjectId,
+// 		ref: "User",
+// 		required: true,
+// 	},
+// 	furniture:{
+// 		type:mongoose.Schema.Types.ObjectId,
+// 		ref:"Furniture"
+// 	},
+// 	material:{type:String},
+// 	color:{type:String},
+// 	size:{type:String},
+// 	quantity:{type:Number},
+// 	orderNumber: {
+// 		type: String,
+// 		unique: true,
+// 	},
+// 	shippingAddress: {
+// 		streetAddress: String,
+// 		municipality: String,
+// 		barangay: String,
+// 		zipCode: Number,
+// 	},
+// 	paymentOption:{
+// 		type:String,
+// 		require:true,
+// 	},
+// 	paymentMethod: {
+// 		type: String,
+// 		enum: ["GCash", "Maya"],
+// 		required: true,
+// 	},
+// 	proofOfPayment: {
+// 		type: String,
+// 		required: true,
+// 	},
+// 	orderStatus: {
+// 		type: String,
+// 		enum: ["pending", "confirmed", "delivered", "cancelled"],
+// 		default: "pending",
+// 	},
+// 	deliveryMode:{
+// 		type:String,
+// 	},
+// 	expectedDelivery:{
+// 		type:String
+// 	},
+// 	subtotal: Number,
+// 	shippingFee: Number,
+// 	totalAmount: Number,
+// },{
+// 	timestamps: true,
+// })
 
-const orderSchema = new mongoose.Schema({
-  user: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
-  },
-  orderNumber: {
-    type: String,
-    unique: true
-  },
-  items: [{
-    furniture: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Furniture',
-      required: true
+const orderSchema = new mongoose.Schema(
+	{
+		user: {
+			type: mongoose.Schema.Types.ObjectId,
+			ref: "User",
+			required: true,
+		},
+    furniture:{
+			type:Object
     },
-    quantity: {
-      type: Number,
-      required: true,
-      min: 1
+		material:{type:String},
+		color:{type:String},
+		size:{type:String},
+		quantity:{type:Number},
+		orderNumber: {
+			type: String,
+			unique: true,
+		},
+		
+		items: [
+			{
+				furniture: {
+					type: mongoose.Schema.Types.ObjectId,
+					ref: "Furniture",
+					required: true,
+				},
+				quantity: {
+					type: Number,
+					required: true,
+					min: 1,
+				},
+				price: {
+					type: Number,
+					required: true,
+				},
+				material: { type: String },
+				color: { type: String },
+				size: { type: String },
+				ECT:{type:Number}
+			},
+		],
+		shippingAddress: {
+			streetAddress: String,
+			municipality: String,
+			barangay: String,
+			zipCode: Number,
+		},
+		phoneNumber: {
+			type: String,
+		},
+		paymentOption:{
+			type:String,
+			require:true,
+		},
+		paymentMethod: {
+			type: String,
+			enum: ["GCash", "Maya"],
+			required: true,
+		},
+		proofOfPayment: {
+			type: String,
+			required: true,
+		},
+		orderStatus: {
+			type: String,
+			enum: ["pending", "confirmed", "delivered", "cancelled"],
+			default: "pending",
+		},
+    deliveryMode:{
+      type:String,
     },
-    price: {
-      type: Number,
-      required: true
-    },
-    material: { type: String },
-    color: { type: String },
-    size: { type: String }
-  }],
-  shippingAddress: {
-    streetAddress: String,
-    municipality: String,
-    barangay: String,
-    zipCode: Number
-  },
-  phoneNumber: {
-    type: String,
-    required: true
-  },
-  paymentMethod: {
-    type: String,
-    enum: ['COD', 'GCash', 'Maya'],
-    required: true
-  },
-  proofOfPayment:{
-    type: String,
-    required: true
-  },
-  orderStatus: {
-    type: String,
-    enum: ['pending', 'confirmed', 'delivered', 'cancelled'],
-    default: 'pending'
-  },
-  subtotal: Number,
-  shippingFee: Number,
-  totalAmount: Number
-}, {
-  timestamps: true
+		expectedDelivery:{
+			type:String
+		},
+		remainingBalance:{
+			type:Number
+		},
+		subtotal: Number,
+		shippingFee: Number,
+		totalAmount: Number,
+		type:{
+			type:String,
+			enum: ["Cart","Pre-Order"],
+			required:true
+		}
+	},
+	{
+		timestamps: true,
+	}
+);
+
+// order number
+orderSchema.pre("save", async function (next) {
+	if (!this.orderNumber) {
+		const date = new Date();
+		const randomNum = Math.floor(Math.random() * 10000)
+			.toString()
+			.padStart(4, "0");
+		this.orderNumber = `ORD-${date.getFullYear()}${randomNum}`;
+	}
+	next();
 });
 
-// Generate simple order number
-orderSchema.pre('save', async function(next) {
-  if (!this.orderNumber) {
-    const date = new Date();
-    const randomNum = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
-    this.orderNumber = `ORD-${date.getFullYear()}${randomNum}`;
-  }
-  next();
-});
+orderSchema.statics.preOrder = async function(user, furniture, material, color, size, quantity, paymentMethod, proofOfPayment, paymentOption,shippingAddress, shippingFee, deliveryMode, expectedDelivery,subtotal,totalAmount,remainingBalance) {
 
-// Helper function to calculate shipping fee
-const calculateShippingFee = (municipality) => {
-  const fee = SHIPPING_FEES[municipality];
-  if (!fee) {
-    throw new Error(`Invalid municipality: ${municipality}`);
-  }
-  return fee;
+
+	// //calculation para sa partial payment ksksks
+	// let partialPayment
+	// let remainingHalf
+	// let partialPaymentplusShippingFee
+	// if(paymentOption === "Partial Payment"){
+	// 	partialPayment = cart.totalAmount / 2;
+	// 	remainingHalf = partialPayment;
+	// 	partialPaymentplusShippingFee = partialPayment + shippingFee;
+	// 	console.log(`Cart total is ${cart.totalAmount} divided by 2 = ${partialPayment}`)
+	// 	console.log("total amount ng partial payment plus shipping fee", partialPaymentplusShippingFee);
+		
+	// }
+
+	if(paymentOption === "Full Payment"){
+		remainingBalance = undefined;
+	}
+	
+  const preOrderData = {
+      user: user,
+			furniture:furniture,
+			material:material,
+			color:color,
+			size:size,
+			quantity:quantity,
+      paymentMethod: paymentMethod,
+      proofOfPayment: proofOfPayment,
+			paymentOption: paymentOption,
+      shippingAddress: shippingAddress,
+      shippingFee: shippingFee,
+      // phoneNumber: userId.phoneNumber,
+			// totalAmount: paymentOption === "Partial Payment" ? partialPaymentplusShippingFee : (cart.totalAmount + shippingFee),
+			// remainingBalance: remainingHalf,
+      deliveryMode: deliveryMode,
+			expectedDelivery:expectedDelivery,
+			subtotal:subtotal,
+			totalAmount:totalAmount,
+			remainingBalance:remainingBalance,
+			type:"Pre-Order",
+  };
+
+
+  return this.create(preOrderData);
 };
 
-// Static method to create order from cart
-orderSchema.statics.createFromCart = async function(cartId, paymentMethod, proofOfPayment) {
+orderSchema.statics.createFromCart = async function(cartId, paymentMethod, proofOfPayment, paymentOption,shippingAddress, shippingFee, deliveryMode, expectedDelivery) {
   const cart = await mongoose.model('Cart').findById(cartId)
     .populate('userId')
     .populate('items.furnitureId');
   
   if (!cart) throw new Error('Cart not found');
-  
-  // Find the user's default or primary address
-  const user = await mongoose.model('User').findById(cart.userId._id);
-  if (!user || !user.addresses || user.addresses.length === 0) {
-    throw new Error('User address not found');
-  }
-  
-  // Get the primary or first address
-  const primaryAddress = user.addresses.find(addr => addr.addressStatus === 'primary') || user.addresses[0];
-  
-  // Calculate shipping fee based on municipality
-  const shippingFee = calculateShippingFee(primaryAddress.municipality);
-  
+
+	console.log("From the model. Payment option is ", paymentOption);
+
+	//calculation para sa partial payment ksksks
+	let partialPayment
+	let remainingHalf
+	let partialPaymentplusShippingFee
+	if(paymentOption === "Partial Payment"){
+		partialPayment = cart.totalAmount / 2;
+		remainingHalf = partialPayment;
+		partialPaymentplusShippingFee = partialPayment + shippingFee;
+		console.log(`Cart total is ${cart.totalAmount} divided by 2 = ${partialPayment}`)
+		console.log("total amount ng partial payment plus shipping fee", partialPaymentplusShippingFee);
+		
+	}
+
+
+	
   const orderData = {
-    user: cart.userId._id,
-    items: cart.items.map(item => ({
-      furniture: item.furnitureId._id,
-      quantity: item.quantity,
-      price: item.furnitureId.price,
-      material: item.material,
-      color: item.color,
-      size: item.size,
-    })),
-    shippingAddress: {
-      streetAddress: primaryAddress.streetAddress,
-      municipality: primaryAddress.municipality,
-      barangay: primaryAddress.barangay,
-      zipCode: primaryAddress.zipCode
-    },
-    phoneNumber: user.phoneNumber,
-    paymentMethod: paymentMethod,
-    subtotal: cart.totalAmount,
-    shippingFee: shippingFee,
-    totalAmount: cart.totalAmount + shippingFee,
-    proofOfPayment: proofOfPayment
+      user: cart.userId._id,
+      items: cart.items.map(item => ({
+          furniture: item.furnitureId._id,
+          quantity: item.quantity,
+          price: item.furnitureId.price,
+          material: item.material,
+          color: item.color,
+          size: item.size
+      })),
+      shippingAddress: shippingAddress,
+      phoneNumber: cart.userId.phoneNumber,
+      paymentMethod: paymentMethod,
+      subtotal: cart.totalAmount,
+      shippingFee: shippingFee,
+			totalAmount: paymentOption === "Partial Payment" ? partialPaymentplusShippingFee : (cart.totalAmount + shippingFee),
+			remainingBalance: remainingHalf,
+      proofOfPayment: proofOfPayment,
+      deliveryMode: deliveryMode,
+			expectedDelivery:expectedDelivery,
+			paymentOption: paymentOption,
+			type:"Cart"
   };
+
 
   return this.create(orderData);
 };
 
-// Static method to create direct order
-orderSchema.statics.createDirectOrder = async function(orderData) {
-  // Validate required fields
-  if (!orderData.userId || !orderData.items || !orderData.paymentMethod) {
-    throw new Error('Missing required fields');
-  }
-
-  // Fetch user details
-  const user = await mongoose.model('User').findById(orderData.userId);
-  if (!user) throw new Error('User not found');
-
-  // Fetch furniture details and validate stock
-  const furniturePromises = orderData.items.map(async (item) => {
-    const furniture = await mongoose.model('Furniture').findById(item.furnitureId);
-    if (!furniture) throw new Error(`Furniture with ID ${item.furnitureId} not found`);
-    if (furniture.stockQuantity < item.quantity) {
-      throw new Error(`Insufficient stock for furniture: ${furniture.name}`);
-    }
-    return {
-      furniture: furniture._id,
-      quantity: item.quantity,
-      material: item.material,
-      color: item.color,
-      size: item.size,
-      price: furniture.price
-    };
-  });
-
-  const processedItems = await Promise.all(furniturePromises);
-
-  // Calculate totals
-  const subtotal = processedItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  
-  // Get shipping address (either from order data or user's default address)
-  const shippingAddress = orderData.shippingAddress || 
-    (user.addresses.find(addr => addr.addressStatus === 'primary') || user.addresses[0]);
-  
-  if (!shippingAddress || !shippingAddress.municipality) {
-    throw new Error('Valid shipping address with municipality is required');
-  }
-
-  // Calculate shipping fee based on municipality
-  const shippingFee = calculateShippingFee(shippingAddress.municipality);
-  const totalAmount = subtotal + shippingFee;
-
-  // Prepare order document
-  const order = {
-    user: user._id,
-    items: processedItems,
-    shippingAddress: {
-      streetAddress: shippingAddress.streetAddress,
-      municipality: shippingAddress.municipality,
-      barangay: shippingAddress.barangay,
-      zipCode: shippingAddress.zipCode
-    },
-    phoneNumber: orderData.phoneNumber || user.phoneNumber,
-    paymentMethod: orderData.paymentMethod,
-    proofOfPayment: orderData.proofOfPayment,
-    subtotal,
-    shippingFee,
-    totalAmount
-  };
-
-  // Create and return the order
-  return this.create(order);
-};
-
-const Order = mongoose.model('Order', orderSchema);
-
+const Order = mongoose.model("Order", orderSchema);
 module.exports = Order;

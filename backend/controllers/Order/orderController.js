@@ -2,63 +2,92 @@ const Order = require("../../models/Order/orderModel");
 const Cart = require("../../models/Cart/cartModel");
 const User = require("../../models/User/userModel");
 const Furniture = require("../../models/Furniture/furnitureModel");
+const Materials = require("../../models/Furniture/materialsModel");
+const FurnitureType = require("../../models/Furniture/furnitureTypeModel");
+const Category = require("../../models/Furniture/categoryModel");
 
 const orderController = {
 	// Create new order from cart
 	createOrder: async (req, res) => {
 		try {
-			const { paymentMethod } = req.body;
-			const userId = req.user._id; // Using ID from cookie token
+			const {
+				paymentMethod,
+				shippingAddress,
+				deliveryMode,
+				expectedDelivery,
+				paymentOption,
+			} = req.body;
+			const userId = req.user._id;
 
-			// Validate that payment method is provided
+			// res.status(200).json(paymentOption)
+			//decision kung if partial or payment
+			// if (paymentOption === "Partial Payment") {
+			// 	console.log("Payment option is Partial payment");
+			// } else {
+			// 	console.log("Payment option is Full payment");
+			// }
+
 			if (!paymentMethod) {
 				return res.status(400).json({
 					error: "Please select a payment method to proceed.",
 				});
 			}
 
-			// For specific payment methods (e.g., GCash, Maya, COD), ensure proof of payment is provided
-			if (["GCash", "Maya", "COD"].includes(paymentMethod)) {
-				if (!req.file) {
-					return res.status(400).json({
-						error: "Please upload proof of payment for the selected method.",
-					});
-				}
+			if (["GCash", "Maya"].includes(paymentMethod) && !req.file) {
+				return res.status(400).json({
+					error: "Please upload proof of payment for the selected method.",
+				});
 			}
 
-			// Check if payment method requires proof of payment
 			let proofOfPayment;
 			if (req.file) {
-				// Convert the uploaded image to a base64-encoded string without the data URL prefix
 				proofOfPayment = req.file.buffer.toString("base64");
 			}
 
-			// Find user's cart
 			const cart = await Cart.findOne({ userId });
 			if (!cart || cart.items.length === 0) {
 				return res.status(400).json({ error: "Cart is empty" });
 			}
+			// console.log(cart);
+			// console.log("Expected delivery: ", cart.expectedDelivery);
 
-			// Create the order with the proof of payment as base64
+			const shippingAddressObj = JSON.parse(shippingAddress);
+			const municipality = shippingAddressObj.municipality;
+
+			// Calculate shipping fee
+			const shippingFees = {
+				Boac: 500,
+				Mogpog: 700,
+				Gasan: 500,
+				Buenavista: 800,
+				Santa_Cruz: 3000,
+				Torrijos: 3000,
+			};
+			const shippingFee = shippingFees[municipality] || 0;
+			// console.log(shippingFee)
+
 			const order = await Order.createFromCart(
 				cart._id,
 				paymentMethod,
-				proofOfPayment
+				proofOfPayment,
+				paymentOption,
+				shippingAddress,
+				shippingFee,
+				deliveryMode,
+				expectedDelivery
 			);
 
-			// Clear the cart
 			await Cart.findByIdAndUpdate(cart._id, {
 				items: [],
 				count: 0,
 				totalAmount: 0,
 			});
 
-			// Add the order to the user's orders array
 			await User.findByIdAndUpdate(userId, {
 				$push: { orders: order._id, proofOfPayment },
 			});
 
-			res.status(201).json({success: "Order placed successfully!", order});
+			res.status(201).json({ success: "Order placed successfully!", order });
 		} catch (error) {
 			console.error("Error creating order:", error);
 			res.status(500).json({
@@ -66,12 +95,140 @@ const orderController = {
 			});
 		}
 	},
+
+	preOrder: async (req, res) => {
+		try {
+			const {
+				quantity,
+				furnitureId,
+				color,
+				material,
+				size,
+				paymentMethod,
+				paymentOption,
+				deliveryMode,
+				shippingAddress,
+				expectedDelivery,
+			} = req.body;
+
+			const userId = req.user._id;
+			const user = await User.findById(userId);
+			if (!user) return res.status(404).json({ message: "User not found!" });
+
+			// Calculate subtotal based on furniture price (assuming you have a way to get the price)
+			const furniture = await Furniture.findById(furnitureId);
+			if (!furniture)
+				return res.status(404).json({ message: "Furniture not found!" });
+
+			const furnitureCategoryId = furniture.category;
+			const furnitureFurnitureType = furniture.furnitureType;
+
+			const category = await Category.findById(furnitureCategoryId);
+			const furnitureType = await FurnitureType.findById(
+				furnitureFurnitureType
+			);
+
+			// const furnitureType = await FurnitureType.findById(category._id);
+
+			// res.status(200).json({message:`${furnitureType.name} found`, furnitureType});
+
+			// res.status(200).json({message:`${category.name} found`, category});
+
+			// const furnitureTypeECT = await FurnitureType({name:{$in:{furniture.category}}})
+
+			if (!["Partial Payment", "Full Payment"].includes(paymentOption)) {
+				return res
+					.status(400)
+					.json({ message: "Please select only valid payment options!" });
+			}
+
+			const selectedMaterial = await Materials.findOne({
+				name: { $in: material },
+			});
+			// res.status(201).json(selectedMaterial.price);
+
+			const subtotal = selectedMaterial.price * quantity;
+			// console.log("Subtotal of the item: ", subtotal);
+			// res.status(201).json(subtotal);
+
+			// const subtotal = furniture.price * quantity;
+
+			// Calculate shipping fee (you can adjust this logic as needed)
+			const shippingFees = {
+				Boac: 500,
+				Mogpog: 700,
+				Gasan: 500,
+				Buenavista: 800,
+				Santa_Cruz: 3000,
+				Torrijos: 3000,
+			};
+			const shippingAddressObj = JSON.parse(shippingAddress);
+			const municipality = shippingAddressObj.municipality;
+			const shippingFee = shippingFees[municipality] || 0;
+
+			let balance;
+			if(paymentOption === "Partial Payment"){
+				balance = subtotal /2;
+			}
+
+			// console.log("Total amount of the furniture is ", subtotal);
+			// console.log("Remaining amount of the furniture is divided by 2 ", balance);
+
+			// Calculate total amount
+			const totalAmount = balance + shippingFee;
+			const remainingBalance = balance;
+			// console.log(
+			// 	`Shipping fee is ${shippingFee} + ${subtotal} = total amount of ${totalAmount}`
+			// );
+			// res.status(201).json(shippingFee);
+
+			let proofOfPayment;
+			if (req.file) {
+				proofOfPayment = req.file.buffer.toString("base64");
+			}
+
+			const preOrder = await Order.preOrder(
+				user,
+				furniture,
+				material,
+				color,
+				size,
+				quantity,
+				paymentMethod,
+				proofOfPayment,
+				paymentOption,
+				shippingAddress,
+				shippingFee,
+				deliveryMode,
+				expectedDelivery,
+				subtotal,
+				totalAmount,
+				remainingBalance,
+			);
+
+			await preOrder.save();
+
+			await User.findByIdAndUpdate(userId, {
+				$push: { orders: preOrder._id, proofOfPayment },
+			});
+
+			// console.log(preOrder);
+			return res
+				.status(201)
+				.json({ message: "Pre-order was created!", preOrder });
+		} catch (error) {
+			console.log("Error creating pre-order:", error);
+			res.status(500).json({ message: "Server error!" });
+		}
+	},
+
 	// Get user's orders
 	getUserOrders: async (req, res) => {
 		try {
 			const userId = req.user._id;
-			const orders = await Order.find({ user: userId })
-				.populate("items.furniture user.firstname")
+			const orders = await Order.find({user: userId})
+				.populate("items.furniture")
+				.populate( "user.firstname")
 				.sort({ createdAt: -1 });
 
 			res.status(200).json(orders);
@@ -89,10 +246,11 @@ const orderController = {
 		try {
 			const { orderId } = req.params;
 			const userId = req.user._id;
-			const order = await Order.findById(orderId)
-			.populate('user')
-			.populate('items.furniture');
 
+			// Fetch the order
+			const order = await Order.findById(orderId).populate("user"); // Always populate user first
+
+			// Check if the order exists
 			if (!order) {
 				return res.status(404).json({
 					error: "Order not found",
@@ -106,9 +264,17 @@ const orderController = {
 				});
 			}
 
+			// Conditionally populate based on order type
+			if (order.type === "Pre-Order") {
+				await order.populate("furniture");
+			} else {
+				await order.populate("items.furniture");
+			}
+
+			// Send the populated order as response
 			res.status(200).json(order);
 		} catch (error) {
-			console.log("Error fetching order : ",error)
+			console.log("Error fetching order: ", error);
 			res.status(500).json({
 				error: "Server error!",
 			});
@@ -178,109 +344,6 @@ const orderController = {
 				success: false,
 				message: "Error fetching all orders",
 				error: error.message,
-			});
-		}
-	},
-
-	createDirectOrder: async (req, res) => {
-		try {
-			const { paymentMethod } = req.body;
-			const userId = req.user._id;
-			const { furnitureId } = req.params;
-			const { quantity = 1 } = req.body;
-
-			// Validate that payment method is provided
-			if (!paymentMethod) {
-				return res.status(400).json({
-					success: false,
-					message: "Please select a payment method to proceed.",
-				});
-			}
-
-			// For specific payment methods, ensure proof of payment is provided
-			if (["GCash", "Maya"].includes(paymentMethod)) {
-				if (!req.file) {
-					return res.status(400).json({
-						success: false,
-						message: "Please upload proof of payment for the selected method.",
-					});
-				}
-			}
-
-			// Check if furniture exists and has sufficient stock
-			const furniture = await Furniture.findById(furnitureId);
-			if (!furniture) {
-				return res.status(404).json({
-					success: false,
-					message: "Furniture not found!",
-				});
-			}
-
-			if (furniture.stockQuantity < quantity) {
-				return res.status(400).json({
-					success: false,
-					message: `Insufficient stock. Only ${furniture.stockQuantity} units available.`,
-				});
-			}
-
-			// Prepare order data
-			const orderData = {
-				userId,
-				items: [
-					{
-						furnitureId,
-						quantity,
-					},
-				],
-				paymentMethod,
-				proofOfPayment: req.file
-					? req.file.buffer.toString("base64")
-					: undefined
-			};
-
-			// Create the order using the model's static method
-			const order = await Order.createDirectOrder(orderData);
-
-			// Update furniture stock
-			await Furniture.findByIdAndUpdate(furnitureId, {
-				$inc: { stockQuantity: -quantity },
-			});
-
-			// Send success response
-			res.status(201).json({
-				success: true,
-				message: "Order created successfully",
-				order
-			});
-		} catch (error) {
-			console.error("Error in creating direct order:", error);
-
-			// Handle specific error cases
-			if (error.message.includes("Missing required fields")) {
-				return res.status(400).json({
-					success: false,
-					message: "Missing required order information",
-				});
-			}
-
-			if (error.message.includes("Insufficient stock")) {
-				return res.status(400).json({
-					success: false,
-					message: error.message,
-				});
-			}
-
-			if (error.message.includes("User not found")) {
-				return res.status(404).json({
-					success: false,
-					message: "User account not found",
-				});
-			}
-
-			// Generic error response
-			res.status(500).json({
-				success: false,
-				message: "Server error while processing your order",
 			});
 		}
 	},

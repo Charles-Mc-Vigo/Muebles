@@ -1,7 +1,8 @@
 # Muebles Web Application
 
 ## Overview
-Muebles is an eCommerce web application developed as a capstone project for the JCKAME Furniture Shop. The platform allows users to upload their own design pictures for furniture and customize raw furniture models such as chairs, tables, and doors by applying their desired designs as skins.
+
+Muebles is a modern eCommerce web application developed as a capstone project for JCKAME Furniture Shop. It offers an interactive customization tool that allows users to design their ideal furniture pieces, adding a personalized touch to their shopping experience. This feature includes a dynamic 3D view, where users can rotate and interact with the furniture model as they choose from various design options. Changes update in real-time, providing a seamless and immersive way for customers to visualize and refine their furniture choices before making a purchase.
 
 ## Features
 - **Image Upload**: Users can upload pictures of their desired furniture design.

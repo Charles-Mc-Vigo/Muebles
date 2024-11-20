@@ -7,7 +7,7 @@ const  LandingPage = () => {
 	return(
 		<div>
 			<div> 
-				<Header /> </div>
+			<Header /> </div>
 			<div>
 				<Hero/>
 			</div>

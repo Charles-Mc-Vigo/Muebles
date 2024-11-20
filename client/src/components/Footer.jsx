@@ -11,7 +11,7 @@ const Footer = () => {
   };
   return (
     <footer className="bg-gray-200 p-10">
-      <div className="container  mx-auto grid grid-cols-1 md:grid-cols-5 gap-15 ">
+      <div className="container mx-auto grid grid-cols-1 md:grid-cols-5 gap-15">
         {/* Information */}
         <div>
           <h3 className="font-bold mb-4">Information</h3>
@@ -90,14 +90,11 @@ const Footer = () => {
               placeholder="jckamewoodworks@gmail.com"
               className="p-2 w-full border border-gray-300 rounded mb-4"
             />
-            <Link to="/signup" className="bg-teal-500 text-white py-2 px-4 rounded inline-block"
+            <Link to="#" onClick={()=>alert("Unavailable for now hihiih")} className="bg-teal-500 text-white py-2 px-4 rounded inline-block"
             >
-              Sign up
+              Subscribe
             </Link>
           </div>
-          {/* <div className="mt-4">
-            <img src="path-to-ps-award-logo.png" alt="PS Award" className="w-full"/>
-          </div> */}
         </div>
 
         {/* Follow us */}

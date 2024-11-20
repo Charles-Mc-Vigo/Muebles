@@ -6,14 +6,28 @@ const furnitureTypeSchema = new mongoose.Schema({
     required:true,
     unique:true
   },
-  estimatedProductionDays:{
-    type:Number
+  ECT:{
+    type:Number,
+    required:true,
+    default:1
   },
   categoryId:{
     type:mongoose.Schema.ObjectId,
     ref:'Category',
     required:true
   },
+  materials:[
+    {
+      type:mongoose.Schema.ObjectId,
+      ref:"Materials"
+    }
+  ],
+  sizes:[
+    {
+      type:mongoose.Schema.ObjectId,
+      ref:"Size"
+    }
+  ],
   isArchived:{
     type:Boolean,
     default:false

@@ -80,7 +80,7 @@ const Logout = ({ isAdmin, isUser }) => {
       {isUser && (
         <span
           onClick={handleLogout}
-          className="text-red-600 text-xl font-semibold cursor-pointer mr-2 "
+          className="text-red-500  text-xl font-semibold cursor-pointer mr-2 "
         >
           {loading ? "Logging out..." : "Logout"}
         </span>

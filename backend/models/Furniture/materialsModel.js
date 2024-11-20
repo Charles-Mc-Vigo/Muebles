@@ -1,22 +1,36 @@
 const mongoose = require('mongoose');
 
 const materialSchema = new mongoose.Schema({
-  name:{
-    type:String,
-    required:true,
-    unique:true
+  furnitureTypeId: {
+    type: mongoose.Schema.ObjectId,
+    ref: "FurnitureType",
+    required: true,
   },
-  stocks:{
-    type:Number,
-    required:true
+  name: {
+    type: String,
+    required: true
   },
-  isArchived:{
-    type:Boolean,
-    default:false
+  price: {
+    type: Number,
+    required: true,
+    default: 0,
+  },
+  stocks: {
+    type: Number,
+    required: true,
+    default: 1,
+  },
+  isArchived: {
+    type: Boolean,
+    default: false,
   }
-},{
-  timestamps:true
-})
+}, {
+  timestamps: true,
+});
 
-const Materials = mongoose.model("Materials",materialSchema);
+// Compound index to allow same name for different furnitureTypeId
+materialSchema.index({ name: 1, furnitureTypeId: 1 }, { unique: true });
+
+const Materials = mongoose.model("Materials", materialSchema);
+
 module.exports = Materials;

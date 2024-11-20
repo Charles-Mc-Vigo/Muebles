@@ -2,12 +2,15 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { FaEye, FaEyeSlash } from 'react-icons/fa'; // Import eye icons
 
 const AdminLogin = () => {
   const [admin, setAdmin] = useState({
     email: "",
     password: ""
   });
+  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false); // State for password visibility
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -17,6 +20,7 @@ const AdminLogin = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
       const response = await fetch('http://localhost:3000/api/admin/login', {
         method: 'POST',
@@ -29,14 +33,11 @@ const AdminLogin = () => {
         }),
         credentials: 'include' // This is important for including cookies in the request/response
       });
-
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || "Admin Login failed");
       }
-
       const data = await response.json();
-
       toast.success('Admin Logged in successfully');
       setTimeout(() => {
         navigate('/dashboard');
@@ -45,6 +46,7 @@ const AdminLogin = () => {
       console.error("Admin Login error", error.message);
       toast.error(error.message || "Admin Login failed");
     }
+    setLoading(false);
   };
 
   return (
@@ -60,19 +62,32 @@ const AdminLogin = () => {
           onChange={handleChange}
           className="bg-slate-100 p-3 rounded-lg"
         />
-        <input
-          type="password"
-          placeholder="Password"
-          id="password"
-          required
-          onChange={handleChange} 
-          className="bg-slate-100 p-3 rounded-lg"
-        />
+        <div className="relative">
+          <input
+            type={showPassword ? "text" : "password"}
+            placeholder="Password"
+            id="password"
+            required
+            onChange={handleChange}
+            className="bg-slate-100 p-3 rounded-lg w-full"
+          />
+          <button
+            type="button"
+            className="absolute right-3 top-1/2 transform -translate-y-1/2"
+            onClick={() => setShowPassword(!showPassword)}
+          >
+            {showPassword ? <FaEyeSlash className="text-gray-500" /> : <FaEye className="text-gray-500" />}
+          </button>
+        </div>
         <button
           type="submit"
-          className="p-3 bg-slate-500 rounded-lg text-slate-50 font-bold uppercase hover:opacity-80 disabled:opacity-70"
+          className={`py-4 px-24 rounded-lg mx-auto text-white font-bold uppercase hover:opacity-80 disabled:opacity-70 ${
+            loading ? "bg-blue-400" : "bg-blue-500"
+          }`}
+          style={{ display: "block", margin: "20px auto 0" }}
+          disabled={loading}
         >
-          Log In
+          {loading ? "Logging in..." : "Log in"}
         </button>
       </form>
     </div>

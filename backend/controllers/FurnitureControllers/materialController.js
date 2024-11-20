@@ -1,22 +1,48 @@
 const Materials = require('../../models/Furniture/materialsModel');
+const FurnitureType = require('../../models/Furniture/furnitureTypeModel');
 
-// Add new material
 exports.addMaterials = async (req, res) => {
   try {
-    const { name, stocks } = req.body;
+    const { name, price, stocks, furnitureTypeId } = req.body;
 
-    if (!name || !stocks) {
-      return res.status(401).json({ message: "Material's name and stocks are required!" });
+    // Validate required fields
+    if (!name || !price || !stocks || !furnitureTypeId) {
+      return res.status(401).json({ message: "Material's name, price, stocks, and furnitureTypeId are required!" });
     }
 
-    const newMaterial = new Materials({ name, stocks });
+    // Check if material with the same name already exists for the same furnitureTypeId
+    const existingMaterial = await Materials.findOne({ name, furnitureTypeId });
+    if (existingMaterial) {
+      return res.status(400).json({ message: `Material with name '${name}' already exists under this FurnitureType!` });
+    }
+
+    // Create new material
+    const newMaterial = new Materials({ name, price, stocks, furnitureTypeId });
     await newMaterial.save();
-    return res.status(201).json({ message: `${newMaterial.name} added successfully!` });
+
+    // Find the corresponding FurnitureType and add materialId to its materials array
+    const furnitureType = await FurnitureType.findById(furnitureTypeId);
+    if (!furnitureType) {
+      return res.status(404).json({ message: "FurnitureType not found!" });
+    }
+
+    // Add the new material to the materials array of the FurnitureType (using addToSet to avoid duplicates)
+    furnitureType.materials.addToSet(newMaterial._id);  // addToSet avoids duplicates
+    await furnitureType.save();  // Save the updated FurnitureType
+
+    // Return the response with the newly added material and updated FurnitureType
+    return res.status(201).json({
+      message: `${newMaterial.name} added successfully!`,
+      newMaterial,
+      updatedFurnitureType: furnitureType,
+    });
   } catch (error) {
     console.log("Error adding material: ", error);
     return res.status(500).json({ message: "Server error" });
   }
 };
+
+
 
 // Get specific material by ID
 exports.getSpecificMaterial = async (req, res) => {
@@ -37,6 +63,7 @@ exports.getSpecificMaterial = async (req, res) => {
 exports.getMaterials = async (req, res) => {
   try {
     const materials = await Materials.find({ isArchived: false });
+
     if (materials.length === 0) {
       return res.status(200).json({ message: "No materials found!" });
     }
@@ -47,6 +74,7 @@ exports.getMaterials = async (req, res) => {
     return res.status(500).json({ message: "Server error" });
   }
 };
+
 
 // Get all archived materials
 exports.ArchivedMaterials = async (req, res) => {
@@ -104,19 +132,29 @@ exports.editMaterial = async (req, res) => {
     const material = await Materials.findById(materialId);
     if (!material) return res.status(404).json({ message: "Material not found!" });
 
-    const { name, stocks } = req.body;
-    if (!name || !stocks) return res.status(400).json({ message: "All fields are required! : name, stocks" });
+    if(material.stocks == null){
+      material.stocks = 1;
+    }
+    if(material.price == null){
+      material.price = 0;
+    }
+
+    const { name, price, stocks, furnitureTypeId} = req.body;
 
     // Check if any changes were made
-    if (name === undefined && stocks === undefined) {
+    if (name === undefined && price === undefined && stocks === undefined) {
       return res.status(400).json({ message: "No changes made!" });
     }
 
     material.name = name;
+    material.price = price;
     material.stocks = stocks;
-    if (name !== undefined && material.name !== name) material.name = name;
-    if (stocks !== undefined && material.stocks !== stocks) material.stocks = stocks;
+    material.furnitureTypeId = furnitureTypeId;
 
+    if (name !== undefined && material.name !== name) material.name = name;
+    if (price !== undefined && material.price !== price) material.price = price;
+    if (stocks !== undefined && material.stocks !== stocks) material.stocks = stocks;
+    if (furnitureTypeId !== undefined && material.stocks !== furnitureTypeId) material.furnitureTypeId = furnitureTypeId;
 
     await material.save();
     return res.status(200).json({ message: `${material.name} has been edited successfully!` });
