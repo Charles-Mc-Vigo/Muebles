@@ -23,7 +23,7 @@ const ProductManagement = () => {
 		materials: [],
 		colors: [],
 		sizes: [],
-		// price: "",
+		price: "",
 	});
 
 	const fetchData = async () => {
@@ -272,7 +272,7 @@ const ProductManagement = () => {
 		formData.append("category", newFurniture.category);
 		formData.append("furnitureType", newFurniture.furnitureType);
 		formData.append("description", newFurniture.description);
-		// formData.append("price", newFurniture.price);
+		formData.append("price", newFurniture.price);
 		newFurniture.materials.forEach((material) => {
 			formData.append("materials[]", material);
 		});
@@ -388,15 +388,17 @@ const ProductManagement = () => {
 							required
 							className="border rounded p-2 w-full"
 						/>
-						<div className="p-2">
-							<p className="italic font-light p-2">
-								Note: Furniture price will change based on the material cost.
-							</p>
-							<p id="price" className="border rounded p-2 w-full bg-gray-100">
-								{newFurniture.price ||
-									"Please select the available materials for this furniture"}
-							</p>
-						</div>
+						{/* Price Input */}
+						<input
+							id="price"
+							type="number"
+							name="price"
+							placeholder="Price"
+							value={newFurniture.price}
+							onChange={handleInputChange}
+							required
+							className="border rounded p-2 w-full"
+						/>
 						{/* Materials */}
 						<div className="mt-4 mb-4 bg-slate-200 rounded-md px-5 py-2">
 							<label className="block font-semibold">Materials:</label>

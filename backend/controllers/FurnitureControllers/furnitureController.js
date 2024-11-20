@@ -46,7 +46,7 @@ exports.createFurniture = async (req, res) => {
 				materials,
 				colors,
 				sizes,
-				// price,
+				price,
 			} = req.body;
 
 			// Validation for required fields
@@ -118,7 +118,7 @@ exports.createFurniture = async (req, res) => {
 				materials: existingMaterials.map((material) => material._id),
 				colors: existingColors.map((color) => color._id),
 				sizes: existingSizes.map((size) => size._id),
-				// price,
+				price,
 			});
 
 			await newFurniture.save();
