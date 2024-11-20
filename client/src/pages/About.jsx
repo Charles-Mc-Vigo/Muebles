@@ -1,38 +1,54 @@
-import React from "react";
+import React, { useRef } from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import { Link } from 'react-router-dom';
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
 const About = () => {
-  const carouselSettings = {
+  const settings = {
     dots: true,
     infinite: true,
     speed: 500,
     slidesToShow: 1,
     slidesToScroll: 1,
-    arrows: false,
+    responsive: [
+      {
+        breakpoint: 640,
+        settings: {
+          slidesToShow: 2,
+        },
+      },
+      {
+        breakpoint: 1024,
+        settings: {
+          slidesToShow: 3,
+        },
+      },
+    ],
   };
 
   return (
-    <div className="bg-gray-50 font-poppins">
-      <Header isLogin={true} cartCount={true} />
-      <div>
-        
-      </div>
-      {/* About Section */}
-      <section className="bg-white rounded-lg shadow-md p-6 sm:p-8 w-full h-auto flex flex-col justify-center items-center my-5">
-        <div className="mb-6 sm:mb-8 text-left flex flex-col justify-center items-center">
-          <h2 className="text-2xl sm:text-3xl font-semibold text-black mb-4 text-center">
-            About Us
-          </h2>
-          <div className="flex flex-col items-center h-full text-center">
-            <div className="w-full max-w-2xl px-4 sm:px-6 text-justify">
-              <p className="text-black text-base sm:text-lg">
+    <div className="About-page">
+      <Header />
+      <section className="flex flex-col items-center p-5 bg- ">
+        <div className="w-full max-w-4xl p-10 rounded-xl">
+          <h1 className="text-4xl font-bold font-serif ">The JCKAME Story</h1>
+          <div className="w-2/5 h-1 bg-teal-500 mb-6"></div>
+          <div className="flex flex-col md:flex-row gap-8">
+            <img
+              src="/landingimage/LOGO.jpg"
+              alt="JC Kame Logo"
+              className="w-full md:w-1/2 lg:w-1/3 p-1 object-contain  rounded-md "
+            />
+            <div className="text-black text-xl sm:text-lg text-justify">
+              <p>
                 Established in 2003, JC Kame Wood Furniture Shop has been a
                 trusted name in crafting high-quality, custom wood furniture in
                 Cawit, Boac, Marinduque, with over five decades of experience.
+              </p>
+              <p className="mt-4">
                 We specialize in creating durable and elegant furniture that
                 reflects the beauty of natural wood. Our commitment to
                 craftsmanship and customer satisfaction has made us a go-to
@@ -44,198 +60,179 @@ const About = () => {
             </div>
           </div>
         </div>
-        <div className="w-full max-w-lg flex justify-center border-2 border-solid border-green-300">
-          <img
-            src="/landingimage/LOGO.jpg"
-            alt="JC Kame Logo"
-            className="w-[150px] sm:w-[200px] h-auto"
-          />
+      </section>
+      <div className="justify-evenly flex w-full  h-1/2 bg-teal-500 mb-5">
+        <h1 className="text-3xl font-bold border-r-2 p-2 border-teal-600 my-4 ">
+          100+
+          <p className="text-xl font-normal">Customer Satisfied</p>
+        </h1>
+        <h1 className="text-3xl font-bold border-r-2 p-2 border-teal-600 my-4">
+          80%
+          <p className="text-xl font-normal">Ratings of our Services</p>
+        </h1>
+        <h1 className="text-3xl font-bold border-r-2 p-2 border-teal-600 my-4 ">
+          70%
+          <p className="text-xl font-normal">Customer Retention Success</p>
+        </h1>
+      </div>
+      {/* core values */}
+      <section className="flex flex-col items-center justify-center ">
+        <div className="flex flex-col text-center  items-center max-w-4xl mb-5">
+          <h1 className="text-3xl font-bold mb-2">Our Core Values</h1>
+          <p className="text-lg text-black">
+            We take pride in embodying values that guide every aspect of our
+            work. From maintaining honesty and trust to ensuring unparalleled
+            craftsmanship, we strive to deliver furniture that enriches your
+            living spaces. Rooted in passion, transparency, and dedication to
+            excellence, we aim to forge lasting connections with our customers
+            while creating timeless pieces that reflect our unwavering
+            commitment to quality and integrity.
+          </p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 p-2 gap-5 bg-teal-300 w-full ">
+          <div className="flex flex-col items-center text-center bg-white p-4 rounded-lg shadow-md hover:scale-90 transition-transform duration-300 ">
+            <img
+              src="/Advertisement/aboutsicon/Integrity.png"
+              alt="Integrity"
+              className="h-24 sm:h-32 "
+            />
+            <h4 className="font-bold text-xl sm:text-2xl">Integrity</h4>
+            <p className="text-black text-base sm:text-lg">
+              We operate with honesty and transparency in all aspects of our
+              business practices.
+            </p>
+          </div>
+
+          <div className="flex flex-col items-center text-center bg-white p-2 rounded-lg shadow-md hover:scale-90 transition-transform duration-300">
+            <img
+              src="/Advertisement/aboutsicon/Quality.png"
+              alt="Quality"
+              className="h-24 sm:h-32 "
+            />
+            <h4 className="font-bold text-xl sm:text-2xl">Quality</h4>
+            <p className="text-black text-base sm:text-lg">
+              We are dedicated to creating exceptional, well-crafted furniture
+              that stands the test of time.
+            </p>
+          </div>
+
+          <div className="flex flex-col items-center text-center bg-white  rounded-lg shadow-md hover:scale-90 transition-transform duration-300">
+            <img
+              src="/Advertisement/aboutsicon/Trust.png"
+              alt="Trust"
+              className="h-24 sm:h-32 "
+            />
+            <h4 className="font-bold text-xl sm:text-2xl">Trust</h4>
+            <p className="text-black text-base sm:text-lg">
+              Trust is the foundation of our business. We strive to earn your
+              trust with every piece we make.
+            </p>
+          </div>
+
+          <div className="flex flex-col items-center text-center bg-white  rounded-lg shadow-md hover:scale-90 transition-transform duration-300">
+            <img
+              src="/Advertisement/aboutsicon/Passion.png"
+              alt="Passion"
+              className="h-24 sm:h-32 "
+            />
+            <h4 className="font-bold text-xl sm:text-2xl">Passion</h4>
+            <p className="text-black text-base sm:text-lg">
+              We are passionate about turning raw materials into lasting
+              furniture that enhances the beauty of your home.
+            </p>
+          </div>
+
+          <div className="flex flex-col items-center text-center bg-white  rounded-lg shadow-md hover:scale-90 transition-transform duration-300">
+            <img
+              src="/Advertisement/aboutsicon/Craftmanship.png"
+              alt="Craftsmanship"
+              className="h-24 sm:h-32 "
+            />
+            <h4 className="font-bold text-xl sm:text-2xl">Craftsmanship</h4>
+            <p className="text-black text-base sm:text-lg">
+              Each piece is crafted with precision and care, combining
+              traditional methods with modern design.
+            </p>
+          </div>
+          <div className="flex flex-col items-center text-center bg-white rounded-lg shadow-md hover:scale-90 transition-transform duration-300">
+            <img
+              src="/Advertisement/aboutsicon/Security.png"
+              alt="Security"
+              className="h-24 sm:h-32 "
+            />
+            <h4 className="font-bold text-xl sm:text-2xl">Security</h4>
+            <p className="text-black text-base sm:text-lg mt-1">
+              We value the security of our transactions and ensure our customers
+              feel safe doing business with us.
+            </p>
+          </div>
         </div>
       </section>
 
-      {/* Commitment Section */}
-      <section className="bg-white p-6 sm:p-8 mb-6 sm:mb-8 border-t-2 border-b-2 border-green-300 w-full h-auto mx-auto">
-        <div className="mb-6 sm:mb-8 text-center">
-          <h3 className="text-2xl sm:text-3xl font-bold text-black mb-2">
-            Our Commitment
-          </h3>
-          <div className="hidden md:flex flex-col md:flex-row justify-between items-center space-y-6 md:space-x-6 text-lg md:text-2xl text-black">
-            <div className="flex-1 flex flex-col items-center">
-              <img
-                src="/Advertisement/aboutsicon/Affordable.jpg"
-                alt="Affordable"
-                className="h-24 sm:h-32 m-2"
-              />
-              <p className="font-semibold">Affordable</p>
-            </div>
-            <div className="flex-1 flex flex-col items-center">
-              <img
-                src="/Advertisement/aboutsicon/Durable.png"
-                alt="Durable"
-                className="h-24 sm:h-32 m-2"
-              />
-              <p className="font-semibold">Durable</p>
-            </div>
-            <div className="flex-1 flex flex-col items-center">
-              <img
-                src="/Advertisement/aboutsicon/Reliable.png"
-                alt="Reliable"
-                className="h-24 sm:h-32 m-2"
-              />
-              <p className="font-semibold">Reliable</p>
-            </div>
-          </div>
-          <div className="md:hidden ">
-            <Slider {...carouselSettings}>
-              <div className="flex flex-col items-center text-center ">
+      <section className="flex flex-col items-center p-5 bg-white ">
+        <div className="w-full max-w-4xl p-10 rounded-xl">
+          <h1 className="text-4xl font-bold font-serif">Our Commitment</h1>
+          <div className="h-1 w-2/5 bg-teal-500 mb-6"></div>
+          <div className="flex flex-col md:flex-row-reverse">
+            <Slider {...settings} className="w-full md:w-2/5">
+              <div>
                 <img
-                  src="/Advertisement/aboutsicon/Affordable.jpg"
+                  src="/Advertisement/carouselimages/livingroom.png"
                   alt="Affordable"
-                  className="h-24 sm:h-32 m-2"
+                  className="w-full h-64 sm:h-80 md:h-96 object-cover p-1 rounded-xl"
                 />
-                <p className="font-semibold">Affordable</p>
               </div>
-              <div className="flex flex-col items-center text-center">
+              <div>
                 <img
-                  src="/Advertisement/aboutsicon/Durable.png"
+                  src="/Advertisement/carouselimages/diningroom.png"
                   alt="Durable"
-                  className="h-24 sm:h-32 m-2"
+                  className="w-full h-64 sm:h-80 md:h-96 object-cover p-1 rounded-xl"
                 />
-                <p className="font-semibold">Durable</p>
               </div>
-              <div className="flex flex-col items-center text-center">
+              <div>
                 <img
-                  src="/Advertisement/aboutsicon/Reliable.png"
+                  src="/Advertisement/carouselimages/image2.jpg"
                   alt="Reliable"
-                  className="h-24 sm:h-32 m-2"
+                  className="w-full h-64 sm:h-80 md:h-96 object-cover p-1 rounded-xl"
                 />
-                <p className="font-semibold">Reliable</p>
+              </div>
+              <div>
+                <img
+                  src="/Advertisement/carouselimages/image1.jpg"
+                  alt="Reliable"
+                  className="w-full h-64 sm:h-80 md:h-96 object-cover p-1 rounded-xl"
+                />
               </div>
             </Slider>
-          </div>
-        </div>
-      </section>
-
-      {/* Core Values */}
-      <section className="bg-white rounded-lg shadow-md p-4 sm:p-6 border-b-2 w-full h-auto max-w-8xl mx-auto space-y-8 text-justify">
-        <div className="flex flex-col md:flex-row justify-between  space-y-8 md:space-x-8">
-          {/* Left Side */}
-          <div className="grid grid-cols-1 gap-8 w-full md:w-1/2 items-center">
-            <div className="flex items-start">
-              <img
-                src="/Advertisement/aboutsicon/Integrity.png"
-                alt="Integrity"
-                className="h-24 sm:h-32 mr-4"
-              />
-              <div className="max-w-xs">
-                <h4 className="font-bold text-xl sm:text-2xl">Integrity</h4>
-                <p className="text-black text-base sm:text-lg">
-                  We operate with honesty and transparency in all aspects of our
-                  business practices.
-                </p>
-              </div>
-            </div>
-            <div className="flex items-start">
-              <img
-                src="/Advertisement/aboutsicon/Quality.png"
-                alt="Quality"
-                className="h-24 sm:h-32 mr-4"
-              />
-              <div className="max-w-xs">
-                <h4 className="font-bold text-xl sm:text-2xl">Quality</h4>
-                <p className="text-black text-base sm:text-lg">
-                  We are dedicated to creating exceptional, well-crafted
-                  furniture that stands the test of time.
-                </p>
-              </div>
-            </div>
-            <div className="flex items-start">
-              <img
-                src="/Advertisement/aboutsicon/Trust.png"
-                alt="Trust"
-                className="h-24 sm:h-32 mr-4"
-              />
-              <div className="max-w-xs">
-                <h4 className="font-bold text-xl sm:text-2xl">Trust</h4>
-                <p className="text-black text-base sm:text-lg">
-                  Trust is the foundation of our business. We strive to earn
-                  your trust with every piece we make.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Right Side */}
-          <div className="grid grid-cols-1 gap-8 w-full md:w-1/2">
-            <div className="flex items-start">
-              <div className="max-w-xs">
-                <h4 className="font-bold text-xl sm:text-2xl">Passion</h4>
-                <p className="text-black text-base sm:text-lg">
-                  We are passionate about turning raw materials into lasting
-                  furniture that enhances the beauty of your home.
-                </p>
-              </div>
-              <img
-                src="/Advertisement/aboutsicon/Passion.png"
-                alt="Passion"
-                className="h-24 sm:h-32 ml-4"
-              />
-            </div>
-            <div className="flex items-start">
-              <div className="max-w-xs">
-                <h4 className="font-bold text-xl sm:text-2xl">Craftsmanship</h4>
-                <p className="text-black text-base sm:text-lg">
-                  Each piece is crafted with precision and care, combining
-                  traditional methods with modern design.
-                </p>
-              </div>
-              <img
-                src="/Advertisement/aboutsicon/Craftmanship.png"
-                alt="Craftsmanship"
-                className="h-24 sm:h-32 ml-4"
-              />
-            </div>
-            <div className="flex items-start">
-              <div className="max-w-xs">
-                <h4 className="font-bold text-xl sm:text-2xl">Security</h4>
-                <p className="text-black text-base sm:text-lg">
-                  We value the security of our transactions and ensure our
-                  customers feel safe doing business with us.
-                </p>
-              </div>
-              <img
-                src="/Advertisement/aboutsicon/Security.png"
-                alt="Security"
-                className="h-24 sm:h-32 ml-4"
-              />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Store Location */}
-      <section className="bg-white rounded-lg shadow-md p-6 sm:p-8 w-full h-auto flex flex-col justify-center items-center">
-        <div className="mb-6 sm:mb-8 text-left flex flex-col justify-center items-center">
-          <h2 className="text-2xl sm:text-3xl font-semibold text-black mb-4 text-center">
-            Store Location
-          </h2>
-          <div className="flex flex-col items-center h-full text-center">
-            <div className="w-full max-w-2xl px-4 sm:px-6 text-justify">
-              <p className="text-black text-base sm:text-lg">
-                Cawit-Tugos Barangay Rd, Boac, Marinduque
+            <div className="text-black text-xl sm:text-lg text-justify md:w-3/5 p-4">
+              <p>
+                At JCKAME, we are passionate about crafting wooden furniture
+                that combines beauty, durability, and functionality. Each piece
+                is carefully designed by skilled artisans using high-quality
+                materials to ensure it stands the test of time. We believe that
+                great furniture should be accessible, offering exceptional value
+                without compromising on craftsmanship. Our commitment to quality
+                and design is matched by our dedication to providing a seamless
+                customer experience. At JCKAME, we aim to earn your trust by
+                delivering furniture that not only meets but exceeds your
+                expectations.
               </p>
-              <p>Open: Mon-Sun 7:00 am - 4:30pm</p>
-              <p>Phone No. 0945 270 3377</p>
             </div>
           </div>
         </div>
-        <div className="w-full max-w-lg flex justify-center border-2 border-solid border-green-300">
-          <img
-            src="/landingimage/LOGO.jpg"
-            alt="JC Kame Logo"
-            className="w-[150px] sm:w-[200px] h-auto"
-          />
-        </div>
+      </section>
+
+      <section
+        className="flex h-screen  items-center justify-center bg-cover bg-center"
+        style={{
+          backgroundImage: "url('/Advertisement/carouselimages/JCAKME.png')",
+        }}
+      >
+        <Link to="/home">
+        <button className="px-6  py-3 bg-transparent border-white border mt-20 text-white font-bold text-lg rounded-lg shadow-md hover:bg-teal-600 transition-all">
+          Shop Now
+        </button>
+        </Link>
       </section>
 
       <Footer />

@@ -9,18 +9,18 @@ const AccordionItem = ({ question, answer }) => {
   };
 
   return (
-    <div className="border-b border-green-700  ">
+    <div className="border-b border-teal-500  ">
       <button
         onClick={toggleAccordion}
         className="flex justify-between items-center w-full py-4 text-left focus:outline-none overflow-hidden "
       >
-        <h3 className="text-xl font-medium text-black font-sans">{question}</h3>
+        <h3 className="text-2xl font-medium text-black font-sans">{question}</h3>
         <span className="text-lg text-black">
           {isOpen ? <FaChevronUp /> : <FaChevronDown />}
         </span>
       </button>
       {isOpen && (
-        <div className="py-4 text-black font-sans text-lg ">
+        <div className="py-4 text-black font-sans text-xl ">
           {answer}
         </div>
       )}

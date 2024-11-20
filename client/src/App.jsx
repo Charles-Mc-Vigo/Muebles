@@ -44,6 +44,7 @@ import ViewUserOrder from "./components/ViewUserOrder";
 import ViewPendingRequest from "./pages/ViewPendingRequest";
 import ErrorBoundary from "./components/ErrorBoundary";
 import PreOrder from "./pages/PreOrder";
+import ReviewPage from "./pages/ReviewPage";
 // import LoadingSpinner from "./components/LoadingSpinner";
 
 
@@ -105,6 +106,8 @@ export default function App() {
 						path="/orders"
 						element={<ProtectedRoute element={ViewOrder} />}
 					/>
+					<Route path="/product-review" element={<ReviewPage />} />
+					{/* <Route path="/create-review" element={<CreateReview />} /> */}
 
 					{/* Admin routes */}
 					<Route path="/admin-login" element={<AdminLogin />} />
@@ -192,6 +195,8 @@ export default function App() {
 							<ProtectedRoute element={ProductManagement} adminOnly={true} />
 						}
 					/>
+					<Route path="/orders/:orderId" element={<ViewUserOrder />} />
+
 					<Route
 						path="/product-customization"
 						element={

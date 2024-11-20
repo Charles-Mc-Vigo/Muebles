@@ -6,6 +6,7 @@
     "react-router-dom": "^6.26.1",
     "react-select": "^5.8.3",
     "react-slider": "^2.0.6",
-    "react-toastify": "^10.0.5"
+    "react-toastify": "^10.0.5",
+    "swiper": "^11.1.14"
   }
 }

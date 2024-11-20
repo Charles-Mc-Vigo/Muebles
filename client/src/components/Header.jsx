@@ -63,7 +63,7 @@ const Header = ({ isLogin, cartCount }) => {
             {/* Logo */}
             <Link
               to="/"
-              className="text-2xl font-bold text-teal-600 whitespace-nowrap"
+              className="text-3xl font-bold text-teal-600 whitespace-nowrap"
             >
               MUEBLES
             </Link>

@@ -179,6 +179,7 @@ const Cart = () => {
 			setLoading(false);
 		}
 	};
+	
 
 	const updateQuantity = async (furnitureId, newQuantity) => {
 		if (newQuantity < 1) {
