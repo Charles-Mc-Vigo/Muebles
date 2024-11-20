@@ -5,9 +5,11 @@ import { FaArrowRightLong, FaArrowLeftLong } from "react-icons/fa6";
 import "react-toastify/dist/ReactToastify.css";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
-import LoadingSpinner from "../components/LoadingSpinner"; // Assuming you have a loading spinner component
+import LoadingSpinner from "../components/LoadingSpinner";
 import { IoMdArrowRoundBack } from "react-icons/io";
 import { TbArrowsExchange2 } from "react-icons/tb";
+import { IoIosArrowDown } from "react-icons/io";
+import { IoIosArrowUp } from "react-icons/io";
 
 const PreOrder = () => {
   const { furnitureId } = useParams();
@@ -31,6 +33,8 @@ const PreOrder = () => {
   const [userInformationVisible, setUserInformationVisible] = useState(false);
   const [paymentOptionVisible, setPaymentOptionVisible] = useState(false);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
+  const [productDescriptionVisible, setProductDescriptionVisible] =
+    useState(false);
   const [price, setPrice] = useState(0);
 
   const shippingFees = {
@@ -278,7 +282,7 @@ const PreOrder = () => {
       <Header isLogin={true} cartCount={true} />
       <div className="flex flex-col lg:flex-row lg:w-full justify-center p-5 gap-5">
         {/* Image Section */}
-        <div className="flex flex-col rounded-xl p-5 border-2 border-teal-600 shadow-lg shadow-gray-300 sm:mb-5 md:mb-5 w-full md:w-1/2 lg:w-1/4 h-[60vh]">
+        <div className="flex flex-col rounded-xl p-5 border-2 border-teal-600 shadow-lg shadow-gray-300 sm:mb-5 md:mb-5 w-full md:w-1/2 lg:w-1/4 h-[70vh]">
           {/* Back Button */}
           <button
             onClick={() => navigate(-1)}
@@ -346,164 +350,360 @@ const PreOrder = () => {
           </div>
         </div>
 
-        {/* Additional Divs */}
-        <div className="flex flex-col rounded-xl p-5 border-2 border-teal-600 shadow-lg shadow-gray-300 w-full md:w-1/2 lg:w-1/4 h-[60vh]">
-          <div>
-            {/* furniture information */}
-            <h1 className="text-3xl mb-2 py-5">{furnitureData.name}</h1>
-            <p className="flex justify-between">
-              <span>Estimated Completion Time: </span>
-              <span>{furnitureData.furnitureType?.ECT || "N/A"} Days</span>
+        {/* 2nd Div */}
+        <div className="flex flex-col  rounded-xl p-5 border-2 border-teal-600 shadow-lg shadow-gray-300 w-full max-w-3/4 md:w-1/2 lg:w-1/4 min-h-[300px]">
+          <div className="">
+            <h1 className="text-2xl font-bold mb-2 ml-2 ">
+              {furnitureData.name}
+            </h1>
+            <p className="flex justify-between ml-2">
+              <span className="text-lg font-normal">
+                Estimated Completion Time:{" "}
+              </span>
+              <span className="text-lg">
+                {furnitureData.furnitureType?.ECT || "N/A"} Days
+              </span>
             </p>
           </div>
-          <div className="mt-2 py-2 bg-slate-200">
-            <div
-              onClick={() => setUserInformationVisible(!userInformationVisible)}
-              className="cursor-pointer border-b-2 border-gray-400 text-black flex justify-between items-center mt-2"
-            >
-              <span className="font-semibold">User Information</span>
-              <span className="text-2xl">
-                {userInformationVisible ? "-" : "+"}
-              </span>
+          <div className=" p-2">
+            {/* product description */}
+            <div>
+              <div
+                onClick={() =>
+                  setProductDescriptionVisible(!productDescriptionVisible)
+                }
+                className="cursor-pointer text-black flex justify-between items-center mt-2"
+              >
+                <span className="font-semibold">Product Description</span>
+                <span className="text-2xl">
+                  {productDescriptionVisible ? (
+                    <IoIosArrowUp />
+                  ) : (
+                    <IoIosArrowDown />
+                  )}
+                </span>
+              </div>
+              {productDescriptionVisible && (
+                <div className="mt-2 p-2 text-black">
+                  <p>
+                    {furnitureData.description || "No description available."}
+                  </p>
+                </div>
+              )}
             </div>
-            {/* User Information Accordion */}
-            {userInformationVisible && (
-              <div className="bg-slate-200 p-2 flex flex-col gap-2">
-                <h1 className="flex justify-between">
-                  Name:{" "}
-                  <span className="mr-2">
-                    {user.firstname} {user.lastname}
+            <div className="mt-2 py-2 ">
+              <div
+                onClick={() =>
+                  setUserInformationVisible(!userInformationVisible)
+                }
+                className="cursor-pointer text-black flex justify-between items-center mt-2"
+              >
+                <span className="font-semibold">User Information</span>
+                <span className="text-2xl">
+                  {userInformationVisible ? (
+                    <IoIosArrowUp />
+                  ) : (
+                    <IoIosArrowDown />
+                  )}
+                </span>
+              </div>
+              {/* User Information Accordion */}
+              {userInformationVisible && (
+                <div className="bg-gray-200 p-2 flex flex-col gap-2 text-black">
+                  <h1 className="flex justify-between">
+                    Name:{" "}
+                    <span className="mr-2">
+                      {user.firstname} {user.lastname}
+                    </span>
+                  </h1>
+                  <h1 className="flex justify-between">
+                    Phone Number:{" "}
+                    <span className="mr-2">{user.phoneNumber}</span>
+                  </h1>
+                  <h1 className="flex justify-between">
+                    Email: <span className="mr-2">{user.email}</span>
+                  </h1>
+                </div>
+              )}
+            </div>
+            {/* Address Section Below */}
+            <div className="text-base flex font-medium py-5 justify-between items-center border-t-2 border-teal-500">
+              <h1>Delivery Address</h1>
+              {user.addresses && user.addresses.length > 0 ? (
+                user.addresses
+                  .filter((address) => address.isDefault)
+                  .map((defaultAddress, index) => (
+                    <p key={index} className="tracking-wide font-light p-2">
+                      {defaultAddress.streetAddress}, {defaultAddress.barangay},{" "}
+                      {defaultAddress.municipality}, {defaultAddress.zipCode}
+                    </p>
+                  ))
+              ) : (
+                <p>No addresses available</p>
+              )}
+              <button
+                onClick={() => navigate("/address/new")}
+                className="text-teal-600 flex items-center font-semibold"
+              >
+                <TbArrowsExchange2 style={{ fontSize: "2rem" }} />
+              </button>
+            </div>
+            {/* Buy Products */}
+            <div className="flex justify-between border-b-2 border-teal-500">
+              <label className="flex justify-between font-semibold mb-5">
+                Quantity
+              </label>
+              <div className="flex items-center gap-2 mb-5">
+                <button
+                  onClick={() => setQuantity((prev) => Math.max(prev - 1, 1))}
+                  className="border border-teal-600 bg-white text-teal-600 px-3 py-1 rounded-l-md hover:bg-teal-600 hover:text-white transition"
+                >
+                  -
+                </button>
+                <span className="border border-teal-600 text-teal-600 px-5 py-1">
+                  {quantity}
+                </span>
+                <button
+                  onClick={() => setQuantity((prev) => Math.min(prev + 1))}
+                  className="border border-teal-600 bg-white text-teal-600 px-3 py-1 rounded-r-md hover:bg-teal-600 hover:text-white transition"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+
+            {/* Colors Section */}
+            <div className="">
+              <label className="flex justify-between font-semibold mb-5">
+                Colors{" "}
+                <span className="font-normal">
+                  {selectedColor || "Select color"}
+                </span>
+              </label>
+              <div className="flex justify-end flex-wrap mb-5 gap-2 ">
+                {furnitureData.colors?.map((color) => (
+                  <div
+                    key={color._id}
+                    onClick={() => handleColorClick(color)}
+                    className={`w-10 h-10 rounded-full border cursor-pointer relative flex items-center justify-center transition-transform transform hover:scale-110 ${
+                      selectedColor === color.name
+                        ? "bg-teal-600 text-black"
+                        : "text-black"
+                    }`}
+                    style={{ backgroundColor: color.hex }}
+                  ></div>
+                ))}
+              </div>
+
+              {/* Materials Section */}
+              <div className="border-b-2 border-teal-500">
+                <h2 className="flex justify-between mb-5 font-semibold">
+                  Materials{" "}
+                  <span className="font-normal">
+                    {selectedMaterial || "Select material"}
                   </span>
-                </h1>
-                <h1 className="flex justify-between">
-                  Phone Number: <span className="mr-2">{user.phoneNumber}</span>
-                </h1>
-                <h1 className="flex justify-between">
-                  Email: <span className="mr-2">{user.email}</span>
-                </h1>
+                </h2>
+                <div className="flex flex-col-1 text-xl space-x-2 mb-5 flex-wrap">
+                  {furnitureData.materials?.map((material) => (
+                    <span
+                      key={material.id}
+                      onClick={() => handleMaterialClick(material)}
+                      className={`border border-teal-600 hover:bg-teal-600 hover:text-white px-2 py-1 rounded-md cursor-pointer transition ${
+                        selectedMaterial === material.name
+                          ? "bg-teal-600 text-white"
+                          : "text-teal-600"
+                      }`}
+                    >
+                      {material.name}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {/* Sizes Section */}
+              <div className="flex flex-col">
+                <h2 className="flex  justify-between font-semibold mb-2">
+                  Sizes{" "}
+                  <span className="font-normal">
+                    {selectedSize || "Select size"}
+                  </span>
+                </h2>
+                <div className="flex text-lg flex-col-2 gap-2 mb-2">
+                  {furnitureData.sizes?.map((size) => (
+                    <span
+                      key={size.id}
+                      onClick={() => handleSizeClick(size)}
+                      className={`border px-2 py-1 rounded-md border-teal-600 hover:bg-teal-600 hover:text-white cursor-pointer transition ${
+                        selectedSize === size.label
+                          ? "bg-teal-600 text-white"
+                          : "text-teal-600"
+                      }`}
+                    >
+                      {size.label}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+          {/* Payment Options */}
+          <div
+            onClick={togglePaymentOptionVisibility}
+            className="mt-5 rounded shadow-md p-2 border-t-2 border-teal-500  cursor-pointer"
+          >
+            <div>
+              <h1 className="flex justify-between font-semibold text-lg">
+                Payment Options
+                <span className="text-2xl">
+                  {paymentOptionVisible ? <IoIosArrowUp /> : <IoIosArrowDown />}
+                </span>
+              </h1>
+            </div>
+
+            {/* Payment Options Content */}
+            {paymentOptionVisible && (
+              <div>
+                {/* Payment Option Buttons */}
+                <div className="flex justify-end gap-5 py-2">
+                  <span
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      setSelectedPaymentOption("Partial Payment");
+                    }}
+                    className={`cursor-pointer border border-teal-600 p-2 rounded font-semibold transition ${
+                      paymentOption === "Partial Payment"
+                        ? "text-white bg-teal-600 border-none"
+                        : "text-teal-500"
+                    }`}
+                  >
+                    Partial Payment
+                  </span>
+                  <span
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      setSelectedPaymentOption("Full Payment");
+                    }}
+                    className={`cursor-pointer border border-teal-600 p-2 rounded font-semibold transition ${
+                      paymentOption === "Full Payment"
+                        ? "text-white bg-teal-600 border-none"
+                        : "text-teal-500"
+                    }`}
+                  >
+                    Full Payment
+                  </span>
+                </div>
+
+                {/* Payment Descriptions */}
+                {paymentOption === "Partial Payment" && (
+                  <div className="p-5 bg-gray-100 rounded mb-5">
+                    <strong>Partial Payment (3-Month Plan):</strong> Pay in
+                    installments with 50% down payment. Remaining balance can be
+                    paid over a minimum of 3 months. A 3% interest applies if
+                    payments are not made on time.
+                  </div>
+                )}
+
+                {paymentOption === "Full Payment" && (
+                  <div className="p-5 bg-gray-100 rounded mb-5">
+                    <strong>Full Payment:</strong> Pay the entire amount upfront
+                    with no additional charges.
+                  </div>
+                )}
+                {/* Payment Method */}
+                <div className="mt-5">
+                  <h3 className="text-lg font-semibold mb-2">
+                    Payment Methods:
+                  </h3>
+                  {/* Display Selected Payment Method */}
+                  {selectedPaymentMethod && (
+                    <p className="mt-5 text-black">
+                      Selected Payment Method:{" "}
+                      <strong>{selectedPaymentMethod}</strong>
+                    </p>
+                  )}
+                </div>
+                {/* Payment Methods Selection */}
+                <div className="flex justify-start text-center bg-gray-100 p-2 gap-5 rounded-md">
+                  {/* GCash Payment */}
+                  <button
+                    value="GCash"
+                    onClick={(event) =>
+                      handlePaymentMethodClick("GCash", event)
+                    }
+                    className={`rounded relative p-2 transition-all duration-200 ${
+                      selectedPaymentMethod === "GCash"
+                        ? "border-2 border-teal-600 bg-white shadow-lg transform scale-105"
+                        : "border border-gray-300 bg-slate-200 hover:border-teal-400"
+                    }`}
+                  >
+                    <img
+                      src="/payment-icon/gcash.png"
+                      alt="Gcash"
+                      className="w-20 h-20 object-contain rounded"
+                    />
+                    {selectedPaymentMethod === "GCash" && (
+                      <div className="absolute -top-2 -right-2 w-6 h-6 bg-teal-600 rounded-full flex items-center justify-center">
+                        <span className="text-white text-sm">✓</span>
+                      </div>
+                    )}
+                  </button>
+
+                  {/* Maya Payment */}
+                  <button
+                    value="Maya"
+                    onClick={(event) => handlePaymentMethodClick("Maya", event)}
+                    className={`rounded relative p-2 transition-all duration-200 ${
+                      selectedPaymentMethod === "Maya"
+                        ? "border-2 border-teal-600 bg-white shadow-lg transform scale-105"
+                        : "border border-gray-300 bg-slate-200 hover:border-teal-400"
+                    }`}
+                  >
+                    <img
+                      src="/payment-icon/maya.jpg"
+                      alt="Maya"
+                      className="w-20 h-20 object-contain rounded"
+                    />
+                    {selectedPaymentMethod === "Maya" && (
+                      <div className="absolute -top-2 -right-2 w-6 h-6 bg-teal-600 rounded-full flex items-center justify-center">
+                        <span className="text-white text-sm">✓</span>
+                      </div>
+                    )}
+                  </button>
+                </div>
+                <div className="mt-5 bg-gray-100 p-5 rounded-md">
+                  <h1 className="text-xl font-semibold mb-2">
+                    Scan the QR Code
+                  </h1>
+                  <div className="flex flex-col lg:flex-row items-start gap-8">
+                    {/* QR Code */}
+                    <div className="flex border-2 border-teal-500 flex-col items-center">
+                      <img
+                        src="/payment-icon/qrcode.png"
+                        alt="QR Code"
+                        className="w-40 h-40 object-contain"
+                      />
+                    </div>
+
+                    {/* Proof of Payment Upload */}
+                    <div className="flex-1 max-w-md pt-5">
+                      <h2 className="font-semibold text-teal-600 mb-4">
+                        Upload Proof of Payment
+                      </h2>
+                      <input
+                        type="file"
+                        onClick={handleInnerClick}
+                        onChange={handleFileUpload}
+                        className="mb-4 w-full border border-teal-500 rounded-md px-3 py-2 text-black focus:border-teal-600 focus:ring-teal-500"
+                      />
+                      {uploadMessage && (
+                        <p className="text-teal-600 mt-2">{uploadMessage}</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
           </div>
-          {/* Address Section Below */}
-          <div className="text-base flex font-medium py-5 justify-between items-center">
-            <h1>Delivery Address</h1>
-            {user.addresses && user.addresses.length > 0 ? (
-              user.addresses
-                .filter((address) => address.isDefault)
-                .map((defaultAddress, index) => (
-                  <p key={index} className="tracking-wide font-light p-2">
-                    {defaultAddress.streetAddress}, {defaultAddress.barangay},{" "}
-                    {defaultAddress.municipality}, {defaultAddress.zipCode}
-                  </p>
-                ))
-            ) : (
-              <p>No addresses available</p>
-            )}
-            <button
-              onClick={() => navigate("/address/new")}
-              className="text-teal-600 flex items-center font-semibold"
-            >
-              <TbArrowsExchange2 style={{ fontSize: "2rem" }} />
-            </button>
-          </div>
-        </div>
-        <div className="flex flex-col rounded-xl p-5 border-2 border-teal-600 shadow-lg shadow-gray-300 w-full md:w-1/2 lg:w-1/4 h-[60vh]">
-          {/* Product Quantity */}
-          <div className="flex justify-between border-b-2 border-gray-300">
-            <label className="flex justify-between font-semibold mb-5">
-              Quantity
-            </label>
-            <div className="flex items-center gap-2 mb-5">
-              <button
-                onClick={() => setQuantity((prev) => Math.max(prev - 1, 1))}
-                className="border border-teal-600 bg-white text-teal-600 px-3 py-1 rounded-l-md hover:bg-teal-600 hover:text-white transition"
-              >
-                -
-              </button>
-              <span className="border border-teal-600 text-teal-600 px-5 py-1">
-                {quantity}
-              </span>
-              <button
-                onClick={() => setQuantity((prev) => Math.min(prev + 1))}
-                className="border border-teal-600 bg-white text-teal-600 px-3 py-1 rounded-r-md hover:bg-teal-600 hover:text-white transition"
-              >
-                +
-              </button>
-            </div>
-          </div>
-          {/* Colors */}
-          <div className="border-b-2 border-gray-300">
-            <label className="flex justify-between font-semibold mb-5">
-              Colors{" "}
-              <span className="font-normal">
-                {selectedColor || "Select color"}
-              </span>
-            </label>
-            <div className="flex justify-end flex-wrap mb-5 gap-2">
-              {furnitureData.colors?.map((color) => (
-                <div
-                  key={color._id}
-                  onClick={() => handleColorClick(color)}
-                  className={`w-10 h-10 rounded-full border cursor-pointer relative flex items-center justify-center transition-transform transform hover:scale-110 ${
-                    selectedColor === color.name
-                      ? "bg-teal-600 text-black"
-                      : "text-black"
-                  }`}
-                  style={{ backgroundColor: color.hex }}
-                ></div>
-              ))}
-            </div>
-          </div>
-          {/* Materials */}
-          <div className="border-b-2 border-gray-300">
-            <h2 className="flex justify-between mb-5 font-semibold">
-              Materials{" "}
-              <span className="font-normal">
-                {selectedMaterial || "Select material"}
-              </span>
-            </h2>
-            <div className="flex justify-end space-x-2 mb-5 flex-wrap">
-              {furnitureData.materials?.map((material) => (
-                <span
-                  key={material.id}
-                  onClick={() => handleMaterialClick(material)}
-                  className={`border border-teal-600 hover:bg-teal-600 hover:text-white px-2 py-1 rounded-md cursor-pointer transition ${
-                    selectedMaterial === material.name
-                      ? "bg-teal-600 text-white"
-                      : "text-teal-600"
-                  }`}
-                >
-                  {material.name}
-                </span>
-              ))}
-            </div>
-          </div>
-          {/* Sizes */}
-          <div>
-            <h2 className="flex justify-between font-semibold mb-5">
-              Sizes{" "}
-              <span className="font-normal">
-                {selectedSize || "Select size"}
-              </span>
-            </h2>
-            <div className="flex justify-end space-x-2 flex-wrap">
-              {furnitureData.sizes?.map((size) => (
-                <span
-                  key={size.id}
-                  onClick={() => handleSizeClick(size)}
-                  className={`border px-2 py-1 rounded-md border-teal-600 hover:bg-teal-600 hover:text-white cursor-pointer transition ${
-                    selectedSize === size.label
-                      ? "bg-teal-600 text-white"
-                      : "text-teal-600"
-                  }`}
-                >
-                  {size.label}
-                </span>
-              ))}
-            </div>
-          </div>
-        </div>
-        <div className="flex flex-col rounded-xl p-5 border-2 border-teal-600 shadow-lg shadow-gray-300 w-full md:w-1/2 lg:w-1/4 h-[60vh]">
           {/* calculation payment */}
           <div className="mt-5 border border-teal-600 p-5">
             <h1 className="font-semibold mb-2">Payment Details</h1>
@@ -536,166 +736,9 @@ const PreOrder = () => {
               </div>
             </div>
           </div>
-          {/* Payment Options */}
-          <div
-            onClick={togglePaymentOptionVisibility}
-            className="mt-5 rounded shadow-md p-5 border border-gray-300 cursor-pointer"
-          >
-            {/* Header */}
-            <h1 className="flex justify-between font-semibold text-lg">
-              Payment Options
-              <span className="text-2xl">
-                {paymentOptionVisible ? "-" : "+"}
-              </span>
-            </h1>
 
-            {/* Payment Options Content */}
-            {paymentOptionVisible && (
-              <div>
-                {/* Payment Option Buttons */}
-                <div className="flex justify-end gap-5 py-5">
-                  <span
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      setSelectedPaymentOption("Partial Payment");
-                    }}
-                    className={`cursor-pointer border border-teal-600 p-2 rounded font-semibold transition ${
-                      paymentOption === "Partial Payment"
-                        ? "text-white bg-teal-600 border-none"
-                        : "text-teal-500"
-                    }`}
-                  >
-                    Partial Payment
-                  </span>
-                  <span
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      setSelectedPaymentOption("Full Payment");
-                    }}
-                    className={`cursor-pointer border border-teal-600 p-2 rounded font-semibold transition ${
-                      paymentOption === "Full Payment"
-                        ? "text-white bg-teal-600 border-none"
-                        : "text-teal-500"
-                    }`}
-                  >
-                    Full Payment
-                  </span>
-                </div>
-
-                {/* Payment Descriptions */}
-                {paymentOption === "Partial Payment" && (
-                  <div className="p-5 bg-slate-200 rounded mb-5">
-                    <strong>Partial Payment (3-Month Plan):</strong> Pay in
-                    installments with 50% down payment. Remaining balance can be
-                    paid over a minimum of 3 months. A 3% interest applies if
-                    payments are not made on time.
-                  </div>
-                )}
-
-                {paymentOption === "Full Payment" && (
-                  <div className="p-5 bg-slate-200 rounded mb-5">
-                    <strong>Full Payment:</strong> Pay the entire amount upfront
-                    with no additional charges.
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-        </div>
-        <div className="flex flex-col rounded-xl p-5 border-2 border-teal-600 shadow-lg shadow-gray-300 w-full md:w-1/2 lg:w-1/4 h-[60vh]">
-          {/* Payment Method */}
-          <div className="mt-5">
-            <h3 className="text-lg font-semibold mb-2">Payment Methods:</h3>
-
-            {/* Payment Methods Selection */}
-            <div className="flex justify-start text-center bg-slate-200 p-5 gap-5 rounded-md">
-              {/* GCash Payment */}
-              <button
-                value="GCash"
-                onClick={(event) => handlePaymentMethodClick("GCash", event)}
-                className={`rounded relative p-2 transition-all duration-200 ${
-                  selectedPaymentMethod === "GCash"
-                    ? "border-2 border-teal-600 bg-white shadow-lg transform scale-105"
-                    : "border border-gray-300 bg-slate-200 hover:border-teal-400"
-                }`}
-              >
-                <img
-                  src="/payment-icon/gcash.png"
-                  alt="Gcash"
-                  className="w-20 h-20 object-contain rounded"
-                />
-                {selectedPaymentMethod === "GCash" && (
-                  <div className="absolute -top-2 -right-2 w-6 h-6 bg-teal-600 rounded-full flex items-center justify-center">
-                    <span className="text-white text-sm">✓</span>
-                  </div>
-                )}
-              </button>
-
-              {/* Maya Payment */}
-              <button
-                value="Maya"
-                onClick={(event) => handlePaymentMethodClick("Maya", event)}
-                className={`rounded relative p-2 transition-all duration-200 ${
-                  selectedPaymentMethod === "Maya"
-                    ? "border-2 border-teal-600 bg-white shadow-lg transform scale-105"
-                    : "border border-gray-300 bg-slate-200 hover:border-teal-400"
-                }`}
-              >
-                <img
-                  src="/payment-icon/maya.jpg"
-                  alt="Maya"
-                  className="w-20 h-20 object-contain rounded"
-                />
-                {selectedPaymentMethod === "Maya" && (
-                  <div className="absolute -top-2 -right-2 w-6 h-6 bg-teal-600 rounded-full flex items-center justify-center">
-                    <span className="text-white text-sm">✓</span>
-                  </div>
-                )}
-              </button>
-            </div>
-
-            {/* Display Selected Payment Method */}
-            {selectedPaymentMethod && (
-              <p className="mt-5 text-gray-600">
-                Selected Payment Method:{" "}
-                <strong>{selectedPaymentMethod}</strong>
-              </p>
-            )}
-          </div>
-          {/* QR Code Section */}
-          <div className="mt-5 bg-slate-200 p-5 rounded-md">
-            <h1 className="text-xl font-semibold mb-2">Scan the QR Code</h1>
-            <div className="flex flex-col lg:flex-row items-start gap-8">
-              {/* QR Code */}
-              <div className="flex flex-col items-center">
-                <img
-                  src="/payment-icon/qrcode.png"
-                  alt="QR Code"
-                  className="w-40 h-40 object-contain"
-                />
-              </div>
-
-              {/* Proof of Payment Upload */}
-              <div className="flex-1 max-w-md pt-5">
-                <h2 className="font-semibold text-teal-600 mb-4">
-                  Upload Proof of Payment
-                </h2>
-                <input
-                  type="file"
-                  onClick={handleInnerClick}
-                  onChange={handleFileUpload}
-                  className="mb-4 w-full border border-gray-300 rounded-md px-3 py-2 text-gray-600 focus:border-teal-600 focus:ring-teal-500"
-                />
-                {uploadMessage && (
-                  <p className="text-teal-600 mt-2">{uploadMessage}</p>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="flex flex-col rounded-xl p-5 border-2 border-teal-600 shadow-lg shadow-gray-300 w-full md:w-1/2 lg:w-1/4 h-[60vh]">
           {/* Delivery Option */}
-          <div className="mt-5 border-t-2 border-gray-300 pt-5">
+          <div className="mt-5 border-t-2 border-teal-500 pt-5">
             <h1 className="font-semibold mb-4">Delivery Mode:</h1>
             <div className="flex justify-end gap-4">
               <button
@@ -758,10 +801,10 @@ const PreOrder = () => {
             {/* Additional information based on selected mode */}
             {selectedDeliveryMode === "Delivery" && (
               <div className="mt-4 p-4 bg-slate-100 rounded-md">
-                <p className="text-gray-600">
+                <p className="text-black font-semibold">
                   Delivery fee will be calculated based on your location.
                 </p>
-                <p className="text-sm text-gray-500 mt-2">
+                <p className="text-base text-black mt-2">
                   Estimated delivery time: {expectedDeliveryDate || "N/A"}
                 </p>
               </div>
@@ -779,9 +822,6 @@ const PreOrder = () => {
             )}
           </div>
           {/* order details */}
-          <div className="mt-5">
-            <h1>Order details</h1>
-          </div>
           <div className="mt-4 flex gap-4">
             <button
               onClick={preOrder}
@@ -793,7 +833,6 @@ const PreOrder = () => {
           </div>
         </div>
       </div>
-
       <ToastContainer />
       <Footer />
     </section>

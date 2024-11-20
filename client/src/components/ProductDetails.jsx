@@ -191,7 +191,7 @@ function ProductDetails({ admin }) {
                         key={index}
                         className="text-black text-sm sm:text-base"
                       >
-                        {size.label || "N/A"}
+                        {size.label} {" "} {size.height} X {size.width}
                       </p>
                     ))
                   ) : (

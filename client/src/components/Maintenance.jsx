@@ -901,7 +901,7 @@ const Maintenance = () => {
 											? sizes.map((size) => ({
 													id: size._id,
 													label: size.label || "N/A",
-													heigth: size.height || "N/A",
+													height: size.height || "N/A",
 													length: size.length || "N/A",
 													width: size.width || "N/A",
 													depth: size.depth || "N/A",
