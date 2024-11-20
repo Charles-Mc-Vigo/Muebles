@@ -113,12 +113,14 @@ const Cart = () => {
 		}
 	}, [selectedAddress, user]);
 
+
 	const totalWithShipping =
 		paymentOption === "Partial Payment"
-			? (totalAmount / 2 + shippingFee).toFixed(2) // Half of the total amount plus shipping fee
-			: (totalAmount + shippingFee).toFixed(2); // Full payment total
+			? (totalAmount + shippingFee / 2).toFixed(2)
+			: (totalAmount + shippingFee).toFixed(2);
 
-	const partialPaymentAmount = (totalAmount / 2 + shippingFee).toFixed(2); // Calculate partial payment amount
+	const partialPaymentAmount = ((totalAmount + shippingFee)/2).toFixed(2);
+	console.log("partial", partialPaymentAmount)
 
 	const handlePaymentMethodClick = (method) => {
 		setSelectedPaymentMethod(method);
@@ -129,6 +131,7 @@ const Cart = () => {
 		setProofOfPayment(file);
 		setUploadMessage(`Selected file: ${file.name}`);
 	};
+
 
 	const preOrderFromCart = async () => {
 		if (!selectedPaymentMethod) {
@@ -169,7 +172,7 @@ const Cart = () => {
 			if (!data.ok) {
 				toast.error(data.error);
 			}
-			
+
 			const orderId = data.order._id;
 			await clearCart();
 			navigate(`/order-details/${orderId}`);
@@ -179,7 +182,6 @@ const Cart = () => {
 			setLoading(false);
 		}
 	};
-	
 
 	const updateQuantity = async (furnitureId, newQuantity) => {
 		if (newQuantity < 1) {
@@ -537,32 +539,63 @@ const Cart = () => {
 								</p>
 							)}
 						</div>
+
 						{/* QR code for payment */}
-						<div className="mt-5 p-5 bg-slate-200">
-							<h1 className="text-xl font-semibold mb-2">Scan the QR Code</h1>
-							<div className="flex items-start gap-8">
-								{/* QR Code Section */}
-								<div className="flex flex-col items-center">
-									<img
-										src="/payment-icon/qrcode.png"
-										alt="qrcode"
-										className="w-40 h-40 object-contain"
-									/>
-								</div>
-								{/* Image Upload Section */}
-								<div className="flex-1 max-w-md pt-5">
-									<h2 className="text-2xl font-semibold text-teal-600 mb-4">
-										Upload Proof of Payment
-									</h2>
-									<input
-										type="file"
-										onChange={handleFileUpload}
-										className="mb-4 w-full border border-gray-300 rounded-md px-3 py-2 text-gray-600 focus:border-teal-600 focus:ring-teal-500"
-									/>
-									{uploadMessage && <p>{uploadMessage}</p>}
+						{selectedPaymentMethod === "Maya" && (
+							<div className="mt-5 p-5 bg-slate-200">
+								<h1 className="text-xl font-semibold mb-2">Scan the QR Code</h1>
+								<div className="flex items-start gap-8">
+									{/* QR Code Section */}
+									<div className="flex flex-col items-center">
+										<img
+											src="/payment-icon/Maya-qr.png"
+											alt="qrcode"
+											className="w-40 h-40 object-contain"
+										/>
+									</div>
+									{/* Image Upload Section */}
+									<div className="flex-1 max-w-md pt-5">
+										<h2 className="text-2xl font-semibold text-teal-600 mb-4">
+											Upload Proof of Payment
+										</h2>
+										<input
+											type="file"
+											onChange={handleFileUpload}
+											className="mb-4 w-full border border-gray-300 rounded-md px-3 py-2 text-gray-600 focus:border-teal-600 focus:ring-teal-500"
+										/>
+										{uploadMessage && <p>{uploadMessage}</p>}
+									</div>
 								</div>
 							</div>
-						</div>
+						)}
+						{selectedPaymentMethod === "GCash" && (
+							<div className="mt-5 p-5 bg-slate-200">
+								<h1 className="text-xl font-semibold mb-2">Scan the QR Code</h1>
+								<div className="flex items-start gap-8">
+									{/* QR Code Section */}
+									<div className="flex flex-col items-center">
+										<img
+											src="/payment-icon/GCash-qr.png"
+											alt="qrcode"
+											className="w-40 h-40 object-contain"
+										/>
+									</div>
+									{/* Image Upload Section */}
+									<div className="flex-1 max-w-md pt-5">
+										<h2 className="text-2xl font-semibold text-teal-600 mb-4">
+											Upload Proof of Payment
+										</h2>
+										<input
+											type="file"
+											onChange={handleFileUpload}
+											className="mb-4 w-full border border-gray-300 rounded-md px-3 py-2 text-gray-600 focus:border-teal-600 focus:ring-teal-500"
+										/>
+										{uploadMessage && <p>{uploadMessage}</p>}
+									</div>
+								</div>
+							</div>
+						)}
+
 						{/* Payment Details */}
 						<div className="border-t-2 p-5 rounded-xl shadow-xl bg-white ">
 							<div className="mt-2 ">
@@ -611,7 +644,7 @@ const Cart = () => {
 										disabled={loading}
 										onClick={preOrderFromCart}
 									>
-										{loading ? "Creating Pre-Order...":"Create Pre-Order"}
+										{loading ? "Creating Pre-Order..." : "Create Pre-Order"}
 									</button>
 								</div>
 							</div>

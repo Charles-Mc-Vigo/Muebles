@@ -211,7 +211,7 @@ orderSchema.statics.createFromCart = async function(cartId, paymentMethod, proof
     .populate('items.furnitureId');
   
   if (!cart) throw new Error('Cart not found');
-
+	console.log(cart.totalAmount)
 	console.log("From the model. Payment option is ", paymentOption);
 
 	//calculation para sa partial payment ksksks

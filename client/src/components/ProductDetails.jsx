@@ -95,6 +95,8 @@ function ProductDetails({ admin }) {
 			toast.error("Please select color, material, and size.");
 			return;
 		}
+
+		setLoading(true); // Start loading
 		const item = {
 			furnitureId: id,
 			quantity: 1,
@@ -105,9 +107,6 @@ function ProductDetails({ admin }) {
 			ECT: ECT,
 		};
 
-		console.log(item);
-
-		// console.log(item)
 		try {
 			const response = await fetch("http://localhost:3000/api/cart", {
 				method: "POST",
@@ -117,17 +116,23 @@ function ProductDetails({ admin }) {
 				credentials: "include",
 				body: JSON.stringify(item),
 			});
+
 			const data = await response.json();
-			if (!data.ok) {
-				toast.error(data.error);
+			if (!response.ok) {
+				throw new Error(data.error || "Failed to add item to cart.");
 			}
+
 			toast.success(data.success);
 		} catch (error) {
 			console.error("Error adding item to cart:", error);
-			toast.error("Error adding item to cart. Please try again.");
+			toast.error(
+				error.message || "Error adding item to cart. Please try again."
+			);
+		} finally {
+			setLoading(false); // Stop loading in both success and error cases
 		}
-		setLoading(false);
 	};
+
 	// content tab
 	const renderTabContent = () => {
 		switch (activeTab) {
@@ -147,7 +152,7 @@ function ProductDetails({ admin }) {
 							{/* Materials Section */}
 							<ul className="mb-4 sm:mb-6">
 								<li className="ml-2 sm:ml-5">
-                <div className="flex justify-between">
+									<div className="flex justify-between">
 										<h3 className="text-base sm:text-lg font-semibold">
 											Materials
 										</h3>
@@ -175,7 +180,10 @@ function ProductDetails({ admin }) {
 								<li className="ml-2 sm:ml-5">
 									<div className="flex justify-between">
 										<h3 className="text-base sm:text-lg font-semibold">
-											Sizes:
+											Sizes:{" "}
+											<span className="italic font-light">
+												( Height X Width X Length X Depth )
+											</span>
 										</h3>
 										<h3 className="text-base sm:text-lg font-semibold">
 											Price
@@ -196,7 +204,7 @@ function ProductDetails({ admin }) {
 									)}
 								</li>
 							</ul>
-              
+
 							{/* Colors Section */}
 							<ul className="mb-4 sm:mb-6 border-t-2 border-teal-500 pt-5 sm:pt-6">
 								<li className="ml-2 sm:ml-5">
@@ -419,6 +427,18 @@ function ProductDetails({ admin }) {
 												{size.label}
 											</span>
 										))}
+									</div>
+									<div className="mt-2 flex flex-col text-right gap-2">
+										<p className="text-lg">
+											Selected Material Cost:{" "}
+											<strong>{materialPrice || "0"}</strong>
+										</p>
+										<p className="text-lg">
+											Selected Size Cost: <strong>{sizePrice || "0"}</strong>
+										</p>
+										<p className="text-xl font-bold">
+											Total Price: <strong>{price}</strong>
+										</p>
 									</div>
 								</div>
 								{/* Add to Cart Button */}

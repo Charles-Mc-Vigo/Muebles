@@ -202,7 +202,7 @@ async function calculateTotalAmount(items) {
 	for (const item of items) {
 		const furniture = await Furniture.findById(item.furnitureId);
 		if (furniture) {
-			total += furniture.price * item.quantity;
+			total += item.price * item.quantity;
 		}
 	}
 	return total;
