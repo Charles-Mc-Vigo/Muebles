@@ -341,7 +341,7 @@ const Home = () => {
                     id={furniture._id}
                     images={furniture.images}
                     name={furniture.name}
-                    // price={furniture.price}
+                    price={furniture.price}
                     description={furniture.description}
                     showViewDetails={true}
                     showPreOrder={true}
