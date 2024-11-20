@@ -23,7 +23,9 @@ function ProductDetails({ admin }) {
 	const [selectedMaterial, setSelectedMaterial] = useState(null);
 	const [selectedSize, setSelectedSize] = useState(null);
 	const [currentImageIndex, setCurrentImageIndex] = useState(0);
-	const [price, setPrice] = useState(null);
+	const [materialPrice, setMaterialPrice] = useState(null);
+	const [sizePrice, setSizePrice] = useState(null);
+	const [price, setPrice] = useState(null)
 	const [ECT, setECT] = useState(null);
 
 	// console.log(price);
@@ -62,16 +64,20 @@ function ProductDetails({ admin }) {
 		// setSelectedSize(null);
 	};
 
-	const handleMaterialClick = (material) => {
-		setSelectedMaterial(material.name);
-		setPrice(material.price);
-		console.log(price)
-	};
+// Kapag pumili ng material, set ang price sa material price
+const handleMaterialClick = (material) => {
+	setSelectedMaterial(material.name);
+	setMaterialPrice(material.price);
+	setPrice(material.price + (sizePrice || 0)); // Update ang price kasama ang sizePrice kung mayroon
+};
 
-	// console.log(selectedMaterial);
-	const handleSizeClick = (size) => {
-		setSelectedSize(size.label);
-	};
+// Kapag pumili ng size, update ang price bilang kabuuan ng materialPrice at sizePrice
+const handleSizeClick = (size) => {
+	setSelectedSize(size.label);
+	setSizePrice(size.price);
+	setPrice((materialPrice || 0) + size.price); // Update ang price kasama ang materialPrice kung mayroon
+};
+
 
 	const handleThumbnailClick = (index) => {
 		setCurrentImageIndex(index);
@@ -90,44 +96,45 @@ function ProductDetails({ admin }) {
 	};
 
 	const addToCart = async (e) => {
-		e.preventDefault();
-		if (!selectedColor || !selectedMaterial || !selectedSize) {
-			toast.error("Please select color, material, and size.");
-			return;
-		}
-		const item = {
-			furnitureId: id,
-			quantity: 1,
-			color: selectedColor,
-			material: selectedMaterial,
-			size: selectedSize,
-			price: price,
-			ECT: ECT,
-		};
+    e.preventDefault();
+    if (!selectedColor || !selectedMaterial || !selectedSize) {
+        toast.error("Please select color, material, and size.");
+        return;
+    }
 
-		console.log(item)
+    // // Calculate total price
+    // const totalPrice = price + (materialPrice || 0) + (sizePrice || 0);
 
-		// console.log(item)
-		try {
-			const response = await fetch("http://localhost:3000/api/cart", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				credentials: "include",
-				body: JSON.stringify(item),
-			});
-			const data = await response.json();
-			if (!data.ok) {
-				toast.error(data.error);
-			}
-			toast.success(data.success);
-		} catch (error) {
-			console.error("Error adding item to cart:", error);
-			toast.error("Error adding item to cart. Please try again.");
-		}
-		setLoading(false);
-	};
+    const item = {
+        furnitureId: id,
+        quantity: 1,
+        color: selectedColor,
+        material: selectedMaterial,
+        size: selectedSize,
+        price: price, 
+        ECT: ECT,
+    };
+    console.log(item);
+    try {
+        // const response = await fetch("http://localhost:3000/api/cart", {
+        //     method: "POST",
+        //     headers: {
+        //         "Content-Type": "application/json",
+        //     },
+        //     credentials: "include",
+        //     body: JSON.stringify(item),
+        // });
+        // const data = await response.json();
+        // if (!data.ok) {
+        //     toast.error(data.error);
+        // }
+        // toast.success(data.success);
+    } catch (error) {
+        console.error("Error adding item to cart:", error);
+        toast.error("Error adding item to cart. Please try again.");
+    }
+    setLoading(false);
+};
 
 	if (error) return <div className="text-red-500 text-center">{error}</div>;
 	if (!furnitureData)
