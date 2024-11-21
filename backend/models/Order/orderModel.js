@@ -95,6 +95,15 @@ const orderSchema = new mongoose.Schema(
 		monthlyInstallment: {
 			type: Number,
 		},
+		interest: {
+			type: Number,
+			default: 0, // Total interest accrued
+		},
+		lastPaymentDate: {
+			type: Date,
+			default: Date.now, // Initial date kapag gumawa ng order
+		},
+		
 		type: {
 			type: String,
 			enum: ["Cart", "Pre-Order"],
@@ -117,6 +126,26 @@ orderSchema.pre("save", async function (next) {
 	}
 	next();
 });
+
+orderSchema.methods.applyInterest = async function () {
+  const currentDate = new Date();
+  const monthsOverdue = Math.floor(
+    (currentDate - this.lastPaymentDate) / (1000 * 60 * 60 * 24 * 30) // Approx. days in a month
+  );
+
+  if (monthsOverdue > 0) {
+    for (let i = 0; i < monthsOverdue; i++) {
+      this.remainingBalance *= 1 + this.interest; // 3% interest kada buwan
+    }
+
+    // Update lastPaymentDate to reflect the interest application
+    this.lastPaymentDate = new Date(this.lastPaymentDate.setMonth(this.lastPaymentDate.getMonth() + monthsOverdue));
+
+    await this.save(); // Save changes to the database
+  }
+};
+
+
 
 orderSchema.statics.preOrder = async function (
 	user,

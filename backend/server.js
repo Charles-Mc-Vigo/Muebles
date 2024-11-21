@@ -2,6 +2,8 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const cookieParser = require('cookie-parser');
+const scheduleInterestJob = require("./jobs/applyInterestJob");
+
 
 // Router imports
 const authCheckRouter = require('./router/authCheck');
@@ -40,6 +42,8 @@ const prodServer = async () => {
 
 // Start the server in production or development
 prodServer();
+scheduleInterestJob();
+
 
 // Middlewares
 app.use(express.json({ limit: '50mb' }));  // Increase limit as necessary
