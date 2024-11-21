@@ -74,6 +74,9 @@ const orderSchema = new mongoose.Schema(
 		expectedDelivery: {
 			type: String,
 		},
+		subtotal: {
+			type: Number,
+		},
 		totalAmount: {
 			type: Number,
 		},
@@ -128,6 +131,7 @@ orderSchema.statics.preOrder = async function (
 	shippingAddress,
 	deliveryMode,
 	expectedDelivery,
+	subtotal,
 	totalAmount,
 	shippingFee,
 	totalAmountWithShipping,
@@ -155,6 +159,7 @@ orderSchema.statics.preOrder = async function (
 		shippingAddress,
 		deliveryMode,
 		expectedDelivery,
+		subtotal,
 		totalAmount,
 		shippingFee,
 		totalAmountWithShipping,
@@ -183,49 +188,48 @@ orderSchema.statics.createFromCart = async function (
 	monthlyInstallment
 ) {
 	const cart = await mongoose
-			.model("Cart")
-			.findById(cartId)
-			.populate("userId")
-			.populate("items.furnitureId");
+		.model("Cart")
+		.findById(cartId)
+		.populate("userId")
+		.populate("items.furnitureId");
 
 	if (!cart) throw new Error("Cart not found");
 
 	// Validation for "Partial Payment"
 	if (paymentOption === "Full Payment") {
-			partialPayment = undefined;
-			remainingBalance = undefined;
-			monthlyInstallment = undefined;
+		partialPayment = undefined;
+		remainingBalance = undefined;
+		monthlyInstallment = undefined;
 	}
 
 	const orderData = {
-			user: cart.userId._id,
-			items: cart.items.map((item) => ({
-					furniture: item.furnitureId._id,
-					quantity: item.quantity,
-					price: item.furnitureId.price,
-					material: item.material,
-					color: item.color,
-					size: item.size,
-			})),
-			shippingAddress,
-			phoneNumber: cart.userId.phoneNumber,
-			paymentMethod,
-			proofOfPayment,
-			paymentOption,
-			shippingFee,
-			deliveryMode,
-			expectedDelivery,
-			totalAmount,
-			totalAmountWithShipping,
-			partialPayment,
-			remainingBalance,
-			monthlyInstallment,
-			type: "Cart",
+		user: cart.userId._id,
+		items: cart.items.map((item) => ({
+			furniture: item.furnitureId._id,
+			quantity: item.quantity,
+			price: item.furnitureId.price,
+			material: item.material,
+			color: item.color,
+			size: item.size,
+		})),
+		shippingAddress,
+		phoneNumber: cart.userId.phoneNumber,
+		paymentMethod,
+		proofOfPayment,
+		paymentOption,
+		shippingFee,
+		deliveryMode,
+		expectedDelivery,
+		totalAmount,
+		totalAmountWithShipping,
+		partialPayment,
+		remainingBalance,
+		monthlyInstallment,
+		type: "Cart",
 	};
 
 	return this.create(orderData);
 };
-
 
 const Order = mongoose.model("Order", orderSchema);
 module.exports = Order;

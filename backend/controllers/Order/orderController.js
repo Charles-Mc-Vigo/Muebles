@@ -98,16 +98,23 @@ const orderController = {
 	preOrder: async (req, res) => {
 		try {
 			const {
-				quantity,
 				furnitureId,
 				color,
 				material,
 				size,
+				quantity,
 				paymentMethod,
 				paymentOption,
+				shippingAddress,
 				deliveryMode,
-				shippingAddress: shippingAddressStr,
 				expectedDelivery,
+				subtotal,
+				totalAmount,
+				shippingFee,
+				totalAmountWithShippingFee,
+				partialPayment,
+				remainingBalance,
+				montlyInstallment
 			} = req.body;
 
 			const userId = req.user._id;
@@ -122,35 +129,6 @@ const orderController = {
 			if (!selectedMaterial)
 				return res.status(400).json({ error: "Invalid material selected!" });
 
-			const subtotal = selectedMaterial.price * quantity;
-
-			let shippingAddress;
-			try {
-				shippingAddress = JSON.parse(shippingAddressStr);
-			} catch (error) {
-				return res
-					.status(400)
-					.json({ error: "Invalid shipping address format" });
-			}
-
-			const shippingFees = {
-				Boac: 500,
-				Mogpog: 700,
-				Gasan: 500,
-				Buenavista: 800,
-				Santa_Cruz: 3000,
-				Torrijos: 3000,
-			};
-			const municipality = shippingAddress.municipality;
-			const shippingFee = shippingFees[municipality] || 0;
-
-			let remainingBalance = null;
-			if (paymentOption === "Partial Payment") {
-				remainingBalance = subtotal / 2;
-			}
-
-			const totalAmount = subtotal + shippingFee;
-
 			if (!req.file) {
 				return res.status(400).json({ error: "Proof of payment is required" });
 			}
@@ -160,20 +138,23 @@ const orderController = {
 			const preOrder = await Order.preOrder(
 				user,
 				furniture,
-				material,
 				color,
+				material,
 				size,
 				quantity,
 				paymentMethod,
 				proofOfPayment,
 				paymentOption,
 				shippingAddress,
-				shippingFee,
 				deliveryMode,
 				expectedDelivery,
 				subtotal,
 				totalAmount,
-				remainingBalance
+				shippingFee,
+				totalAmountWithShippingFee,
+				partialPayment,
+				remainingBalance,
+				montlyInstallment
 			);
 
 			await User.findByIdAndUpdate(userId, {
