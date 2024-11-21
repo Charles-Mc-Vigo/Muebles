@@ -174,18 +174,18 @@ const Cart = () => {
 				credentials: "include",
 			});
 
-			// if (!response.ok) {
-			// 	throw new Error(response.message);
-			// }
-			// const data = await response.json();
-			// if (!data.ok) {
-			// 	toast.error(data.error);
-			// }
+			if (!response.ok) {
+				throw new Error(response.message);
+			}
+			const data = await response.json();
+			if (!data.ok) {
+				toast.error(data.error);
+			}
 
-			// const orderId = data.order._id;
-			// await clearCart();
-			// navigate(`/order-details/${orderId}`);
-			// await fetchCartItems();
+			const orderId = data.order._id;
+			await clearCart();
+			navigate(`/order-details/${orderId}`);
+			await fetchCartItems();
 		} catch (error) {
 			setError(error.message);
 			setLoading(false);
