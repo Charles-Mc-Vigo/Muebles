@@ -95,8 +95,7 @@ function ProductDetails({ admin }) {
 			toast.error("Please select color, material, and size.");
 			return;
 		}
-
-		setLoading(true); // Start loading
+		setLoading(true);
 		const item = {
 			furnitureId: id,
 			quantity: 1,
@@ -106,7 +105,6 @@ function ProductDetails({ admin }) {
 			price: price,
 			ECT: ECT,
 		};
-
 		try {
 			const response = await fetch("http://localhost:3000/api/cart", {
 				method: "POST",
@@ -116,20 +114,26 @@ function ProductDetails({ admin }) {
 				credentials: "include",
 				body: JSON.stringify(item),
 			});
-
 			const data = await response.json();
 			if (!response.ok) {
 				throw new Error(data.error || "Failed to add item to cart.");
 			}
-
-			toast.success(data.success);
+			console.log("Adding to cart was successful");
+			alert(data.message);
+			
+			// Reset the form fields
+			setSelectedColor(null);
+			setSelectedMaterial(null);
+			setSelectedSize(null);
+			setMaterialPrice(null);
+			setSizePrice(null);
+			setPrice(0);
+	
 		} catch (error) {
 			console.error("Error adding item to cart:", error);
-			toast.error(
-				error.message || "Error adding item to cart. Please try again."
-			);
+			toast.error(error.message || "Error adding item to cart. Please try again.");
 		} finally {
-			setLoading(false); // Stop loading in both success and error cases
+			setLoading(false);
 		}
 	};
 

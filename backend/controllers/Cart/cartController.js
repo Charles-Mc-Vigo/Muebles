@@ -108,7 +108,7 @@ exports.addToCart = async (req, res) => {
 			{ path: "items.furnitureId", select: "name description price image furnitureType" },
 		]);
 
-		res.status(200).json({ success: "Item added to cart successfully", cart });
+		res.status(200).json({ message: "Item added to cart successfully", cart });
 	} catch (error) {
 		console.error("Error in adding to cart", error);
 		res.status(500).json({ error: "Server error!" });
