@@ -3,224 +3,183 @@ const Cart = require("../../models/Cart/cartModel");
 const User = require("../../models/User/userModel");
 const Furniture = require("../../models/Furniture/furnitureModel");
 const Materials = require("../../models/Furniture/materialsModel");
-const FurnitureType = require("../../models/Furniture/furnitureTypeModel");
-const Category = require("../../models/Furniture/categoryModel");
 
 const orderController = {
-	// Create new order from cart
-	createOrder: async (req, res) => {
-		try {
-			const {
-				paymentMethod,
-				shippingAddress,
-				deliveryMode,
-				expectedDelivery,
-				paymentOption,
-			} = req.body;
-			const userId = req.user._id;
+    // Create order from cart
+    createOrder: async (req, res) => {
+        try {
+            const {
+                paymentMethod,
+                shippingAddress: shippingAddressStr,
+                deliveryMode,
+                expectedDelivery,
+                paymentOption,
+                totalAmount,
+                shippingFee,
+                totalAmountWithShippingFee,
+                partialPayment,
+                remainingBalance,
+                montlyInstallment,
+            } = req.body;
 
-			// res.status(200).json(paymentOption)
-			//decision kung if partial or payment
-			// if (paymentOption === "Partial Payment") {
-			// 	console.log("Payment option is Partial payment");
-			// } else {
-			// 	console.log("Payment option is Full payment");
-			// }
+            const userId = req.user._id;
 
-			if (!paymentMethod) {
-				return res.status(400).json({
-					error: "Please select a payment method to proceed.",
-				});
-			}
+            if (!paymentMethod || !["GCash", "Maya"].includes(paymentMethod)) {
+                return res.status(400).json({ error: "Invalid payment method" });
+            }
 
-			if (["GCash", "Maya"].includes(paymentMethod) && !req.file) {
-				return res.status(400).json({
-					error: "Please upload proof of payment for the selected method.",
-				});
-			}
+            if (!shippingAddressStr) {
+                return res.status(400).json({ error: "Shipping address is required" });
+            }
 
-			let proofOfPayment;
-			if (req.file) {
-				proofOfPayment = req.file.buffer.toString("base64");
-			}
+            let shippingAddress;
+            try {
+                shippingAddress = JSON.parse(shippingAddressStr);
+            } catch (error) {
+                return res.status(400).json({ error: "Invalid shipping address format" });
+            }
 
-			const cart = await Cart.findOne({ userId });
-			if (!cart || cart.items.length === 0) {
-				return res.status(400).json({ error: "Cart is empty" });
-			}
-			// console.log(cart);
-			// console.log("Expected delivery: ", cart.expectedDelivery);
+            if (!req.file) {
+                return res.status(400).json({ error: "Proof of payment is required" });
+            }
 
-			const shippingAddressObj = JSON.parse(shippingAddress);
-			const municipality = shippingAddressObj.municipality;
+            const proofOfPayment = req.file.buffer.toString("base64");
 
-			// Calculate shipping fee
-			const shippingFees = {
-				Boac: 500,
-				Mogpog: 700,
-				Gasan: 500,
-				Buenavista: 800,
-				Santa_Cruz: 3000,
-				Torrijos: 3000,
-			};
-			const shippingFee = shippingFees[municipality] || 0;
-			// console.log(shippingFee)
+            const cart = await Cart.findOne({ userId }).populate("items.furnitureId");
+            if (!cart || cart.items.length === 0) {
+                return res.status(400).json({ error: "Cart is empty" });
+            }
 
-			const order = await Order.createFromCart(
-				cart._id,
-				paymentMethod,
-				proofOfPayment,
-				paymentOption,
-				shippingAddress,
-				shippingFee,
-				deliveryMode,
-				expectedDelivery
-			);
+            // Adjustments based on payment option
+            let adjustedPartialPayment = partialPayment;
+            let adjustedRemainingBalance = remainingBalance;
+            let adjustedInstallment = montlyInstallment;
 
-			await Cart.findByIdAndUpdate(cart._id, {
-				items: [],
-				count: 0,
-				totalAmount: 0,
-			});
+            if (paymentOption === "Full Payment") {
+                adjustedPartialPayment = null;
+                adjustedRemainingBalance = null;
+                adjustedInstallment = null;
+            }
 
-			await User.findByIdAndUpdate(userId, {
-				$push: { orders: order._id, proofOfPayment },
-			});
+            const order = await Order.createFromCart(
+                cart._id,
+                paymentMethod,
+                proofOfPayment,
+                paymentOption,
+                shippingAddress,
+                deliveryMode,
+                expectedDelivery,
+                totalAmount,
+                shippingFee,
+                totalAmountWithShippingFee,
+                adjustedPartialPayment,
+                adjustedRemainingBalance,
+                adjustedInstallment
+            );
 
-			res.status(201).json({ success: "Order placed successfully!", order });
-		} catch (error) {
-			console.error("Error creating order:", error);
-			res.status(500).json({
-				error: "Error creating order",
-			});
-		}
-	},
+            // // Empty the cart after successful order
+            // await Cart.findByIdAndUpdate(cart._id, {
+            //     items: [],
+            //     count: 0,
+            //     totalAmount: 0,
+            // });
 
-	preOrder: async (req, res) => {
-		try {
-			const {
-				quantity,
-				furnitureId,
-				color,
-				material,
-				size,
-				paymentMethod,
-				paymentOption,
-				deliveryMode,
-				shippingAddress,
-				expectedDelivery,
-			} = req.body;
+						console.log(order)
 
-			const userId = req.user._id;
-			const user = await User.findById(userId);
-			if (!user) return res.status(404).json({ message: "User not found!" });
+            res.status(201).json({ success: "Order placed successfully!", order });
+        } catch (error) {
+            console.error("Error creating order:", error);
+            res.status(500).json({ error: "Error creating order" });
+        }
+    },
 
-			// Calculate subtotal based on furniture price (assuming you have a way to get the price)
-			const furniture = await Furniture.findById(furnitureId);
-			if (!furniture)
-				return res.status(404).json({ message: "Furniture not found!" });
+    // Pre-order functionality
+    preOrder: async (req, res) => {
+        try {
+            const {
+                quantity,
+                furnitureId,
+                color,
+                material,
+                size,
+                paymentMethod,
+                paymentOption,
+                deliveryMode,
+                shippingAddress: shippingAddressStr,
+                expectedDelivery,
+            } = req.body;
 
-			const furnitureCategoryId = furniture.category;
-			const furnitureFurnitureType = furniture.furnitureType;
+            const userId = req.user._id;
+            const user = await User.findById(userId);
+            if (!user) return res.status(404).json({ message: "User not found!" });
 
-			const category = await Category.findById(furnitureCategoryId);
-			const furnitureType = await FurnitureType.findById(
-				furnitureFurnitureType
-			);
+            const furniture = await Furniture.findById(furnitureId);
+            if (!furniture) return res.status(404).json({ message: "Furniture not found!" });
 
-			// const furnitureType = await FurnitureType.findById(category._id);
+            const selectedMaterial = await Materials.findOne({ name: material });
+            if (!selectedMaterial)
+                return res.status(400).json({ error: "Invalid material selected!" });
 
-			// res.status(200).json({message:`${furnitureType.name} found`, furnitureType});
+            const subtotal = selectedMaterial.price * quantity;
 
-			// res.status(200).json({message:`${category.name} found`, category});
+            let shippingAddress;
+            try {
+                shippingAddress = JSON.parse(shippingAddressStr);
+            } catch (error) {
+                return res.status(400).json({ error: "Invalid shipping address format" });
+            }
 
-			// const furnitureTypeECT = await FurnitureType({name:{$in:{furniture.category}}})
+            const shippingFees = {
+                Boac: 500,
+                Mogpog: 700,
+                Gasan: 500,
+                Buenavista: 800,
+                Santa_Cruz: 3000,
+                Torrijos: 3000,
+            };
+            const municipality = shippingAddress.municipality;
+            const shippingFee = shippingFees[municipality] || 0;
 
-			if (!["Partial Payment", "Full Payment"].includes(paymentOption)) {
-				return res
-					.status(400)
-					.json({ message: "Please select only valid payment options!" });
-			}
+            let remainingBalance = null;
+            if (paymentOption === "Partial Payment") {
+                remainingBalance = subtotal / 2;
+            }
 
-			const selectedMaterial = await Materials.findOne({
-				name: { $in: material },
-			});
-			// res.status(201).json(selectedMaterial.price);
+            const totalAmount = subtotal + shippingFee;
 
-			const subtotal = selectedMaterial.price * quantity;
-			// console.log("Subtotal of the item: ", subtotal);
-			// res.status(201).json(subtotal);
+            if (!req.file) {
+                return res.status(400).json({ error: "Proof of payment is required" });
+            }
 
-			// const subtotal = furniture.price * quantity;
+            const proofOfPayment = req.file.buffer.toString("base64");
 
-			// Calculate shipping fee (you can adjust this logic as needed)
-			const shippingFees = {
-				Boac: 500,
-				Mogpog: 700,
-				Gasan: 500,
-				Buenavista: 800,
-				Santa_Cruz: 3000,
-				Torrijos: 3000,
-			};
-			const shippingAddressObj = JSON.parse(shippingAddress);
-			const municipality = shippingAddressObj.municipality;
-			const shippingFee = shippingFees[municipality] || 0;
+            const preOrder = await Order.preOrder(
+                user,
+                furniture,
+                material,
+                color,
+                size,
+                quantity,
+                paymentMethod,
+                proofOfPayment,
+                paymentOption,
+                shippingAddress,
+                shippingFee,
+                deliveryMode,
+                expectedDelivery,
+                subtotal,
+                totalAmount,
+                remainingBalance
+            );
 
-			let balance;
-			if(paymentOption === "Partial Payment"){
-				balance = subtotal /2;
-			}
+						console.log(preOrder)
 
-			// console.log("Total amount of the furniture is ", subtotal);
-			// console.log("Remaining amount of the furniture is divided by 2 ", balance);
-
-			// Calculate total amount
-			const totalAmount = balance + shippingFee;
-			const remainingBalance = balance;
-			// console.log(
-			// 	`Shipping fee is ${shippingFee} + ${subtotal} = total amount of ${totalAmount}`
-			// );
-			// res.status(201).json(shippingFee);
-
-			let proofOfPayment;
-			if (req.file) {
-				proofOfPayment = req.file.buffer.toString("base64");
-			}
-
-			const preOrder = await Order.preOrder(
-				user,
-				furniture,
-				material,
-				color,
-				size,
-				quantity,
-				paymentMethod,
-				proofOfPayment,
-				paymentOption,
-				shippingAddress,
-				shippingFee,
-				deliveryMode,
-				expectedDelivery,
-				subtotal,
-				totalAmount,
-				remainingBalance,
-			);
-
-			await preOrder.save();
-
-			await User.findByIdAndUpdate(userId, {
-				$push: { orders: preOrder._id, proofOfPayment },
-			});
-
-			// console.log(preOrder);
-			return res
-				.status(201)
-				.json({ message: "Pre-order was created!", preOrder });
-		} catch (error) {
-			console.log("Error creating pre-order:", error);
-			res.status(500).json({ message: "Server error!" });
-		}
-	},
+            res.status(201).json({ message: "Pre-order created!", preOrder });
+        } catch (error) {
+            console.error("Error creating pre-order:", error);
+            res.status(500).json({ message: "Server error!" });
+        }
+    },
 
 	// Get user's orders
 	getUserOrders: async (req, res) => {

@@ -113,14 +113,18 @@ const Cart = () => {
 		}
 	}, [selectedAddress, user]);
 
+	const totalAmountWithShippingFee = (totalAmount + shippingFee).toFixed(2);
 
-	const totalWithShipping =
-		paymentOption === "Partial Payment"
-			? (totalAmount + shippingFee / 2).toFixed(2)
-			: (totalAmount + shippingFee).toFixed(2);
+	// kapag partial payment
+	const partialPaymentAmount = ((totalAmount + shippingFee) / 2).toFixed(2);
 
-	const partialPaymentAmount = ((totalAmount + shippingFee)/2).toFixed(2);
-	console.log("partial", partialPaymentAmount)
+	const remainingBalance = (totalAmount + shippingFee - partialPaymentAmount).toFixed(2);
+
+	const montlyInstallment = (remainingBalance / 3).toFixed(2);
+
+	// kapag full payment
+	const fullPayment = totalAmountWithShippingFee;
+	// console.log("partial", partialPaymentAmount);
 
 	const handlePaymentMethodClick = (method) => {
 		setSelectedPaymentMethod(method);
@@ -131,7 +135,6 @@ const Cart = () => {
 		setProofOfPayment(file);
 		setUploadMessage(`Selected file: ${file.name}`);
 	};
-
 
 	const preOrderFromCart = async () => {
 		if (!selectedPaymentMethod) {
@@ -152,11 +155,17 @@ const Cart = () => {
 		formData.append("shippingAddress", JSON.stringify(addressToSend));
 		formData.append("deliveryMode", deliveryMode);
 		formData.append("expectedDelivery", expectedDeliveryDate);
+		formData.append("totalAmount", totalAmount);
+		formData.append("shippingFee", shippingFee);
+		formData.append("totalAmountWithShippingFee", totalAmountWithShippingFee);
+		formData.append("partialPaymentAmount", partialPaymentAmount);
+		formData.append("remainingBalance", remainingBalance);
+		formData.append("montlyInstallment", montlyInstallment);
 
-		// // Log FormData contents
-		// for (const [key, value] of formData.entries()) {
-		// 	console.log(`${key}:`, value);
-		// }
+		// Log FormData contents
+		for (const [key, value] of formData.entries()) {
+			console.log(`${key}:`, value);
+		}
 
 		try {
 			const response = await fetch("http://localhost:3000/api/orders/create", {
@@ -165,18 +174,18 @@ const Cart = () => {
 				credentials: "include",
 			});
 
-			if (!response.ok) {
-				throw new Error(response.message);
-			}
-			const data = await response.json();
-			if (!data.ok) {
-				toast.error(data.error);
-			}
+			// if (!response.ok) {
+			// 	throw new Error(response.message);
+			// }
+			// const data = await response.json();
+			// if (!data.ok) {
+			// 	toast.error(data.error);
+			// }
 
-			const orderId = data.order._id;
-			await clearCart();
-			navigate(`/order-details/${orderId}`);
-			await fetchCartItems();
+			// const orderId = data.order._id;
+			// await clearCart();
+			// navigate(`/order-details/${orderId}`);
+			// await fetchCartItems();
 		} catch (error) {
 			setError(error.message);
 			setLoading(false);
@@ -603,27 +612,40 @@ const Cart = () => {
 								<div className="text-lg font-normal">
 									<div className="flex justify-between">
 										<span>Items total:</span>
-										<span>₱{totalAmount.toFixed(2)}</span>
+										<span>₱ {totalAmount.toFixed(2)}</span>
 									</div>
 									<div className="flex justify-between">
 										<span>Shipping Fee:</span>
-										<span>₱{shippingFee.toFixed(2)}</span>
+										<span>₱ {shippingFee.toFixed(2)}</span>
 									</div>
 									{/* payable amount dito */}
 									<div className="mt-5">
 										{paymentOption === "Partial Payment" ? (
-											<div className="flex justify-between">
-												<h3 className="text-lg font-semibold">
-													Partial Payment (50%):
-												</h3>
-												<p className="font-bold">PHP {partialPaymentAmount}</p>
+											<div className="flex flex-col">
+												<div className="flex justify-between">
+													<h3 className="font-semibold">Total:</h3>
+													<p>₱ {totalAmountWithShippingFee}</p>
+												</div>
+
+												<div className="flex justify-between">
+													<h3 className="font-semibold">
+														Partial Payment (50%):
+													</h3>
+													<p>₱ {partialPaymentAmount}</p>
+												</div>
+												<div className="flex justify-between">
+													<h3 className="font-semibold">
+														Montly Installment (3 months):
+													</h3>
+													<p>₱ {montlyInstallment}</p>
+												</div>
 											</div>
 										) : (
 											<div className="flex justify-between">
 												<h3 className="text-lg font-semibold">
 													Total Payment:
 												</h3>
-												<p className="font-bold">PHP {totalWithShipping}</p>
+												<p className="font-bold">PHP {fullPayment}</p>
 											</div>
 										)}
 									</div>

@@ -62,18 +62,18 @@ const orderSchema = new mongoose.Schema(
 			ref: "User",
 			required: true,
 		},
-    furniture:{
-			type:Object
-    },
-		material:{type:String},
-		color:{type:String},
-		size:{type:String},
-		quantity:{type:Number},
+		furniture: {
+			type: Object,
+		},
+		material: { type: String },
+		color: { type: String },
+		size: { type: String },
+		quantity: { type: Number },
 		orderNumber: {
 			type: String,
 			unique: true,
 		},
-		
+
 		items: [
 			{
 				furniture: {
@@ -93,7 +93,7 @@ const orderSchema = new mongoose.Schema(
 				material: { type: String },
 				color: { type: String },
 				size: { type: String },
-				ECT:{type:Number}
+				ECT: { type: Number },
 			},
 		],
 		shippingAddress: {
@@ -105,9 +105,9 @@ const orderSchema = new mongoose.Schema(
 		phoneNumber: {
 			type: String,
 		},
-		paymentOption:{
-			type:String,
-			require:true,
+		paymentOption: {
+			type: String,
+			require: true,
 		},
 		paymentMethod: {
 			type: String,
@@ -123,23 +123,35 @@ const orderSchema = new mongoose.Schema(
 			enum: ["pending", "confirmed", "delivered", "cancelled"],
 			default: "pending",
 		},
-    deliveryMode:{
-      type:String,
-    },
-		expectedDelivery:{
-			type:String
+		deliveryMode: {
+			type: String,
 		},
-		remainingBalance:{
-			type:Number
+		expectedDelivery: {
+			type: String,
 		},
-		subtotal: Number,
-		shippingFee: Number,
-		totalAmount: Number,
-		type:{
-			type:String,
-			enum: ["Cart","Pre-Order"],
-			required:true
-		}
+		totalAmount: {
+			type: Number,
+		},
+		shippingFee: {
+			type: Number,
+		},
+		totalAmountWithShipping: {
+			type: Number,
+		},
+		partialPayment: {
+			type: Number,
+		},
+		remainingBalance: {
+			type: Number,
+		},
+		montlyInstallment: {
+			type: Number,
+		},
+		type: {
+			type: String,
+			enum: ["Cart", "Pre-Order"],
+			required: true,
+		},
 	},
 	{
 		timestamps: true,
@@ -158,103 +170,115 @@ orderSchema.pre("save", async function (next) {
 	next();
 });
 
-orderSchema.statics.preOrder = async function(user, furniture, material, color, size, quantity, paymentMethod, proofOfPayment, paymentOption,shippingAddress, shippingFee, deliveryMode, expectedDelivery,subtotal,totalAmount,remainingBalance) {
-
-
-	// //calculation para sa partial payment ksksks
-	// let partialPayment
-	// let remainingHalf
-	// let partialPaymentplusShippingFee
-	// if(paymentOption === "Partial Payment"){
-	// 	partialPayment = cart.totalAmount / 2;
-	// 	remainingHalf = partialPayment;
-	// 	partialPaymentplusShippingFee = partialPayment + shippingFee;
-	// 	console.log(`Cart total is ${cart.totalAmount} divided by 2 = ${partialPayment}`)
-	// 	console.log("total amount ng partial payment plus shipping fee", partialPaymentplusShippingFee);
-		
-	// }
-
-	if(paymentOption === "Full Payment"){
+orderSchema.statics.preOrder = async function (
+	user,
+	furniture,
+	material,
+	color,
+	size,
+	quantity,
+	paymentMethod,
+	proofOfPayment,
+	paymentOption,
+	shippingAddress,
+	deliveryMode,
+	expectedDelivery,
+	totalAmount,
+	shippingFee,
+	totalAmountWithShipping,
+	partialPayment,
+	remainingBalance,
+	monthlyInstallment
+) {
+	// Validation for "Partial Payment"
+	if (paymentOption === "Full Payment") {
 		remainingBalance = undefined;
+		monthlyInstallment = undefined;
+		partialPayment = undefined;
 	}
-	
-  const preOrderData = {
-      user: user,
-			furniture:furniture,
-			material:material,
-			color:color,
-			size:size,
-			quantity:quantity,
-      paymentMethod: paymentMethod,
-      proofOfPayment: proofOfPayment,
-			paymentOption: paymentOption,
-      shippingAddress: shippingAddress,
-      shippingFee: shippingFee,
-      // phoneNumber: userId.phoneNumber,
-			// totalAmount: paymentOption === "Partial Payment" ? partialPaymentplusShippingFee : (cart.totalAmount + shippingFee),
-			// remainingBalance: remainingHalf,
-      deliveryMode: deliveryMode,
-			expectedDelivery:expectedDelivery,
-			subtotal:subtotal,
-			totalAmount:totalAmount,
-			remainingBalance:remainingBalance,
-			type:"Pre-Order",
-  };
 
+	const preOrderData = {
+		user,
+		furniture,
+		material,
+		color,
+		size,
+		quantity,
+		paymentMethod,
+		proofOfPayment,
+		paymentOption,
+		shippingAddress,
+		deliveryMode,
+		expectedDelivery,
+		totalAmount,
+		shippingFee,
+		totalAmountWithShipping,
+		partialPayment,
+		remainingBalance,
+		monthlyInstallment,
+		type: "Pre-Order",
+	};
 
-  return this.create(preOrderData);
+	return this.create(preOrderData);
 };
 
-orderSchema.statics.createFromCart = async function(cartId, paymentMethod, proofOfPayment, paymentOption,shippingAddress, shippingFee, deliveryMode, expectedDelivery) {
-  const cart = await mongoose.model('Cart').findById(cartId)
-    .populate('userId')
-    .populate('items.furnitureId');
-  
-  if (!cart) throw new Error('Cart not found');
-	console.log(cart.totalAmount)
-	console.log("From the model. Payment option is ", paymentOption);
+orderSchema.statics.createFromCart = async function (
+	cartId,
+	paymentMethod,
+	proofOfPayment,
+	paymentOption,
+	shippingAddress,
+	deliveryMode,
+	expectedDelivery,
+	totalAmount,
+	shippingFee,
+	totalAmountWithShipping,
+	partialPayment,
+	remainingBalance,
+	monthlyInstallment
+) {
+	const cart = await mongoose
+		.model("Cart")
+		.findById(cartId)
+		.populate("userId")
+		.populate("items.furnitureId");
 
-	//calculation para sa partial payment ksksks
-	let partialPayment
-	let remainingHalf
-	let partialPaymentplusShippingFee
-	if(paymentOption === "Partial Payment"){
-		partialPayment = cart.totalAmount / 2;
-		remainingHalf = partialPayment;
-		partialPaymentplusShippingFee = partialPayment + shippingFee;
-		console.log(`Cart total is ${cart.totalAmount} divided by 2 = ${partialPayment}`)
-		console.log("total amount ng partial payment plus shipping fee", partialPaymentplusShippingFee);
-		
+	if (!cart) throw new Error("Cart not found");
+
+	// Validation for "Partial Payment"
+	if (paymentOption === "Full Payment") {
+		remainingBalance = undefined;
+		monthlyInstallment = undefined;
+		partialPayment = undefined;
 	}
 
+	const orderData = {
+		user: cart.userId._id,
+		items: cart.items.map((item) => ({
+			furniture: item.furnitureId._id,
+			quantity: item.quantity,
+			price: item.furnitureId.price,
+			material: item.material,
+			color: item.color,
+			size: item.size,
+		})),
+		shippingAddress,
+		phoneNumber: cart.userId.phoneNumber,
+		paymentMethod,
+		proofOfPayment,
+		paymentOption,
+		shippingFee,
+		deliveryMode,
+		expectedDelivery,
+		totalAmount,
+		totalAmountWithShipping,
+		partialPayment,
+		remainingBalance,
+		monthlyInstallment,
+		type: "Cart",
+	};
 
-	
-  const orderData = {
-      user: cart.userId._id,
-      items: cart.items.map(item => ({
-          furniture: item.furnitureId._id,
-          quantity: item.quantity,
-          price: item.furnitureId.price,
-          material: item.material,
-          color: item.color,
-          size: item.size
-      })),
-      shippingAddress: shippingAddress,
-      phoneNumber: cart.userId.phoneNumber,
-      paymentMethod: paymentMethod,
-      subtotal: cart.totalAmount,
-      shippingFee: shippingFee,
-			totalAmount: paymentOption === "Partial Payment" ? partialPaymentplusShippingFee : (cart.totalAmount + shippingFee),
-			remainingBalance: remainingHalf,
-      proofOfPayment: proofOfPayment,
-      deliveryMode: deliveryMode,
-			expectedDelivery:expectedDelivery,
-			paymentOption: paymentOption,
-			type:"Cart"
-  };
-
-
-  return this.create(orderData);
+	return this.create(orderData);
 };
 
 const Order = mongoose.model("Order", orderSchema);
