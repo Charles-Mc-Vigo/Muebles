@@ -127,7 +127,6 @@ function ProductDetails({ admin }) {
 			setSelectedSize(null);
 			setMaterialPrice(null);
 			setSizePrice(null);
-			setPrice(0);
 	
 		} catch (error) {
 			console.error("Error adding item to cart:", error);

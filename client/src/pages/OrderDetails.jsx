@@ -185,8 +185,7 @@ const OrderDetails = () => {
 										</div>
 										<div className="mt-4 md:mt-0">
 											<p className="text-lg font-medium text-teal-700">
-												PHP {(item.price * item.quantity).toFixed(2)} X{" "}
-												<span> {item.quantity} </span>
+												PHP {item.price}
 											</p>
 										</div>
 									</li>
