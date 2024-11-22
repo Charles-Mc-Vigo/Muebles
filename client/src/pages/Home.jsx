@@ -262,7 +262,7 @@ const Home = () => {
 
   return (
     <div className="bg-white text-gray-800 flex flex-col min-h-screen">
-      <Header isLogin={true} cartCount={cartCount} />
+      <Header isLogin={true} />
       <ToastContainer
         style={{ top: "80px", right: "50px" }}
         autoClose={3000}

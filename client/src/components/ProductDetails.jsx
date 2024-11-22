@@ -302,7 +302,7 @@ function ProductDetails({ admin }) {
 				<LoadingSpinner />
 			) : (
 				<section className="bg-white">
-					<Header isLogin={true} cartCount={true} />
+					<Header isLogin={true} />
 					<div className="w-full h-auto p-5 flex flex-col lg:flex-row">
 						<div className="flex flex-col lg:flex-row lg:w-full justify-center p-5">
 							<div className="flex flex-col rounded-xl p-5 border-2 border-teal-600 sm:mb-5 md:mb-5 max-w-2/5 shadow-lg shadow-gray-300">
