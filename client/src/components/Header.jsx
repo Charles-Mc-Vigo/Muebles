@@ -11,6 +11,7 @@ import {
 import { CgProfile } from "react-icons/cg";
 import { Link } from "react-router-dom";
 import Logout from "./Logout";
+import Notification from "./Notification";
 
 const Header = ({ isLogin }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -102,6 +103,12 @@ const Header = ({ isLogin }) => {
                     </span>
                   )}
                 </Link>
+              )}
+
+              {isLogin && (
+                <div>
+                  <Notification/>
+                </div>
               )}
               {/* User Icon with Collapsible Menu */}
               <div className="relative">
