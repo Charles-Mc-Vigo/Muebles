@@ -3,7 +3,10 @@ import { Link } from "react-router-dom";
 
 const OrderManagement = () => {
   const [orders, setOrders] = useState([]);
+  const [filteredOrders, setFilteredOrders] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [filter, setFilter] = useState("all"); // Filter state
 
   const fetchOrder = async () => {
     setLoading(true);
@@ -20,6 +23,7 @@ const OrderManagement = () => {
       }
       const ordersData = await response.json();
       setOrders(ordersData.orders || []);
+      setFilteredOrders(ordersData.orders || []); // Initialize filtered orders
     } catch (error) {
       console.error("Error fetching orders:", error);
     } finally {
@@ -33,7 +37,6 @@ const OrderManagement = () => {
 
   const handleStatusChange = async (orderId, newStatus) => {
     try {
-      console.log(`Updating Order ID: ${orderId} to Status: ${newStatus}`);
       const response = await fetch(
         `http://localhost:3000/api/admin/update/${orderId}`,
         {
@@ -53,16 +56,10 @@ const OrderManagement = () => {
           order._id === orderId ? { ...order, orderStatus: newStatus } : order
         )
       );
-      console.log(`Order ID: ${orderId} successfully updated to ${newStatus}`);
+      setHasUnsavedChanges(false);
     } catch (error) {
       console.error("Error updating order status:", error);
     }
-  };
-
-  const handleUpdateClick = (orderId) => {
-    const selectElement = document.getElementById(`status-select-${orderId}`);
-    const newStatus = selectElement.value; 
-    handleStatusChange(orderId, newStatus); 
   };
 
   const handleSelectChange = (orderId, event) => {
@@ -72,6 +69,19 @@ const OrderManagement = () => {
         order._id === orderId ? { ...order, orderStatus: newStatus } : order
       )
     );
+    setHasUnsavedChanges(true);
+  };
+
+  const handleFilterChange = (event) => {
+    const selectedFilter = event.target.value;
+    setFilter(selectedFilter);
+    if (selectedFilter === "all") {
+      setFilteredOrders(orders);
+    } else {
+      setFilteredOrders(
+        orders.filter((order) => order.orderStatus === selectedFilter)
+      );
+    }
   };
 
   return (
@@ -79,6 +89,35 @@ const OrderManagement = () => {
       <h1 className="text-3xl font-bold text-center mb-6 text-gray-800">
         Order Management
       </h1>
+
+      <div className="flex justify-between items-center mb-4">
+        <div>
+          <label htmlFor="filter" className="mr-2 text-gray-700">
+            Filter by Status:
+          </label>
+          <select
+            id="filter"
+            value={filter}
+            onChange={handleFilterChange}
+            className="border rounded p-2"
+          >
+            <option value="all">All</option>
+            <option value="pending">Pending</option>
+            <option value="confirmed">Confirmed</option>
+            <option value="delivered">Delivered</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+        </div>
+        {hasUnsavedChanges && (
+          <button
+            onClick={() => setHasUnsavedChanges(false)} // Save action can be added here
+            className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
+          >
+            Save Changes
+          </button>
+        )}
+      </div>
+
       {loading ? (
         <div className="flex items-center justify-center">
           <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-blue-500"></div>
@@ -109,7 +148,7 @@ const OrderManagement = () => {
             </tr>
           </thead>
           <tbody>
-            {orders.map((order) => (
+            {filteredOrders.map((order) => (
               <tr
                 key={order._id}
                 className="hover:bg-gray-100 transition-colors duration-200"
@@ -128,12 +167,10 @@ const OrderManagement = () => {
                 </td>
                 <td className="py-3 px-4 border-b text-gray-600">
                   <select
-                    id={`status-select-${order._id}`} 
-                    value={order.orderStatus} 
-                    onChange={(e) => handleSelectChange(order._id, e)} 
+                    value={order.orderStatus}
+                    onChange={(e) => handleSelectChange(order._id, e)}
                     className="border rounded p-1"
                   >
-                    <option value="pending">Pending</option>
                     <option value="confirmed">Confirmed</option>
                     <option value="delivered">Delivered</option>
                     <option value="cancelled">Cancelled</option>
@@ -146,12 +183,6 @@ const OrderManagement = () => {
                   >
                     View
                   </Link>
-                  <button
-                    onClick={() => handleUpdateClick(order._id)} 
-                    className="text-blue-500 hover:underline"
-                  >
-                    Update
-                  </button>
                 </td>
               </tr>
             ))}

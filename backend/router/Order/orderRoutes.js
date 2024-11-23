@@ -12,7 +12,7 @@ router.post("/pre-order/create", checkUserAuth, upload.single("proofOfPayment"),
 router.get('/my-orders', checkUserAuth, orderController.getUserOrders);
 router.get('/details/:orderId', checkUserAuth, orderController.getOrderDetails);
 router.put('/cancel/:orderId', checkUserAuth, orderController.cancelOrder);
-router.put('/update/:orderId',checkUserAuth,orderController.updateOrderStatus);
+router.put('/update/:orderId',checkAdminAuth,orderController.updateOrderStatus);
 router.get("/:orderNumber", checkAdminAuth, orderController.getOrderByOrderNumber);
 
 

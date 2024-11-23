@@ -295,11 +295,11 @@ const orderController = {
 	// Admin: Get all orders
 	getAllOrders: async (req, res) => {
 		try {
-			const orders = await Order.find(req.query)
+			const orders = await Order.find({ orderStatus: { $nin: ["cancelled", "pending"] } })
 				.populate("user", "firstname lastname email phoneNumber")
 				.populate("items.furniture")
 				.sort({ createdAt: -1 });
-
+	
 			res.status(200).json({
 				success: true,
 				orders,
@@ -312,6 +312,7 @@ const orderController = {
 			});
 		}
 	},
+	
 
 	// Admin: Update order status
 	updateOrderStatus: async (req, res) => {

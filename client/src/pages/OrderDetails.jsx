@@ -109,11 +109,17 @@ const OrderDetails = () => {
 									Status: {""}
 								</span>
 								<span
-									className={`${
+									className={`font-semibold ${
 										order.orderStatus === "pending"
 											? "text-yellow-600"
-											: "text-green-700"
-									} font-semibold`}
+											: order.orderStatus === "confirmed"
+											? "text-blue-600"
+											: order.orderStatus === "delivered"
+											? "text-green-700"
+											: order.orderStatus === "cancelled"
+											? "text-red-600"
+											: "text-gray-600" // Fallback color for any unexpected status
+									}`}
 								>
 									{order.orderStatus}
 								</span>
@@ -204,7 +210,9 @@ const OrderDetails = () => {
 							<div className="flex justify-end">
 								<p className="text-xl font-semibold mt-4 text-teal-700 pr-2 pb-2">
 									Total: ₱
-									{order.totalAmountWithShipping ? order.totalAmountWithShipping.toFixed(2) : "0.00"}
+									{order.totalAmountWithShipping
+										? order.totalAmountWithShipping.toFixed(2)
+										: "0.00"}
 								</p>
 							</div>
 						</div>
@@ -233,16 +241,17 @@ const OrderDetails = () => {
 									<p>Quantity: {order.quantity}</p>
 									<p className="font-semibold text-lg mt-5">
 										Subtotal:{" "}
-										<span className="font-normal">
-											₱ {order.subtotal}
-										</span>{" "}
+										<span className="font-normal">₱ {order.subtotal}</span>{" "}
 									</p>
 								</div>
 							</div>
 						</div>
 						<div className="bg-white border flex border-teal-400 rounded-xl p-4 md:p-6 text-right gap-2">
 							<div className="bg-red-200 flex flex-1">
-								<p>ilalagay dine yung about sa pag patong ng interest sa order ng user kapag di nakabayad monthly</p>
+								<p>
+									ilalagay dine yung about sa pag patong ng interest sa order ng
+									user kapag di nakabayad monthly
+								</p>
 							</div>
 							{order.paymentOption === "Full Payment" ? (
 								<div>
