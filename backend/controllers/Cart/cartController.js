@@ -8,7 +8,7 @@ exports.viewCart = async (req, res) => {
   try {
     const user = await User.findById(req.user._id);
     if (!user) return res.status(404).json({ message: "User not found!" });
-		
+
 		// console.log("User information", user)
 
     const cart = await Cart.findOne({ userId: user._id })

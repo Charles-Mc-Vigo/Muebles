@@ -185,7 +185,7 @@ const OrderDetails = () => {
 										</div>
 										<div className="mt-4 md:mt-0">
 											<p className="text-lg font-medium text-teal-700">
-												PHP {item.price}
+												PHP {order.totalAmount} X {item.quantity}
 											</p>
 										</div>
 									</li>
@@ -204,7 +204,7 @@ const OrderDetails = () => {
 							<div className="flex justify-end">
 								<p className="text-xl font-semibold mt-4 text-teal-700 pr-2 pb-2">
 									Total: ₱
-									{order.totalAmount ? order.totalAmount.toFixed(2) : "0.00"}
+									{order.totalAmountWithShipping ? order.totalAmountWithShipping.toFixed(2) : "0.00"}
 								</p>
 							</div>
 						</div>

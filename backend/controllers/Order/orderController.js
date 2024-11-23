@@ -275,6 +275,23 @@ const orderController = {
 		}
 	},
 
+	getOrderByOrderNumber: async (req, res) => {
+		try {
+			const { orderNumber } = req.params;
+	
+			// Assuming `Order` is your Mongoose model
+			const order = await Order.findOne({ orderNumber });
+	
+			if (!order) {
+				return res.status(404).json({ message: "Order not found" });
+			}
+	
+			res.status(200).json(order);
+		} catch (error) {
+			res.status(500).json({ message: "Server error", error: error.message });
+		}
+	},
+
 	// Admin: Get all orders
 	getAllOrders: async (req, res) => {
 		try {

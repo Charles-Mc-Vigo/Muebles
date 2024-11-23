@@ -202,7 +202,7 @@ const ViewOrder = () => {
                                   Quantity: {order.quantity}
                                 </p>
                                 <p className="text-sm text-gray-600">
-                                  Price: PHP {order.subtotal}
+                                  Price: PHP {order.totalAmount}
                                 </p>
                                 <p className="text-sm text-gray-600">
                                   Expected Delivery: {order.expectedDelivery}
@@ -272,7 +272,7 @@ const ViewOrder = () => {
                                       Quantity: {item.quantity}
                                     </p>
                                     <p className="text-sm text-gray-600">
-                                      Price: PHP {item.price}
+                                      Price: PHP {order.totalAmount}
                                     </p>
                                     <p className="text-sm text-gray-600">
                                       Expected Delivery:{" "}
@@ -309,7 +309,7 @@ const ViewOrder = () => {
                           </p>
                         )}
                         <p className="text-xl font-bold text-gray-800">
-                          Total: PHP {order.totalAmount}
+                          Total: PHP {order.totalAmountWithShipping}
                         </p>
                       </div>
                     </div>
