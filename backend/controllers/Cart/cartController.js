@@ -8,6 +8,8 @@ exports.viewCart = async (req, res) => {
   try {
     const user = await User.findById(req.user._id);
     if (!user) return res.status(404).json({ message: "User not found!" });
+		
+		// console.log("User information", user)
 
     const cart = await Cart.findOne({ userId: user._id })
       .populate({
@@ -18,6 +20,8 @@ exports.viewCart = async (req, res) => {
         path: "userId",
         select: "firstname lastname email phoneNumber addresses",
       });
+
+			// console.log(cart.userId.addresses)
 
     if (!cart) {
       return res.status(200).json({
@@ -36,6 +40,7 @@ exports.viewCart = async (req, res) => {
     res.status(200).json({
       success: true,
       cart: {
+				userId: user,
         items: cart.items,
         count: cart.count,
         totalAmount: cart.totalAmount,

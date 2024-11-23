@@ -23,8 +23,8 @@ router.get("/notifications/pending-orders",checkAdminAuth, viewPendingOrder);
 router.get("/notifications/pending-request/:adminId", checkAdminAuth, ViewRequest);
 router.post("/notifications/accept-request/:adminId", checkAdminAuth, AcceptAdminRequest);
 router.post("/notifications/reject-request/:adminId", checkAdminAuth, RejectAdminRequest);
-router.post('/notifications/accept-order/:orderId',checkAdminAuth,AcceptOrder);
-router.put('/notifications/cancel-order/:orderId',checkAdminAuth,cancelOrder);
+router.put('/accept-order/:orderId',checkAdminAuth,AcceptOrder);
+router.put('/cancel-order/:orderId',checkAdminAuth,cancelOrder);
 
 router.get('/verified/:adminId', checkAdminAuth, getAdminById);
 router.put("/setting/update-profile", checkAdminAuth, upload.single('image'), updateProfile);

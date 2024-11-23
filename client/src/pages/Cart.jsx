@@ -76,6 +76,7 @@ const Cart = () => {
 				setCount(data.cart.count);
 				setTotalAmount(data.cart.totalAmount);
 				setUser(data.cart.userId);
+				console.log(data.cart.userId)
 				const defaultAddress = data.cart.userId.addresses?.find(
 					(address) => address.isDefault
 				);

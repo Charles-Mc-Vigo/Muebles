@@ -79,7 +79,7 @@ const ViewOrder = () => {
 
   return (
     <div className="bg-gray-50 w-full min-h-screen">
-      <Header isLogin={true} cartCount={true} />
+      <Header isLogin={true} />
       <div className="container mx-auto px-4 py-8 max-w-6xl">
         <div className="flex items-center mb-6">
           <button
