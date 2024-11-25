@@ -60,6 +60,19 @@ const orderController = {
 			const adjustedInstallment =
 				paymentOption === "Full Payment" ? null : montlyInstallment;
 
+			// Calculate due date only for partial payments
+			let dueDate = null;
+			if (paymentOption === "Partial Payment") {
+				dueDate = new Date();
+				dueDate.setDate(dueDate.getDate() + 30); // Set due date to 30 days from now
+			}
+			console.log(dueDate)
+
+			// Set interest and lastPaymentDate to undefined for full payments
+			const interest = paymentOption === "Full Payment" &&  undefined
+			const lastPaymentDate =
+				paymentOption === "Full Payment" && undefined
+
 			const order = await Order.createFromCart(
 				cart._id,
 				paymentMethod,
@@ -73,7 +86,10 @@ const orderController = {
 				totalAmountWithShippingFee,
 				adjustedPartialPayment,
 				adjustedRemainingBalance,
-				adjustedInstallment
+				adjustedInstallment,
+				dueDate,
+				interest,
+				lastPaymentDate
 			);
 
 			// Clear the user's cart after order creation
@@ -114,7 +130,7 @@ const orderController = {
 				totalAmountWithShippingFee,
 				partialPayment,
 				remainingBalance,
-				montlyInstallment
+				montlyInstallment,
 			} = req.body;
 
 			const userId = req.user._id;
@@ -134,6 +150,17 @@ const orderController = {
 			}
 
 			const proofOfPayment = req.file.buffer.toString("base64");
+			// Calculate due date only for partial payments
+			let dueDate = null;
+			if (paymentOption === "Partial Payment") {
+				dueDate = new Date();
+				dueDate.setDate(dueDate.getDate() + 30); // Set due date to 30 days from now
+			}
+
+			// Set interest and lastPaymentDate to undefined for full payments
+			const interest = paymentOption === "Full Payment" && undefined 
+			const lastPaymentDate =
+				paymentOption === "Full Payment" && undefined
 
 			const preOrder = await Order.preOrder(
 				user,
@@ -154,7 +181,10 @@ const orderController = {
 				totalAmountWithShippingFee,
 				partialPayment,
 				remainingBalance,
-				montlyInstallment
+				montlyInstallment,
+				dueDate,
+				interest,
+				lastPaymentDate
 			);
 
 			await User.findByIdAndUpdate(userId, {
@@ -278,14 +308,14 @@ const orderController = {
 	getOrderByOrderNumber: async (req, res) => {
 		try {
 			const { orderNumber } = req.params;
-	
+
 			// Assuming `Order` is your Mongoose model
 			const order = await Order.findOne({ orderNumber });
-	
+
 			if (!order) {
 				return res.status(404).json({ message: "Order not found" });
 			}
-	
+
 			res.status(200).json(order);
 		} catch (error) {
 			res.status(500).json({ message: "Server error", error: error.message });
@@ -295,11 +325,13 @@ const orderController = {
 	// Admin: Get all orders
 	getAllOrders: async (req, res) => {
 		try {
-			const orders = await Order.find({ orderStatus: { $nin: ["pending", "cancelled"] } })
-			.populate("user", "firstname lastname email phoneNumber")
-			.populate("items.furniture")
-			.sort({ createdAt: -1 });	
-	
+			const orders = await Order.find({
+				orderStatus: { $nin: ["pending", "cancelled"] },
+			})
+				.populate("user", "firstname lastname email phoneNumber")
+				.populate("items.furniture")
+				.sort({ createdAt: -1 });
+
 			res.status(200).json({
 				success: true,
 				orders,
@@ -312,7 +344,6 @@ const orderController = {
 			});
 		}
 	},
-	
 
 	// Admin: Update order status
 	updateOrderStatus: async (req, res) => {
