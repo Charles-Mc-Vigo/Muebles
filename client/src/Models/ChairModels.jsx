@@ -1,7 +1,7 @@
 import React from "react";
 import { useGLTF } from "@react-three/drei";
 
-export function Model({ selectedBackrest, selectedSeat }) {
+export function Chair({ selectedBackrest, selectedSeat }) {
 	const { nodes, materials } = useGLTF("/Models/ChairModels.glb");
 
 	// Function to get the appropriate backrest node and material based on selection
@@ -118,7 +118,7 @@ export function Model({ selectedBackrest, selectedSeat }) {
 				position={[-0.847, -0.269, -0.89]}
 				scale={0.175}
 			/>
-			F{/* Dynamic Backrest */}
+			{/* Dynamic Backrest */}
 			<mesh
 				geometry={backrest.geometry}
 				material={backrest.material}
