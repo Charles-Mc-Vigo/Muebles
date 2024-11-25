@@ -6,7 +6,7 @@ const services = [
   {
     title: "Custom Furniture Design",
     description: "Work with our designers to create unique pieces that fit your style and needs.",
-    icon: "🪑", // You can replace this with an actual icon or image.
+    icon: "🪑", 
   },
   {
     title: "Furniture Restoration",
@@ -22,10 +22,12 @@ const services = [
 
 const ServicePage = () => {
   return (
-    <div className="min-h-screen">
-      <Header /> 
-
-      <h1 className="text-4xl font-bold text-center mt-40 mb-6">Our Services</h1>
+    
+      
+      <main>
+        <Header />  
+        <section>
+        <h1 className="text-4xl font-bold text-center mt-40 mb-6">Our Services</h1>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 ml-2 mr-2">
         {services.map((service, index) => (
@@ -36,13 +38,17 @@ const ServicePage = () => {
           </div>
         ))}
       </div>
-
       <div className="mt-5">
-        <Footer />
       </div>
+        </section>
+        <Footer />
+      </main>
+
+
+     
 
     
-    </div>
+   
   );
 };
 
