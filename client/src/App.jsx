@@ -47,7 +47,6 @@ import PreOrder from "./pages/PreOrder";
 import ReviewPage from "./pages/ReviewPage";
 // import LoadingSpinner from "./components/LoadingSpinner";
 
-
 export default function App() {
 	return (
 		<ErrorBoundary>
@@ -105,6 +104,10 @@ export default function App() {
 					<Route
 						path="/orders"
 						element={<ProtectedRoute element={ViewOrder} />}
+					/>
+					<Route
+						path="/product-customization"
+						element={<ProtectedRoute element={ProductCustomization} />}
 					/>
 					<Route path="/product-review" element={<ReviewPage />} />
 					{/* <Route path="/create-review" element={<CreateReview />} /> */}
