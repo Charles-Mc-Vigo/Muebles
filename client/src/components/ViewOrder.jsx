@@ -10,8 +10,6 @@ import {
 import { useNavigate } from "react-router-dom";
 import Header from "./Header";
 import Footer from "./Footer";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 
 const ViewOrder = () => {
 	const [orders, setOrders] = useState([]);
@@ -61,13 +59,35 @@ const ViewOrder = () => {
 			if (!response.ok) {
 				throw new Error("Failed to cancel order");
 			}
-			toast.success("Order was cancelled");
+			alert("Order was cancelled");
 			fetchOrder();
 		} catch (error) {
 			console.log(error);
 			setErrorMessage(error.message);
 		} finally {
 			setCancelLoading(null);
+		}
+	};
+	const handleDeliveryConfirmation = async (orderId) => {
+		setLoading(true);
+		try {
+			const response = await fetch(
+				`http://localhost:3000/api/orders/confirm-delivery/${orderId}`,
+				{
+					method: "POST",
+					credentials: "include",
+				}
+			);
+			if (!response.ok) {
+				throw new Error("Failed to confirm order");
+			}
+			alert("Order has been confirmed!");
+			fetchOrder();
+		} catch (error) {
+			console.log(error);
+			setErrorMessage(error.message);
+		} finally {
+			setLoading(false);
 		}
 	};
 
@@ -177,9 +197,7 @@ const ViewOrder = () => {
 									{order.type === "Pre-Order" ? (
 										<div>
 											<div className="bg-gray-50 rounded-lg p-4 mb-4">
-												<h3 className="font-medium text-gray-700 mb-4">
-													Order Information
-												</h3>
+												<h3 className="font-medium text-gray-700 mb-4"></h3>
 												<p>Payment: {order.paymentOption}</p>
 												<div className="bg-white rounded-lg shadow-sm p-4 border border-gray-100">
 													<div className="flex items-center space-x-4">
@@ -244,7 +262,26 @@ const ViewOrder = () => {
 										<div>
 											<div className="bg-gray-50 rounded-lg p-4 mb-4">
 												<h3 className="font-medium text-gray-700 mb-4">
-													Order Information
+													{order.orderStatus === "pending" && (
+														<div className="p-5 text-right bg-yellow-200">
+															<h1>Your order is being process</h1>
+														</div>
+													)}
+													{order.orderStatus === "confirmed" && (
+														<div className="p-5 text-right bg-blue-200">
+															<h1>Your order is being process</h1>
+														</div>
+													)}
+													{order.orderStatus === "delivered" && (
+														<div className="p-5 text-right bg-green-200">
+															<h1>Your order has been delivered</h1>
+														</div>
+													)}
+													{order.orderStatus === "cancelled" && (
+														<>
+															<FaTimesCircle className="mr-2" /> Cancelled
+														</>
+													)}
 												</h3>
 												<p>Payment: {order.paymentOption}</p>
 												<div className="space-y-4">
@@ -314,31 +351,23 @@ const ViewOrder = () => {
 											</div>
 										</div>
 									)}
-									{/* Cancel Order Button */}
+									{/* Cancel Order Button or Confirm Delivery Button */}
 									<div className="flex justify-end mt-6">
-										<button
-											disabled={
-												order.orderStatus !== "pending" ||
-												cancelLoading === order._id
-											}
-											onClick={() => cancelOrder(order._id)}
-											className={`px-6 py-2 rounded-lg transition-colors
-      ${
-				order.orderStatus !== "pending"
-					? "bg-gray-100 text-gray-400 cursor-not-allowed"
-					: cancelLoading === order._id
-					? "bg-red-100 text-red-400 cursor-not-allowed"
-					: "bg-white text-red-600 border border-red-600 hover:bg-red-600 hover:text-white"
-			}`}
-										>
-											{cancelLoading === order._id
-												? "Cancelling..."
-												: "Cancel Order"}
-										</button>
-									</div>
-									{/* Review */}
-									<div>
-										<button>Write A Review</button>
+										{order.orderStatus === "delivered" && !order.isDelivered ? (
+											<button
+												onClick={() => handleDeliveryConfirmation(order._id)}
+												className="px-6 py-2 rounded-lg bg-blue-200 text-blue-600 hover:bg-blue-600 hover:text-white"
+											>
+												Confirm Delivery
+											</button>
+										) : (
+											// Render other content, such as a confirmation message or nothing
+											<div>
+												{order.isDelivered && (
+													<p className="text-green-600">Delivery confirmed</p>
+												)}
+											</div>
+										)}
 									</div>
 								</div>
 							</div>
@@ -352,7 +381,6 @@ const ViewOrder = () => {
 				)}
 			</div>
 			<Footer />
-			<ToastContainer />
 		</div>
 	);
 };

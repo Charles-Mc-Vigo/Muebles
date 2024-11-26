@@ -200,6 +200,22 @@ const orderController = {
 		}
 	},
 
+	confirmedDelivery: async (req,res) => {
+		try {
+			const {orderId} = req.params
+			const order = await Order.findById(orderId);
+
+			if(!order) return res.status(404).json({message:"Order not found!"});
+
+			order.isDelivered = true;
+			await order.save();
+			res.status(200).json({message:"Thankyou for confirmation!",order});
+		} catch (error) {
+			console.log("Error confirming the order: ", error);
+			res.status(500).json({message:"Server error!"});
+		}
+	},
+
 	// Get user's orders
 	getUserOrders: async (req, res) => {
 		try {

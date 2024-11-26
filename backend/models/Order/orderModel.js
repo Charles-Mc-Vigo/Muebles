@@ -103,6 +103,10 @@ const orderSchema = new mongoose.Schema(
     lastPaymentDate: {
       type: Date,
     },
+    isDelivered:{
+      type:Boolean,
+      default:false
+    },
     type: {
       type: String,
       enum: ["Cart", "Pre-Order"],
