@@ -260,7 +260,7 @@ const ViewOrder = () => {
 										</div>
 									) : (
 										<div>
-											<div className="bg-gray-50 rounded-lg p-4 mb-4">
+											<div className=" rounded-lg p-4 mb-4">
 												<h3 className="font-medium text-gray-700 mb-4">
 													{order.orderStatus === "pending" && (
 														<div className="p-5 text-right bg-yellow-200">
@@ -361,12 +361,47 @@ const ViewOrder = () => {
 												Confirm Delivery
 											</button>
 										) : (
-											// Render other content, such as a confirmation message or nothing
 											<div>
-												{order.isDelivered && (
-													<p className="text-green-600">Delivery confirmed</p>
+												{order.orderStatus === "delivered" &&
+												order.isDelivered ? (
+													<button
+														// onClick={() => handleProductRating(order._id)}
+														className="px-16 py-2 rounded-lg bg-blue-200 text-blue-600 hover:bg-blue-600 hover:text-white"
+													>
+														Rate
+													</button>
+												) : (
+													<div>
+														{order.isDelivered && (
+															<p className="text-green-600">
+																Delivery confirmed
+															</p>
+														)}
+													</div>
 												)}
 											</div>
+										)}
+
+										{order.orderStatus === "pending" && (
+											<button
+												disabled={
+													order.orderStatus !== "pending" ||
+													cancelLoading === order._id
+												}
+												onClick={() => cancelOrder(order._id)}
+												className={`px-6 py-2 rounded-lg transition-colors
+        ${
+					order.orderStatus !== "pending"
+						? "bg-gray-100 text-gray-400 cursor-not-allowed"
+						: cancelLoading === order._id
+						? "bg-red-100 text-red-400 cursor-not-allowed"
+						: "bg-white text-red-600 border border-red-600 hover:bg-red-600 hover:text-white"
+				}`}
+											>
+												{cancelLoading === order._id
+													? "Cancelling..."
+													: "Cancel Order"}
+											</button>
 										)}
 									</div>
 								</div>

@@ -185,7 +185,8 @@ exports.getFurnitureById = async (req, res) => {
     .populate("furnitureType")
     .populate("colors") 
     .populate("materials")
-    .populate("sizes");
+    .populate("sizes")
+		.populate("ratings")
 		if (!furniture) {
 			return res.status(404).json({ error: "Furniture not found!" });
 		}

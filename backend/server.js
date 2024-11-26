@@ -24,6 +24,9 @@ const orderRoutes = require('../backend/router/Order/orderRoutes');
 // Cart routes
 const cartRoutes = require('./router/Cart/cartRoutes');
 
+// Rating router
+const ratingRoutes = require('./router/Rating/ratingRoutes');
+
 // Database connection
 const connectDB = require("./database/db");
 
@@ -66,6 +69,7 @@ app.use("/api/sizes", sizeRoutes);
 app.use("/api/cart", cartRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/orders", orderRoutes);
+app.use('/api/ratings',ratingRoutes);
 
 // Global error handling middleware
 app.use((err, req, res, next) => {
