@@ -278,9 +278,9 @@ const ViewOrder = () => {
 														</div>
 													)}
 													{order.orderStatus === "cancelled" && (
-														<>
-															<FaTimesCircle className="mr-2" /> Cancelled
-														</>
+														<div className="p-5 text-right bg-red-200">
+															<h1>Order cancelled</h1>
+														</div>
 													)}
 												</h3>
 												<p>Payment: {order.paymentOption}</p>
@@ -365,7 +365,7 @@ const ViewOrder = () => {
 												{order.orderStatus === "delivered" &&
 												order.isDelivered ? (
 													<button
-														// onClick={() => handleProductRating(order._id)}
+														onClick={() => navigate(`/rating/${order._id}`)}
 														className="px-16 py-2 rounded-lg bg-blue-200 text-blue-600 hover:bg-blue-600 hover:text-white"
 													>
 														Rate

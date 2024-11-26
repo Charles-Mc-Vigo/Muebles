@@ -45,6 +45,7 @@ import ViewPendingRequest from "./pages/ViewPendingRequest";
 import ErrorBoundary from "./components/ErrorBoundary";
 import PreOrder from "./pages/PreOrder";
 import ReviewPage from "./pages/ReviewPage";
+import Rating from "./pages/Rating";
 // import LoadingSpinner from "./components/LoadingSpinner";
 
 export default function App() {
@@ -74,6 +75,10 @@ export default function App() {
 					<Route
 						path="/address/new"
 						element={<ProtectedRoute element={AddNewAddress} />}
+					/>
+					<Route
+						path="/rating/:orderId"
+						element={<ProtectedRoute element={Rating} />}
 					/>
 					<Route
 						path="/password-reset/request"
