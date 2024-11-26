@@ -4,7 +4,8 @@ import { OrbitControls } from "@react-three/drei";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { Chair } from "../Models/ChairModels";
-import { Door } from "../Models/DoorModels";
+// import { Door } from "../Models/DoorModels";
+import { Sofa } from "../Models/DesignSofa";
 
 const ProductCustomization = () => {
 	// State for selected model
@@ -14,7 +15,11 @@ const ProductCustomization = () => {
 	const [selectedSeat, setSelectedSeat] = useState("");
 	const [selectedWood, setSelectedWood] = useState("");
 	// for door
-	const [selectedDesign, setSelectedDesign] = useState(1);
+	// const [selectedDesign, setSelectedDesign] = useState(1);
+
+	// for sofa
+	const [selectedSofaBackrest, setSelectedSofaBackrest] = useState("");
+	const [selectedSofaArmrest, setSelectedSofaArmrest] = useState("");
 
 	// Handlers for each part selection
 	const handleBackrestChange = (e) => {
@@ -28,12 +33,53 @@ const ProductCustomization = () => {
 		if (selectedModel === "chair") setSelectedWood(e.target.value);
 	};
 
-	// for door
-	const handleDoorDesignChange = (e) => {
-		if (selectedModel === "door") setSelectedDesign(Number(e.target.value));
+	// handle backrest of sofa
+	const handleSofaBackrest = (e) => {
+		if (selectedModel === "sofa") setSelectedSofaBackrest(e.target.value);
+	};
+	const handleSofaArmrest = (e) => {
+		if (selectedModel === "sofa") setSelectedSofaArmrest(e.target.value);
 	};
 
+	// for door
+	// const handleDoorDesignChange = (e) => {
+	// 	if (selectedModel === "door") setSelectedDesign(Number(e.target.value));
+	// };
+
 	// console.log(selectedWood);
+
+	// const handleSubmit = async () => {
+	//   if(selectedModel === "chair"){
+	//     FormData = new FormData();
+	//   }
+	//   try {
+	//     // // Example: Simulate form submission or API call
+	//     // const response = await fetch('/api/submit', {
+	//     //   method: 'POST',
+	//     //   headers: {
+	//     //     'Content-Type': 'application/json',
+	//     //   },
+	//     //   body: JSON.stringify({
+	//     //     woodType: selectedWood,
+	//     //     backrest: selectedBackrest,
+	//     //     seat: selectedSeat,
+	//     //   }),
+	//     // });
+
+	//     // if (!response.ok) {
+	//     //   throw new Error('Failed to submit. Please try again.');
+	//     // }
+
+	//     // const result = await response.json();
+	//     // console.log('Submission successful:', result);
+
+	//     // // Optional: Reset form or show success message
+	//     // alert('Submission successful!');
+	//   } catch (error) {
+	//     console.error('Error:', error);
+	//     alert('Something went wrong! Please try again.');
+	//   }
+	// };
 
 	return (
 		<div className="flex flex-col h-screen">
@@ -66,6 +112,12 @@ const ProductCustomization = () => {
 						{selectedModel === "door" && (
 							<Door selectedDesign={selectedDesign} />
 						)}
+						{selectedModel === "sofa" && (
+							<Sofa
+								selectedBackrest={selectedSofaBackrest}
+								selectedArmrest={selectedSofaArmrest}
+							/>
+						)}
 						<OrbitControls enableZoom={false} />
 					</Canvas>
 				</div>
@@ -79,6 +131,7 @@ const ProductCustomization = () => {
 							className="px-4 py-2 border rounded shadow"
 						>
 							<option value="chair">Chair</option>
+							<option value="sofa">Sofa</option>
 							<option value="door">Door</option>
 						</select>
 					</div>
@@ -140,8 +193,67 @@ const ProductCustomization = () => {
 							</div>
 						</>
 					)}
+
+					{/* Sofa Customization Controls */}
+					{selectedModel === "sofa" && (
+						<>
+							<div className="bg-white shadow rounded p-4">
+								<h3 className="text-lg font-semibold">Sofa Backrest Option</h3>
+								<select
+									value={selectedSofaBackrest}
+									onChange={handleSofaBackrest}
+									className="mt-2 px-4 py-2 border rounded shadow w-full"
+								>
+									<option value="" disabled>
+										Select Sofa Backrest Design
+									</option>{" "}
+									{["Design 1", "Design 2", "Design 3", "Design 4"].map(
+										(index) => (
+											<option key={index} value={index}>
+												{index}
+											</option>
+										)
+									)}
+								</select>
+							</div>
+							<div className="bg-white shadow rounded p-4">
+								<h3 className="text-lg font-semibold">Sofa Armrest Options</h3>
+								<select
+									value={selectedSofaArmrest}
+									onChange={handleSofaArmrest}
+									className="mt-2 px-4 py-2 border rounded shadow w-full"
+								>
+									<option value="" disabled>
+										Select Sofa Armrest Design
+									</option>{" "}
+									{["Design 1", "Design 2"].map(
+										(index) => (
+											<option key={index} value={index}>
+												{index}
+											</option>
+										)
+									)}
+								</select>
+							</div>
+							{/* <div className="bg-white shadow rounded p-4 mt-4">
+								<h3 className="text-lg font-semibold">Woods Available</h3>
+								<select
+									value={selectedWood}
+									onChange={handleWoodChange}
+									className="mt-2 px-4 py-2 border rounded shadow w-full"
+								>
+									<option value="" disabled>
+										Select Wood Type
+									</option>
+									<option value="Acacia">Acacia</option>
+									<option value="Mahogany">Mahogany</option>
+									<option value="Narra">Narra</option>
+								</select>
+							</div> */}
+						</>
+					)}
 					{/* Door Customization Controls */}
-					{selectedModel === "door" && (
+					{/* {selectedModel === "door" && (
 						<div className="bg-white shadow rounded p-4">
 							<h3 className="text-lg font-semibold">Door Designs</h3>
 							<select
@@ -157,7 +269,7 @@ const ProductCustomization = () => {
 								))}
 							</select>
 						</div>
-					)}
+					)} */}
 					<button
 						type="submit"
 						// onClick={handleSubmit}
