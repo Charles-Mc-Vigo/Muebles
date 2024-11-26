@@ -172,7 +172,7 @@ const ViewUserOrder = () => {
 								{order.paymentMethod || "N/A"}
 							</li>
 							<li>
-								<p className="ml-1 text-base text-black">
+								<div className="ml-1 text-base text-black">
 									Address:
 									{order.user.addresses
 										.filter((address) => address.isDefault)
@@ -183,7 +183,7 @@ const ViewUserOrder = () => {
 												, {defaultAddress.zipCode}
 											</p>
 										))}
-								</p>
+								</div>
 							</li>
 							<li>
 								<p>

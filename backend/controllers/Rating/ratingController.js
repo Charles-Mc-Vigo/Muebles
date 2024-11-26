@@ -16,11 +16,13 @@ exports.createReviewsAndRatings = async (req, res) => {
 
 
 		const newReviewAndRating = new Rating({
-      user:user,
-			furniture: exisitingFurniture,
+      user:user._id,
+			furniture: exisitingFurniture._id,
 			rating,
 			review,
 		});
+
+    // console.log(newReviewAndRating)
 
 		// Save the document to the database
 		await newReviewAndRating.save();
@@ -54,6 +56,7 @@ exports.getRatingOfaFurniture = async(req,res) => {
     res.status(500).json({message:"Server error!"})
   }
 }
+
 exports.viewRaviewsAndRatings = async (req, res) => {
 	try {
     // const {furnitureId} = req.params

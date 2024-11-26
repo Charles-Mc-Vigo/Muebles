@@ -5,7 +5,6 @@ import Header from "./Header";
 import Footer from "./Footer";
 import { IoMdArrowRoundBack } from "react-icons/io";
 import LoadingSpinner from "./LoadingSpinner";
-import ProductReview from "./ProductReview";
 
 function ProductDetails({ admin }) {
 	const { id } = useParams();
@@ -68,6 +67,7 @@ function ProductDetails({ admin }) {
 				}
 				const data = await response.json();
 				setRatings(data); // Set the ratings state
+				// console.log(data)
 			} catch (error) {
 				console.error("Error fetching ratings:", error);
 				throw new Error("Error fetching ratings. Please try again.");
@@ -163,18 +163,6 @@ function ProductDetails({ admin }) {
 	// content tab
 	const renderTabContent = () => {
 		switch (activeTab) {
-			case "review":
-				return (
-					<div
-						id="review"
-						className="p-4 sm:p-6 md:p-8 bg-white shadow-xl border-teal-500 border rounded-lg max-w-full"
-					>
-						<h2 className="text-xl sm:text-2xl font-bold mb-4">
-							Customer Reviews
-						</h2>
-						<ProductReview />
-					</div>
-				);
 			case "description":
 				return (
 					<div
@@ -292,18 +280,6 @@ function ProductDetails({ admin }) {
 						<p className="text-gray-700 text-sm sm:text-base">
 							{furnitureData.warranty || "No warranty information available."}
 						</p>
-					</div>
-				);
-			case "review":
-				return (
-					<div
-						id="review"
-						className="p-4 sm:p-6 md:p-8 bg-white shadow-xl border-teal-500 border rounded-lg max-w-full"
-					>
-						<h2 className="text-xl sm:text-2xl font-bold mb-4">
-							Customer Reviews
-						</h2>
-						<ProductReview />
 					</div>
 				);
 			case "care-guide":
@@ -568,18 +544,6 @@ function ProductDetails({ admin }) {
 								}`}
 							>
 								Warranty
-							</button>
-
-							{/* Review Button */}
-							<button
-								onClick={() => setActiveTab("review")}
-								className={`px-4 py-2 rounded-lg transition text-sm sm:text-base md:text-lg ${
-									activeTab === "review"
-										? "bg-teal-600 text-white"
-										: "hover:text-teal-600"
-								}`}
-							>
-								Review
 							</button>
 
 							{/* How to Care Button */}

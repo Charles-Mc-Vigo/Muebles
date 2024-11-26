@@ -11,6 +11,8 @@ const {
 	sendPasswordResetVerificationCode,
 } = require("../../utils/EmailVerification");
 const createToken = require("../../utils/tokenUtils");
+const Furniture = require("../../models/Furniture/furnitureModel");
+const Rating = require('../../models/Rating/ratingModel');
 
 exports.getAllUsers = async (req, res) => {
 	try {

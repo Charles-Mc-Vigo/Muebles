@@ -34,7 +34,7 @@ const RatingComponent = () => {
 			setOrder(orderData);
 			// Set furnitureId based on order type
 			if (orderData.type === "Pre-Order") {
-				setFurnitureId(orderData.order.furniture._id); // Assuming furniture object has an id
+				setFurnitureId(orderData.furniture._id); // Assuming furniture object has an id
 			} else {
 				setFurnitureId(orderData.items[0]?.furniture._id); // Assuming items is an array
 			}
@@ -64,10 +64,11 @@ const RatingComponent = () => {
 			return;
 		}
 		const ratingData = {
-			furnitureId,
 			rating,
 			review: review.trim(),
 		};
+
+		console.log(ratingData)
 		try {
 			const response = await fetch(
 				`http://localhost:3000/api/ratings/${furnitureId}`,

@@ -37,6 +37,9 @@ const furnitureSchema = new mongoose.Schema(
 				ref: "Rating",
 			},
 		],
+		isRated:{
+			type:Boolean
+		},
 		isArchived: {
 			type: Boolean,
 			default: false,
