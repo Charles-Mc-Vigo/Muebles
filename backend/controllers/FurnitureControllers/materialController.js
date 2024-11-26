@@ -5,10 +5,10 @@ exports.addMaterials = async (req, res) => {
   try {
     const { name, price, stocks, furnitureTypeId } = req.body;
 
-    // Validate required fields
-    if (!name || !price || !stocks || !furnitureTypeId) {
-      return res.status(401).json({ message: "Material's name, price, stocks, and furnitureTypeId are required!" });
-    }
+    // // Validate required fields
+    // if (!name || !price || !stocks || !furnitureTypeId) {
+    //   return res.status(401).json({ message: "Material's name, price, stocks, and furnitureTypeId are required!" });
+    // }
 
     // Check if material with the same name already exists for the same furnitureTypeId
     const existingMaterial = await Materials.findOne({ name, furnitureTypeId });

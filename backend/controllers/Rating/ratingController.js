@@ -35,7 +35,25 @@ exports.createReviewsAndRatings = async (req, res) => {
 		res.status(500).json({ message: "Server error!" });
 	}
 };
+exports.getRatingOfaFurniture = async(req,res) => {
+  try {
+    const {furnitureId} = req.params
+    const exisitingFurniture = await Furniture.findById(furnitureId);
+    if(!exisitingFurniture) return res.status(404).json({message:"Furniture not found!"});
 
+    const reviewsAndRatings = await Rating.find({furniture:furnitureId})
+    .populate('user') // Populate the 'user' field
+    .populate('furniture'); // Populate the 'furniture' field;
+
+    if(reviewsAndRatings.length === 0) return res.status(400).json({message:"No reviews yet!"});
+    
+
+    res.status(200).json(reviewsAndRatings)
+  } catch (error) {
+    console.log("Error getting the ratings: ", error);
+    res.status(500).json({message:"Server error!"})
+  }
+}
 exports.viewRaviewsAndRatings = async (req, res) => {
 	try {
     // const {furnitureId} = req.params

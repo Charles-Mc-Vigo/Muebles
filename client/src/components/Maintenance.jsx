@@ -139,7 +139,7 @@ const Maintenance = () => {
 	const [newMaterial, setNewMaterial] = useState({
 		name: "",
 		price: "",
-		stock: "",
+		stocks: "",
 		furnitureTypeId: "",
 	});
 	const [selectedFilter, setSelectedFilter] = useState("");
@@ -289,12 +289,12 @@ const Maintenance = () => {
 
 	const handleAddNewMaterial = async () => {
 		setLoading(true);
-		const { name, price, stock, furnitureTypeId } = newMaterial; // Include furnitureTypeId
+		const { name, price, stocks, furnitureTypeId } = newMaterial; // Include furnitureTypeId
 
-		if (!name || !price || !stock || !furnitureTypeId) {
+		if (!name || !price || !stocks || !furnitureTypeId) {
 			// Check for furnitureTypeId
 			toast.error(
-				"Please provide valid name, price, stock, and select a furniture type."
+				"Please provide valid name, price, stocks, and select a furniture type."
 			);
 			return;
 		}
@@ -305,12 +305,12 @@ const Maintenance = () => {
 					"Content-Type": "application/json",
 				},
 				credentials: "include",
-				body: JSON.stringify({ name, price, stock, furnitureTypeId }), // Include furnitureTypeId in the body
+				body: JSON.stringify({ name, price, stocks, furnitureTypeId }), // Include furnitureTypeId in the body
 			});
 			if (response.ok) {
 				toast.success("Material added successfully.");
-				setNewMaterial({ name: "", price: "", stock: "", furnitureTypeId: "" }); // Reset input
-				await fetchMaterials(); // Refresh the list
+				setNewMaterial({ name: "", price: "", stocks: "", furnitureTypeId: "" }); // Reset input
+				fetchMaterials(); // Refresh the list
 			} else {
 				const errorData = await response.json();
 				toast.error(errorData.message);
@@ -793,11 +793,11 @@ const Maintenance = () => {
 									"number"
 								)}
 								{renderInputField(
-									"Stock",
-									"stock",
-									newMaterial.stock,
+									"Stocks",
+									"stocks",
+									newMaterial.stocks,
 									(e) =>
-										setNewMaterial({ ...newMaterial, stock: e.target.value }),
+										setNewMaterial({ ...newMaterial, stocks: e.target.value }),
 									"number"
 								)}
 							</>
@@ -898,7 +898,7 @@ const Maintenance = () => {
 									headers={[
 										"Material Name",
 										"Price",
-										"Stocks",
+										"stocks",
 										"Furniture Type",
 									]}
 									data={
@@ -907,7 +907,7 @@ const Maintenance = () => {
 													id: material._id,
 													name: material.name,
 													price: material.price,
-													stock: material.stock,
+													stocks: material.stocks,
 													furnitureTypeId: Array.isArray(furnitureTypes)
 														? furnitureTypes.find(
 																(type) => type._id === material.furnitureTypeId

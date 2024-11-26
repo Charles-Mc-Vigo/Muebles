@@ -247,11 +247,7 @@ const OrderDetails = () => {
 							</div>
 						</div>
 						<div className="bg-white border flex border-teal-400 rounded-xl p-4 md:p-6 text-right gap-2">
-							<div className="bg-red-200 flex flex-1">
-								<p>
-									ilalagay dine yung about sa pag patong ng interest sa order ng
-									user kapag di nakabayad monthly
-								</p>
+							<div className="flex flex-1">
 							</div>
 							{order.paymentOption === "Full Payment" ? (
 								<div>

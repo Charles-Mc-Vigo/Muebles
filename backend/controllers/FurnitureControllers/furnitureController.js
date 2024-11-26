@@ -143,7 +143,8 @@ exports.getAllFurnitures = async (req, res) => {
 			.populate("furnitureType") // Populate furniture type if needed
 			.populate("colors") // Populate colors if needed
 			.populate("materials") // Populate materials
-			.populate("sizes"); // Populate sizes
+			.populate("sizes") // Populate sizes
+			.populate("ratings")
 
 		// Return the fetched furnitures
 		res.status(200).json(furnitures);
