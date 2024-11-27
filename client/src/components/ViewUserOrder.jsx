@@ -133,7 +133,7 @@ const ViewUserOrder = () => {
 	const handleUpdateStatus = async () => {
 		try {
 			const response = await fetch(
-				`http://localhost:3000/api/orders/update-shipping/${orderId}`,
+				`http://localhost:3000/api/orders/update/${orderId}`,
 				{
 					method: "PUT",
 					credentials: "include",

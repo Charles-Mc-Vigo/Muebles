@@ -254,7 +254,7 @@ const ViewOrder = () => {
 													</p>
 												)}
 												<p className="text-xl font-bold text-gray-800">
-													Total: PHP {order.totalAmount}
+													Total: PHP {order.totalAmountWithShipping}
 												</p>
 											</div>
 										</div>

@@ -66,12 +66,11 @@ const orderController = {
 				dueDate = new Date();
 				dueDate.setDate(dueDate.getDate() + 30); // Set due date to 30 days from now
 			}
-			console.log(dueDate)
+			console.log(dueDate);
 
 			// Set interest and lastPaymentDate to undefined for full payments
-			const interest = paymentOption === "Full Payment" &&  undefined
-			const lastPaymentDate =
-				paymentOption === "Full Payment" && undefined
+			const interest = paymentOption === "Full Payment" && undefined;
+			const lastPaymentDate = paymentOption === "Full Payment" && undefined;
 
 			const order = await Order.createFromCart(
 				cart._id,
@@ -158,9 +157,8 @@ const orderController = {
 			}
 
 			// Set interest and lastPaymentDate to undefined for full payments
-			const interest = paymentOption === "Full Payment" && undefined 
-			const lastPaymentDate =
-				paymentOption === "Full Payment" && undefined
+			const interest = paymentOption === "Full Payment" && undefined;
+			const lastPaymentDate = paymentOption === "Full Payment" && undefined;
 
 			const preOrder = await Order.preOrder(
 				user,
@@ -202,49 +200,51 @@ const orderController = {
 
 	updateShippingStatus: async (req, res) => {
 		try {
-			const {orderId} = req.params
-			const {shippingStatus} = req.body;
+			const { orderId } = req.params;
+			const { shippingStatus } = req.body;
 			const order = await Order.findById(orderId);
 			if (!order) {
-				return res.status(404).json({message:"Order not found"});
+				return res.status(404).json({ message: "Order not found" });
 			}
-	
+
 			order.shippingStatus = shippingStatus;
-			
+
 			await order.save();
-			res.status(200).json({message:`Shipping status updated to ${shippingStatus}`});
+			res
+				.status(200)
+				.json({ message: `Shipping status updated to ${shippingStatus}` });
 		} catch (error) {
 			console.error("Error updating shipping status:", error);
-			res.status(500).json({message:"Server error!"})
+			res.status(500).json({ message: "Server error!" });
 		}
 	},
-	
 
-	Orders: async (req,res) => {
+	Orders: async (req, res) => {
 		try {
 			const orders = await Order.find();
-			if(orders.length === 0) return res.status(400).json({message:"No orders found!"});
+			if (orders.length === 0)
+				return res.status(400).json({ message: "No orders found!" });
 
-			res.status(200).json(orders)
+			res.status(200).json(orders);
 		} catch (error) {
 			console.log("Error getting all orders:");
-			res.status(500).json({message:"Server error!"})
+			res.status(500).json({ message: "Server error!" });
 		}
 	},
 
-	confirmedDelivery: async (req,res) => {
+	confirmedDelivery: async (req, res) => {
 		try {
-			const {orderId} = req.params
+			const { orderId } = req.params;
 			const order = await Order.findById(orderId);
 
-			if(!order) return res.status(404).json({message:"Order not found!"});
+			if (!order) return res.status(404).json({ message: "Order not found!" });
 
 			order.isDelivered = true;
 			await order.save();
-			res.status(200).json({message:"Thankyou for confirmation!",order});
+			res.status(200).json({ message: "Thankyou for confirmation!", order });
 		} catch (error) {
 			console.log("Error confirming the order: ", error);
-			res.status(500).json({message:"Server error!"});
+			res.status(500).json({ message: "Server error!" });
 		}
 	},
 
@@ -433,6 +433,29 @@ const orderController = {
 			});
 		}
 	},
+
+	generateMonthlyOrders: async (req, res) => {
+		try {
+			const startOfMonth = new Date();
+			startOfMonth.setDate(1); // Set to the first day of the month
+			startOfMonth.setHours(0, 0, 0, 0); // Set time to 00:00:00
+
+			const endOfMonth = new Date(); // This will be the current date
+			endOfMonth.setHours(23, 59, 59, 999); // Set time to the end of today
+
+			// Query for successful orders only (delivered and isDelivered=true)
+			const successfulOrders = await Order.find({
+				createdAt: { $gte: startOfMonth, $lte: endOfMonth },
+				orderStatus: "delivered", // Status must be 'delivered'
+				isDelivered: true, // Order must be marked as delivered
+			});
+
+			res.status(200).json({ orders: successfulOrders });
+		} catch (error) {
+			console.error("Error generating report:", error);
+			res.status(500).json({ message: "Error generating report" });
+		}
+	}
 };
 
 module.exports = orderController;

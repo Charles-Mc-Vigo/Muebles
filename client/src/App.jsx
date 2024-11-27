@@ -45,6 +45,7 @@ import ViewPendingRequest from "./pages/ViewPendingRequest";
 import ErrorBoundary from "./components/ErrorBoundary";
 import PreOrder from "./pages/PreOrder";
 import Rating from "./pages/Rating";
+import GenerateReport from "./components/GenerateReport";
 // import LoadingSpinner from "./components/LoadingSpinner";
 
 export default function App() {
@@ -99,6 +100,7 @@ export default function App() {
 						path={`/order-details/:orderId`}
 						element={<ProtectedRoute element={OrderDetails} />}
 					/>
+
 					<Route
 						path="/pre-order/:furnitureId"
 						element={<ProtectedRoute element={PreOrder} />}
@@ -141,6 +143,10 @@ export default function App() {
 					<Route
 						path="/dashboard"
 						element={<ProtectedRoute element={DashBoard} adminOnly={true} />}
+					/>
+					<Route
+						path={`/generate-report`}
+						element={<ProtectedRoute element={GenerateReport} adminOnly={true} />}
 					/>
 					<Route
 						path="/dashboard/setting/admin-profile/view"

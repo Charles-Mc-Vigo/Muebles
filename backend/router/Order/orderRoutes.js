@@ -16,6 +16,7 @@ router.put('/update-shipping/:orderId', checkAdminAuth, orderController.updateSh
 router.put('/update/:orderId',checkAdminAuth,orderController.updateOrderStatus);
 router.post("/confirm-delivery/:orderId", checkUserAuth, orderController.confirmedDelivery);
 router.get("/:orderNumber", checkAdminAuth, orderController.getOrderByOrderNumber);
+router.get("/generate-order/monthly", checkAdminAuth, orderController.generateMonthlyOrders);
 router.get('/',orderController.Orders);
 
 
