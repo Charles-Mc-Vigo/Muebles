@@ -6,7 +6,7 @@ Command: npx gltfjsx@6.5.3 DesignSofa.glb
 import React from "react";
 import { useGLTF } from "@react-three/drei";
 
-export function Sofa({ selectedBackrest, selectedArmrest }) {
+export function Sofa({ selectedBackrest, selectedArmrest, selectedSofaWood }) {
 	const { nodes, materials } = useGLTF("/Models/DesignSofa.glb");
 
 	const getBackrest = () => {
@@ -77,6 +77,7 @@ export function Sofa({ selectedBackrest, selectedArmrest }) {
 					geometry: nodes.Armrest1.geometry,
 					material: materials.Brown,
 					position: [1.876, 0.425, 0],
+					rotation: [0, 0, -0.014],
 					scale: [0.71, 0.781, 1.141],
 				};
 		}
@@ -87,6 +88,51 @@ export function Sofa({ selectedBackrest, selectedArmrest }) {
 
 	return (
 		<group dispose={null}>
+
+			{/* gamitin to */}
+			{/* {selectedSofaWood === "Acacia" ? (
+				<>
+					<mesh
+						geometry={armrest.geometry}
+						material={materials["Material.001"]}
+						rotation={armrest.rotation}
+						position={armrest.position}
+						scale={armrest.scale}
+
+						// position={[-1.708, 0.464, 0]}
+						// rotation={[0, 0, -0.014]}
+						// scale={[0.71, 0.781, 1.141]}
+					/>
+					<mesh
+						geometry={backrest.geometry}
+						material={materials["Material.001"]}
+						position={backrest.position}
+						rotation={backrest.rotation}
+						scale={backrest.scale}
+						// position={[0.145, 0.268, -1.188]}
+						// scale={[0.84, 0.579, 0.632]}
+					/>
+				</>
+			) : (
+				<>
+					<mesh
+						geometry={armrest.geometry}
+						material={armrest.material}
+						rotation={armrest.rotation}
+						position={armrest.position}
+						scale={armrest.scale}
+					/>
+					<mesh
+						geometry={backrest.geometry}
+						material={backrest.material}
+						position={backrest.position}
+						rotation={backrest.rotation}
+						scale={backrest.scale}
+					/>
+				</>
+			)} */}
+
+
 			{/* <mesh
 				geometry={nodes.Armrest1mahogany.geometry}
 				material={materials.Material}
@@ -248,6 +294,7 @@ export function Sofa({ selectedBackrest, selectedArmrest }) {
 				scale={[0.008, 0.001, 0.008]}
 			/> */}
 
+			{/* armrest */}
 			<mesh
 				geometry={armrest.geometry}
 				material={armrest.material}
@@ -255,6 +302,7 @@ export function Sofa({ selectedBackrest, selectedArmrest }) {
 				position={armrest.position}
 				scale={armrest.scale}
 			/>
+			{/* backrest */}
 			<mesh
 				geometry={backrest.geometry}
 				material={backrest.material}

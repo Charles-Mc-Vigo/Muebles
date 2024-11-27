@@ -20,6 +20,7 @@ const ProductCustomization = () => {
 	// for sofa
 	const [selectedSofaBackrest, setSelectedSofaBackrest] = useState("");
 	const [selectedSofaArmrest, setSelectedSofaArmrest] = useState("");
+	const [selectedSofaWood, setSelectedSofaWood] = useState("");
 
 	// Handlers for each part selection
 	const handleBackrestChange = (e) => {
@@ -39,6 +40,10 @@ const ProductCustomization = () => {
 	};
 	const handleSofaArmrest = (e) => {
 		if (selectedModel === "sofa") setSelectedSofaArmrest(e.target.value);
+	};
+
+	const handleSofaWoodChange = (e) => {
+		if (selectedModel === "sofa") setSelectedSofaWood(e.target.value);
 	};
 
 	// for door
@@ -226,20 +231,18 @@ const ProductCustomization = () => {
 									<option value="" disabled>
 										Select Sofa Armrest Design
 									</option>{" "}
-									{["Design 1", "Design 2"].map(
-										(index) => (
-											<option key={index} value={index}>
-												{index}
-											</option>
-										)
-									)}
+									{["Design 1", "Design 2"].map((index) => (
+										<option key={index} value={index}>
+											{index}
+										</option>
+									))}
 								</select>
 							</div>
-							{/* <div className="bg-white shadow rounded p-4 mt-4">
+							<div className="bg-white shadow rounded p-4 mt-4">
 								<h3 className="text-lg font-semibold">Woods Available</h3>
 								<select
-									value={selectedWood}
-									onChange={handleWoodChange}
+									value={selectedSofaWood}
+									onChange={handleSofaWoodChange}
 									className="mt-2 px-4 py-2 border rounded shadow w-full"
 								>
 									<option value="" disabled>
@@ -249,7 +252,7 @@ const ProductCustomization = () => {
 									<option value="Mahogany">Mahogany</option>
 									<option value="Narra">Narra</option>
 								</select>
-							</div> */}
+							</div>
 						</>
 					)}
 					{/* Door Customization Controls */}
