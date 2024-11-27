@@ -17,8 +17,12 @@ const GenerateReport = () => {
         credentials: "include",
       });
       const data = await response.json();
-      const orders = data.orders;
 
+      // Log the fetched data to ensure correct structure
+      console.log("Fetched Data:", data);
+
+      const orders = data.orders;
+      
       if (!orders || orders.length === 0) {
         alert("No successful orders found for this month!");
         setLoading(false);
@@ -50,21 +54,27 @@ const GenerateReport = () => {
       { title: "Date", dataKey: "date" },
     ];
 
+    // Check the orders data before mapping to rows
+    console.log("Orders Data Before Mapping:", orders);
+
     // Map the order data into rows for the table
     const rows = orders.map((order) => ({
-      orderNumber: order.orderNumber, // Use the "ORD" field for order number
+      orderNumber: order.orderNumber, // Ensure the correct order number is mapped
       totalAmount: `₱${order.totalAmountWithShipping.toLocaleString()}`,
       orderStatus: order.orderStatus,
       date: new Date(order.createdAt).toLocaleString(),
     }));
 
+    // Check the rows before passing to autoTable
+    console.log("Rows Data to be Passed to autoTable:", rows);
+
     // Add the table to the PDF
     doc.autoTable({
-      head: [columns.map(col => col.title)], // Use column titles from the header
+      head: [columns.map(col => col.title)], // Column headers
       body: rows, // Data rows
-      startY: 20, // Start the table a little below the title
+      startY: 20, // Table start position
       margin: { top: 30 }, // Adjust margins
-      theme: "grid", // Add grid theme for better readability
+      theme: "grid", // Add grid theme for readability
       columnStyles: {
         orderNumber: { cellWidth: 30 },
         totalAmount: { cellWidth: 30 },
@@ -72,7 +82,7 @@ const GenerateReport = () => {
         date: { cellWidth: 60 },
       },
       didDrawCell: (data) => {
-        if (data.column.index === 2) { // For "Total Amount", we can align right
+        if (data.column.index === 1) { // Align "Total Amount" right
           doc.text(data.cell.text, data.cell.x + data.cell.width - 10, data.cell.y + 10, {
             align: "right",
           });
@@ -81,7 +91,7 @@ const GenerateReport = () => {
     });
 
     // Download the PDF
-    doc.save("Successful_Monthly_Orders_Report.pdf");
+    doc.save("Muebles_Monthly_Orders_Report.pdf");
   };
 
   return (
