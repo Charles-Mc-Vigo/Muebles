@@ -15,38 +15,41 @@ export function Sofa({ selectedBackrest, selectedArmrest }) {
 				return {
 					geometry: nodes.Backrest1.geometry,
 					material: materials.Brown,
-          position:[0.145, 0.268, -1.188],
-          scale:[0.84, 0.579, 0.632],
+					// position: [0.145, 0.268, -1.188],
+					// scale: [1.0, 0.7, 0.7],
+					position: [0.145, 0.268, -1.188],
+					scale: [0.84, 0.579, 0.632],
 				};
 
 			case "Design 2":
 				return {
 					geometry: nodes.Backrest2.geometry,
 					material: materials.Brown,
-          position:[0.145, 0.268, -1.188],
-          scale:[0.84, 0.579, 0.632], 
+					position: [-0.07, 0.063, -1.235],
+					scale: [1.288, 1, 1.282],
 				};
 
 			case "Design 3":
 				return {
 					geometry: nodes.Backrest3.geometry,
 					material: materials.Brown,
-          position:[0.145, 0.268, -1.188],
-          scale:[0.84, 0.579, 0.632],
+					position: [-1.839, 3.436, -1.145],
+					scale: [1.389, 1, 1],
 				};
 			case "Design 4":
 				return {
 					geometry: nodes.Backrest4.geometry,
 					material: materials.Brown,
-          position:[0.145, 0.268, -1.188],
-          scale:[0.84, 0.579, 0.632],
+					position: [-0.444, 0.75, -1.193],
+					rotation: [1.453, Math.PI / 2, 0],
+					scale: [0.008, 0.001, 0.008],
 				};
 			default:
 				return {
 					geometry: nodes.Backrest1.geometry,
 					material: materials.Brown,
-          position:[0.145, 0.268, -1.188],
-          scale:[0.84, 0.579, 0.632],
+					position: [0.145, 0.268, -1.188],
+					scale: [0.84, 0.579, 0.632],
 				};
 		}
 	};
@@ -57,25 +60,24 @@ export function Sofa({ selectedBackrest, selectedArmrest }) {
 				return {
 					geometry: nodes.Armrest1.geometry,
 					material: materials.Brown,
-          position:[1.876, 0.425, 0],
-          rotation:[0, 0, -0.014],
-          scale:[0.71, 0.781, 1.141],
+					position: [1.876, 0.425, 0],
+					rotation: [0, 0, -0.014],
+					scale: [0.71, 0.781, 1.141],
 				};
 			case "Design 2":
 				return {
 					geometry: nodes.Armrest2_.geometry,
 					material: materials.Brown,
-          position:[1.876, 0.425, 0],
-          rotation:[0, 0, -0.014],
-          scale:[0.71, 0.781, 1.141],
+					position: [-0.499, 0.912, -1.203],
+					rotation: [-1.571, 1.568, 3.023],
+					scale: [0.008, 0.001, 0.008],
 				};
 			default:
 				return {
 					geometry: nodes.Armrest1.geometry,
 					material: materials.Brown,
-          position:[1.876, 0.425, 0],
-          rotation:[0, 0, -0.014],
-          scale:[0.71, 0.781, 1.141],
+					position: [1.876, 0.425, 0],
+					scale: [0.71, 0.781, 1.141],
 				};
 		}
 	};
@@ -249,15 +251,16 @@ export function Sofa({ selectedBackrest, selectedArmrest }) {
 			<mesh
 				geometry={armrest.geometry}
 				material={armrest.material}
-				position={[1.876, 0.425, 0]}
-				rotation={[0, 0, -0.014]}
-				scale={[0.71, 0.781, 1.141]}
+				rotation={armrest.rotation}
+				position={armrest.position}
+				scale={armrest.scale}
 			/>
 			<mesh
 				geometry={backrest.geometry}
 				material={backrest.material}
-				position={[0.145, 0.268, -1.188]}
-				scale={[0.84, 0.579, 0.632]}
+				position={backrest.position}
+				rotation={backrest.rotation}
+				scale={backrest.scale}
 			/>
 		</group>
 	);
