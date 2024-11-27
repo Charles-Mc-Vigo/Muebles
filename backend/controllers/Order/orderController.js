@@ -200,6 +200,26 @@ const orderController = {
 		}
 	},
 
+	updateShippingStatus: async (req, res) => {
+		try {
+			const {orderId} = req.params
+			const {shippingStatus} = req.body;
+			const order = await Order.findById(orderId);
+			if (!order) {
+				return res.status(404).json({message:"Order not found"});
+			}
+	
+			order.shippingStatus = shippingStatus;
+			
+			await order.save();
+			res.status(200).json({message:`Shipping status updated to ${shippingStatus}`});
+		} catch (error) {
+			console.error("Error updating shipping status:", error);
+			res.status(500).json({message:"Server error!"})
+		}
+	},
+	
+
 	Orders: async (req,res) => {
 		try {
 			const orders = await Order.find();

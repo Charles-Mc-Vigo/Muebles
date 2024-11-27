@@ -9,6 +9,8 @@ const ViewUserOrder = () => {
 	const [order, setOrder] = useState(null);
 	const [loading, setLoading] = useState(false);
 	const [newStatus, setNewStatus] = useState(""); // State for new status
+	const [newShippingStatus, setNewShippingStatus] = useState(""); // New state for shipping status
+
 	const navigate = useNavigate();
 
 	const fetchOrder = async () => {
@@ -42,6 +44,40 @@ const ViewUserOrder = () => {
 	useEffect(() => {
 		fetchOrder();
 	}, [orderId]);
+
+	const handleUpdateShippingStatus = async () => {
+		console.log("Updating shipping status to:", newShippingStatus); // Log the new status
+		try {
+			const response = await fetch(
+				`http://localhost:3000/api/orders/update-shipping/${orderId}`,
+				{
+					method: "PUT",
+					credentials: "include",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({ shippingStatus: newShippingStatus }),
+				}
+			);
+
+			// Log the response status and data
+			if (!response.ok) {
+				const errorData = await response.json();
+				console.error("Error updating shipping status:", errorData); // Log error data if response is not OK
+				toast.error(errorData.message || "Failed to update shipping status.");
+				return;
+			}
+
+			// Log success and updated shipping status
+			console.log("Shipping status updated successfully!");
+
+			// Fetch the updated order to verify the status change
+			fetchOrder(); // Refresh the order details
+		} catch (error) {
+			toast.error("An error occurred while updating shipping status.");
+			console.log("Error:", error.message); // Log any error during the process
+		}
+	};
 
 	const handleAccept = async () => {
 		try {
@@ -97,7 +133,7 @@ const ViewUserOrder = () => {
 	const handleUpdateStatus = async () => {
 		try {
 			const response = await fetch(
-				`http://localhost:3000/api/orders/update/${orderId}`,
+				`http://localhost:3000/api/orders/update-shipping/${orderId}`,
 				{
 					method: "PUT",
 					credentials: "include",
@@ -206,6 +242,17 @@ const ViewUserOrder = () => {
 										{order.orderStatus}
 									</span>
 								</p>
+								<p>
+									Shipping Status: 
+									<span>
+										{order.shippingStatus === 'pending' && "Pending"}
+										{order.shippingStatus === 'shipped' && "Shipped"}
+										{order.shippingStatus === 'out for delivery' && "Out for Delivery"}
+										{order.shippingStatus === 'delivered' && "Delivered"}
+										{order.shippingStatus === 'returned' && "Returned"}
+										{order.shippingStatus === 'failed delivery' && "Failed Delivery"}
+									</span>
+								</p>
 							</li>
 						</ul>
 						{/* Dropdown for updating order status */}
@@ -228,7 +275,30 @@ const ViewUserOrder = () => {
 								Update Status
 							</button>
 						</div>
+						<div className="mt-4">
+							<label className="block text-gray-700">
+								Update Shipping Status:
+							</label>
+							<select
+								value={newShippingStatus}
+								onChange={(e) => setNewShippingStatus(e.target.value)}
+								className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+							>
+								<option value="">Select Shipping Status</option>
+								<option value="shipped">Shipped</option>
+								<option value="out for delivery">Out for Delivery</option>
+								<option value="returned">Returned</option>
+								<option value="failed delivery">Failed Delivery</option>
+							</select>
+							<button
+								onClick={handleUpdateShippingStatus}
+								className="mt-2 px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600"
+							>
+								Update Shipping Status
+							</button>
+						</div>
 					</div>
+
 					{/* Order Items */}
 					<div className="bg-white rounded-lg shadow-md p-6">
 						<h2 className="text-2xl font-semibold mb-4">Items</h2>
@@ -343,10 +413,10 @@ const ViewUserOrder = () => {
 													{item.quantity}
 												</td>
 												<td className="py-3 px-4 text-black border border-gray-300">
-													₱{item.price.toFixed(2)}
+													₱ {order.totalAmount / item.quantity.toFixed(2)}
 												</td>
 												<td className="py-3 px-4 text-black border border-gray-300">
-													₱{(item.price * item.quantity).toFixed(2)}
+													₱ {order.totalAmount}
 												</td>
 											</tr>
 										))
@@ -357,7 +427,7 @@ const ViewUserOrder = () => {
 						<div className="mt-6 space-y-2">
 							<div className="flex justify-between text-gray-800">
 								<span>Subtotal:</span>
-								<span>₱{order.subtotal?.toFixed(2) || "0.00"}</span>
+								<span>₱{order.totalAmount?.toFixed(2) || "0.00"}</span>
 							</div>
 							<div className="flex justify-between text-gray-800">
 								<span>Shipping Fee:</span>

@@ -107,6 +107,11 @@ const orderSchema = new mongoose.Schema(
       type:Boolean,
       default:false
     },
+    shippingStatus: { 
+      type: String, 
+      enum: ['pending', 'shipped', 'out for delivery', 'delivered', 'returned', 'failed delivery'],
+      default: 'pending'
+    },
     type: {
       type: String,
       enum: ["Cart", "Pre-Order"],

@@ -12,6 +12,7 @@ router.post("/pre-order/create", checkUserAuth, upload.single("proofOfPayment"),
 router.get('/my-orders', checkUserAuth, orderController.getUserOrders);
 router.get('/details/:orderId', checkUserAuth, orderController.getOrderDetails);
 router.put('/cancel/:orderId', checkUserAuth, orderController.cancelOrder);
+router.put('/update-shipping/:orderId', checkAdminAuth, orderController.updateShippingStatus);
 router.put('/update/:orderId',checkAdminAuth,orderController.updateOrderStatus);
 router.post("/confirm-delivery/:orderId", checkUserAuth, orderController.confirmedDelivery);
 router.get("/:orderNumber", checkAdminAuth, orderController.getOrderByOrderNumber);
