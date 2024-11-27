@@ -200,6 +200,18 @@ const orderController = {
 		}
 	},
 
+	Orders: async (req,res) => {
+		try {
+			const orders = await Order.find();
+			if(orders.length === 0) return res.status(400).json({message:"No orders found!"});
+
+			res.status(200).json(orders)
+		} catch (error) {
+			console.log("Error getting all orders:");
+			res.status(500).json({message:"Server error!"})
+		}
+	},
+
 	confirmedDelivery: async (req,res) => {
 		try {
 			const {orderId} = req.params

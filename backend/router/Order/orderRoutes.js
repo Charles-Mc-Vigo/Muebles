@@ -15,6 +15,7 @@ router.put('/cancel/:orderId', checkUserAuth, orderController.cancelOrder);
 router.put('/update/:orderId',checkAdminAuth,orderController.updateOrderStatus);
 router.post("/confirm-delivery/:orderId", checkUserAuth, orderController.confirmedDelivery);
 router.get("/:orderNumber", checkAdminAuth, orderController.getOrderByOrderNumber);
+router.get('/',orderController.Orders);
 
 
 module.exports = router;
