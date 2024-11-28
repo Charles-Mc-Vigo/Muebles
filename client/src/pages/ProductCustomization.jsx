@@ -4,8 +4,8 @@ import { OrbitControls } from "@react-three/drei";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import { Chair } from "../Models/ChairModels";
-// import { Door } from "../Models/DoorModels";
 import { Sofa } from "../Models/DesignSofa";
+import { Door } from "../Models/DesignDoor";
 
 const ProductCustomization = () => {
 	// State for selected model
@@ -14,8 +14,10 @@ const ProductCustomization = () => {
 	const [selectedBackrest, setSelectedBackrest] = useState("");
 	const [selectedSeat, setSelectedSeat] = useState("");
 	const [selectedWood, setSelectedWood] = useState("");
+
 	// for door
-	// const [selectedDesign, setSelectedDesign] = useState(1);
+	const [selectedDoorDesign, setselectedDoorDesign] = useState("");
+	const [selectedDoorWoodType, setSelectedDoorWoodType] = useState("");
 
 	// for sofa
 	const [selectedSofaBackrest, setSelectedSofaBackrest] = useState("");
@@ -47,9 +49,13 @@ const ProductCustomization = () => {
 	};
 
 	// for door
-	// const handleDoorDesignChange = (e) => {
-	// 	if (selectedModel === "door") setSelectedDesign(Number(e.target.value));
-	// };
+	const handleDoorDesignChange = (e) => {
+		if (selectedModel === "door") setselectedDoorDesign(e.target.value);
+	};
+
+	const handleDoorWoodChange = (e) => {
+		if(selectedModel === "door") setSelectedDoorWoodType(e.target.value);
+	}
 
 	// console.log(selectedWood);
 
@@ -115,15 +121,22 @@ const ProductCustomization = () => {
 							/>
 						)}
 						{selectedModel === "door" && (
-							<Door selectedDesign={selectedDesign} />
+							<Door 
+							selectedDoorDesign={selectedDoorDesign} 
+							selectedDoorWoodType={selectedDoorWoodType}
+							/>
 						)}
 						{selectedModel === "sofa" && (
 							<Sofa
 								selectedBackrest={selectedSofaBackrest}
 								selectedArmrest={selectedSofaArmrest}
+								selectedSofaWood={selectedSofaWood}
 							/>
 						)}
-						<OrbitControls enableZoom={false} />
+						<OrbitControls minDistance={2} maxDistance={10} />
+
+						{/* commented for now kase ano. ayaw ko na eh */}
+						{/* enableZoom={false} */}
 					</Canvas>
 				</div>
 				{/* Customization Controls */}
@@ -256,23 +269,50 @@ const ProductCustomization = () => {
 						</>
 					)}
 					{/* Door Customization Controls */}
-					{/* {selectedModel === "door" && (
-						<div className="bg-white shadow rounded p-4">
-							<h3 className="text-lg font-semibold">Door Designs</h3>
-							<select
-								value={selectedDesign}
-								onChange={handleDoorDesignChange}
-								className="mt-2 px-4 py-2 border rounded shadow w-full"
-							>
-								<option value={0}>Default</option>
-								{[1, 2, 3, 4, 5, 6, 7].map((index) => (
-									<option key={`door-${index}`} value={index}>
-										Design {index}
+					{selectedModel === "door" && (
+						<>
+							<div className="bg-white shadow rounded p-4">
+								<h3 className="text-lg font-semibold">Door Designs</h3>
+								<select
+									value={selectedDoorDesign}
+									onChange={handleDoorDesignChange}
+									className="mt-2 px-4 py-2 border rounded shadow w-full"
+								>
+									<option value="" disabled>
+										Select Door Design
 									</option>
-								))}
-							</select>
-						</div>
-					)} */}
+									{[
+										"Design 1",
+										"Design 2",
+										"Design 3",
+										"Design 4",
+										"Design 5",
+										"Design 6",
+										"Design 7",
+									].map((index) => (
+										<option key={index} value={index}>
+											{index}
+										</option>
+									))}
+								</select>
+							</div>
+							<div className="bg-white shadow rounded p-4 mt-4">
+								<h3 className="text-lg font-semibold">Woods Available</h3>
+								<select
+									value={selectedDoorWoodType}
+									onChange={handleDoorWoodChange}
+									className="mt-2 px-4 py-2 border rounded shadow w-full"
+								>
+									<option value="" disabled>
+										Select Wood Type
+									</option>
+									<option value="Acacia">Acacia</option>
+									<option value="Mahogany">Mahogany</option>
+									<option value="Narra">Narra</option>
+								</select>
+							</div>
+						</>
+					)}
 					<button
 						type="submit"
 						// onClick={handleSubmit}
