@@ -5,21 +5,25 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import { FaEye, FaEyeSlash } from "react-icons/fa"; // Import eye icons
 
 export default function Login() {
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
-  const navigate = useNavigate();
+	const [showPassword, setShowPassword] = useState(false);
+	const [formData, setFormData] = useState({
+		email: "",
+		password: "",
+	});
+	const [loading, setLoading] = useState(false);
+	const navigate = useNavigate();
 
-  const handleChange = (e) => {
-    const { id, value } = e.target;
-    setFormData({ ...formData, [id]: value });
-  };
+	const handleChange = (e) => {
+		const { id, value } = e.target;
+		setFormData({ ...formData, [id]: value });
+	};
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
+		setLoading(true);
 		try {
 			const response = await fetch("http://localhost:3000/api/users/login", {
 				method: "POST",
@@ -29,16 +33,13 @@ export default function Login() {
 				credentials: "include",
 				body: JSON.stringify(formData),
 			});
-			const data = await response.json();
-			
 			if (!response.ok) {
-				// Handle error case
-				toast.error(data.error || "Log in failed");
-				return; // Do not proceed further
+				const errorData = await response.json();
+				toast.error(errorData.message || "Something went wrong!");
+				return;
 			}
-
-			// Handle success case
-			toast.success(data.success);
+			const data = await response.json();
+			toast.success("Logged in successfully");
 			setTimeout(() => {
 				navigate("/home");
 			}, 2000);
@@ -46,76 +47,98 @@ export default function Login() {
 			console.error("Log in error", error);
 			toast.error(error.message || "Log in failed");
 		}
+		setLoading(false);
 	};
 
 	return (
-		<div
-			className="min-h-screen bg-fill flex justify-center items-center"
-			style={{
-				backgroundImage: "url(/landingimage/jckamecover.jpg)",
-				backgroundSize: "cover",
-				backgroundPosition: "center",
-			}}
-		>
-			<div className="bg-teal-800 bg-opacity-90 p-6 md:p-10 rounded-lg max-w-md w-full relative">
-				{/* Back Button */}
-				<button
-					onClick={() => navigate(-1)}
-					className="absolute top-4 left-4 text-white hover:text-gray-300"
-				>
-					<FaArrowLeft className="text-xl" />
-				</button>
-				<div className="flex justify-center mb-6">
-					<FaFingerprint className="text-white text-4xl" />
-				</div>
-				<h1 className="text-center text-white text-3xl font-semibold mb-6">
-					Log In
-				</h1>
-				<form onSubmit={handleSubmit} className="space-y-4">
-					<input
-						type="email"
-						id="email"
-						placeholder="E-mail address"
-						required
-						value={formData.email} // Bind input value to state
-						onChange={handleChange}
-						className="w-full px-4 py-2 text-white bg-transparent border-b-2 border-gray-300 placeholder-gray-300 focus:outline-none focus:border-white transition duration-200"
-					/>
-					<input
-						type="password"
-						id="password"
-						placeholder="Password"
-						required
-						value={formData.password} // Bind input value to state
-						onChange={handleChange}
-						className="w-full px-4 py-2 text-white bg-transparent border-b-2 border-gray-300 placeholder-gray-300 focus:outline-none focus:border-white transition duration-200"
-					/>
+		<>
+			<Header />
+			<div
+				className="min-h-screen flex flex-col justify-center items-center mb-5 mt-5"
+				style={{
+					backgroundImage: "url(/landingimage/login.png)",
+					backgroundSize: "contain",
+					backgroundPosition: "center",
+					backgroundRepeat: "no-repeat",
+				}}
+			>
+				<div className="bg-teal-800 bg-opacity-90 p-10 md:p-12 rounded-lg max-w-lg w-full relative shadow-lg">
+					{/* Back Button */}
 					<button
-						type="submit"
-						className="w-full py-3 mt-6 bg-white text-teal-800 font-bold rounded-full hover:bg-gray-100 transition-colors duration-300"
+						onClick={() => navigate(-1)}
+						className="absolute top-4 left-4 text-white hover:text-gray-300"
+						aria-label="Go back"
 					>
-						Log In
+						<FaArrowLeft className="text-xl" />
 					</button>
-				</form>
-				<p className="text-white text-sm text-center mt-4">
-					Don't have an account?{" "}
-					<Link to="/SignUp" className="underline hover:text-gray-300">
-						Sign up Now
-					</Link>
-					.
-				</p>
-				<p className="text-white text-sm text-center mt-2">
-					Forgot password?{" "}
-					<Link
-						to="/password-reset/request"
-						className="underline hover:text-gray-300"
-					>
-						Click here
-					</Link>
-					.
-				</p>
+					<div className="flex justify-center mb-6">
+						<FaFingerprint className="text-white text-4xl" />
+					</div>
+					<h1 className="text-center text-white text-3xl font-semibold mb-6">
+						Log In
+					</h1>
+					<form onSubmit={handleSubmit} className="space-y-6">
+						<input
+							type="email"
+							id="email"
+							placeholder="E-mail address"
+							required
+							onChange={handleChange}
+							className="bg-slate-100 p-3 rounded w-full"
+						/>
+						<div className="relative">
+							<input
+								type={showPassword ? "text" : "password"}
+								id="password"
+								placeholder="Password"
+								required
+								onChange={handleChange}
+								className="bg-slate-100 p-3 rounded w-full"
+							/>
+							<button
+								type="button"
+								className="absolute right-3 top-1/2 transform -translate-y-1/2"
+								onClick={() => setShowPassword(!showPassword)}
+							>
+								{showPassword ? (
+									<FaEyeSlash className="text-black" />
+								) : (
+									<FaEye className="text-black" />
+								)}
+							</button>
+						</div>
+						<button
+							type="submit"
+							className={`py-4 px-24 rounded-lg mx-auto text-white font-bold uppercase hover:opacity-80 disabled:opacity-70 ${
+								loading ? "bg-blue-400" : "bg-blue-500"
+							}`}
+							style={{ display: "block", margin: "20px auto 0" }}
+							disabled={loading}
+						>
+							{loading ? "Logging in..." : "Log in"}
+						</button>
+					</form>
+					<p className="text-white text-sm text-center mt-4">
+						Don't have an account?{" "}
+						<Link to="/SignUp" className="underline hover:text-gray-300">
+							Sign up Now
+						</Link>
+						.
+					</p>
+					<p className="text-white text-sm text-center mt-2">
+						Forgot password?{" "}
+						<Link
+							to="/password-reset/request"
+							className="underline hover:text-gray-300"
+						>
+							Click here
+						</Link>
+						.
+					</p>
+				</div>
 			</div>
+			<Footer />
 			<ToastContainer />
-		</div>
+		</>
 	);
 }

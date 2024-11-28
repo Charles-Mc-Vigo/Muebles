@@ -28,18 +28,13 @@ const Header = ({ isLogin, cartCount }) => {
         setIsMenuOpen(false);
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isMenuOpen]);
 
   // Prevent scroll when mobile menu is open
   useEffect(() => {
-    if (isMenuOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "unset";
-    }
+    document.body.style.overflow = isMenuOpen ? "hidden" : "unset";
     return () => {
       document.body.style.overflow = "unset";
     };
@@ -60,7 +55,7 @@ const Header = ({ isLogin, cartCount }) => {
   };
 
   return (
-    <header className="relative w-full bg-white shadow-md">
+    <header className=" w-full bg-white shadow-xl rounded-xl ">
       {/* Desktop Header */}
       <div className="hidden lg:block">
         <div className="max-w-7xl mx-auto px-4 py-4">
@@ -68,11 +63,10 @@ const Header = ({ isLogin, cartCount }) => {
             {/* Logo */}
             <Link
               to="/"
-              className="text-2xl font-bold text-teal-600 whitespace-nowrap"
+              className="text-3xl font-bold text-teal-600 whitespace-nowrap"
             >
               MUEBLES
             </Link>
-
             {/* Search Bar */}
             <div className="flex-1 max-w-2xl">
               <div className="flex">
@@ -86,7 +80,6 @@ const Header = ({ isLogin, cartCount }) => {
                 </button>
               </div>
             </div>
-
             {/* Navigation Items */}
             <div className="flex items-center gap-8">
               <Link
@@ -99,7 +92,6 @@ const Header = ({ isLogin, cartCount }) => {
                   <p className="text-xs">Delivery Method</p>
                 </div>
               </Link>
-
               {isLogin && (
                 <Link to="/cart" className="relative">
                   <FaShoppingCart className="text-2xl hover:text-teal-600 transition-colors" />
@@ -110,7 +102,6 @@ const Header = ({ isLogin, cartCount }) => {
                   )}
                 </Link>
               )}
-
               {/* User Icon with Collapsible Menu */}
               <div className="relative">
                 {isLogin ? (
@@ -124,7 +115,7 @@ const Header = ({ isLogin, cartCount }) => {
                     {/* Collapsible User Menu */}
                     {isUserMenuOpen && (
                       <div className="absolute right-0 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-50 transition-transform transform opacity-100 text-center">
-                        <nav className="">
+                        <nav>
                           <Link
                             to="/my-profile/view"
                             className="block py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
@@ -170,9 +161,8 @@ const Header = ({ isLogin, cartCount }) => {
           </div>
         </div>
       </div>
-
       {/* Second Navigation Bar */}
-      <nav className="hidden md:flex justify-center space-x-8 py-0 bg-white text-lg">
+      <nav className="hidden md:flex justify-center space-x-8 py-0  text-lg ">
         <Link className="text-black py-2 hover:underline m-2" to="/home">
           All Furnitures
         </Link>
@@ -189,20 +179,17 @@ const Header = ({ isLogin, cartCount }) => {
           Services
         </Link>
         <div className="flex items-center space-x-2 text-sm text-black py-2 m-2">
-          <span className="text-teal-500">•</span>
-          <Link to="/brochure" className="text-teal-500 hover:underline">
-            Brochure
-          </Link>
-          <span className="text-gray-400">•</span>
+          <span className="text-teal-500 text-base font-bold">•</span>
           <Link
             to="https://tinyurl.com/5avjxzav"
-            className="text-gray-700 hover:underline"
+            target="blank"
+            rel="noopener noreferrer"
+            className="text-gray-700 text-base hover:underline"
           >
             Store Location
           </Link>
         </div>
       </nav>
-
       {/* Mobile Header */}
       <div className="lg:hidden">
         <div className="px-4 py-3">
@@ -214,11 +201,9 @@ const Header = ({ isLogin, cartCount }) => {
             >
               <FaBars className="text-xl" />
             </button>
-
             <Link to="/" className="text-2xl font-bold text-teal-600">
               MUEBLES
             </Link>
-
             <div className="flex items-center gap-4">
               <button
                 onClick={toggleMobileSearch}
@@ -227,7 +212,6 @@ const Header = ({ isLogin, cartCount }) => {
               >
                 <FaSearch className="text-xl" />
               </button>
-
               {isLogin && (
                 <Link to="/cart" className="relative">
                   <FaShoppingCart className="text-2xl hover:text-teal-600 transition-colors" />
@@ -240,7 +224,6 @@ const Header = ({ isLogin, cartCount }) => {
               )}
             </div>
           </div>
-
           {/* Mobile Search Bar */}
           {isMobileSearchOpen && (
             <div className="mt-3">
@@ -257,36 +240,91 @@ const Header = ({ isLogin, cartCount }) => {
             </div>
           )}
         </div>
-
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 z-40">
-            <div className="mobile-menu fixed inset-y-0 left-0 w-64 bg-white shadow-xl z-50 overflow-y-auto">
-              <div className="p-4">
-                <div className="flex justify-end">
+          <div className="fixed inset-0 bg-transparent   bg-opacity-50 z-40">
+            <div className="mobile-menu fixed inset-y-0 left-0 w-64 bg-gray-100 shadow-xl border border-teal-500 rounded-br-xl rounded-tr-xl z-50 overflow-y-auto">
+              <div className="p-2  m-2">
+                <div className="flex justify-start text-teal-400  ">
                   <button
                     onClick={toggleMenu}
-                    className="p-2 hover:bg-gray-100 rounded-md transition-colors"
+                    className="p-2  hover:text-teal-700 rounded-md transition-colors"
                     aria-label="Close menu"
                   >
-                    <FaTimes className="text-xl" />
+                    <FaTimes className="text-3xl" />
                   </button>
                 </div>
-
-                <div className="mt-4">
+                <div className="inset-0  flex ">
                   {isLogin ? (
-                    <Logout isUser={true} />
+                    <div className="flex flex-col  py-3 px-2 font-serif gap-5 items-baseline">
+                      <Link
+                        to="/my-profile/view"
+                        className="flex items-center font-normal p-1 gap-2 rounded-md text-base tex-black hover:bg-teal-600 transition-colors"
+                        onClick={toggleMenu}
+                      >
+                        <CgProfile className="inline-block text-teal-600 text-4xl hover:text-teal-600" />
+                        Manage Account
+                      </Link>
+                      <Link
+                        to="/cart"
+                        className="block py-2 p-1 text-center rounded-md text-black text-normal text-lg hover:bg-teal-700 transition-colors"
+                      >
+                        <div className="flex items-center gap-2 font-normal text-xl  justify-center">
+                          <FaShoppingCart className="text-teal-600 text-4xl" />
+                          <span>Cart</span>
+                        </div>
+                      </Link>
+
+                      <Link
+                        className="text-black  font-normal text-lg hover:text-teal-500"
+                        to="/home"
+                      >
+                        All Furnitures
+                      </Link>
+                      <Link
+                        className="text-black  font-normal text-lg hover:text-teal-500"
+                        to="/about"
+                      >
+                        About Us
+                      </Link>
+                      <Link
+                        className="text-black  font-normal text-lg hover:text-teal-500 "
+                        to="/featured"
+                      >
+                        Featured
+                      </Link>
+                      <Link
+                        className="text-black  font-normal text-lg hover:text-teal-500"
+                        to="/service-page"
+                      >
+                        Services
+                      </Link>
+                      <div className="flex items-center gap-1  text-black py-2 ">
+                        <span className="text-teal-500  text-lg font-bold">
+                          •
+                        </span>
+                        <Link
+                          to="https://tinyurl.com/5avjxzav"
+                          target="blank"
+                          rel="noopener noreferrer"
+                          className="text-black font-normal text-base hover:text-teal-500"
+                        >
+                          Store Location
+                        </Link>
+                      </div>
+                      <Logout isUser={true} className="inline-block  " />
+                    </div>
                   ) : (
                     <div className="flex flex-col gap-4">
                       <Link
                         to="/login"
-                        className="block px-4 py-2 text-center rounded-md bg-teal-600 text-white hover:bg-teal-700 transition-colors"
+                        className="block px-4 py-2 text-center rounded-md text-black hover:bg-teal-700 transition-colors"
                       >
                         Login
                       </Link>
                       <Link
                         to="/signup"
-                        className="block px-4 py-2 text-center rounded-md bg-teal-600 text-white hover:bg-teal-700 transition-colors"
+                        className="block px-4 py-2 text-center rounded-md text-black hover:bg-teal-700 transition-colors"
                       >
                         Sign Up
                       </Link>

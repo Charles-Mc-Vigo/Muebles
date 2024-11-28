@@ -8,13 +8,13 @@ exports.AddCategory = async (req, res) => {
 
 		const existingCategory = await Category.findOne({ name });
 		if (existingCategory)
-			return res.status(400).json({ message: `${name} is already existing!` });
+			return res.status(400).json({ error: `${name} is already existing!` });
 
 		const newCategory = new Category({ name });
 		await newCategory.save();
 		res
 			.status(200)
-			.json({ message: "Category added successfully", category: newCategory });
+			.json({ success : "Category added successfully", category: newCategory });
 	} catch (error) {
 		console.error("Error adding new category: ", error);
 		res.status(500).send("Server error!");
@@ -26,11 +26,11 @@ exports.ArchiveCategory = async (req, res) => {
 		const {categoryId} = req.params;
 		const existingCategory = await Category.findById(categoryId);
 
-		if(!existingCategory) return res.status(404).json({message:"Category not found!"});
+		if(!existingCategory) return res.status(404).json({error:"Category not found!"});
 
 		existingCategory.isArchived = true;
 		await existingCategory.save();
-		res.status(200).json({message:`${existingCategory.name} has been archived!`})
+		res.status(200).json({success:`${existingCategory.name} has been archived!`})
 	} catch (error) {
 		console.error("Error in archiving category: ", error);
 		res.status(500).json({message:"Server error!"});

@@ -18,11 +18,6 @@ const services = [
     description: "We offer professional delivery and assembly services for your convenience.",
     icon: "📦", 
   },
-  {
-    title: "Maintenance Services",
-    description: "Keep your furniture in top condition with our maintenance services.",
-    icon: "🔧", 
-  },
 ];
 
 const ServicePage = () => {

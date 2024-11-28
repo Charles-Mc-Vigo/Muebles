@@ -6,7 +6,7 @@ const FAQPage = () => {
       <div className="flex flex-col md:justify-between items-start">
         <div className="w-full">
           <h2 className="text-3xl md:text-4xl font-bold text-left mb-4">FAQ</h2>
-          <p className="text-justify text-base md:text-lg text-gray-700 mb-2">
+          <p className="text-justify text-2xl md:text-lg text-gray-700 mb-2">
             We are here to help every step of the way as quickly and conveniently as possible so you can go back to relaxing on your JCKAME wood furniture with peace of mind.
           </p>
           <p className="font-semibold text-base md:text-lg">

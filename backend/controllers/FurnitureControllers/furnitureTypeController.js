@@ -4,7 +4,7 @@ const Category = require("../../models/Furniture/categoryModel");
 
 exports.AddFurnitureType = async (req, res) => {
   try {
-    const { name, categoryId } = req.body;
+    const { name, ECT, categoryId } = req.body;
 
     // Check if the category exists by name
     const existingCategory = await Category.findById(categoryId);
@@ -18,8 +18,11 @@ exports.AddFurnitureType = async (req, res) => {
       return res.status(400).json({ message: "Furniture type already exists!" });
     }
 
+    if(!ECT) return res.status(400).json({message:"Estimated Completion Time required!"});
+
+
     // Create a new furniture type with the category ID
-    const newFurnitureType = new FurnitureType({ name, categoryId: existingCategory._id });
+    const newFurnitureType = new FurnitureType({ name, ECT, categoryId: existingCategory._id });
     await newFurnitureType.save();
 
     return res.status(201).json({ message:`${newFurnitureType.name} added successfully`, newFurnitureType});
@@ -32,7 +35,7 @@ exports.AddFurnitureType = async (req, res) => {
 // Get All Furniture Types
 exports.GetFurnitureType = async (req, res) => {
   try {
-    const furnitureType = await FurnitureType.find({isArchived:false});
+    const furnitureType = await FurnitureType.find({isArchived:false}).populate('materials').populate('sizes');
     if (furnitureType.length === 0) {
       return res.status(200).json({ message: "No furniture type found!" });
     }
@@ -132,6 +135,10 @@ exports.getFurTypeById = async (req, res) => {
       return res.status(404).json({ message: "Furniture type not found!" });
     }
 
+    if(!furnitureType.ECT){
+      return furnitureType.ECT = 1;
+    }
+
     return res.status(200).json(furnitureType);
   } catch (error) {
     console.log("Error fetching furniture type:", error);
@@ -143,30 +150,38 @@ exports.getFurTypeById = async (req, res) => {
 exports.UpdateFurnitype = async (req, res) => {
   try {
     const { furnitypeId } = req.params;
-    const { name, categoryId } = req.body;
+    const { name, ECT, categoryId } = req.body;
 
     // Find the furniture type by ID
-    const exisitingFurnitype = await FurnitureType.findById(furnitypeId);
-    if (!exisitingFurnitype) {
+    const existingFurnitype = await FurnitureType.findById(furnitypeId);
+    if (!existingFurnitype) {
       return res.status(404).json({ message: "Furniture type not found!" });
     }
 
-    // Check if the category exists by name
-    const existingCategory = await Category.findById(categoryId);
-    if (!existingCategory) {
-      return res.status(404).json({ message: "Category not found!" });
+    // Check if the category exists by ID
+    if (categoryId) {
+      const existingCategory = await Category.findById(categoryId);
+      if (!existingCategory) {
+        return res.status(404).json({ message: "Category not found!" });
+      }
+      // Only update categoryId if the category exists
+      existingFurnitype.categoryId = existingCategory._id;
+    }
+
+    // Update only the provided fields
+    if (name !== undefined) {
+      existingFurnitype.name = name;
     }
     
-
-    // Update furniture type fields with the new name and category ID
-    exisitingFurnitype.name = name;
-    exisitingFurnitype.categoryId = existingCategory._id;
+    if (ECT !== undefined) {
+      existingFurnitype.ECT = ECT;
+    }
 
     // Save the updated furniture type
-    const updatedFurnitype = await exisitingFurnitype.save();
+    const updatedFurnitype = await existingFurnitype.save();
 
-    // Return the updated furniture type and category ID
-    res.status(200).json({message:"Furniture type updated successfully!", updatedFurnitype});
+    // Return the updated furniture type
+    res.status(200).json({ message: "Furniture type updated successfully!", updatedFurnitype });
   } catch (error) {
     console.error("Error in updating furniture type: ", error);
     res.status(500).json({ message: "Server error!" });

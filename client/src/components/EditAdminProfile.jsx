@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { IoIosArrowBack } from "react-icons/io";
 
 const AdminEditProfile = () => {
     const [profile, setProfile] = useState({
@@ -10,6 +12,7 @@ const AdminEditProfile = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(null);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchProfile = async () => {
@@ -83,7 +86,11 @@ const AdminEditProfile = () => {
     if (error) return <p className="text-red-500">{error}</p>;
 
     return (
-        <div className="p-6 bg-white rounded-lg shadow-lg w-96 mx-auto">
+        <div className="p-6 mt-5 bg-white rounded-lg shadow-lg border-2 w-96 mx-auto">
+            <div className="flex items-center mb-6 cursor-pointer" onClick={() => navigate("/dashboard/setting/admin-profile/view")}>
+                <IoIosArrowBack className="text-2xl text-gray-600 mr-2" />
+                <span className="text-lg text-gray-600">Back</span>
+            </div>
             <h2 className="text-2xl font-semibold mb-4">Edit Profile</h2>
             {success && <p className="text-green-500 mb-4">{success}</p>}
 
@@ -100,7 +107,7 @@ const AdminEditProfile = () => {
             <input
                 type="text"
                 name="name"
-                value={profile.name}
+                value={profile.name|| ""}
                 onChange={handleInputChange}
                 className="mb-4 px-3 py-2 border border-gray-300 rounded-md w-full focus:outline-none focus:border-teal-600"
             />
@@ -109,7 +116,7 @@ const AdminEditProfile = () => {
             <input
                 type="email"
                 name="email"
-                value={profile.email}
+                value={profile.email || ""}
                 onChange={handleInputChange}
                 className="mb-4 px-3 py-2 border border-gray-300 rounded-md w-full focus:outline-none focus:border-teal-600"
             />
@@ -118,7 +125,7 @@ const AdminEditProfile = () => {
             <input
                 type="text"
                 name="role"
-                value={profile.role}
+                value={profile.role || ""}
                 onChange={handleInputChange}
                 className="mb-4 px-3 py-2 border border-gray-300 rounded-md w-full focus:outline-none focus:border-teal-600"
             />

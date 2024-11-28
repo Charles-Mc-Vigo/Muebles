@@ -142,24 +142,41 @@ const UserProfile = () => {
         </div>
         <div className="flex-1 p-6 bg-white border rounded-lg shadow flex flex-col">
           <h2 className="font-bold text-lg">Address Book</h2>
-          <div className="mt-4 flex-grow flex flex-col">
-            <p className="font-semibold">DEFAULT SHIPPING ADDRESS</p>
-            <p>{profile.streetAddress}</p>
-            <p>
-              {profile.municipality}, {profile.zipCode}
-            </p>
-            <p>{profile.phoneNumber}</p>
+          <div className="mt-4 flex-grow flex flex-col p-2">
+            <p className="font-semibold">SHIPPING ADDRESS</p>
+            {profile.addresses.map((address, index) => (
+              <div key={index}>
+                <p>
+                  {address.streetAddress}, {address.barangay},{" "}
+                  {address.municipality}, {address.zipCode}
+                  {index === 0 && (
+                    <span className="ml-2 text-sm text-green-600 font-semibold">
+                      (Default)
+                    </span>
+                  )}
+                </p>
+              </div>
+            ))}
           </div>
         </div>
       </div>
     ),
     personalProfile: (
       <div className="profile-container w-full max-w-screen-lg mx-auto p-8 bg-white shadow-md rounded-lg mt-5 mb-5">
-        <h1 className="text-2xl font-semibold text-gray-700 mb-6">
-          My profile
-        </h1>
+        <img
+          src={
+            profile && profile.image && profile.image.startsWith("data:")
+              ? profile.image
+              : profile?.image || "default-profile-image.jpg" // Use a default image if profile.image is undefined
+          }
+          alt={`${profile?.firstname || ""} ${
+            profile?.lastname || ""
+          }'s Profile Picture`}
+          className="w-24 h-24 rounded-full object-cover mb-2 shadow-lg transition-transform group-hover:scale-105"
+        />
+        <h1 className="text-xl font-semibold text-gray-700 mb-3">My profile</h1>
 
-        <div className="profile-details grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div className="profile-details grid grid-cols-1 md:grid-cols-2 gap-6 mb-5">
           <div>
             <p className="text-sm text-gray-500">Full Name</p>
             <p className="text-lg font-medium text-gray-800">
@@ -195,9 +212,9 @@ const UserProfile = () => {
           </div>
         </div>
 
-        <div className="button-container mt-8 flex flex-col space-y-4">
+        <div className="button-container mt-5 flex flex-col space-y-4">
           <Link
-            to="/my-profile/edit" 
+            to="/my-profile/edit"
             className="bg-teal-500 text-white px-6 py-3 rounded-md hover:bg-teal-600 transition duration-300 text-center"
           >
             Edit Profile
@@ -214,8 +231,9 @@ const UserProfile = () => {
               <tr className="bg-gray-200">
                 <th className="px-4 py-2 text-left font-semibold">Full Name</th>
                 <th className="px-4 py-2 text-left font-semibold">Address</th>
-                <th className="px-4 py-2 text-left font-semibold">Location</th>
-                <th className="px-4 py-2 text-left font-semibold">Phone Number</th>
+                <th className="px-4 py-2 text-left font-semibold">
+                  Phone Number
+                </th>
                 <th className="px-4 py-2 text-left font-semibold">Actions</th>
               </tr>
             </thead>
@@ -224,13 +242,24 @@ const UserProfile = () => {
                 <td className="px-4 py-2">
                   {profile.firstname} {profile.lastname}
                 </td>
-                <td className="px-4 py-2">{profile.streetAddress}</td>
                 <td className="px-4 py-2">
-                  {profile.municipality}, {profile.zipCode}
+                  {profile.addresses.map((address, index) => (
+                    <div key={index}>
+                      <p>
+                        {address.streetAddress}, {address.barangay},{" "}
+                        {address.municipality}, {address.zipCode}
+                        {address.isDefault && (
+                          <span className="ml-2 text-sm text-green-600 font-semibold">
+                            (Default)
+                          </span>
+                        )}
+                      </p>
+                    </div>
+                  ))}
                 </td>
                 <td className="px-4 py-2">{profile.phoneNumber}</td>
                 <td className="px-4 py-2">
-                  <a href="#" className="text-blue-500">
+                  <a href="/address/new" className="text-blue-500">
                     EDIT
                   </a>
                 </td>
@@ -238,9 +267,11 @@ const UserProfile = () => {
             </tbody>
           </table>
         </div>
-        <button className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg">
-          + ADD NEW ADDRESS
-        </button>
+        <Link to={"/address/new"}>
+          <button className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg">
+            + ADD NEW ADDRESS
+          </button>
+        </Link>
       </div>
     ),
     myOrders: <OrderDetails />,
@@ -248,7 +279,7 @@ const UserProfile = () => {
 
   return (
     <div>
-      <Header />
+      <Header isLogin={true} cartCount={true} />
       <div className="flex flex-col lg:flex-row my-8 p-5 bg-gray-100 w-full border rounded-lg shadow-lg">
         <aside className="w-full lg:w-1/4 bg-white border-r border-gray-200 mb-5 lg:mb-0 mr-5 rounded-md">
           <nav className="space-y-4 text-gray-700 p-4">
@@ -303,3 +334,4 @@ const UserProfile = () => {
 };
 
 export default UserProfile;
+
