@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import React, { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBars, faUser, faCog, faSignOutAlt, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
@@ -41,7 +40,7 @@ const HamburgerMenu = () => {
 
     return (
         <div>
-            <button onClick={toggleMenu} className="text-gray-800 p-2">
+            <button onClick={toggleMenu} className="text-gray-800 p-2">  </button>
                 <FontAwesomeIcon icon={faBars} />
             <button onClick={toggleMenu} className="text-gray-800 p-2">
                 <FontAwesomeIcon icon={faBars} />
