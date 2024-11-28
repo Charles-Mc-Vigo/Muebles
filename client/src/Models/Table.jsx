@@ -6,148 +6,329 @@ Command: npx gltfjsx@6.5.3 Table.glb
 import React from "react";
 import { useGLTF } from "@react-three/drei";
 
-export function Model(props) {
-	const { nodes, materials } = useGLTF("/Table.glb");
+export function Table({
+	selectedTableTop,
+	selectedTableLeg,
+	selectedTableWood,
+}) {
+	const { nodes, materials } = useGLTF("/Models/Table.glb");
+
+	const getTableLeg = () => {
+		switch (selectedTableLeg) {
+			case "Design 1":
+				return {
+					geometry: nodes.Table1_Leg1_Brown.geometry,
+					material: materials.Brown,
+					position: [1.985, 2.75, -26.776],
+					rotation: [1.571, -0.001, -3.139],
+					scale: [0.245, 5.459, 0.23],
+				};
+
+			case "Design 2":
+				return {
+					geometry: nodes.Table2_Leg2_Brown.geometry,
+					material: materials.Brown,
+					position: [0.064, 0.667, -26.648],
+					rotation: [3.142, 1.567, 1.565],
+					scale: [-0.195, -5.55, -0.171],
+				};
+			default:
+				return {
+					geometry: nodes.Table1_Leg1_Brown.geometry,
+					material: materials.Brown,
+					position: [1.985, 2.75, -26.776],
+					rotation: [1.571, -0.001, -3.139],
+					scale: [0.245, 5.459, 0.23],
+				};
+		}
+	};
+
+	const getTableTop = () => {
+		switch (selectedTableTop) {
+			case "Design 1":
+				return {
+					geometry: nodes.Table1_top1_Brown.geometry,
+					material: materials.Brown,
+					position: [0.063, 2.976, -26.714],
+					rotation: [-Math.PI, 0, -Math.PI],
+					scale: [-2.843, -0.137, -6.388],
+				};
+			case "Design 2":
+				return {
+					geometry: nodes.Table2_top2_Brown.geometry,
+					material: materials.Brown,
+					position: [41.213, -18.302, -28.856],
+					rotation: [-Math.PI, 1.57, -Math.PI],
+					scale: [3.493, 3.493, 4.468],
+				};
+			case "Design 3":
+				return {
+					geometry: nodes.Table3_top3_Brown.geometry,
+					material: materials.Brown,
+					position: [-0.061, 3.202, -26.592],
+					scale: [3.628, 1.39, 2.799],
+				};
+			default:
+				return {
+					geometry: nodes.Table1_top1_Brown.geometry,
+					material: materials.Brown,
+					position: [0.063, 2.976, -26.714],
+					rotation: [-Math.PI, 0, -Math.PI],
+					scale: [-2.843, -0.137, -6.388],
+				};
+		}
+	};
+
+	const tableTop = getTableTop();
+	const tableLeg = getTableLeg();
 	return (
-		<group {...props} dispose={null}>
-			<mesh
+		<group dispose={null}>
+			{selectedTableWood === "Acacia" ? (
+				<>
+					<mesh
+						geometry={tableTop.geometry}
+						material={materials.Acacia}
+						position={[0.063, 2.976, -26.714]}
+						rotation={[-Math.PI, 0, -Math.PI]}
+						scale={[-2.843, -0.137, -6.388]}
+					/>
+					<mesh
+						geometry={tableLeg.geometry}
+						material={materials.Acacia}
+						position={[1.985, 2.75, -26.776]}
+						rotation={[1.571, -0.001, -3.139]}
+						scale={[0.245, 5.459, 0.23]}
+					/>
+				</>
+			) : (
+				<>
+					<mesh
+						geometry={nodes.Table1_top1_Brown.geometry}
+						material={materials.Brown}
+						position={[0.063, 2.976, -26.714]}
+						rotation={[-Math.PI, 0, -Math.PI]}
+						scale={[-2.843, -0.137, -6.388]}
+					/>
+					<mesh
+						geometry={nodes.Table1_Leg1_Brown.geometry}
+						material={materials.Brown}
+						position={[1.985, 2.75, -26.776]}
+						rotation={[1.571, -0.001, -3.139]}
+						scale={[0.245, 5.459, 0.23]}
+					/>
+				</>
+			)}
+
+			{selectedTableWood === "Mahogany" ? (
+				<>
+					<mesh
+						geometry={tableTop.geometry}
+						material={materials.Mahogany}
+						position={[0.063, 2.976, -26.714]}
+						rotation={[-Math.PI, 0, -Math.PI]}
+						scale={[-2.843, -0.137, -6.388]}
+					/>
+					<mesh
+						geometry={tableLeg.geometry}
+						material={materials.Mahogany}
+						position={[1.985, 2.75, -26.776]}
+						rotation={[1.571, -0.001, -3.139]}
+						scale={[0.245, 5.459, 0.23]}
+					/>
+				</>
+			) : (
+				<>
+					<mesh
+						geometry={nodes.Table1_top1_Brown.geometry}
+						material={materials.Brown}
+						position={[0.063, 2.976, -26.714]}
+						rotation={[-Math.PI, 0, -Math.PI]}
+						scale={[-2.843, -0.137, -6.388]}
+					/>
+					<mesh
+						geometry={nodes.Table1_Leg1_Brown.geometry}
+						material={materials.Brown}
+						position={[1.985, 2.75, -26.776]}
+						rotation={[1.571, -0.001, -3.139]}
+						scale={[0.245, 5.459, 0.23]}
+					/>
+				</>
+			)}
+
+			{selectedTableWood === "Narra" ? (
+				<>
+					<mesh
+						geometry={tableTop.geometry}
+						material={materials.Narra}
+						position={[0.063, 2.976, -26.714]}
+						rotation={[-Math.PI, 0, -Math.PI]}
+						scale={[-2.843, -0.137, -6.388]}
+					/>
+					<mesh
+						geometry={tableLeg.geometry}
+						material={materials.Narra}
+						position={[1.985, 2.75, -26.776]}
+						rotation={[1.571, -0.001, -3.139]}
+						scale={[0.245, 5.459, 0.23]}
+					/>
+				</>
+			) : (
+				<>
+					<mesh
+						geometry={nodes.Table1_top1_Brown.geometry}
+						material={materials.Brown}
+						position={[0.063, 2.976, -26.714]}
+						rotation={[-Math.PI, 0, -Math.PI]}
+						scale={[-2.843, -0.137, -6.388]}
+					/>
+					<mesh
+						geometry={nodes.Table1_Leg1_Brown.geometry}
+						material={materials.Brown}
+						position={[1.985, 2.75, -26.776]}
+						rotation={[1.571, -0.001, -3.139]}
+						scale={[0.245, 5.459, 0.23]}
+					/>
+				</>
+			)}
+
+			{/* <mesh
 				geometry={nodes.Table1_top1_Narra.geometry}
-				material={materials["Material.004"]}
+				material={materials.Narra}
 				position={[0.092, 3.077, 0.019]}
 				rotation={[-Math.PI, 0, -Math.PI]}
 				scale={[-2.843, -0.137, -6.388]}
 			/>
 			<mesh
 				geometry={nodes.Table1_Leg1_Narra.geometry}
-				material={materials.Material}
+				material={materials.Narra}
 				position={[1.985, 2.721, -0.057]}
 				rotation={[1.571, -0.001, -3.139]}
 				scale={[0.245, 5.459, 0.23]}
 			/>
 			<mesh
 				geometry={nodes.Table2_top2_Narra.geometry}
-				material={materials["Material.008"]}
+				material={materials["Material.002"]}
 				position={[41.124, -18.302, -2.177]}
 				rotation={[-Math.PI, 1.57, -Math.PI]}
 				scale={[3.493, 3.493, 4.468]}
 			/>
 			<mesh
 				geometry={nodes.Table3_top3_Narra.geometry}
-				material={materials["Material.016"]}
+				material={materials["Material.001"]}
 				position={[0.053, 3.22, 0.047]}
 				scale={[3.628, 1.39, 2.799]}
 			/>
 			<mesh
 				geometry={nodes.Table2_Leg2_Narra.geometry}
-				material={materials["Material.012"]}
+				material={materials.Narra}
 				position={[0.064, 0.709, 0.096]}
-				rotation={[-3.142, 1.567, 1.565]}
+				rotation={[-Math.PI, 1.567, 1.565]}
 				scale={[-0.199, -5.55, -0.171]}
 			/>
 			<mesh
 				geometry={nodes.Table1_Leg1_Mahogany.geometry}
-				material={materials["Material.001"]}
+				material={materials.Mahogany}
 				position={[1.985, 2.723, -13.587]}
 				rotation={[1.571, -0.001, -3.139]}
 				scale={[0.245, 5.459, 0.23]}
 			/>
 			<mesh
 				geometry={nodes.Table1_Leg1_Brown.geometry}
-				material={materials["Material.002"]}
+				material={materials.Brown}
 				position={[1.985, 2.75, -26.776]}
 				rotation={[1.571, -0.001, -3.139]}
 				scale={[0.245, 5.459, 0.23]}
 			/>
 			<mesh
 				geometry={nodes.Table1_Leg1_Acacia.geometry}
-				material={materials["Material.003"]}
+				material={materials.Acacia}
 				position={[1.985, 2.756, -40.236]}
 				rotation={[1.571, -0.001, -3.139]}
 				scale={[0.245, 5.459, 0.23]}
 			/>
 			<mesh
 				geometry={nodes.Table1_top1_Mahogany.geometry}
-				material={materials["Material.005"]}
+				material={materials.Mahogany}
 				position={[0.092, 3.001, -13.533]}
 				rotation={[-Math.PI, 0, -Math.PI]}
 				scale={[-2.843, -0.137, -6.388]}
 			/>
 			<mesh
 				geometry={nodes.Table1_top1_Brown.geometry}
-				material={materials["Material.006"]}
+				material={materials.Brown}
 				position={[0.063, 2.976, -26.714]}
 				rotation={[-Math.PI, 0, -Math.PI]}
 				scale={[-2.843, -0.137, -6.388]}
 			/>
 			<mesh
 				geometry={nodes.Table1_top1_Acacia.geometry}
-				material={materials["Material.007"]}
+				material={materials.Acacia}
 				position={[0.122, 3.003, -40.074]}
 				rotation={[-Math.PI, 0, -Math.PI]}
 				scale={[-2.843, -0.137, -6.388]}
 			/>
 			<mesh
 				geometry={nodes.Table2_top2_Mahogany.geometry}
-				material={materials["Material.009"]}
+				material={materials.Acacia}
 				position={[41.139, -18.302, -15.547]}
 				rotation={[-Math.PI, 1.57, -Math.PI]}
 				scale={[3.493, 3.493, 4.468]}
 			/>
 			<mesh
 				geometry={nodes.Table2_top2_Brown.geometry}
-				material={materials["Material.010"]}
+				material={materials.Brown}
 				position={[41.213, -18.302, -28.856]}
 				rotation={[-Math.PI, 1.57, -Math.PI]}
 				scale={[3.493, 3.493, 4.468]}
 			/>
 			<mesh
 				geometry={nodes.Table2_top2_Acacia.geometry}
-				material={materials["Material.011"]}
+				material={materials.Acacia}
 				position={[41.168, -18.302, -42.286]}
 				rotation={[-Math.PI, 1.57, -Math.PI]}
 				scale={[3.493, 3.493, 4.468]}
 			/>
 			<mesh
 				geometry={nodes.Table2_Leg2_Mahogany.geometry}
-				material={materials["Material.013"]}
+				material={materials.Mahogany}
 				position={[0.064, 0.687, -13.439]}
-				rotation={[3.142, 1.567, 1.565]}
+				rotation={[Math.PI, 1.567, 1.565]}
 				scale={[-0.195, -5.55, -0.171]}
 			/>
 			<mesh
 				geometry={nodes.Table2_Leg2_Brown.geometry}
-				material={materials["Material.014"]}
+				material={materials.Brown}
 				position={[0.064, 0.667, -26.648]}
 				rotation={[3.142, 1.567, 1.565]}
 				scale={[-0.195, -5.55, -0.171]}
 			/>
 			<mesh
 				geometry={nodes.Table2_Leg2_Acacia.geometry}
-				material={materials["Material.015"]}
+				material={materials.Acacia}
 				position={[0.064, 0.667, -40.105]}
 				rotation={[3.142, 1.567, 1.565]}
 				scale={[-0.203, -5.55, -0.171]}
 			/>
 			<mesh
 				geometry={nodes.Table3_top3_Mahogany.geometry}
-				material={materials["Material.017"]}
+				material={materials.Mahogany}
 				position={[0.053, 3.209, -13.46]}
 				scale={[3.628, 1.39, 2.799]}
 			/>
 			<mesh
 				geometry={nodes.Table3_top3_Brown.geometry}
-				material={materials["Material.018"]}
+				material={materials.Brown}
 				position={[-0.061, 3.202, -26.592]}
 				scale={[3.628, 1.39, 2.799]}
 			/>
 			<mesh
 				geometry={nodes.Table3_top3_Acacia.geometry}
-				material={materials["Material.019"]}
+				material={materials.Acacia}
 				position={[-0.061, 3.199, -39.93]}
 				scale={[3.628, 1.39, 2.799]}
-			/>
+			/> */}
 		</group>
 	);
 }
 
-useGLTF.preload("/Table.glb");
+useGLTF.preload("/Models/Table.glb");

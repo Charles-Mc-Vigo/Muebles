@@ -6,6 +6,7 @@ import Footer from "../components/Footer";
 import { Chair } from "../Models/ChairModels";
 import { Sofa } from "../Models/DesignSofa";
 import { Door } from "../Models/DesignDoor";
+import { Table } from "../Models/Table";
 import { useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 
@@ -23,7 +24,7 @@ const RotatingObject = ({ children }) => {
 
 const ProductCustomization = () => {
 	// State for selected model
-	const [selectedModel, setSelectedModel] = useState("chair");
+	const [selectedModel, setSelectedModel] = useState("table");
 	// for chair
 	const [selectedBackrest, setSelectedBackrest] = useState("");
 	const [selectedSeat, setSelectedSeat] = useState("");
@@ -39,6 +40,9 @@ const ProductCustomization = () => {
 	const [selectedSofaWood, setSelectedSofaWood] = useState("");
 
 	// for table
+	const [selectedTableTop, setSelectedTableTop] = useState("");
+	const [selectedTableLeg, setSelectedTableLeg] = useState("");
+	const [selectedTableWood, setSelectedTableWood] = useState("");
 
 	// Handlers for each part selection
 	const handleBackrestChange = (e) => {
@@ -71,6 +75,17 @@ const ProductCustomization = () => {
 
 	const handleDoorWoodChange = (e) => {
 		if (selectedModel === "door") setSelectedDoorWoodType(e.target.value);
+	};
+
+	// for table
+	const handleTableTopChange = (e) => {
+		if (selectedModel === "table") setSelectedTableTop(e.target.value);
+	};
+	const handleTableLegChange = (e) => {
+		if (selectedModel === "table") setSelectedTableLeg(e.target.value);
+	};
+	const handleTableWoodChange = (e) => {
+		if (selectedModel === "table") setSelectedTableWood(e.target.value);
 	};
 
 	// console.log(selectedWood);
@@ -138,6 +153,15 @@ const ProductCustomization = () => {
 								/>
 							</RotatingObject>
 						)}
+						{selectedModel === "table" && (
+							<RotatingObject>
+								<Table
+									selectedTableTop={selectedTableTop}
+									selectedTableLeg={selectedTableLeg}
+									selectedTableWood={selectedTableWood}
+								/>
+							</RotatingObject>
+						)}
 						{selectedModel === "door" && (
 							<RotatingObject>
 								<Door
@@ -173,6 +197,7 @@ const ProductCustomization = () => {
 							<option value="chair">Chair</option>
 							<option value="sofa">Sofa</option>
 							<option value="door">Door</option>
+							<option value="table">Table</option>
 						</select>
 					</div>
 					{/* Chair Customization Controls */}
@@ -234,6 +259,61 @@ const ProductCustomization = () => {
 						</>
 					)}
 
+					{/* Table Customization Controls */}
+					{selectedModel === "table" && (
+						<>
+							<div className="bg-white shadow rounded p-4">
+								<h3 className="text-lg font-semibold">Table Top Option</h3>
+								<select
+									value={selectedTableTop}
+									onChange={handleTableTopChange}
+									className="mt-2 px-4 py-2 border rounded shadow w-full"
+								>
+									<option value="" disabled>
+										Select Table Top Designs
+									</option>{" "}
+									{["Design 1", "Design 2", "Design 3"].map((index) => (
+										<option key={index} value={index}>
+											{index}
+										</option>
+									))}
+								</select>
+							</div>
+							<div className="bg-white shadow rounded p-4">
+								<h3 className="text-lg font-semibold">Table Legs Options</h3>
+								<select
+									value={selectedTableLeg}
+									onChange={handleTableLegChange}
+									className="mt-2 px-4 py-2 border rounded shadow w-full"
+								>
+									<option value="" disabled>
+										Select Table Legs Design
+									</option>{" "}
+									{["Design 1", "Design 2"].map((index) => (
+										<option key={index} value={index}>
+											{index}
+										</option>
+									))}
+								</select>
+							</div>
+							<div className="bg-white shadow rounded p-4 mt-4">
+								<h3 className="text-lg font-semibold">Woods Option</h3>
+								<select
+									value={selectedTableWood}
+									onChange={handleTableWoodChange}
+									className="mt-2 px-4 py-2 border rounded shadow w-full"
+								>
+									<option value="" disabled>
+										Select Wood Type
+									</option>
+									<option value="Acacia">Acacia</option>
+									<option value="Mahogany">Mahogany</option>
+									<option value="Narra">Narra</option>
+								</select>
+							</div>
+						</>
+					)}
+
 					{/* Sofa Customization Controls */}
 					{selectedModel === "sofa" && (
 						<>
@@ -274,7 +354,7 @@ const ProductCustomization = () => {
 								</select>
 							</div>
 							<div className="bg-white shadow rounded p-4 mt-4">
-								<h3 className="text-lg font-semibold">Woods Available</h3>
+								<h3 className="text-lg font-semibold">Woods Options</h3>
 								<select
 									value={selectedSofaWood}
 									onChange={handleSofaWoodChange}
@@ -319,7 +399,7 @@ const ProductCustomization = () => {
 								</select>
 							</div>
 							<div className="bg-white shadow rounded p-4 mt-4">
-								<h3 className="text-lg font-semibold">Woods Available</h3>
+								<h3 className="text-lg font-semibold">Woods Options</h3>
 								<select
 									value={selectedDoorWoodType}
 									onChange={handleDoorWoodChange}
