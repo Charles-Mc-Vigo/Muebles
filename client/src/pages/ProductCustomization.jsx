@@ -6,6 +6,20 @@ import Footer from "../components/Footer";
 import { Chair } from "../Models/ChairModels";
 import { Sofa } from "../Models/DesignSofa";
 import { Door } from "../Models/DesignDoor";
+import { useRef } from "react";
+import { useFrame } from "@react-three/fiber";
+
+const RotatingObject = ({ children }) => {
+	const groupRef = useRef();
+
+	useFrame(() => {
+		if (groupRef.current) {
+			groupRef.current.rotation.y += 0.0;
+		}
+	});
+
+	return <group ref={groupRef}>{children}</group>;
+};
 
 const ProductCustomization = () => {
 	// State for selected model
@@ -23,6 +37,8 @@ const ProductCustomization = () => {
 	const [selectedSofaBackrest, setSelectedSofaBackrest] = useState("");
 	const [selectedSofaArmrest, setSelectedSofaArmrest] = useState("");
 	const [selectedSofaWood, setSelectedSofaWood] = useState("");
+
+	// for table
 
 	// Handlers for each part selection
 	const handleBackrestChange = (e) => {
@@ -54,8 +70,8 @@ const ProductCustomization = () => {
 	};
 
 	const handleDoorWoodChange = (e) => {
-		if(selectedModel === "door") setSelectedDoorWoodType(e.target.value);
-	}
+		if (selectedModel === "door") setSelectedDoorWoodType(e.target.value);
+	};
 
 	// console.log(selectedWood);
 
@@ -114,24 +130,30 @@ const ProductCustomization = () => {
 						<pointLight position={[0, 5, 0]} intensity={0.8} color="#ffd700" />
 						{/* Conditionally render models */}
 						{selectedModel === "chair" && (
-							<Chair
-								selectedBackrest={selectedBackrest}
-								selectedSeat={selectedSeat}
-								selectedWood={selectedWood}
-							/>
+							<RotatingObject>
+								<Chair
+									selectedBackrest={selectedBackrest}
+									selectedSeat={selectedSeat}
+									selectedWood={selectedWood}
+								/>
+							</RotatingObject>
 						)}
 						{selectedModel === "door" && (
-							<Door 
-							selectedDoorDesign={selectedDoorDesign} 
-							selectedDoorWoodType={selectedDoorWoodType}
-							/>
+							<RotatingObject>
+								<Door
+									selectedDoorDesign={selectedDoorDesign}
+									selectedDoorWoodType={selectedDoorWoodType}
+								/>
+							</RotatingObject>
 						)}
 						{selectedModel === "sofa" && (
-							<Sofa
-								selectedBackrest={selectedSofaBackrest}
-								selectedArmrest={selectedSofaArmrest}
-								selectedSofaWood={selectedSofaWood}
-							/>
+							<RotatingObject>
+								<Sofa
+									selectedBackrest={selectedSofaBackrest}
+									selectedArmrest={selectedSofaArmrest}
+									selectedSofaWood={selectedSofaWood}
+								/>
+							</RotatingObject>
 						)}
 						<OrbitControls minDistance={2} maxDistance={10} />
 
