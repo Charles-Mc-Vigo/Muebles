@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
-import React, { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBars, faUser, faCog, faSignOutAlt, faSignOutAlt, faTimes } from "@fortawesome/free-solid-svg-icons";
+import { faBars, faUser, faCog, faSignOutAlt, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
 import Logout from "../components/Logout";
-import Logout from "../components/Logout";
+
 
 const HamburgerMenu = () => {
     const [isOpen, setIsOpen] = useState(false);

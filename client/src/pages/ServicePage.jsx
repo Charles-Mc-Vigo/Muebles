@@ -2,47 +2,56 @@ import React from "react";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 
-const services = [
+const servicesData = [
   {
-    title: "Custom Furniture Design",
-    description: "Work with our designers to create unique pieces that fit your style and needs.",
-    icon: "🪑", // You can replace this with an actual icon or image.
+    category: "Living Room",
+    description:
+      "We offer repair and repaint services for living room furniture to ensure your space remains stylish and functional.",
+    icon: "🛋️",
   },
   {
-    title: "Furniture Restoration",
-    description: "Revive your old furniture with our restoration services to bring back its original beauty.",
-    icon: "🛠️", 
+    category: "Bedroom",
+    description:
+      "From installation of beds to restoration of dressers, our bedroom furniture services cater to your comfort and convenience.",
+    icon: "🛏️",
   },
   {
-    title: "Delivery and Assembly",
-    description: "We offer professional delivery and assembly services for your convenience.",
-    icon: "📦", 
+    category: "Dining Room",
+    description:
+      "Keep your dining area pristine with our expert repair and repaint services for chairs, tables, and more.",
+    icon: "🍽️",
+  },
+  {
+    category: "Door",
+    description:
+      "Enhance your home with professional door repair, repaint, and installation services for both panel and flush doors.",
+    icon: "🚪",
   },
 ];
 
 const ServicePage = () => {
   return (
-    <div className="min-h-screen">
-      <Header /> 
-
-      <h1 className="text-4xl font-bold text-center mt-40 mb-6">Our Services</h1>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 ml-2 mr-2">
-        {services.map((service, index) => (
-          <div key={index} className="bg-gray-300 p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
-            <div className="text-4xl mb-4">{service.icon}</div>
-            <h2 className="text-2xl font-semibold mb-2">{service.title}</h2>
-            <p className="text-black">{service.description}</p>
-          </div>
-        ))}
-      </div>
-
-      <div className="mt-5">
-        <Footer />
-      </div>
-
-    
-    </div>
+    <main>
+      <Header />
+      <section className="bg-gray-100 py-8 px-4">
+        <h1 className="text-4xl font-bold text-center mb-8">Our Services</h1>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+          {servicesData.map((service, index) => (
+            <div
+              key={index}
+              className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-300"
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <div className="text-4xl">{service.icon}</div>
+                <h2 className="text-2xl font-semibold">{service.category}</h2>
+              </div>
+              <p className="text-black text-xl text-justify">{service.description}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+      <Footer />
+    </main>
   );
 };
 

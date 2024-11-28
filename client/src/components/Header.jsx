@@ -169,9 +169,6 @@ const Header = ({ isLogin, cartCount }) => {
         <Link className="text-black py-2 hover:underline m-2" to="/about">
           About Us
         </Link>
-        <Link className="text-black py-2 hover:underline m-2" to="/featured">
-          Featured
-        </Link>
         <Link
           className="text-black py-2 hover:underline m-2"
           to="/service-page"
