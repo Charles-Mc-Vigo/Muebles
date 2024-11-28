@@ -355,6 +355,7 @@ const Maintenance = () => {
 			} else {
 				const errorData = await response.json();
 				toast.error("Failed to add new size");
+				console.log(errorData)
 			}
 		} catch (error) {
 			console.error("Error adding size:", error);
@@ -823,7 +824,7 @@ const Maintenance = () => {
 										Array.isArray(categories)
 											? categories.map((category) => ({
 													id: category._id,
-													name: category.name || "N/A",
+													name: category.name,
 											  }))
 											: []
 									}
@@ -849,12 +850,12 @@ const Maintenance = () => {
 										Array.isArray(furnitureTypes)
 											? furnitureTypes.map((type) => ({
 													id: type._id,
-													name: type.name || "N/A",
-													ECT: type.ECT || "N/A",
+													name: type.name,
+													ECT: type.ECT,
 													category:
 														categories.find(
 															(cat) => cat._id === type.categoryId
-														)?.name || "N/A",
+														)?.name,
 											  }))
 											: []
 									}
@@ -876,9 +877,9 @@ const Maintenance = () => {
 										Array.isArray(colors)
 											? colors.map((color) => ({
 													id: color._id,
-													name: color.name || "N/A",
-													rgb: color.rgb || "N/A",
-													hex: color.hex || "N/A",
+													name: color.name,
+													rgb: color.rgb ,
+													hex: color.hex ,
 											  }))
 											: []
 									}

@@ -24,7 +24,7 @@ const RotatingObject = ({ children }) => {
 
 const ProductCustomization = () => {
 	// State for selected model
-	const [selectedModel, setSelectedModel] = useState("table");
+	const [selectedModel, setSelectedModel] = useState("chair");
 	// for chair
 	const [selectedBackrest, setSelectedBackrest] = useState("");
 	const [selectedSeat, setSelectedSeat] = useState("");

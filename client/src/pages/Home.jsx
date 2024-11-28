@@ -283,9 +283,10 @@ const Home = () => {
 						Custom Furniture, Designed for You!
 					</h1>
 					<p className="text-white text-lg sm:text-xl mt-4 text-center">
-						Experience the joy of creating furniture that fits your style
-						perfectly.
+						Explore endless possibilities by customizing your furniture in an
+						interactive 3D space.
 					</p>
+
 					<Link
 						to="/product-customization"
 						className="mt-6 px-6 py-3 bg-white text-black font-bold rounded-md hover:bg-gray-200 transition"

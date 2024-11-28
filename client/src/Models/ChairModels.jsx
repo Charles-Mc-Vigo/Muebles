@@ -463,7 +463,7 @@ export function Chair({ selectedBackrest, selectedSeat, selectedWood }) {
 				</>
 			)}
 
-{selectedWood === "Narra" ? (
+			{selectedWood === "Narra" ? (
 				<>
 					{/* Backrest */}
 					<mesh
