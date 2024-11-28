@@ -1,5 +1,4 @@
-import React from "react";
-import { FaShoppingCart } from "react-icons/fa";
+import React from "react"; import { FaShoppingCart } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import Carousel from "./Carousel";
 
