@@ -119,6 +119,7 @@ const Table = ({
 const Maintenance = () => {
 	const initialSizeState = {
 		label: "",
+		price:"",
 		height: "",
 		length: "",
 		width: "",
@@ -309,7 +310,12 @@ const Maintenance = () => {
 			});
 			if (response.ok) {
 				toast.success("Material added successfully.");
-				setNewMaterial({ name: "", price: "", stocks: "", furnitureTypeId: "" }); // Reset input
+				setNewMaterial({
+					name: "",
+					price: "",
+					stocks: "",
+					furnitureTypeId: "",
+				}); // Reset input
 				fetchMaterials(); // Refresh the list
 			} else {
 				const errorData = await response.json();
@@ -340,6 +346,7 @@ const Maintenance = () => {
 				credentials: "include",
 				body: JSON.stringify({
 					label: newSize.label,
+					price: newSize.price,
 					height: newSize.height,
 					length: newSize.length,
 					width: newSize.width,
@@ -355,7 +362,7 @@ const Maintenance = () => {
 			} else {
 				const errorData = await response.json();
 				toast.error("Failed to add new size");
-				console.log(errorData)
+				console.log(errorData);
 			}
 		} catch (error) {
 			console.error("Error adding size:", error);
@@ -407,7 +414,7 @@ const Maintenance = () => {
 		setLoading(true);
 
 		if (
-			!newItemName && 
+			!newItemName &&
 			selectedFilter !== "Furniture Size" &&
 			selectedFilter !== "Colors" &&
 			selectedFilter !== "Furniture Materials"
@@ -417,14 +424,17 @@ const Maintenance = () => {
 		}
 		try {
 			if (selectedFilter === "Categories") {
-				const response = await fetch("http://localhost:3000/api/categories/add", {
-					method: "POST",
-					headers: {
-						"Content-Type": "application/json",
-					},
-					credentials: "include",
-					body: JSON.stringify({ name: newItemName }),
-				});
+				const response = await fetch(
+					"http://localhost:3000/api/categories/add",
+					{
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json",
+						},
+						credentials: "include",
+						body: JSON.stringify({ name: newItemName }),
+					}
+				);
 				if (!response.ok) {
 					const errorData = await response.json();
 					throw new Error(errorData.message || "Failed to add category.");
@@ -471,7 +481,7 @@ const Maintenance = () => {
 				toast.success(responseData.message);
 				await fetchFurnitureTypes();
 			}
-	
+
 			resetInputFields();
 		} catch (error) {
 			toast.error(error.message);
@@ -560,7 +570,6 @@ const Maintenance = () => {
 		setNewSize(initialSizeState);
 		setSelectedFurnitureType("");
 		setSelectedCategory("");
-
 	};
 
 	const renderInputField = (
@@ -699,6 +708,9 @@ const Maintenance = () => {
 
 								{renderInputField("Label", "label", newSize.label, (e) =>
 									setNewSize({ ...newSize, label: e.target.value })
+								)}
+								{renderInputField("Price", "price", newSize.price, (e) =>
+									setNewSize({ ...newSize, price: e.target.value })
 								)}
 								{renderInputField(
 									"Height (inches)",
@@ -852,10 +864,9 @@ const Maintenance = () => {
 													id: type._id,
 													name: type.name,
 													ECT: type.ECT,
-													category:
-														categories.find(
-															(cat) => cat._id === type.categoryId
-														)?.name,
+													category: categories.find(
+														(cat) => cat._id === type.categoryId
+													)?.name,
 											  }))
 											: []
 									}
@@ -878,8 +889,8 @@ const Maintenance = () => {
 											? colors.map((color) => ({
 													id: color._id,
 													name: color.name,
-													rgb: color.rgb ,
-													hex: color.hex ,
+													rgb: color.rgb,
+													hex: color.hex,
 											  }))
 											: []
 									}
@@ -931,6 +942,7 @@ const Maintenance = () => {
 								<Table
 									headers={[
 										"Size Label",
+										"Price",
 										"Height",
 										"Length",
 										"Width",
@@ -942,6 +954,7 @@ const Maintenance = () => {
 											? sizes.map((size) => ({
 													id: size._id,
 													label: size.label || "N/A",
+													price: size.price || "N/A",
 													height: size.height || "N/A",
 													length: size.length || "N/A",
 													width: size.width || "N/A",

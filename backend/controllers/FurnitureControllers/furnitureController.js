@@ -138,7 +138,7 @@ exports.createFurniture = async (req, res) => {
 // Get all furnitures or furniture by ID
 exports.getAllFurnitures = async (req, res) => {
 	try {
-		const furnitures = await Furniture.find()
+		const furnitures = await Furniture.find({isArchived:false})
 			.populate("category") // Populate category if needed
 			.populate("furnitureType") // Populate furniture type if needed
 			.populate("colors") // Populate colors if needed

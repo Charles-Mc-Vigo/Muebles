@@ -1,7 +1,5 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
 
 const ProductCard = ({
@@ -46,10 +44,10 @@ const ProductCard = ({
         }
       );
       const data = await response.json();
-      toast.success(data.success);
+      alert(data.success);
       onArchiveSuccess();
     } catch (error) {
-      toast.error("Error archiving item. Please try again.");
+      throw new Error("Error archiving item. Please try again.");
     }
   };
 
@@ -68,10 +66,10 @@ const ProductCard = ({
         }
       );
       const data = await response.json();
-      toast.success(data.success);
+      alert(data.success);
       onUnArchiveSuccess();
     } catch (error) {
-      toast.error("Error unarchiving item. Please try again.");
+      throw new Error("Error unarchiving item. Please try again.");
     }
   };
 
@@ -130,7 +128,6 @@ const ProductCard = ({
 					</button>
 				)}
 			</div>
-			<ToastContainer />
 		</div>
 	);
 };
