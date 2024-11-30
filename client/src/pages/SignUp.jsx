@@ -283,45 +283,56 @@ export default function SignUp() {
 	};
 
 	const handleSubmit = async (e) => {
-		e.preventDefault();
-		setLoading(true);
-		if (formData.password !== formData.confirmPassword) {
-			toast.error("Passwords do not match");
-			return;
-		}
-		if (!formData.agreeToTerms) {
-			toast.error("Please agree to the Terms and Conditions");
-			return;
-		}
-		try {
-			const response = await fetch("http://localhost:3000/api/users/signup", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({
-					...formData,
-					zipCode,
-				}),
-			});
-			const data = await response.json();
-			if (!response.ok) {
-				setLoading(false);
-				throw new Error(data.error);
-			}
-			if (!data.newUser || !data.newUser._id) {
-				throw new Error("Invalid response from server");
-			}
-			toast.success(data.success);
-			navigate(`/verify-account/${data.newUser._id}`);
-		} catch (error) {
-			console.error("Sign up error:", error.message);
-			toast.error(
-				error.message || "An unexpected error occurred. Please try again."
-			);
-		}
-		setLoading(false);
-	};
+    e.preventDefault();
+    setLoading(true); // Set loading to true at the start
+
+    // Validate password and agreement to terms
+    if (formData.password !== formData.confirmPassword) {
+        toast.error("Passwords do not match");
+        setLoading(false); // Stop loading
+        return; // Exit the function
+    }
+    if (!formData.agreeToTerms) {
+        toast.error("Please agree to the Terms and Conditions");
+        setLoading(false); // Stop loading
+        return; // Exit the function
+    }
+
+    try {
+        // Send signup request
+        const response = await fetch("http://localhost:3000/api/users/signup", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                ...formData,
+                zipCode,
+            }),
+        });
+
+        const data = await response.json();
+
+        // Check if the response is not OK
+        if (!response.ok) {
+            throw new Error(data.error || "Failed to sign up");
+        }
+
+        // Check if newUser is present in the response
+        if (!data.newUser || !data.newUser._id) {
+            throw new Error("Invalid response from server");
+        }
+
+        // Successful signup
+        toast.success(data.success);
+        navigate(`/verify-account/${data.newUser._id}`);
+    } catch (error) {
+        console.error("Sign up error:", error.message);
+        toast.error(error.message || "An unexpected error occurred. Please try again.");
+    } finally {
+        setLoading(false); // Stop loading in both success and error cases
+    }
+};
 
 	return (
 		<div className="min-h-screen flex flex-col">
