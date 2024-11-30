@@ -923,7 +923,7 @@ const Maintenance = () => {
 													furnitureTypeId: Array.isArray(furnitureTypes)
 														? furnitureTypes.find(
 																(type) => type._id === material.furnitureTypeId
-														  )?.name || "N/A"
+														  )?.name 
 														: "N/A",
 											  }))
 											: []
@@ -954,15 +954,15 @@ const Maintenance = () => {
 											? sizes.map((size) => ({
 													id: size._id,
 													label: size.label || "N/A",
-													price: size.price || "N/A",
-													height: size.height || "N/A",
-													length: size.length || "N/A",
-													width: size.width || "N/A",
-													depth: size.depth || "N/A",
+													price: size.price ,
+													height: size.height ,
+													length: size.length ,
+													width: size.width ,
+													depth: size.depth ,
 													furnitureType: Array.isArray(furnitureTypes)
 														? furnitureTypes.find(
 																(type) => type._id === size.furnitureTypeId
-														  )?.name || "N/A"
+														  )?.name 
 														: "N/A",
 											  }))
 											: []

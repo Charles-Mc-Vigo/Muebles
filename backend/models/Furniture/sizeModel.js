@@ -12,7 +12,7 @@ const sizeSchema = new mongoose.Schema({
   },
   width: {
     type: Number,
-    default:"N/A"
+    default:0
   },
   height: {
     type: Number,
