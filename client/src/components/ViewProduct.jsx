@@ -40,7 +40,7 @@ function ViewProduct() {
 			);
 			const data = await response.json();
 			setArchivedFurnitures(data || []);
-			fetchArchivedFurnitures();
+			fetchFurniture();
 		} catch (error) {
 			setError(error.message);
 		} finally {
@@ -79,7 +79,7 @@ function ViewProduct() {
 	};
 
 	const refreshArchiveFurnitureList = async () => {
-		await fetchArchivedFurnitures();
+		fetchArchivedFurnitures();
 	};
 
 	const toggleDropdown = () => {

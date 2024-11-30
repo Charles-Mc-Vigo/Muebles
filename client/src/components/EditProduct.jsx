@@ -1,477 +1,331 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { ClipLoader } from "react-spinners";
 
 const EditProduct = () => {
-	const { furnitureId } = useParams();
-	const navigate = useNavigate();
-	const [isLoading, setIsLoading] = useState(false);
-	const [isFetching, setIsFetching] = useState(true);
-	const [categories, setCategories] = useState([]);
-	const [furnitureTypes, setFurnitureTypes] = useState([]);
-	const [materials, setMaterials] = useState([]);
-	const [colors, setColors] = useState([]);
-	const [sizes, setSizes] = useState([]);
+    const { furnitureId } = useParams();
+    const navigate = useNavigate();
+    const [loading, setLoading] = useState(false);
+    const [categories, setCategories] = useState([]);
+    const [furnitureTypes, setFurnitureTypes] = useState([]);
+    const [filteredFurnitureTypes, setFilteredFurnitureTypes] = useState([]);
+    const [materials, setMaterials] = useState([]); // Initialize as empty
+    const [colors, setColors] = useState([]);
+    const [sizes, setSizes] = useState([]); // Initialize as empty
+    const [furnitureData, setFurnitureData] = useState({
+        images: [],
+        name: "",
+        category: "",
+        furnitureType: "",
+        description: "",
+        materials: [],
+        colors: [],
+        sizes: [],
+        price: "",
+    });
+    const [imageFiles, setImageFiles] = useState([]);
+    const [previewImages, setPreviewImages] = useState([]);
 
-	const [furnitureData, setFurnitureData] = useState({
-		images: [],
-		name: "",
-		category: "",
-		furnitureType: "",
-		description: "",
-		materials: [],
-		colors: [],
-		sizes: [],
-		price: "",
-	});
-	const [originalData, setOriginalData] = useState({}); // Store original data
-	const [imageFiles, setImageFiles] = useState([]);
-	const [previewImages, setPreviewImages] = useState([]);
-	const [removeImages, setRemoveImages] = useState([]);
+    useEffect(() => {
+        const fetchData = async () => {
+            setLoading(true);
+            try {
+                const [
+                    furnitureResponse,
+                    categoriesResponse,
+                    furnitureTypesResponse,
+                    materialsResponse,
+                    colorsResponse,
+                    sizesResponse,
+                ] = await Promise.all([
+                    fetch(`http://localhost:3000/api/furnitures/${furnitureId}`, {
+                        credentials: "include",
+                    }),
+                    fetch("http://localhost:3000/api/categories"),
+                    fetch("http://localhost:3000/api/furniture-types"),
+                    fetch("http://localhost:3000/api/materials"),
+                    fetch("http://localhost:3000/api/colors"),
+                    fetch("http://localhost:3000/api/sizes"),
+                ]);
 
-	useEffect(() => {
-		const fetchAllData = async () => {
-			setIsFetching(true);
-			try {
-				// Fetch all data in parallel
-				const [
-					furnitureResponse,
-					categoriesResponse,
-					furnitureTypesResponse,
-					materialsResponse,
-					colorsResponse,
-					sizesResponse,
-				] = await Promise.all([
-					fetch(`http://localhost:3000/api/furnitures/${furnitureId}`, {
-						credentials: "include",
-					}),
-					fetch("http://localhost:3000/api/categories"),
-					fetch("http://localhost:3000/api/furniture-types"),
-					fetch("http://localhost:3000/api/materials"),
-					fetch("http://localhost:3000/api/colors"),
-					fetch("http://localhost:3000/api/sizes"),
-				]);
+                if (!furnitureResponse.ok) throw new Error("Failed to fetch furniture data");
+                if (!categoriesResponse.ok) throw new Error("Failed to fetch categories");
+                if (!furnitureTypesResponse.ok) throw new Error("Failed to fetch furniture types");
+                if (!materialsResponse.ok) throw new Error("Failed to fetch materials");
+                if (!colorsResponse.ok) throw new Error("Failed to fetch colors");
+                if (!sizesResponse.ok) throw new Error("Failed to fetch sizes");
 
-				// Check if all responses are ok
-				if (
-					!furnitureResponse.ok ||
-					!categoriesResponse.ok ||
-					!furnitureTypesResponse.ok ||
-					!materialsResponse.ok ||
-					!colorsResponse.ok ||
-					!sizesResponse.ok
-				) {
-					throw new Error("Failed to fetch data");
-				}
+                const furnitureData = await furnitureResponse.json();
+                const categoriesData = await categoriesResponse.json();
+                const furnitureTypesData = await furnitureTypesResponse.json();
+                const materialsData = await materialsResponse.json();
+                const colorsData = await colorsResponse.json();
+                const sizesData = await sizesResponse.json();
 
-				// Parse all responses
-				const [
-					furnitureData,
-					categoriesData,
-					furnitureTypesData,
-					materialsData,
-					colorsData,
-					sizesData,
-				] = await Promise.all([
-					furnitureResponse.json(),
-					categoriesResponse.json(),
-					furnitureTypesResponse.json(),
-					materialsResponse.json(),
-					colorsResponse.json(),
-					sizesResponse.json(),
-				]);
+                setCategories(categoriesData);
+                setFurnitureTypes(furnitureTypesData);
+                setMaterials(materialsData);
+                setColors(colorsData);
+                setSizes(sizesData);
 
-				// Set the fetched data to state
-				setCategories(categoriesData);
-				setFurnitureTypes(furnitureTypesData);
-				setMaterials(materialsData);
-				setColors(colorsData);
-				setSizes(sizesData);
+                // Set initial furniture data for editing
+                setFurnitureData({
+                    name: furnitureData.name,
+                    description: furnitureData.description,
+                    price: furnitureData.price,
+                    category: furnitureData.category._id,
+                    furnitureType: furnitureData.furnitureType._id,
+                    materials: furnitureData.materials.map(m => m._id),
+                    colors: furnitureData.colors.map(c => c._id),
+                    sizes: furnitureData.sizes.map(s => s._id),
+                    images: furnitureData.images || [],
+                });
 
-				// Transform the furniture data
-				const transformedData = {
-					name: furnitureData.name,
-					description: furnitureData.description,
-					price: furnitureData.price,
-					category: furnitureData.category._id,
-					furnitureType: furnitureData.furnitureType._id,
-					materials: furnitureData.materials.map((material) => material._id),
-					colors: furnitureData.colors.map((color) => color._id),
-					sizes: furnitureData.sizes.map((size) => size._id),
-					images: furnitureData.images || [],
-				};
+                const imageUrls = furnitureData.images.map(img => `data:image/jpeg;base64,${img}`);
+                setPreviewImages(imageUrls);
 
-				setFurnitureData(transformedData);
-				setOriginalData(transformedData);
+                // Filter furniture types based on the selected category
+                const selectedCategoryId = furnitureData.category._id; // Assuming it's an object
+                setFilteredFurnitureTypes(furnitureTypesData.filter(type => type.categoryId === selectedCategoryId));
 
-				// Handle images
-				if (furnitureData.images && furnitureData.images.length > 0) {
-					const imageUrls = furnitureData.images.map((img) =>
-						img.startsWith("data:") ? img : `data:image/jpeg;base64,${img}`
-					);
-					setPreviewImages(imageUrls);
-				}
+                // Set materials and sizes based on the selected furniture type
+                const selectedFurnitureTypeId = furnitureData.furnitureType._id; // Assuming it's an object
+                const selectedFurnitureType = furnitureTypesData.find(type => type._id === selectedFurnitureTypeId);
+                if (selectedFurnitureType) {
+                    setMaterials(selectedFurnitureType.materials); // Assuming materials is an array of objects
+                    setSizes(selectedFurnitureType.sizes); // Assuming sizes is an array of objects
+                }
+            } catch (error) {
+                toast.error(error.message || "Failed to load data");
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchData();
+    }, [furnitureId]);
 
-				toast.success("Product data loaded successfully");
-			} catch (error) {
-				console.error("Error fetching data:", error);
-				toast.error("Failed to load data");
-			} finally {
-				setIsFetching(false);
-			}
-		};
+    const handleCategoryChange = (e) => {
+        const categoryId = e.target.value;
+        setFurnitureData(prev => ({
+            ...prev,
+            category: categoryId,
+            furnitureType: "", // Reset furniture type when category changes
+        }));
+        setFilteredFurnitureTypes(furnitureTypes.filter(type => type.categoryId === categoryId));
+        // Clear materials and sizes when category changes
+        setMaterials([]);
+        setSizes([]);
+    };
 
-		fetchAllData();
-	}, [furnitureId]);
+    const handleFurnitureTypeChange = (e) => {
+        const furnitureTypeId = e.target.value;
+        setFurnitureData((prev) => ({
+            ...prev,
+            furnitureType: furnitureTypeId,
+        }));
 
-	const handleMultipleSelect = (field, value) => {
-		setFurnitureData((prevData) => {
-			const currentValues = prevData[field];
-			const newValues = currentValues.includes(value)
-				? currentValues.filter((v) => v !== value)
-				: [...currentValues, value];
+        // Clear materials and sizes if no furniture type is selected
+        if (!furnitureTypeId) {
+            setMaterials([]);
+            setSizes([]);
+            return;
+        }
 
-			return {
-				...prevData,
-				[field]: newValues,
-			};
-		});
-	};
+        // Find the selected furniture type
+        const selectedFurnitureType = furnitureTypes.find(type => type._id === furnitureTypeId);
+        if (selectedFurnitureType) {
+            // Update materials and sizes based on the selected furniture type
+            setMaterials(selectedFurnitureType.materials); // Assuming materials is an array of objects
+            setSizes(selectedFurnitureType.sizes); // Assuming sizes is an array of objects
+        }
+    };
 
-	const handleInputChange = (e) => {
-		const { name, value } = e.target;
-		setFurnitureData((prevData) => ({
-			...prevData,
-			[name]: value,
-		}));
-	};
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setFurnitureData(prev => ({
+            ...prev,
+            [name]: value,
+        }));
+    };
 
-	const handleImageChange = (e) => {
-		const files = Array.from(e.target.files);
-		setImageFiles((prevFiles) => [...prevFiles, ...files]);
-		const newPreviewUrls = files.map((file) => URL.createObjectURL(file));
-		setPreviewImages((prevPreviews) => [...prevPreviews, ...newPreviewUrls]);
-	};
+    const handleMultipleSelect = (field, value) => {
+        setFurnitureData(prev => {
+            const currentValues = prev[field];
+            const newValues = currentValues.includes(value)
+                ? currentValues.filter(v => v !== value)
+                : [...currentValues, value];
+            return {
+                ...prev,
+                [field]: newValues,
+            };
+        });
+    };
 
-	const removeImage = (index) => {
-		// Get the image to be removed
-		const imageToRemove = previewImages[index];
+    const handleImageChange = (e) => {
+        const files = Array.from(e.target.files);
+        setImageFiles(prev => [...prev, ...files]);
+        const newPreviewUrls = files.map(file => URL.createObjectURL(file));
+        setPreviewImages(prev => [...prev, ...newPreviewUrls]);
+    };
 
-		// If the image is from the original data, add it to removeImages
-		if (furnitureData.images.includes(imageToRemove)) {
-			setRemoveImages((prev) => [...prev, imageToRemove]);
-		}
+    const removeImage = (index) => {
+        setPreviewImages(prev => prev.filter((_, i) => i !== index));
+        setImageFiles(prev => prev.filter((_, i) => i !== index));
+    };
 
-		// Remove from preview and files
-		setPreviewImages((prev) => prev.filter((_, i) => i !== index));
-		setImageFiles((prev) => prev.filter((_, i) => i !== index));
-	};
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        const formData = new FormData();
+        Object.keys(furnitureData).forEach(key => {
+            if (Array.isArray(furnitureData[key])) {
+                furnitureData[key].forEach(value => formData.append(key, value));
+            } else {
+                formData.append(key, furnitureData[key]);
+            }
+        });
+        imageFiles.forEach(file => formData.append("images", file));
 
-	const handleSubmit = async (e) => {
-		e.preventDefault();
-		setIsLoading(true);
-		try {
-			const formData = new FormData();
+        try {
+            const response = await fetch(`http://localhost:3000/api/furnitures/edit/${furnitureId}`, {
+                method: "PUT",
+                body: formData,
+                credentials: "include",
+            });
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || "Failed to update product");
+            }
+            toast.success("Product updated successfully!");
+            navigate(-1);
+        } catch (error) {
+            toast.error(error.message || "Failed to update product");
+        } finally {
+            setLoading(false);
+        }
+    };
 
-			// Add IDs for category, furniture type, etc.
-			if (furnitureData.category !== originalData.category) {
-				formData.append("category", furnitureData.category);
-			}
-			if (furnitureData.furnitureType !== originalData.furnitureType) {
-				formData.append("furnitureType", furnitureData.furnitureType);
-			}
+    if (loading) {
+        return (
+            <div className="flex justify-center items-center h-screen">
+                <ClipLoader loading={loading} size={50} color="#007bff" />
+            </div>
+        );
+    }
 
-			// Add other fields that have changed
-			const fieldsToCheck = ["name", "description", "price"];
+    return (
+        <div className="max-w-4xl mx-auto p-6 bg-white shadow-md rounded-lg">
+            <h2 className="text-2xl font-semibold mb-6 text-gray-800">Edit Product</h2>
+            <form onSubmit={handleSubmit} className="space-y-6">
+                {/* Image Upload Section */}
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Product Images</label>
+                    <div className="grid grid-cols-3 gap-4 mb-4">
+                        {previewImages.map((preview, index) => (
+                            <div key={index} className="relative">
+                                <img src={preview} alt={`Preview ${index}`} className="w-full h-32 object-cover rounded" />
+                                <button type="button" onClick={() => removeImage(index)} className="absolute top-1 right-1 text-red-700 text-3xl rounded-full p-1 hover:bg-red-600 focus:outline-none">×</button>
+                            </div>
+                        ))}
+                    </div>
+                    <input type="file" multiple accept="image/*" onChange={handleImageChange} className="block w-full text-sm text-gray-500" />
+                </div>
+                {/* Product Details Section */}
+                <div className="grid grid-cols-2 gap-6">
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700">Name</label>
+                        <input type="text" name="name" value={furnitureData.name} onChange={handleInputChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700">Category</label>
+                        <select name="category" value={furnitureData.category} onChange={handleCategoryChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
+                            <option value="">Select Category</option>
+                            {categories.map(category => (
+                                <option key={category._id} value={category._id}>{category.name}</option>
+                            ))}
+                        </select>
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700">Furniture Type</label>
+                        <select name="furnitureType" value={furnitureData.furnitureType} onChange={handleFurnitureTypeChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
+                            <option value="">Select Furniture Type</option>
+                            {filteredFurnitureTypes.map(type => (
+                                <option key={type._id} value={type._id}>{type.name}</option>
+                            ))}
+                        </select>
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700">Price</label>
+                        <input type="number" name="price" value={furnitureData.price} onChange={handleInputChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" />
+                    </div>
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-gray-700">Description</label>
+                    <textarea name="description" value={furnitureData.description} onChange={handleInputChange} rows="4" className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" />
+                </div>
+                {/* Materials Section */}
+                <div className="mt-4 mb-4 bg-slate-200 rounded-md px-5 py-2">
+                    <label className="block font-semibold">Materials:</label>
+                    <div className="flex flex-wrap">
+                        {materials.length > 0 ? (
+                            materials.map((material) => (
+                                <label key={material._id} className="flex items-center w-1/3 p-2">
+                                    <input
+                                        type="checkbox"
+                                        name="material"
+                                        value={material._id}
+                                        checked={furnitureData.materials.includes(material._id)}
+                                        onChange={() => handleMultipleSelect('materials', material._id)} // Ensure this function handles adding/removing materials
+                                        className="mr-2 h-4 w-4 border rounded text-blue-600 focus:ring-blue-500"
+                                    />
+                                    <span className="text-gray-700">{material.name}</span>
+                                </label>
+                            ))
+                        ) : (
+                            <span className="text-gray-500">No materials available</span>
+                        )}
+                    </div>
+                </div>
 
-			fieldsToCheck.forEach((field) => {
-				if (furnitureData[field] !== originalData[field]) {
-					formData.append(field, furnitureData[field]);
-				}
-			});
+                {/* Sizes Section */}
+                <div className="mb-4 bg-slate-200 rounded-md p-2">
+                    <label className="block font-semibold my-2 mb-2">
+                        Sizes:{" "}
+                        <span className="font-light">(Height X Width X Length X Depth)</span>
+                    </label>
+                    <div className="flex flex-wrap">
+                        {sizes.length > 0 ? (
+                            sizes.map((size) => (
+                                <label key={size._id} className="flex items-center w-1/3 p-2">
+                                    <input
+                                        type="checkbox"
+                                        name="sizes"
+                                        value={size._id}
+                                        checked={furnitureData.sizes.includes(size._id)}
+                                        onChange={() => handleMultipleSelect('sizes', size._id)} // Ensure this function handles adding/removing sizes
+                                        className="mr-2 h-4 w-4 border rounded text-blue-600 focus:ring-blue-500"
+                                    />
+                                    <span className="text-gray-700">
+                                        {size.label} <span className="text-gray-500 italic">({size.height} X {size.width} X {size.length} X {size.depth})</span>
+                                    </span>
+                                </label>
+                            ))
+                        ) : (
+                            <p className="text-gray-500">No sizes available</p>
+                        )}
+                    </div>
+                </div>
 
-			// Add multiple select fields
-			const multiSelectFields = ["materials", "colors", "sizes"];
-			multiSelectFields.forEach((field) => {
-				const originalValues = originalData[field] || [];
-				const currentValues = furnitureData[field] || [];
-
-				// Only append if the arrays are different
-				if (JSON.stringify(originalValues) !== JSON.stringify(currentValues)) {
-					currentValues.forEach((value) => {
-						formData.append(field, value);
-					});
-				}
-			});
-
-			// Add new image files
-			imageFiles.forEach((file) => {
-				formData.append("images", file);
-			});
-
-			// Add images to remove
-			if (removeImages.length > 0) {
-				removeImages.forEach((img) => {
-					formData.append("removeImages", img);
-				});
-			}
-
-			const response = await fetch(
-				`http://localhost:3000/api/furnitures/edit/${furnitureId}`,
-				{
-					method: "PUT",
-					body: formData,
-					credentials: "include",
-				}
-			);
-
-			const data = await response.json();
-			if (!response.ok) {
-				throw new Error(data.message || "Failed to update product");
-			}
-			toast.success("Product updated successfully!");
-			navigate(-1);
-		} catch (error) {
-			toast.error(error.message || "Failed to update product");
-			console.error(error);
-		} finally {
-			setIsLoading(false);
-		}
-	};
-
-	if (isFetching) {
-		return (
-			<div className="flex justify-center items-center min-h-screen">
-				<div className="text-xl text-gray-600">Loading product data...</div>
-			</div>
-		);
-	}
-
-	return (
-		<div className="max-w-4xl mx-auto p-6 bg-white shadow-md rounded-lg">
-			<h2 className="text-2xl font-semibold mb-6 text-gray-800">
-				Edit Product
-			</h2>
-			<form onSubmit={handleSubmit} className="space-y-6">
-				{/* Image Upload Section */}
-				<div>
-					<label className="block text-sm font-medium text-gray-700 mb-2">
-						Product Images (Minimum 5 required)
-					</label>
-					<div className="grid grid-cols-3 gap-4 mb-4">
-						{previewImages.map((preview, index) => (
-							<div key={index} className="relative">
-								<img
-									src={preview}
-									alt={`Preview ${index}`}
-									className="w-full h-32 object-cover rounded"
-								/>
-								<button
-									type="button"
-									onClick={() => removeImage(index)}
-									className="absolute top-1 right-1 text-red-700 text-3xl rounded-full p-1 hover:bg-red-600 focus:outline-none"
-								>
-									×
-								</button>
-							</div>
-						))}
-					</div>
-					<input
-						type="file"
-						multiple
-						accept="image/*"
-						onChange={handleImageChange}
-						className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
-					/>
-					<p className="mt-2 text-sm text-gray-500">
-						Current images: {previewImages.length} (Minimum 5 required)
-					</p>
-				</div>
-				{/* Product Details Section */}
-				<div className="grid grid-cols-2 gap-6">
-					<div>
-						<label className="block text-sm font-medium text-gray-700">
-							Name
-						</label>
-						<input
-							type="text"
-							name="name"
-							value={furnitureData.name}
-							onChange={handleInputChange}
-							className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-						/>
-					</div>
-					<select
-						name="category"
-						value={furnitureData.category}
-						onChange={handleInputChange}
-						className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-					>
-						<option value="">Select Category</option>
-						{categories.map((category) => (
-							<option key={category.id} value={category.id}>
-								{category.name}
-							</option>
-						))}
-					</select>
-					<select
-						name="furnitureType"
-						value={furnitureData.furnitureType}
-						onChange={handleInputChange}
-						className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-					>
-						<option value="">Select Furniture Type</option>
-						{furnitureTypes.map((type) => (
-							<option key={type.id} value={type.id}>
-								{type.name}
-							</option>
-						))}
-					</select>
-					<div>
-						<label className="block text-sm font-medium text-gray-700">
-							Price
-						</label>
-						<input
-							type="number"
-							name="price"
-							value={furnitureData.price}
-							onChange={handleInputChange}
-							className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-						/>
-					</div>
-					<div>
-						<label className="block text-sm font-medium text-gray-700">
-							Stock
-						</label>
-						<input
-							type="number"
-							name="stocks"
-							value={furnitureData.stocks}
-							onChange={handleInputChange}
-							className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-						/>
-					</div>
-				</div>
-				<div>
-					<label className="block text-sm font-medium text-gray-700">
-						Description
-					</label>
-					<textarea
-						name="description"
-						value={furnitureData.description}
-						onChange={handleInputChange}
-						rows="4"
-						className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-					/>
-				</div>
-				<div className="space-y-6">
-					{/* Materials Selection */}
-					<div>
-						<label className="block text-sm font-medium text-gray-700 mb-3">
-							Materials
-						</label>
-						<div className="grid grid-cols-3 gap-4">
-							{materials.map((material) => (
-								<div
-									key={material.id}
-									className="flex items-center space-x-2 bg-white border rounded-md p-3 hover:bg-gray-50"
-								>
-									<input
-										type="checkbox"
-										id={`material-${material.id}`}
-										checked={furnitureData.materials.includes(material.name)}
-										onChange={() =>
-											handleMultipleSelect("materials", material.name)
-										}
-										className="h-4 w-4 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500"
-									/>
-									<label
-										htmlFor={`material-${material.id}`}
-										className="text-sm text-gray-700 cursor-pointer"
-									>
-										{material.name}
-									</label>
-								</div>
-							))}
-						</div>
-					</div>
-					<div>
-						<label className="block text-sm font-medium text-gray-700 mb-3">
-							Colors
-						</label>
-						<div className="grid grid-cols-3 gap-4">
-							{colors.map((color) => (
-								<div
-									key={color.id}
-									className="flex items-center space-x-2 bg-white border rounded-md p-3 hover:bg-gray-50"
-								>
-									<input
-										type="checkbox"
-										id={`color-${color.id}`}
-										checked={furnitureData.colors.includes(color.name)}
-										onChange={() => handleMultipleSelect("colors", color.name)}
-										className="h-4 w-4 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500"
-									/>
-									<label
-										htmlFor={`color-${color.id}`}
-										className="text-sm text-gray-700 cursor-pointer"
-									>
-										{color.name}
-									</label>
-								</div>
-							))}
-						</div>
-						<div>
-							<label className="block text-sm font-medium text-gray-700 mb-3">
-								Sizes
-							</label>
-							<div className="grid grid-cols-3 gap-4">
-								{sizes.map((size) => (
-									<div
-										key={size.id}
-										className="flex items-center space-x-2 bg-white border rounded-md p-3 hover:bg-gray-50"
-									>
-										<input
-											type="checkbox"
-											id={`size-${size.id}`}
-											checked={furnitureData.sizes.includes(size.label)}
-											onChange={() => handleMultipleSelect("sizes", size.label)}
-											className="h-4 w-4 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500"
-										/>
-										<label
-											htmlFor={`size-${size.id}`}
-											className="text-sm text-gray-700 cursor-pointer"
-										>
-											{size.label}
-										</label>
-									</div>
-								))}
-							</div>
-						</div>
-					</div>
-				</div>
-
-				<div className="flex gap-4">
-					<button
-						type="submit"
-						disabled={isLoading}
-						className={`flex-1 bg-indigo-600 text-white font-medium py-3 px-4 rounded-md shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ${
-							isLoading ? "opacity-50 cursor-not-allowed" : ""
-						}`}
-					>
-						{isLoading ? "Updating..." : "Update Product"}
-					</button>
-					<button
-						type="button"
-						onClick={() => navigate(-1)}
-						className="flex-1 bg-gray-200 text-gray-800 font-medium py-3 px-4 rounded-md shadow-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
-					>
-						Cancel
-					</button>
-				</div>
-			</form>
-		</div>
-	);
+                {/* Submit Button */}
+                <button type="submit" disabled={loading} className="flex-1 bg-indigo-600 text-white font-medium py-3 px-4 rounded-md shadow-md hover:bg-indigo-700 focus:outline-none">
+                    {loading ? "Updating..." : "Update Product"}
+                </button>
+            </form>
+            <ToastContainer />
+        </div>
+    );
 };
 
 export default EditProduct;
