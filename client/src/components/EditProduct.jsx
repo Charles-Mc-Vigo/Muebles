@@ -22,12 +22,12 @@ const EditProduct = () => {
 		materials: [],
 		colors: [],
 		sizes: [],
-		stocks: "",
 		price: "",
 	});
 	const [originalData, setOriginalData] = useState({}); // Store original data
 	const [imageFiles, setImageFiles] = useState([]);
 	const [previewImages, setPreviewImages] = useState([]);
+	const [removeImages, setRemoveImages] = useState([]);
 
 	useEffect(() => {
 		const fetchAllData = async () => {
@@ -93,13 +93,11 @@ const EditProduct = () => {
 					name: furnitureData.name,
 					description: furnitureData.description,
 					price: furnitureData.price,
-					stocks: furnitureData.stocks.stocks,
-					category: furnitureData.category.name,
-					furnitureType: furnitureData.furnitureType.name,
-					materials:
-						furnitureData.materials?.map((material) => material.name) || [],
-					colors: furnitureData.colors?.map((color) => color.name) || [],
-					sizes: furnitureData.sizes?.map((size) => size.label) || [],
+					category: furnitureData.category._id,
+					furnitureType: furnitureData.furnitureType._id,
+					materials: furnitureData.materials.map((material) => material._id),
+					colors: furnitureData.colors.map((color) => color._id),
+					sizes: furnitureData.sizes.map((size) => size._id),
 					images: furnitureData.images || [],
 				};
 
@@ -148,17 +146,6 @@ const EditProduct = () => {
 		}));
 	};
 
-	const handleArrayInputChange = (e, field) => {
-		const values = e.target.value
-			.split(",")
-			.map((item) => item.trim())
-			.filter((item) => item);
-		setFurnitureData((prevData) => ({
-			...prevData,
-			[field]: values,
-		}));
-	};
-
 	const handleImageChange = (e) => {
 		const files = Array.from(e.target.files);
 		setImageFiles((prevFiles) => [...prevFiles, ...files]);
@@ -167,6 +154,15 @@ const EditProduct = () => {
 	};
 
 	const removeImage = (index) => {
+		// Get the image to be removed
+		const imageToRemove = previewImages[index];
+
+		// If the image is from the original data, add it to removeImages
+		if (furnitureData.images.includes(imageToRemove)) {
+			setRemoveImages((prev) => [...prev, imageToRemove]);
+		}
+
+		// Remove from preview and files
 		setPreviewImages((prev) => prev.filter((_, i) => i !== index));
 		setImageFiles((prev) => prev.filter((_, i) => i !== index));
 	};
@@ -175,29 +171,50 @@ const EditProduct = () => {
 		e.preventDefault();
 		setIsLoading(true);
 		try {
-			if (previewImages.length < 5) {
-				toast.error("At least 5 images are required!");
-				return;
-			}
 			const formData = new FormData();
-			// Append only modified fields to formData
-			Object.keys(furnitureData).forEach((key) => {
-				if (furnitureData[key] !== originalData[key]) {
-					if (Array.isArray(furnitureData[key])) {
-						furnitureData[key].forEach((value) => {
-							formData.append(key, value);
-						});
-					} else {
-						formData.append(key, furnitureData[key]);
-					}
+
+			// Add IDs for category, furniture type, etc.
+			if (furnitureData.category !== originalData.category) {
+				formData.append("category", furnitureData.category);
+			}
+			if (furnitureData.furnitureType !== originalData.furnitureType) {
+				formData.append("furnitureType", furnitureData.furnitureType);
+			}
+
+			// Add other fields that have changed
+			const fieldsToCheck = ["name", "description", "price"];
+
+			fieldsToCheck.forEach((field) => {
+				if (furnitureData[field] !== originalData[field]) {
+					formData.append(field, furnitureData[field]);
 				}
 			});
-			// Append new image files
+
+			// Add multiple select fields
+			const multiSelectFields = ["materials", "colors", "sizes"];
+			multiSelectFields.forEach((field) => {
+				const originalValues = originalData[field] || [];
+				const currentValues = furnitureData[field] || [];
+
+				// Only append if the arrays are different
+				if (JSON.stringify(originalValues) !== JSON.stringify(currentValues)) {
+					currentValues.forEach((value) => {
+						formData.append(field, value);
+					});
+				}
+			});
+
+			// Add new image files
 			imageFiles.forEach((file) => {
 				formData.append("images", file);
 			});
 
-			console.log("Form data", formData);
+			// Add images to remove
+			if (removeImages.length > 0) {
+				removeImages.forEach((img) => {
+					formData.append("removeImages", img);
+				});
+			}
 
 			const response = await fetch(
 				`http://localhost:3000/api/furnitures/edit/${furnitureId}`,
