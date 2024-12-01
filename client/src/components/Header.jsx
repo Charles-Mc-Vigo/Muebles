@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   FaSearch,
   FaTruck,
@@ -12,11 +13,13 @@ import { CgProfile } from "react-icons/cg";
 import { Link } from "react-router-dom";
 import Logout from "./Logout";
 
-const Header = ({ isLogin, cartCount }) => {
+const Header = ({ isLogin, cartCount, }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const navigate = useNavigate();
 
   // Close menu when clicking outside
   useEffect(() => {
@@ -55,12 +58,35 @@ const Header = ({ isLogin, cartCount }) => {
     setIsUserMenuOpen(!isUserMenuOpen);
   };
   //search
-  const handleSearch = () => {
+  const handleSearch = async (e) => {
+    e.preventDefault(); // Prevent form submission
+    
     if (searchQuery.trim()) {
-      // Redirect to a search results page or handle the search logic
-      window.location.href = `/search?query=${encodeURIComponent(searchQuery)}`;
+      try {
+        const response = await fetch(`http://localhost:3000/api/search?query=${searchQuery}`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+  
+        const data = await response.json();
+        console.log("API Response Data:", data); // Debug log to verify the API response
+  
+        // Ensure the data is passed correctly to the /search-results page
+        if (data.length > 0) {
+          console.log("Passing data to search results:", data); // Log the data before navigation
+          navigate("/search-result", { state: { searchResults: data } });
+        } else {
+          console.log("No results found. Passing empty array.");
+          navigate("/search-result", { state: { searchResults: [] } });
+        }
+  
+      } catch (error) {
+        console.error("Error while searching:", error);
+        navigate("/search-result", { state: { searchResults: [] } }); // Pass empty array in case of error
+      }
     }
   };
+  
 
   return (
     <header className=" w-full bg-white shadow-xl rounded-xl ">
@@ -77,22 +103,33 @@ const Header = ({ isLogin, cartCount }) => {
             </button>
             {/* Search Bar */}
             <div className="flex-1 max-w-2xl">
-              <div className="flex">
-                <input
-                  type="text"
-                  placeholder="What are you looking for?"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full border border-gray-300 px-4 py-2 rounded-l-md focus:outline-none focus:ring-2 focus:ring-teal-500"
-                />
-                <button
-                  onClick={handleSearch}
-                  className="bg-teal-600 text-white px-6 py-2 rounded-r-md hover:bg-teal-700 transition-colors"
-                >
-                  <FaSearch className="text-lg" />
-                </button>
+      <form onSubmit={handleSearch} className="flex">
+        <input
+          type="text"
+          placeholder="What are you looking for?"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full border border-gray-300 px-4 py-2 rounded-l-md focus:outline-none focus:ring-2 focus:ring-teal-500"
+        />
+        <button
+          type="submit"
+          className="bg-teal-600 text-white px-6 py-2 rounded-r-md hover:bg-teal-700 transition-colors"
+        >
+          <FaSearch className="text-lg" />
+        </button>
+      </form>
+    </div>    
+            {/* Search Results */}
+              <div className="search-result">
+                {searchResults.map((result) => (
+                  <div key={result._id} className="search-result-item">
+                    {/* Render your result details here */}
+                    <h3>{result.name}</h3>
+                    <p>{result.description}</p>
+                    {/* Add any other fields you want to display */}
+                  </div>
+                ))}
               </div>
-            </div>
             {/* Navigation Items */}
             <div className="flex items-center gap-8">
               <Link
