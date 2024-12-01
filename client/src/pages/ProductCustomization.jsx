@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import Header from "../components/Header";
@@ -71,7 +71,23 @@ const ProductCustomization = () => {
 		if (selectedModel === "door") setSelectedDoorWoodType(e.target.value);
 	};
 	// console.log(selectedWood);
-
+	// Reset customization when model changes
+	useEffect(() => {
+		// Reset all states based on the selected model
+		if (selectedModel === "chair") {
+			setSelectedBackrest("");
+			setSelectedSeat("");
+			setSelectedWood("");
+		} else if (selectedModel === "sofa") {
+			setSelectedSofaBackrest("");
+			setSelectedSofaArmrest("");
+			setSelectedSofaWood("");
+		} else if (selectedModel === "door") {
+			setselectedDoorDesign("");
+			setSelectedDoorWoodType("");
+		}
+	}, [selectedModel]);
+	
 	// const handleSubmit = async () => {
 	//   if(selectedModel === "chair"){
 	//     FormData = new FormData();
