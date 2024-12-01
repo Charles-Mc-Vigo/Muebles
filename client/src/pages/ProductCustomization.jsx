@@ -6,7 +6,6 @@ import Footer from "../components/Footer";
 import { Chair } from "../Models/ChairModels";
 import { Sofa } from "../Models/DesignSofa";
 import { Door } from "../Models/DesignDoor";
-import { Table } from "../Models/Table";
 import { useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 
@@ -15,7 +14,7 @@ const RotatingObject = ({ children }) => {
 
 	useFrame(() => {
 		if (groupRef.current) {
-			groupRef.current.rotation.y += 0.01;
+			groupRef.current.rotation.y += 0.0;
 		}
 	});
 
@@ -39,17 +38,12 @@ const ProductCustomization = () => {
 	const [selectedSofaArmrest, setSelectedSofaArmrest] = useState("");
 	const [selectedSofaWood, setSelectedSofaWood] = useState("");
 
-	// for table
-	const [selectedTableTop, setSelectedTableTop] = useState("");
-	const [selectedTableLeg, setSelectedTableLeg] = useState("");
-	const [selectedTableWood, setSelectedTableWood] = useState("");
-
 	// Handlers for each part selection
-	const handleBackrestChange = (e) => {
-		if (selectedModel === "chair") setSelectedBackrest(e.target.value);
+	const handleBackrestChange = (design) => {
+		if (selectedModel === "chair") setSelectedBackrest(design);
 	};
-	const handleSeatChange = (e) => {
-		if (selectedModel === "chair") setSelectedSeat(e.target.value);
+	const handleSeatChange = (design) => {
+		if (selectedModel === "chair") setSelectedSeat(design);
 	};
 
 	const handleWoodChange = (e) => {
@@ -57,11 +51,11 @@ const ProductCustomization = () => {
 	};
 
 	// handle backrest of sofa
-	const handleSofaBackrest = (e) => {
-		if (selectedModel === "sofa") setSelectedSofaBackrest(e.target.value);
+	const handleSofaBackrest = (design) => {
+		if (selectedModel === "sofa") setSelectedSofaBackrest(design);
 	};
-	const handleSofaArmrest = (e) => {
-		if (selectedModel === "sofa") setSelectedSofaArmrest(e.target.value);
+	const handleSofaArmrest = (design) => {
+		if (selectedModel === "sofa") setSelectedSofaArmrest(design);
 	};
 
 	const handleSofaWoodChange = (e) => {
@@ -69,25 +63,13 @@ const ProductCustomization = () => {
 	};
 
 	// for door
-	const handleDoorDesignChange = (e) => {
-		if (selectedModel === "door") setselectedDoorDesign(e.target.value);
+	const handleDoorDesignChange = (design) => {
+		if (selectedModel === "door") setselectedDoorDesign(design);
 	};
 
 	const handleDoorWoodChange = (e) => {
 		if (selectedModel === "door") setSelectedDoorWoodType(e.target.value);
 	};
-
-	// for table
-	const handleTableTopChange = (e) => {
-		if (selectedModel === "table") setSelectedTableTop(e.target.value);
-	};
-	const handleTableLegChange = (e) => {
-		if (selectedModel === "table") setSelectedTableLeg(e.target.value);
-	};
-	const handleTableWoodChange = (e) => {
-		if (selectedModel === "table") setSelectedTableWood(e.target.value);
-	};
-
 	// console.log(selectedWood);
 
 	// const handleSubmit = async () => {
@@ -153,15 +135,6 @@ const ProductCustomization = () => {
 								/>
 							</RotatingObject>
 						)}
-						{selectedModel === "table" && (
-							<RotatingObject>
-								<Table
-									selectedTableTop={selectedTableTop}
-									selectedTableLeg={selectedTableLeg}
-									selectedTableWood={selectedTableWood}
-								/>
-							</RotatingObject>
-						)}
 						{selectedModel === "door" && (
 							<RotatingObject>
 								<Door
@@ -197,50 +170,72 @@ const ProductCustomization = () => {
 							<option value="chair">Chair</option>
 							<option value="sofa">Sofa</option>
 							<option value="door">Door</option>
-							<option value="table">Table</option>
 						</select>
 					</div>
 					{/* Chair Customization Controls */}
 					{selectedModel === "chair" && (
 						<>
+							{/* Backrest Options */}
 							<div className="bg-white shadow rounded p-4">
 								<h3 className="text-lg font-semibold">Backrest Options</h3>
-								<select
-									value={selectedBackrest}
-									onChange={handleBackrestChange}
-									className="mt-2 px-4 py-2 border rounded shadow w-full"
-								>
-									<option value="" disabled>
-										Select Backrest Design
-									</option>{" "}
-									{["Design 1", "Design 2", "Design 3", "Design 4"].map(
-										(index) => (
-											<option key={index} value={index}>
-												{index}
-											</option>
-										)
-									)}
-								</select>
+								<div className="flex gap-4 mt-2">
+									{[
+										"Design1.jpg",
+										"Design2.jpg",
+										"Design3.jpg",
+										"Design4.jpg",
+									].map((image, index) => (
+										<div
+											key={index}
+											onClick={() =>
+												handleBackrestChange(`Design ${index + 1}`)
+											}
+											className={`cursor-pointer border rounded p-1 ${
+												selectedBackrest === `Design ${index + 1}`
+													? "border-blue-500"
+													: "border-gray-300"
+											}`}
+										>
+											<img
+												src={`/Chair/Backrest/${image}`}
+												alt={`Backrest ${index + 1}`}
+												className="w-20 h-20 object-cover"
+											/>
+										</div>
+									))}
+								</div>
 							</div>
-							<div className="bg-white shadow rounded p-4">
+
+							{/* Seats Options */}
+							<div className="bg-white shadow rounded p-4 mt-4">
 								<h3 className="text-lg font-semibold">Seats Options</h3>
-								<select
-									value={selectedSeat}
-									onChange={handleSeatChange}
-									className="mt-2 px-4 py-2 border rounded shadow w-full"
-								>
-									<option value="" disabled>
-										Select Seat Design
-									</option>{" "}
-									{["Design 1", "Design 2", "Design 3", "Design 4"].map(
-										(index) => (
-											<option key={index} value={index}>
-												{index}
-											</option>
-										)
-									)}
-								</select>
+								<div className="flex gap-4 mt-2">
+									{[
+										"Design1.jpg",
+										"Design2.jpg",
+										"Design3.jpg",
+										"Design4.jpg",
+									].map((image, index) => (
+										<div
+											key={index}
+											onClick={() => handleSeatChange(`Design ${index + 1}`)}
+											className={`cursor-pointer border rounded p-1 ${
+												selectedSeat === `Design ${index + 1}`
+													? "border-blue-500"
+													: "border-gray-300"
+											}`}
+										>
+											<img
+												src={`/Chair/Seat/${image}`}
+												alt={`Seat ${index + 1}`}
+												className="w-20 h-20 object-cover"
+											/>
+										</div>
+									))}
+								</div>
 							</div>
+
+							{/* Wood Options */}
 							<div className="bg-white shadow rounded p-4 mt-4">
 								<h3 className="text-lg font-semibold">Woods Available</h3>
 								<select
@@ -251,64 +246,11 @@ const ProductCustomization = () => {
 									<option value="" disabled>
 										Select Wood Type
 									</option>
-									<option value="Acacia">Acacia</option>
-									<option value="Mahogany">Mahogany</option>
-									<option value="Narra">Narra</option>
-								</select>
-							</div>
-						</>
-					)}
-
-					{/* Table Customization Controls */}
-					{selectedModel === "table" && (
-						<>
-							<div className="bg-white shadow rounded p-4">
-								<h3 className="text-lg font-semibold">Table Top Option</h3>
-								<select
-									value={selectedTableTop}
-									onChange={handleTableTopChange}
-									className="mt-2 px-4 py-2 border rounded shadow w-full"
-								>
-									<option value="" disabled>
-										Select Table Top Designs
-									</option>{" "}
-									{["Design 1", "Design 2", "Design 3"].map((index) => (
-										<option key={index} value={index}>
-											{index}
+									{["Acacia", "Mahogany", "Narra"].map((wood) => (
+										<option key={wood} value={wood}>
+											{wood}
 										</option>
 									))}
-								</select>
-							</div>
-							<div className="bg-white shadow rounded p-4">
-								<h3 className="text-lg font-semibold">Table Legs Options</h3>
-								<select
-									value={selectedTableLeg}
-									onChange={handleTableLegChange}
-									className="mt-2 px-4 py-2 border rounded shadow w-full"
-								>
-									<option value="" disabled>
-										Select Table Legs Design
-									</option>{" "}
-									{["Design 1", "Design 2"].map((index) => (
-										<option key={index} value={index}>
-											{index}
-										</option>
-									))}
-								</select>
-							</div>
-							<div className="bg-white shadow rounded p-4 mt-4">
-								<h3 className="text-lg font-semibold">Woods Option</h3>
-								<select
-									value={selectedTableWood}
-									onChange={handleTableWoodChange}
-									className="mt-2 px-4 py-2 border rounded shadow w-full"
-								>
-									<option value="" disabled>
-										Select Wood Type
-									</option>
-									<option value="Acacia">Acacia</option>
-									<option value="Mahogany">Mahogany</option>
-									<option value="Narra">Narra</option>
 								</select>
 							</div>
 						</>
@@ -317,41 +259,61 @@ const ProductCustomization = () => {
 					{/* Sofa Customization Controls */}
 					{selectedModel === "sofa" && (
 						<>
-							<div className="bg-white shadow rounded p-4">
-								<h3 className="text-lg font-semibold">Sofa Backrest Option</h3>
-								<select
-									value={selectedSofaBackrest}
-									onChange={handleSofaBackrest}
-									className="mt-2 px-4 py-2 border rounded shadow w-full"
-								>
-									<option value="" disabled>
-										Select Sofa Backrest Design
-									</option>{" "}
-									{["Design 1", "Design 2", "Design 3", "Design 4"].map(
-										(index) => (
-											<option key={index} value={index}>
-												{index}
-											</option>
-										)
-									)}
-								</select>
+								<div className="bg-white shadow rounded p-4">
+								<h3 className="text-lg font-semibold">Sofa Backrest Options</h3>
+								<div className="flex gap-4 mt-2">
+									{[
+										"Design1.jpg",
+										"Design2.jpg",
+										"Design3.jpg",
+										"Design4.jpg",
+									].map((image, index) => (
+										<div
+											key={index}
+											onClick={() =>
+												handleSofaBackrest(`Design ${index + 1}`)
+											}
+											className={`cursor-pointer border rounded p-1 ${
+												selectedSofaBackrest === `Design ${index + 1}`
+													? "border-blue-500"
+													: "border-gray-300"
+											}`}
+										>
+											<img
+												src={`/Sofa/Backrest/${image}`}
+												alt={`Sofa Backrest ${index + 1}`}
+												className="w-20 h-20 object-cover"
+											/>
+										</div>
+									))}
+								</div>
 							</div>
 							<div className="bg-white shadow rounded p-4">
 								<h3 className="text-lg font-semibold">Sofa Armrest Options</h3>
-								<select
-									value={selectedSofaArmrest}
-									onChange={handleSofaArmrest}
-									className="mt-2 px-4 py-2 border rounded shadow w-full"
-								>
-									<option value="" disabled>
-										Select Sofa Armrest Design
-									</option>{" "}
-									{["Design 1", "Design 2"].map((index) => (
-										<option key={index} value={index}>
-											{index}
-										</option>
+								<div className="flex gap-4 mt-2">
+									{[
+										"Design1.jpg",
+										"Design2.jpg",
+									].map((image, index) => (
+										<div
+											key={index}
+											onClick={() =>
+												handleSofaArmrest(`Design ${index + 1}`)
+											}
+											className={`cursor-pointer border rounded p-1 ${
+												selectedSofaArmrest === `Design ${index + 1}`
+													? "border-blue-500"
+													: "border-gray-300"
+											}`}
+										>
+											<img
+												src={`/Sofa/Armrest/${image}`}
+												alt={`Backrest ${index + 1}`}
+												className="w-20 h-20 object-cover"
+											/>
+										</div>
 									))}
-								</select>
+								</div>
 							</div>
 							<div className="bg-white shadow rounded p-4 mt-4">
 								<h3 className="text-lg font-semibold">Woods Options</h3>
@@ -373,30 +335,35 @@ const ProductCustomization = () => {
 					{/* Door Customization Controls */}
 					{selectedModel === "door" && (
 						<>
-							<div className="bg-white shadow rounded p-4">
-								<h3 className="text-lg font-semibold">Door Designs</h3>
-								<select
-									value={selectedDoorDesign}
-									onChange={handleDoorDesignChange}
-									className="mt-2 px-4 py-2 border rounded shadow w-full"
-								>
-									<option value="" disabled>
-										Select Door Design
-									</option>
+							<div className="bg-white shadow rounded p-4 mt-4">
+								<h3 className="text-lg font-semibold">Seats Options</h3>
+								<div className="flex gap-4 mt-2">
 									{[
-										"Design 1",
-										"Design 2",
-										"Design 3",
-										"Design 4",
-										"Design 5",
-										"Design 6",
-										"Design 7",
-									].map((index) => (
-										<option key={index} value={index}>
-											{index}
-										</option>
+										"Design1.jpg",
+										"Design2.jpg",
+										"Design3.jpg",
+										"Design4.jpg",
+										"Design5.jpg",
+										"Design4.jpg",
+										"Design7.jpg",
+									].map((image, index) => (
+										<div
+											key={index}
+											onClick={() => handleDoorDesignChange(`Design ${index + 1}`)}
+											className={`cursor-pointer border rounded p-1 ${
+												selectedDoorDesign === `Design ${index + 1}`
+													? "border-blue-500"
+													: "border-gray-300"
+											}`}
+										>
+											<img
+												src={`/Door/${image}`}
+												alt={`Door ${index + 1}`}
+												className="w-20 h-20 object-cover"
+											/>
+										</div>
 									))}
-								</select>
+								</div>
 							</div>
 							<div className="bg-white shadow rounded p-4 mt-4">
 								<h3 className="text-lg font-semibold">Woods Options</h3>
