@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import Header from "../components/Header";
@@ -6,8 +6,8 @@ import Footer from "../components/Footer";
 import { Chair } from "../Models/ChairModels";
 import { Sofa } from "../Models/DesignSofa";
 import { Door } from "../Models/DesignDoor";
-import { useRef } from "react";
 import { useFrame } from "@react-three/fiber";
+import { useNavigate } from "react-router-dom";
 
 const RotatingObject = ({ children }) => {
 	const groupRef = useRef();
@@ -21,7 +21,37 @@ const RotatingObject = ({ children }) => {
 	return <group ref={groupRef}>{children}</group>;
 };
 
+const chairMaterials = {
+	Narra: {
+		name: "Narra",
+		price: 9000,
+	},
+	Mahogany: {
+		name: "Mahogany",
+		price: 3000,
+	},
+	Acacia: {
+		name: "Acacia",
+		price: 3000,
+	},
+};
+
+const chairSizes = {
+	Standard: {
+		name: "Standard",
+		dimensions: {
+			height: 35,
+			width: 21,
+			depth: 18,
+			length: 0,
+		},
+	},
+};
+
 const ProductCustomization = () => {
+	const navigate = useNavigate();
+	const canvasRef = useRef(null); // Reference for the canvas
+
 	// State for selected model
 	const [selectedModel, setSelectedModel] = useState("chair");
 	// for chair
@@ -38,6 +68,12 @@ const ProductCustomization = () => {
 	const [selectedSofaArmrest, setSelectedSofaArmrest] = useState("");
 	const [selectedSofaWood, setSelectedSofaWood] = useState("");
 	const [quantity, setQuantity] = useState(1); // Initial quantity set to 1
+	const [size, setSize] = useState(null);
+	const [isCustomSizeVisible, setCustomSizeVisible] = useState(false);
+
+	const toggleCustomSize = () => {
+		setCustomSizeVisible((prev) => !prev);
+	};
 
 	const [customSize, setCustomSize] = useState({
 		height: "",
@@ -105,7 +141,6 @@ const ProductCustomization = () => {
 	}, [selectedModel]);
 
 	const handleSubmit = async () => {
-		// If no item is selected, show an alert
 		if (!selectedModel) {
 			alert("Please select a piece of furniture to checkout.");
 			return;
@@ -140,31 +175,10 @@ const ProductCustomization = () => {
 				quantity,
 				customSize,
 			};
-		} else {
-			alert("Invalid selection. Please choose a valid piece of furniture.");
-			return;
 		}
 
-		console.log("FormData: ", formData)
-
-		try {
-			// const response = await fetch("/api/submit", {
-			// 	method: "POST",
-			// 	headers: {
-			// 		"Content-Type": "application/json",
-			// 	},
-			// 	body: JSON.stringify(formData),
-			// });
-			// if (!response.ok) {
-			// 	throw new Error("Failed to submit. Please try again.");
-			// }
-			// const result = await response.json();
-			// console.log("Submission successful:", result);
-			// alert("Submission successful!");
-		} catch (error) {
-			console.error("Error:", error);
-			alert("Something went wrong! Please try again.");
-		}
+		console.log("FormData: ", formData);
+		navigate("/customize-product/pre-order", { state: formData });
 	};
 
 	return (
@@ -173,7 +187,7 @@ const ProductCustomization = () => {
 			<div className="flex-grow flex flex-col md:flex-row bg-gray-100 p-4">
 				{/* Canvas for the 3D model */}
 				<div className="flex-grow md:w-2/3 flex items-center justify-center">
-					<Canvas>
+					<Canvas ref={canvasRef}>
 						{/* <ambientLight intensity={0.5} />
 						<directionalLight position={[10, 10, 10]} /> */}
 						<ambientLight intensity={0.7} color="#ffffff" />
@@ -441,9 +455,9 @@ const ProductCustomization = () => {
 					)}
 
 					{/* Quantity Input for Furniture */}
-					<div className="bg-white shadow rounded p-4 mt-4">
-						<h3 className="text-lg font-semibold">Quantity</h3>
+					<div className="bg-white shadow w-full flex justify-center rounded p-4 mt-4">
 						<div className="flex items-center space-x-4 mt-2">
+						<h3 className="text-lg font-semibold">Quantity</h3>
 							<button
 								onClick={() => handleQuantityChange(-1)}
 								className="px-4 py-2 bg-gray-300 rounded-full hover:bg-gray-400"
@@ -466,72 +480,153 @@ const ProductCustomization = () => {
 						</div>
 					</div>
 
-					{/* Custom Size Inputs */}
-					<div className="bg-white shadow rounded p-4 mt-4">
-						<h3 className="text-lg font-semibold">Custom Size</h3>
-						<div className="grid grid-cols-2 gap-4 mt-2">
-							<div>
-								<label htmlFor="height" className="block text-sm font-medium">
-									Height <span className="italic font-light text-sm">(inches)</span>
-								</label>
-								<input
-									type="number"
-									id="height"
-									value={customSize.height}
-									onChange={(e) =>
-										setCustomSize({ ...customSize, height: e.target.value })
-									}
-									className="mt-1 px-4 py-2 border rounded shadow w-full"
-									placeholder="Enter Height"
-								/>
+					{selectedModel === "chair" && (
+						<div className="bg-gray-50 shadow rounded p-6 mt-6">
+							<h3 className="text-xl font-bold text-gray-800 mb-4">
+								Available Chair Sizes
+							</h3>
+							<div className="flex justify-end">
+								<button
+									onClick={toggleCustomSize}
+									className="px-4 py-2 mb-4 text-sm text-white bg-blue-600 rounded hover:bg-blue-700"
+								>
+									{isCustomSizeVisible
+										? "Return to Sizes"
+										: "Customize your own size!"}
+								</button>
 							</div>
-							<div>
-								<label htmlFor="length" className="block text-sm font-medium">
-									Length <span className="italic font-light text-sm">(inches)</span>
-								</label>
-								<input
-									type="number"
-									id="length"
-									value={customSize.length}
-									onChange={(e) =>
-										setCustomSize({ ...customSize, length: e.target.value })
-									}
-									className="mt-1 px-4 py-2 border rounded shadow w-full"
-									placeholder="Enter Length"
-								/>
-							</div>
-							<div>
-								<label htmlFor="width" className="block text-sm font-medium">
-									Width <span className="italic font-light text-sm">(inches)</span>
-								</label>
-								<input
-									type="number"
-									id="width"
-									value={customSize.width}
-									onChange={(e) =>
-										setCustomSize({ ...customSize, width: e.target.value })
-									}
-									className="mt-1 px-4 py-2 border rounded shadow w-full"
-									placeholder="Enter Width"
-								/>
-							</div>
-							<div>
-								<label htmlFor="depth" className="block text-sm font-medium">
-									Depth <span className="italic font-light text-sm">(inches)</span>
-								</label>
-								<input
-									type="number"
-									id="depth"
-									value={customSize.depth}
-									onChange={(e) =>
-										setCustomSize({ ...customSize, depth: e.target.value })
-									}
-									className="mt-1 px-4 py-2 border rounded shadow w-full"
-									placeholder="Enter Depth"
-								/>
-							</div>
+							{isCustomSizeVisible ? (
+								<div className="bg-white shadow rounded p-4 mt-4">
+									<h3 className="text-lg font-semibold">Custom Size</h3>
+									<div className="grid grid-cols-2 gap-4 mt-2">
+										<div>
+											<label
+												htmlFor="height"
+												className="block text-sm font-medium"
+											>
+												Height{" "}
+												<span className="italic font-light text-sm">
+													(inches)
+												</span>
+											</label>
+											<input
+												type="number"
+												id="height"
+												value={customSize.height}
+												onChange={(e) =>
+													setCustomSize({
+														...customSize,
+														height: e.target.value,
+													})
+												}
+												className="mt-1 px-4 py-2 border rounded shadow w-full"
+												placeholder="Enter Height"
+											/>
+										</div>
+										<div>
+											<label
+												htmlFor="length"
+												className="block text-sm font-medium"
+											>
+												Length{" "}
+												<span className="italic font-light text-sm">
+													(inches)
+												</span>
+											</label>
+											<input
+												type="number"
+												id="length"
+												value={customSize.length}
+												onChange={(e) =>
+													setCustomSize({
+														...customSize,
+														length: e.target.value,
+													})
+												}
+												className="mt-1 px-4 py-2 border rounded shadow w-full"
+												placeholder="Enter Length"
+											/>
+										</div>
+										<div>
+											<label
+												htmlFor="width"
+												className="block text-sm font-medium"
+											>
+												Width{" "}
+												<span className="italic font-light text-sm">
+													(inches)
+												</span>
+											</label>
+											<input
+												type="number"
+												id="width"
+												value={customSize.width}
+												onChange={(e) =>
+													setCustomSize({
+														...customSize,
+														width: e.target.value,
+													})
+												}
+												className="mt-1 px-4 py-2 border rounded shadow w-full"
+												placeholder="Enter Width"
+											/>
+										</div>
+										<div>
+											<label
+												htmlFor="depth"
+												className="block text-sm font-medium"
+											>
+												Depth{" "}
+												<span className="italic font-light text-sm">
+													(inches)
+												</span>
+											</label>
+											<input
+												type="number"
+												id="depth"
+												value={customSize.depth}
+												onChange={(e) =>
+													setCustomSize({
+														...customSize,
+														depth: e.target.value,
+													})
+												}
+												className="mt-1 px-4 py-2 border rounded shadow w-full"
+												placeholder="Enter Depth"
+											/>
+										</div>
+									</div>
+								</div>
+							) : (
+								<ul className="mt-4 grid gap-4 sm:grid-cols-1">
+									{Object.entries(chairSizes).map(
+										([key, { name, dimensions }]) => (
+											<li
+												key={key}
+												className="border border-gray-200 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow"
+											>
+												<h4 className="text-lg font-semibold text-gray-700">
+													{name}
+												</h4>
+												<p className="text-sm text-gray-600">
+													<span className="font-medium">Height:</span>{" "}
+													{dimensions.height}"
+												</p>
+												<p className="text-sm text-gray-600">
+													<span className="font-medium">Width:</span>{" "}
+													{dimensions.width}"
+												</p>
+												<p className="text-sm text-gray-600">
+													<span className="font-medium">Depth:</span>{" "}
+													{dimensions.depth}"
+												</p>
+											</li>
+										)
+									)}
+								</ul>
+							)}
 						</div>
-					</div>
+					)}
 
 					<button
 						type="submit"

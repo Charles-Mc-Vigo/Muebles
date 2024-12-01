@@ -116,6 +116,10 @@ const orderSchema = new mongoose.Schema(
       enum: ["Cart", "Pre-Order"],
       required: true,
     },
+    isCustomization:{
+      type:Boolean,
+      default:false
+    }
   },
   {
     timestamps: true,
