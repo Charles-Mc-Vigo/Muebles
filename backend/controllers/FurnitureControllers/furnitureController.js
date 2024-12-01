@@ -6,6 +6,8 @@ const FurnitureType = require("../../models/Furniture/furnitureTypeModel");
 const Materials = require("../../models/Furniture/materialsModel");
 const Colors = require("../../models/Furniture/colorModel");
 const Size = require("../../models/Furniture/sizeModel");
+const User = require("../../models/User/userModel");
+const Rating = require('../../models/Rating/ratingModel');
 
 // Multer setup for handling image uploads in memory
 const upload = multer({
@@ -368,3 +370,39 @@ exports.UnArchived = async (req, res) => {
 		res.status(500).json({ error: "Server error!" });
 	}
 };
+
+exports.checkIfRated = async (req, res) => {
+  try {
+    const { furnitureId } = req.params;
+
+    // Check if furniture exists
+    const furniture = await Furniture.findById(furnitureId);
+    if (!furniture) return res.status(404).json({ message: "Furniture not found!" });
+
+    // Check if user exists
+    const user = await User.findById(req.user._id);
+    if (!user) return res.status(404).json({ message: "User not found!" });
+
+    // Check if the user already rated the furniture
+    const ratedFurniture = await Rating.find({ user: user._id, furniture: furnitureId });
+
+    if (ratedFurniture) {
+      // Mark furniture as rated
+      furniture.isRated = true;
+      await furniture.save();
+
+      return res.status(200).json({
+        rated: true,
+				ratedFurniture
+      });
+    }
+    await furniture.save();
+
+    res.status(200).json({ rated: false });
+  } catch (error) {
+    console.error("Error checking if rated: ", error);
+    res.status(500).json({ message: "Server error!" });
+  }
+};
+
+

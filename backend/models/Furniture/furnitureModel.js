@@ -38,7 +38,8 @@ const furnitureSchema = new mongoose.Schema(
 			},
 		],
 		isRated:{
-			type:Boolean
+			type:Boolean,
+			default:false
 		},
 		isArchived: {
 			type: Boolean,

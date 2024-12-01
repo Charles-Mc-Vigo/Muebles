@@ -15,7 +15,7 @@ const RotatingObject = ({ children }) => {
 
 	useFrame(() => {
 		if (groupRef.current) {
-			groupRef.current.rotation.y += 0.0;
+			groupRef.current.rotation.y += 0.01;
 		}
 	});
 

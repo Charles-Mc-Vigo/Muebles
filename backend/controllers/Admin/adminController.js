@@ -486,6 +486,7 @@ exports.AcceptOrder = async (req, res) => {
 		if (!orderToAccept) return res.status(404).json({ message: "Order not found!" });
 		
 		orderToAccept.orderStatus = "confirmed";
+		orderToAccept.isConfirmed = true
 		const orderUpdate = await orderToAccept.save();
 		res.status(200).json({ message: "Order was accepted", orderUpdate });
 	} catch (error) {

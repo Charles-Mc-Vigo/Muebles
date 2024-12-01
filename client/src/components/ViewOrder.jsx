@@ -6,7 +6,10 @@ import {
 	FaHourglassHalf,
 	FaClipboardCheck,
 	FaTimesCircle,
+	FaShippingFast,
+	FaRoute,
 } from "react-icons/fa";
+import { MdWrongLocation } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import Header from "./Header";
 import Footer from "./Footer";
@@ -14,6 +17,7 @@ import Footer from "./Footer";
 const ViewOrder = () => {
 	const [orders, setOrders] = useState([]);
 	const [errorMessage, setErrorMessage] = useState("");
+	const [furniture, setFurniture] = useState(null);
 	const [loading, setLoading] = useState(false);
 	const [cancelLoading, setCancelLoading] = useState(null);
 	const [filter, setFilter] = useState("All"); // State for filter
@@ -34,6 +38,8 @@ const ViewOrder = () => {
 			}
 			const ordersData = await response.json();
 			setOrders(ordersData);
+			// const furnitureIds = orders.map((order) => order.furniture._id);
+			// console.log(furnitureIds);
 		} catch (error) {
 			console.log("Error fetching orders", error);
 			setErrorMessage(error.message);
@@ -114,22 +120,30 @@ const ViewOrder = () => {
 				{/* Filter Buttons */}
 				<div className="mb-4">
 					<div className="flex space-x-4">
-						{["All", "Pending", "Confirmed", "Delivered", "Cancelled"].map(
-							(status) => (
-								<button
-									key={status}
-									onClick={() => setFilter(status)}
-									className={`px-4 py-2 rounded-lg transition-colors 
+						{[
+							"All",
+							"Pending",
+							"Confirmed",
+							"Delivered",
+							"Cancelled",
+							"Shipped",
+							"Out for Delivery",
+							"Failed to Delivery",
+							"Returned",
+						].map((status) => (
+							<button
+								key={status}
+								onClick={() => setFilter(status)}
+								className={`px-4 py-2 rounded-lg transition-colors 
                   ${
 										filter === status
 											? "bg-blue-500 text-white"
 											: "bg-gray-200 text-gray-800 hover:bg-blue-100"
 									}`}
-								>
-									{status}
-								</button>
-							)
-						)}
+							>
+								{status}
+							</button>
+						))}
 					</div>
 				</div>
 
@@ -158,17 +172,25 @@ const ViewOrder = () => {
 										</h2>
 										<span
 											className={`px-4 py-2 rounded-full text-sm font-medium flex items-center
-                        ${
-													order.orderStatus === "pending"
-														? "bg-yellow-100 text-yellow-800"
-														: order.orderStatus === "confirmed"
-														? "bg-blue-100 text-blue-800"
-														: order.orderStatus === "delivered"
-														? "bg-green-100 text-green-800"
-														: order.orderStatus === "cancelled"
-														? "bg-red-100 text-red-800"
-														: ""
-												}`}
+    ${
+			order.orderStatus === "pending"
+				? "bg-yellow-100 text-yellow-800"
+				: order.orderStatus === "confirmed"
+				? "bg-blue-100 text-blue-800"
+				: order.orderStatus === "delivered"
+				? "bg-green-100 text-green-800"
+				: order.orderStatus === "cancelled"
+				? "bg-red-100 text-red-800"
+				: order.orderStatus === "shipped"
+				? "bg-purple-100 text-purple-800"
+				: order.orderStatus === "out for delivery"
+				? "bg-orange-100 text-orange-800"
+				: order.orderStatus === "failed to deliver"
+				? "bg-gray-100 text-gray-800"
+				: order.orderStatus === "returned"
+				? "bg-pink-100 text-pink-800"
+				: ""
+		}`}
 										>
 											{order.orderStatus === "pending" && (
 												<>
@@ -188,6 +210,27 @@ const ViewOrder = () => {
 											{order.orderStatus === "cancelled" && (
 												<>
 													<FaTimesCircle className="mr-2" /> Cancelled
+												</>
+											)}
+											{order.orderStatus === "shipped" && (
+												<>
+													<FaRoute className="mr-2" /> Shipped
+												</>
+											)}
+											{order.orderStatus === "out for delivery" && (
+												<>
+													<FaShippingFast className="mr-2" /> Out for Delivery
+												</>
+											)}
+											{order.orderStatus === "failed to deliver" && (
+												<>
+													<MdWrongLocation className="mr-2" /> Delivery Attempt
+													Failed
+												</>
+											)}
+											{order.orderStatus === "returned" && (
+												<>
+													<FaBoxOpen className="mr-2" /> Returned
 												</>
 											)}
 										</span>
@@ -264,17 +307,37 @@ const ViewOrder = () => {
 												<h3 className="font-medium text-gray-700 mb-4">
 													{order.orderStatus === "pending" && (
 														<div className="p-5 text-right bg-yellow-200">
-															<h1>Your order is being process</h1>
+															<h1>Your order is being processed</h1>
 														</div>
 													)}
 													{order.orderStatus === "confirmed" && (
 														<div className="p-5 text-right bg-blue-200">
-															<h1>Your order is being process</h1>
+															<h1>Your order is being processed</h1>
+														</div>
+													)}
+													{order.orderStatus === "shipped" && (
+														<div className="p-5 text-right bg-purple-200">
+															<h1>Your order has been shipped</h1>
+														</div>
+													)}
+													{order.orderStatus === "out for delivery" && (
+														<div className="p-5 text-right bg-orange-200">
+															<h1>Your order is out for delivery</h1>
 														</div>
 													)}
 													{order.orderStatus === "delivered" && (
 														<div className="p-5 text-right bg-green-200">
 															<h1>Your order has been delivered</h1>
+														</div>
+													)}
+													{order.orderStatus === "failed to deliver" && (
+														<div className="p-5 text-right bg-gray-200">
+															<h1>Delivery attempt failed</h1>
+														</div>
+													)}
+													{order.orderStatus === "returned" && (
+														<div className="p-5 text-right bg-pink-200">
+															<h1>Your order has been returned</h1>
 														</div>
 													)}
 													{order.orderStatus === "cancelled" && (
@@ -283,6 +346,7 @@ const ViewOrder = () => {
 														</div>
 													)}
 												</h3>
+
 												<p>Payment: {order.paymentOption}</p>
 												<div className="space-y-4">
 													{order.items.map((item, itemIndex) => (

@@ -9,9 +9,10 @@ const {
   Archived,
   UnArchived,
   ArchivedFurnitures,
+  checkIfRated,
 } = require("../../controllers/FurnitureControllers/furnitureController");
 
-const { checkAdminAuth } = require("../../middlewares/checkAuth");
+const { checkAdminAuth, checkUserAuth } = require("../../middlewares/checkAuth");
 
 // Get all furnitures
 // GET - /api/furnitures
@@ -40,5 +41,7 @@ router.post("/unarchive/:furnitureId", checkAdminAuth, UnArchived);
 // Get furniture by ID
 // GET - /api/furnitures/:furnitureId
 router.get("/:furnitureId", getFurnitureById);
+
+router.get('/check-if-rated/:furnitureId', checkUserAuth, checkIfRated);
 
 module.exports = router;

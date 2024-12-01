@@ -9,7 +9,6 @@ const ViewUserOrder = () => {
 	const [order, setOrder] = useState(null);
 	const [loading, setLoading] = useState(false);
 	const [newStatus, setNewStatus] = useState(""); // State for new status
-	const [newShippingStatus, setNewShippingStatus] = useState(""); // New state for shipping status
 
 	const navigate = useNavigate();
 
@@ -44,40 +43,6 @@ const ViewUserOrder = () => {
 	useEffect(() => {
 		fetchOrder();
 	}, [orderId]);
-
-	const handleUpdateShippingStatus = async () => {
-		console.log("Updating shipping status to:", newShippingStatus); // Log the new status
-		try {
-			const response = await fetch(
-				`http://localhost:3000/api/orders/update-shipping/${orderId}`,
-				{
-					method: "PUT",
-					credentials: "include",
-					headers: {
-						"Content-Type": "application/json",
-					},
-					body: JSON.stringify({ shippingStatus: newShippingStatus }),
-				}
-			);
-
-			// Log the response status and data
-			if (!response.ok) {
-				const errorData = await response.json();
-				console.error("Error updating shipping status:", errorData); // Log error data if response is not OK
-				toast.error(errorData.message || "Failed to update shipping status.");
-				return;
-			}
-
-			// Log success and updated shipping status
-			console.log("Shipping status updated successfully!");
-
-			// Fetch the updated order to verify the status change
-			fetchOrder(); // Refresh the order details
-		} catch (error) {
-			toast.error("An error occurred while updating shipping status.");
-			console.log("Error:", error.message); // Log any error during the process
-		}
-	};
 
 	const handleAccept = async () => {
 		try {
@@ -232,25 +197,22 @@ const ViewUserOrder = () => {
 												? "text-yellow-600"
 												: order.orderStatus === "confirmed"
 												? "text-blue-600"
+												: order.orderStatus === "shipped"
+												? "text-purple-600"
+												: order.orderStatus === "out for delivery"
+												? "text-orange-600"
 												: order.orderStatus === "delivered"
-												? "text-green-700"
+												? "text-green-600"
 												: order.orderStatus === "cancelled"
 												? "text-red-600"
-												: "text-gray-600" // Fallback color for any unexpected status
+												: order.orderStatus === "failed to deliver"
+												? "text-red-500"
+												: order.orderStatus === "returned"
+												? "text-pink-600"
+												: "text-gray-600"
 										}`}
 									>
 										{order.orderStatus}
-									</span>
-								</p>
-								<p>
-									Shipping Status: 
-									<span>
-										{order.shippingStatus === 'pending' && "Pending"}
-										{order.shippingStatus === 'shipped' && "Shipped"}
-										{order.shippingStatus === 'out for delivery' && "Out for Delivery"}
-										{order.shippingStatus === 'delivered' && "Delivered"}
-										{order.shippingStatus === 'returned' && "Returned"}
-										{order.shippingStatus === 'failed delivery' && "Failed Delivery"}
 									</span>
 								</p>
 							</li>
@@ -265,37 +227,28 @@ const ViewUserOrder = () => {
 							>
 								<option value="pending">Pending</option>
 								<option value="confirmed">Confirmed</option>
-								<option value="delivered">Delivered</option>
-								<option value="cancelled">Cancelled</option>
-							</select>
-							<button
-								onClick={handleUpdateStatus}
-								className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
-							>
-								Update Status
-							</button>
-						</div>
-						<div className="mt-4">
-							<label className="block text-gray-700">
-								Update Shipping Status:
-							</label>
-							<select
-								value={newShippingStatus}
-								onChange={(e) => setNewShippingStatus(e.target.value)}
-								className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-							>
-								<option value="">Select Shipping Status</option>
 								<option value="shipped">Shipped</option>
 								<option value="out for delivery">Out for Delivery</option>
+								<option value="delivered">Delivered</option>
+								<option value="failed to deliver">Failed to Deliver</option>
 								<option value="returned">Returned</option>
-								<option value="failed delivery">Failed Delivery</option>
+								<option value="cancelled">Cancelled</option>
 							</select>
-							<button
-								onClick={handleUpdateShippingStatus}
-								className="mt-2 px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600"
-							>
-								Update Shipping Status
-							</button>
+							{order.isConfirmed ? (
+								<button
+									onClick={handleUpdateStatus}
+									className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+								>
+									Update Status
+								</button>
+							) : (
+								<button
+									disabled
+									className="mt-2 px-4 py-2 bg-gray-400 text-white rounded-md cursor-not-allowed"
+								>
+									Update Status
+								</button>
+							)}	
 						</div>
 					</div>
 
