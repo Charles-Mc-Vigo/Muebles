@@ -37,6 +37,22 @@ const ProductCustomization = () => {
 	const [selectedSofaBackrest, setSelectedSofaBackrest] = useState("");
 	const [selectedSofaArmrest, setSelectedSofaArmrest] = useState("");
 	const [selectedSofaWood, setSelectedSofaWood] = useState("");
+	const [quantity, setQuantity] = useState(1); // Initial quantity set to 1
+
+	const [customSize, setCustomSize] = useState({
+		height: "",
+		length: "",
+		width: "",
+		depth: "",
+	});
+
+	// Handle increase/decrease
+	const handleQuantityChange = (change) => {
+		setQuantity((prevQuantity) => {
+			const newQuantity = prevQuantity + change;
+			return newQuantity > 0 ? newQuantity : 1; // Prevent negative quantity
+		});
+	};
 
 	// Handlers for each part selection
 	const handleBackrestChange = (design) => {
@@ -87,39 +103,69 @@ const ProductCustomization = () => {
 			setSelectedDoorWoodType("");
 		}
 	}, [selectedModel]);
-	
-	// const handleSubmit = async () => {
-	//   if(selectedModel === "chair"){
-	//     FormData = new FormData();
-	//   }
-	//   try {
-	//     // // Example: Simulate form submission or API call
-	//     // const response = await fetch('/api/submit', {
-	//     //   method: 'POST',
-	//     //   headers: {
-	//     //     'Content-Type': 'application/json',
-	//     //   },
-	//     //   body: JSON.stringify({
-	//     //     woodType: selectedWood,
-	//     //     backrest: selectedBackrest,
-	//     //     seat: selectedSeat,
-	//     //   }),
-	//     // });
 
-	//     // if (!response.ok) {
-	//     //   throw new Error('Failed to submit. Please try again.');
-	//     // }
+	const handleSubmit = async () => {
+		// If no item is selected, show an alert
+		if (!selectedModel) {
+			alert("Please select a piece of furniture to checkout.");
+			return;
+		}
 
-	//     // const result = await response.json();
-	//     // console.log('Submission successful:', result);
+		// Prepare the formData based on the selected model
+		let formData;
 
-	//     // // Optional: Reset form or show success message
-	//     // alert('Submission successful!');
-	//   } catch (error) {
-	//     console.error('Error:', error);
-	//     alert('Something went wrong! Please try again.');
-	//   }
-	// };
+		if (selectedModel === "chair") {
+			formData = {
+				model: "chair",
+				selectedBackrest,
+				selectedSeat,
+				selectedWood,
+				quantity,
+				customSize,
+			};
+		} else if (selectedModel === "sofa") {
+			formData = {
+				model: "sofa",
+				selectedBackrest: selectedSofaBackrest,
+				selectedArmrest: selectedSofaArmrest,
+				selectedWood: selectedSofaWood,
+				quantity,
+				customSize,
+			};
+		} else if (selectedModel === "door") {
+			formData = {
+				model: "door",
+				selectedDesign: selectedDoorDesign,
+				selectedWoodType: selectedDoorWoodType,
+				quantity,
+				customSize,
+			};
+		} else {
+			alert("Invalid selection. Please choose a valid piece of furniture.");
+			return;
+		}
+
+		console.log("FormData: ", formData)
+
+		try {
+			// const response = await fetch("/api/submit", {
+			// 	method: "POST",
+			// 	headers: {
+			// 		"Content-Type": "application/json",
+			// 	},
+			// 	body: JSON.stringify(formData),
+			// });
+			// if (!response.ok) {
+			// 	throw new Error("Failed to submit. Please try again.");
+			// }
+			// const result = await response.json();
+			// console.log("Submission successful:", result);
+			// alert("Submission successful!");
+		} catch (error) {
+			console.error("Error:", error);
+			alert("Something went wrong! Please try again.");
+		}
+	};
 
 	return (
 		<div className="flex flex-col h-screen">
@@ -275,7 +321,7 @@ const ProductCustomization = () => {
 					{/* Sofa Customization Controls */}
 					{selectedModel === "sofa" && (
 						<>
-								<div className="bg-white shadow rounded p-4">
+							<div className="bg-white shadow rounded p-4">
 								<h3 className="text-lg font-semibold">Sofa Backrest Options</h3>
 								<div className="flex gap-4 mt-2">
 									{[
@@ -286,9 +332,7 @@ const ProductCustomization = () => {
 									].map((image, index) => (
 										<div
 											key={index}
-											onClick={() =>
-												handleSofaBackrest(`Design ${index + 1}`)
-											}
+											onClick={() => handleSofaBackrest(`Design ${index + 1}`)}
 											className={`cursor-pointer border rounded p-1 ${
 												selectedSofaBackrest === `Design ${index + 1}`
 													? "border-blue-500"
@@ -307,15 +351,10 @@ const ProductCustomization = () => {
 							<div className="bg-white shadow rounded p-4">
 								<h3 className="text-lg font-semibold">Sofa Armrest Options</h3>
 								<div className="flex gap-4 mt-2">
-									{[
-										"Design1.jpg",
-										"Design2.jpg",
-									].map((image, index) => (
+									{["Design1.jpg", "Design2.jpg"].map((image, index) => (
 										<div
 											key={index}
-											onClick={() =>
-												handleSofaArmrest(`Design ${index + 1}`)
-											}
+											onClick={() => handleSofaArmrest(`Design ${index + 1}`)}
 											className={`cursor-pointer border rounded p-1 ${
 												selectedSofaArmrest === `Design ${index + 1}`
 													? "border-blue-500"
@@ -365,7 +404,9 @@ const ProductCustomization = () => {
 									].map((image, index) => (
 										<div
 											key={index}
-											onClick={() => handleDoorDesignChange(`Design ${index + 1}`)}
+											onClick={() =>
+												handleDoorDesignChange(`Design ${index + 1}`)
+											}
 											className={`cursor-pointer border rounded p-1 ${
 												selectedDoorDesign === `Design ${index + 1}`
 													? "border-blue-500"
@@ -398,9 +439,103 @@ const ProductCustomization = () => {
 							</div>
 						</>
 					)}
+
+					{/* Quantity Input for Furniture */}
+					<div className="bg-white shadow rounded p-4 mt-4">
+						<h3 className="text-lg font-semibold">Quantity</h3>
+						<div className="flex items-center space-x-4 mt-2">
+							<button
+								onClick={() => handleQuantityChange(-1)}
+								className="px-4 py-2 bg-gray-300 rounded-full hover:bg-gray-400"
+							>
+								-
+							</button>
+							<input
+								type="number"
+								value={quantity}
+								onChange={(e) => setQuantity(Number(e.target.value))}
+								className="w-16 text-center px-4 py-2 border rounded shadow"
+								min="1"
+							/>
+							<button
+								onClick={() => handleQuantityChange(1)}
+								className="px-4 py-2 bg-gray-300 rounded-full hover:bg-gray-400"
+							>
+								+
+							</button>
+						</div>
+					</div>
+
+					{/* Custom Size Inputs */}
+					<div className="bg-white shadow rounded p-4 mt-4">
+						<h3 className="text-lg font-semibold">Custom Size</h3>
+						<div className="grid grid-cols-2 gap-4 mt-2">
+							<div>
+								<label htmlFor="height" className="block text-sm font-medium">
+									Height <span className="italic font-light text-sm">(inches)</span>
+								</label>
+								<input
+									type="number"
+									id="height"
+									value={customSize.height}
+									onChange={(e) =>
+										setCustomSize({ ...customSize, height: e.target.value })
+									}
+									className="mt-1 px-4 py-2 border rounded shadow w-full"
+									placeholder="Enter Height"
+								/>
+							</div>
+							<div>
+								<label htmlFor="length" className="block text-sm font-medium">
+									Length <span className="italic font-light text-sm">(inches)</span>
+								</label>
+								<input
+									type="number"
+									id="length"
+									value={customSize.length}
+									onChange={(e) =>
+										setCustomSize({ ...customSize, length: e.target.value })
+									}
+									className="mt-1 px-4 py-2 border rounded shadow w-full"
+									placeholder="Enter Length"
+								/>
+							</div>
+							<div>
+								<label htmlFor="width" className="block text-sm font-medium">
+									Width <span className="italic font-light text-sm">(inches)</span>
+								</label>
+								<input
+									type="number"
+									id="width"
+									value={customSize.width}
+									onChange={(e) =>
+										setCustomSize({ ...customSize, width: e.target.value })
+									}
+									className="mt-1 px-4 py-2 border rounded shadow w-full"
+									placeholder="Enter Width"
+								/>
+							</div>
+							<div>
+								<label htmlFor="depth" className="block text-sm font-medium">
+									Depth <span className="italic font-light text-sm">(inches)</span>
+								</label>
+								<input
+									type="number"
+									id="depth"
+									value={customSize.depth}
+									onChange={(e) =>
+										setCustomSize({ ...customSize, depth: e.target.value })
+									}
+									className="mt-1 px-4 py-2 border rounded shadow w-full"
+									placeholder="Enter Depth"
+								/>
+							</div>
+						</div>
+					</div>
+
 					<button
 						type="submit"
-						// onClick={handleSubmit}
+						onClick={handleSubmit}
 						className="px-4 py-2 bg-blue-500 text-white font-bold rounded hover:bg-blue-600 transition"
 					>
 						Checkout
