@@ -1,33 +1,34 @@
 import { useLocation } from "react-router-dom";
 import Header from "./Header";
 import Footer from "./Footer";
+import ProductCard from "./ProductCard"; // Import your ProductCard component
 
-const SearchResults= () => {
+const SearchResults = () => {
   const location = useLocation();
   const searchResults = location.state?.searchResults || [];
-  console.log("Search Results from location.state:", searchResults); 
 
   return (
     <div>
-      <Header/>
-      <div>
-      {searchResults.length > 0 ? (
-        <div>
-          <h2>Search Results:</h2>
-          <ul>
-            {searchResults.map((result) => (
-              <li key={result._id}>
-                <h3>{result.name}</h3>
-                <p>{result.description}</p>
-              </li>
-            ))}
-          </ul>
-        </div>
-      ) : (
-        <p>No results to display</p>
-      )}
+      <Header />
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
+        {searchResults.length > 0 ? (
+          searchResults.map((result) => (
+            <ProductCard
+              key={result._id}
+              id={result._id}
+              images={result.images}
+              name={result.name}
+              price={result.price}
+              description={result.description}
+              showPreOrder={true} // Show Pre-order button
+              
+            />
+          ))
+        ) : (
+          <p>No results to display</p>
+        )}
       </div>
-      <Footer/>
+      <Footer />
     </div>
   );
 };
