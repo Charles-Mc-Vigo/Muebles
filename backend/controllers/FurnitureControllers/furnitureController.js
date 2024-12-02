@@ -7,6 +7,7 @@ const Materials = require("../../models/Furniture/materialsModel");
 const Colors = require("../../models/Furniture/colorModel");
 const Size = require("../../models/Furniture/sizeModel");
 
+
 // Multer setup for handling image uploads in memory
 const upload = multer({
 	storage: multer.memoryStorage(),
@@ -360,3 +361,24 @@ exports.UnArchived = async (req, res) => {
 		res.status(500).json({ error: "Server error!" });
 	}
 };
+exports.searchFurnitureByName = async (req, res) => {
+	const { query } = req.query; // Retrieve the search query from the query string
+	if (!query) {
+	  return res.status(400).json({ message: "Search query is required" });
+	}
+	try {
+	  // Use a case-insensitive regex search to find furniture by name
+	  const furnitureItems = await Furniture.find({
+		name: { $regex: query, $options: 'i' } // 'i' makes the search case-insensitive
+	  });
+  
+	  if (furnitureItems.length === 0) {
+		return res.status(404).json({ message: "No furniture items found" });
+	  }
+  
+	  res.json(furnitureItems); // Send back the found furniture items
+	} catch (error) {
+	  console.error("Error in search:", error);
+	  res.status(500).json({ message: "Error searching for furniture", error });
+	}
+  };

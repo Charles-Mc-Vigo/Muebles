@@ -11,11 +11,14 @@ import {
 import { CgProfile } from "react-icons/cg";
 import { Link } from "react-router-dom";
 import Logout from "./Logout";
+import { useNavigate } from "react-router-dom";
 
 const Header = ({ isLogin, cartCount }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const navigate = useNavigate();
 
   // Close menu when clicking outside
   useEffect(() => {
@@ -53,6 +56,37 @@ const Header = ({ isLogin, cartCount }) => {
   const toggleUserMenu = () => {
     setIsUserMenuOpen(!isUserMenuOpen);
   };
+  const handleSearch = async (e) => {
+    e.preventDefault(); // Prevent form submission
+    
+    if (searchQuery.trim()) {
+      try {
+        const response = await fetch(`http://localhost:3000/api/search?query=${searchQuery}`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+  
+        const data = await response.json();
+        console.log("API Response Data:", data); // Debug log to verify the API response
+  
+        // Ensure the data is passed correctly to the /search-results page
+        if (data.length > 0) {
+          console.log("Passing data to search results:", data); // Log the data before navigation
+          navigate("/search-results", { state: { searchResults: data } });
+        } else {
+          console.log("No results found. Passing empty array.");
+          navigate("/search-results", { state: { searchResults: [] } });
+        }
+  
+      } catch (error) {
+        console.error("Error while searching:", error);
+        navigate("/search-results", { state: { searchResults: [] } }); // Pass empty array in case of error
+      }
+    }
+  };
+  
+  
+  
 
   return (
     <header className=" w-full bg-white shadow-xl rounded-xl ">
@@ -69,17 +103,26 @@ const Header = ({ isLogin, cartCount }) => {
             </Link>
             {/* Search Bar */}
             <div className="flex-1 max-w-2xl">
-              <div className="flex">
-                <input
-                  type="text"
-                  placeholder="What are you looking for?"
-                  className="w-full border border-gray-300 px-4 py-2 rounded-l-md focus:outline-none focus:ring-2 focus:ring-teal-500"
-                />
-                <button className="bg-teal-600 text-white px-6 py-2 rounded-r-md hover:bg-teal-700 transition-colors">
-                  <FaSearch className="text-lg" />
-                </button>
-              </div>
-            </div>
+  <form
+    onSubmit={handleSearch} // Handle form submission
+    className="flex"
+  >
+    <input
+      type="text"
+      placeholder="What are you looking for?"
+      value={searchQuery} // Controlled input
+      onChange={(e) => setSearchQuery(e.target.value)} // Update state with input value
+      className="w-full border border-gray-300 px-4 py-2 rounded-l-md focus:outline-none focus:ring-2 focus:ring-teal-500"
+    />
+    <button
+      type="submit" // Ensures proper form handling
+      className="bg-teal-600 text-white px-6 py-2 rounded-r-md hover:bg-teal-700 transition-colors"
+    >
+      <FaSearch className="text-lg" />
+    </button>
+  </form>
+</div>
+
             {/* Navigation Items */}
             <div className="flex items-center gap-8">
               <Link

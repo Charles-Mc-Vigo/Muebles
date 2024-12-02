@@ -5,7 +5,6 @@ import Header from "../components/Header";
 import { ToastContainer, toast } from "react-toastify";
 import { FaFilter, FaTimes } from "react-icons/fa";
 import Select from "react-select";
-import Slider from "react-slider";
 import "react-toastify/dist/ReactToastify.css";
 
 const Home = () => {
@@ -39,13 +38,6 @@ const Home = () => {
       }
     };
 
-    console.log("furnitureData",furnitureData)
-    console.log("categories",categories)
-    console.log("furniture types",furnitureTypes)
-    console.log("Current items kuno",currentItems)
-
-
-
     const fetchCategories = async () => {
       try {
         const response = await fetch("http://localhost:3000/api/categories");
@@ -58,9 +50,7 @@ const Home = () => {
 
     const fetchFurnitureTypes = async () => {
       try {
-        const response = await fetch(
-          "http://localhost:3000/api/furniture-types"
-        );
+        const response = await fetch("http://localhost:3000/api/furniture-types");
         const data = await response.json();
         setFurnitureTypes(data);
       } catch (error) {
@@ -95,27 +85,28 @@ const Home = () => {
   const incrementCartCount = () => setCartCount((prevCount) => prevCount + 1);
 
   const filteredFurnitureData = useMemo(() => {
-    if (selectedCategories.length === 0 && selectedFurnitureTypes.length === 0 && priceRange[0] === 0 && priceRange[1] === 120000) {
-      return furnitureData; 
+    if (
+      selectedCategories.length === 0 &&
+      selectedFurnitureTypes.length === 0 &&
+      priceRange[0] === 0 &&
+      priceRange[1] === 120000
+    ) {
+      return furnitureData;
     }
-  
     return furnitureData.filter((item) => {
       const categoryMatch =
         selectedCategories.length === 0 ||
         selectedCategories.some((category) =>
           item.category.name.includes(category.value)
         );
-  
       const typeMatch =
         selectedFurnitureTypes.length === 0 ||
         selectedFurnitureTypes.some(
           (type) =>
             item.furnitureType?.name?.toLowerCase() === type.value.toLowerCase()
         );
-  
       const priceMatch =
         item.price >= priceRange[0] && item.price <= priceRange[1];
-  
       return categoryMatch && typeMatch && priceMatch;
     });
   }, [furnitureData, selectedCategories, selectedFurnitureTypes, priceRange]);
@@ -146,8 +137,10 @@ const Home = () => {
     setSelectedFurnitureTypes(selectedOption || []);
   };
 
-  const handlePriceChange = (value) => {
-    setPriceRange(value);
+  const handlePriceRangeChange = (event) => {
+    const value = event.target.value;
+    const [minPrice, maxPrice] = value.split("-").map(Number);
+    setPriceRange([minPrice, maxPrice]);
   };
 
   const customStyles = {
@@ -188,7 +181,7 @@ const Home = () => {
       </div>
     );
   }
-
+  
   if (error) {
     showToast(error, "error"); // Show toast notification on error
     return (
@@ -201,8 +194,7 @@ const Home = () => {
   const FilterContent = () => (
     <div className="flex flex-col flex-wrap justify-between w-full">
       {/* Filter Categories */}
-
-      <div className="w-full lg:w-3/4 xl:w-2/3 mb-5  p-2">
+      <div className="w-full lg:w-3/4 xl:w-2/3 mb-5 p-2">
         <h2 className="text-xl text-justify font-semibold mb-2">Categories</h2>
         <Select
           isMulti
@@ -217,7 +209,7 @@ const Home = () => {
         />
       </div>
       {/* Filter Furniture Types */}
-      <div className="w-full lg:w-5/6 xl:w-3/4 mb-5  p-2">
+      <div className="w-full lg:w-5/6 xl:w-3/4 mb-5 p-2">
         <h2 className="text-xl font-semibold mb-2 whitespace-nowrap ">
           Furniture Types
         </h2>
@@ -233,29 +225,27 @@ const Home = () => {
           styles={customStyles}
         />
       </div>
+      {/* Price Range Dropdown */}
       <div className="w-full lg:w-5/6 xl:w-3/4">
         <h1 className="text-xl font-semibold mb-1">Price Range</h1>
-        <Slider
-          min={0}
-          max={120000}
-          step={100}
-          value={priceRange}
-          onChange={handlePriceChange}
-          range
-          renderTrack={(props, state) => (
-            <div {...props} className="bg-gray-500" />
-          )}
-          renderThumb={(props, state) => (
-            <div
-              {...props}
-              className="bg-teal-600 w-4 h-4 rounded-full border-2"
-            />
-          )}
-        />
-        <div className="flex justify-between gap-5 mt-5 items-baseline border-t-2">
-          <span>₱{priceRange[0]}</span>
-          <span>₱{priceRange[1]}</span>
-        </div>
+        <select
+          value={`${priceRange[0]}-${priceRange[1]}`} // Set the value to the current price range
+          onChange={handlePriceRangeChange}
+          className="border border-gray-300 rounded p-2"
+        >
+          <option value="0-10000">₱0 - ₱10,000</option>
+          <option value="10001-20000">₱10,001 - ₱20,000</option>
+          <option value="20001-30000">₱20,001 - ₱30,000</option>
+          <option value="30001-40000">₱30,001 - ₱40,000</option>
+          <option value="40001-50000">₱40,001 - ₱50,000</option>
+          <option value="50001-60000">₱50,001 - ₱60,000</option>
+          <option value="60001-70000">₱60,001 - ₱70,000</option>
+          <option value="70001-80000">₱70,001 - ₱80,000</option>
+          <option value="80001-90000">₱80,001 - ₱90,000</option>
+          <option value="90001-100000">₱90,001 - ₱100,000</option>
+          <option value="100001-120000">₱100,001 - ₱120,000</option>
+          <option value="120001-150000">₱120,001 - ₱150,000</option>
+        </select>
       </div>
     </div>
   );
@@ -315,14 +305,11 @@ const Home = () => {
                   <FaTimes className="text-3xl" />
                 </button>
               </div>
-
               {/* FilterSection in Main */}
               <div className="mt-5 p-2 gap-2 flex-col">
                 <div className="flex items-baseline mb-2">
                   <FaFilter className="text-2xl mb-1 text-teal-600 " />
-                  <h1 className="text-2xl text-justify font-semibold px-2">
-                    Filter
-                  </h1>
+                  <h1 className="text-2xl text-justify font-semibold px-2">Filter</h1>
                 </div>
                 <FilterContent />
               </div>

@@ -4,6 +4,7 @@ import { faBars, faUser, faCog, faSignOutAlt, faTimes } from "@fortawesome/free-
 import { Link } from "react-router-dom";
 import Logout from "../components/Logout";
 
+
 const HamburgerMenu = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [profile, setProfile] = useState(null);
