@@ -62,17 +62,17 @@ const About = () => {
         </div>
       </section>
       <div className="justify-evenly flex w-full  h-1/2 bg-teal-500 mb-5">
-        <h1 className="text-3xl font-bold border-r-2 p-2 border-teal-600 my-4 ">
+        <h1 className="text-3xl font-bold text-white border-r-2 p-2 border-white my-4 ">
           100+
           <p className="text-xl font-normal">Customer Satisfied</p>
         </h1>
-        <h1 className="text-3xl font-bold border-r-2 p-2 border-teal-600 my-4">
+        <h1 className="text-3xl font-bold text-white border-r-2 p-2 border-white my-4">
           80%
-          <p className="text-xl font-normal">Ratings of our Services</p>
+          <p className="text-xl font-normal text-white">Ratings of our Services</p>
         </h1>
-        <h1 className="text-3xl font-bold border-r-2 p-2 border-teal-600 my-4 ">
+        <h1 className="text-3xl font-bold border-r-2 p-2 text-white border-white my-4 ">
           70%
-          <p className="text-xl font-normal">Customer Retention Success</p>
+          <p className="text-xl font-normal text-white">Customer Retention Success</p>
         </h1>
       </div>
       {/* core values */}
@@ -89,7 +89,7 @@ const About = () => {
             commitment to quality and integrity.
           </p>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 p-2 gap-5 bg-teal-300 w-full ">
+        <div className="grid grid-cols-1 md:grid-cols-3 p-2 gap-5 bg-teal-500 w-full ">
           <div className="flex flex-col items-center text-center bg-white p-4 rounded-lg shadow-md hover:scale-90 transition-transform duration-300 ">
             <img
               src="/Advertisement/aboutsicon/Integrity.png"

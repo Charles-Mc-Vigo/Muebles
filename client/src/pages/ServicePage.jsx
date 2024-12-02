@@ -45,7 +45,7 @@ const ServicePage = () => {
                 <div className="text-4xl">{service.icon}</div>
                 <h2 className="text-2xl font-semibold">{service.category}</h2>
               </div>
-              <p className="text-black text-xl text-justify">{service.description}</p>
+              <p className="text-gray-700">{service.description}</p>
             </div>
           ))}
         </div>
