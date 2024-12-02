@@ -15,7 +15,7 @@ const CheckoutCustomization = () => {
 	}
 
 	const { model, quantity, size } = formData;
-	console.log(size)
+	console.log("Form Data :", formData);
 
 	// State for payment option, method, delivery mode, and proof of payment
 	const [paymentOption, setPaymentOption] = useState(
@@ -72,39 +72,43 @@ const CheckoutCustomization = () => {
 	// Function to handle order creation using fetch
 	const createCustomizationOrder = async () => {
 		try {
+			const furnitureDetails = {
+				model,
+				quantity,
+				selectedBackrest: formData.selectedBackrest,
+				selectedSeat: formData.selectedSeat,
+				selectedDesign: formData.selectedDesign,
+				selectedWoodType: formData.selectedWoodType,
+			};
+	
+			// Conditionally add selectedArmrest if the model is not a chair
+			if (model !== "chair") {
+				furnitureDetails.selectedDesign = formData.selectedDesign;
+			}
+	
 			const orderData = {
-				user: formData.user,
-				furnitureDetails: {
-					model,
-					quantity,
-					selectedBackrest: formData.selectedBackrest,
-					selectedSeat: formData.selectedSeat,
-					selectedArmrest: formData.selectedArmrest,
-					selectedWood: formData.selectedWood,
-					selectedDesign: formData.selectedDesign,
-					selectedWoodType: formData.selectedWoodType,
-				},
+				user: user,
+				furnitureDetails,
 				size,
 				paymentMethod,
 				paymentOption,
 				proofOfPayment,
 				deliveryMode,
 			};
-
-			const response = await fetch("/api/orders", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify(orderData),
-			});
-
-			if (!response.ok) {
-				throw new Error("Failed to create order");
-			}
-
-			const responseData = await response.json();
-			console.log("Order created successfully:", responseData);
+	
+			// Uncomment the following lines to make the API call
+			// const response = await fetch("/api/orders", {
+			// 	method: "POST",
+			// 	headers: {
+			// 		"Content-Type": "application/json",
+			// 	},
+			// 	body: JSON.stringify(orderData),
+			// });
+			// if (!response.ok) {
+			// 	throw new Error("Failed to create order");
+			// }
+			// const responseData = await response.json();
+			console.log("Order created successfully:", orderData);
 		} catch (error) {
 			console.error("Error creating order:", error);
 		}
@@ -183,7 +187,7 @@ const CheckoutCustomization = () => {
 							</>
 						)}
 						<div className="space-y-2">
-							<h2 className="text-xl font-semibold mb-4">Custom Size</h2>
+							<h2 className="text-xl font-semibold mb-4">Size</h2>
 							<p>
 								<strong>Name:</strong> {size?.name || "Not specified"}
 							</p>

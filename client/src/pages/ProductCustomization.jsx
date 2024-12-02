@@ -90,8 +90,6 @@ const ProductCustomization = () => {
 		});
 	};
 
-	console.log(selectedSize)
-
 	// Handlers for each part selection
 	const handleBackrestChange = (design) => {
 		if (selectedModel === "chair") setSelectedBackrest(design);
@@ -155,25 +153,25 @@ const ProductCustomization = () => {
 			formData = {
 				model: "chair",
 				selectedBackrest: selectedBackrest,
-				selectedSeat :  selectedSeat,
-				selectedWood : selectedWood,
+				selectedSeat: selectedSeat,
+				selectedWood: selectedWood,
 				quantity,
 				size: selectedSize || customSize,
 			};
 		} else if (selectedModel === "sofa") {
 			formData = {
 				model: "sofa",
-				selectedBackrest: selectedSofaBackrest,
-				selectedArmrest: selectedSofaArmrest,
-				selectedWood: selectedSofaWood,
+				selectedSofaBackrest: selectedSofaBackrest,
+				selectedSofaArmrest: selectedSofaArmrest,
+				selectedSofaWood: selectedSofaWood,
 				quantity,
 				size: selectedSize || customSize,
 			};
 		} else if (selectedModel === "door") {
 			formData = {
 				model: "door",
-				selectedDesign: selectedDoorDesign,
-				selectedWoodType: selectedDoorWoodType,
+				selectedDoorDesign: selectedDoorDesign,
+				selectedDoorWoodType: selectedDoorWoodType,
 				quantity,
 				size: selectedSize || customSize,
 			};
@@ -483,6 +481,322 @@ const ProductCustomization = () => {
 					</div>
 
 					{selectedModel === "chair" && (
+						<div className="bg-gray-50 shadow rounded p-6 mt-6">
+							<h3 className="text-xl font-bold text-gray-800 mb-4">
+								Available Chair Sizes
+							</h3>
+							<div className="flex justify-end">
+								<button
+									onClick={toggleCustomSize}
+									className="px-4 py-2 mb-4 text-sm text-white bg-blue-600 rounded hover:bg-blue-700"
+								>
+									{isCustomSizeVisible
+										? "Return to Sizes"
+										: "Customize your own size!"}
+								</button>
+							</div>
+							{isCustomSizeVisible ? (
+								<div className="bg-white shadow rounded p-4 mt-4">
+									<h3 className="text-lg font-semibold">Custom Size</h3>
+									<div className="grid grid-cols-2 gap-4 mt-2">
+										<div>
+											<label
+												htmlFor="height"
+												className="block text-sm font-medium"
+											>
+												Height{" "}
+												<span className="italic font-light text-sm">
+													(inches)
+												</span>
+											</label>
+											<input
+												type="number"
+												id="height"
+												value={customSize.height}
+												onChange={(e) =>
+													setCustomSize({
+														...customSize,
+														height: e.target.value,
+													})
+												}
+												className="mt-1 px-4 py-2 border rounded shadow w-full"
+												placeholder="Enter Height"
+											/>
+										</div>
+										<div>
+											<label
+												htmlFor="length"
+												className="block text-sm font-medium"
+											>
+												Length{" "}
+												<span className="italic font-light text-sm">
+													(inches)
+												</span>
+											</label>
+											<input
+												type="number"
+												id="length"
+												value={customSize.length}
+												onChange={(e) =>
+													setCustomSize({
+														...customSize,
+														length: e.target.value,
+													})
+												}
+												className="mt-1 px-4 py-2 border rounded shadow w-full"
+												placeholder="Enter Length"
+											/>
+										</div>
+										<div>
+											<label
+												htmlFor="width"
+												className="block text-sm font-medium"
+											>
+												Width{" "}
+												<span className="italic font-light text-sm">
+													(inches)
+												</span>
+											</label>
+											<input
+												type="number"
+												id="width"
+												value={customSize.width}
+												onChange={(e) =>
+													setCustomSize({
+														...customSize,
+														width: e.target.value,
+													})
+												}
+												className="mt-1 px-4 py-2 border rounded shadow w-full"
+												placeholder="Enter Width"
+											/>
+										</div>
+										<div>
+											<label
+												htmlFor="depth"
+												className="block text-sm font-medium"
+											>
+												Depth{" "}
+												<span className="italic font-light text-sm">
+													(inches)
+												</span>
+											</label>
+											<input
+												type="number"
+												id="depth"
+												value={customSize.depth}
+												onChange={(e) =>
+													setCustomSize({
+														...customSize,
+														depth: e.target.value,
+													})
+												}
+												className="mt-1 px-4 py-2 border rounded shadow w-full"
+												placeholder="Enter Depth"
+											/>
+										</div>
+									</div>
+								</div>
+							) : (
+								<ul className="mt-4 grid gap-4 sm:grid-cols-1">
+									{Object.entries(chairSizes).map(
+										([key, { name, dimensions }]) => (
+											<li
+												key={key}
+												onClick={() => setSelectedSize({ name, dimensions })}
+												className={`border p-4 rounded-lg shadow-sm transition-shadow cursor-pointer ${
+													selectedSize?.name === name
+														? "border-blue-600 bg-blue-50 shadow-md"
+														: "border-gray-200 hover:shadow-md"
+												}`}
+											>
+												<h4
+													className={`text-lg font-semibold ${
+														selectedSize?.name === name
+															? "text-blue-600"
+															: "text-gray-700"
+													}`}
+												>
+													{name}
+												</h4>
+												<p className="text-sm text-gray-600">
+													<span className="font-medium">Height:</span>{" "}
+													{dimensions.height}"
+												</p>
+												<p className="text-sm text-gray-600">
+													<span className="font-medium">Width:</span>{" "}
+													{dimensions.width}"
+												</p>
+												<p className="text-sm text-gray-600">
+													<span className="font-medium">Depth:</span>{" "}
+													{dimensions.depth}"
+												</p>
+											</li>
+										)
+									)}
+								</ul>
+							)}
+						</div>
+					)}
+					{selectedModel === "sofa" && (
+						<div className="bg-gray-50 shadow rounded p-6 mt-6">
+							<h3 className="text-xl font-bold text-gray-800 mb-4">
+								Available Sofa Sizes
+							</h3>
+							<div className="flex justify-end">
+								<button
+									onClick={toggleCustomSize}
+									className="px-4 py-2 mb-4 text-sm text-white bg-blue-600 rounded hover:bg-blue-700"
+								>
+									{isCustomSizeVisible
+										? "Return to Sizes"
+										: "Customize your own size!"}
+								</button>
+							</div>
+							{isCustomSizeVisible ? (
+								<div className="bg-white shadow rounded p-4 mt-4">
+									<h3 className="text-lg font-semibold">Custom Size</h3>
+									<div className="grid grid-cols-2 gap-4 mt-2">
+										<div>
+											<label
+												htmlFor="height"
+												className="block text-sm font-medium"
+											>
+												Height{" "}
+												<span className="italic font-light text-sm">
+													(inches)
+												</span>
+											</label>
+											<input
+												type="number"
+												id="height"
+												value={customSize.height}
+												onChange={(e) =>
+													setCustomSize({
+														...customSize,
+														height: e.target.value,
+													})
+												}
+												className="mt-1 px-4 py-2 border rounded shadow w-full"
+												placeholder="Enter Height"
+											/>
+										</div>
+										<div>
+											<label
+												htmlFor="length"
+												className="block text-sm font-medium"
+											>
+												Length{" "}
+												<span className="italic font-light text-sm">
+													(inches)
+												</span>
+											</label>
+											<input
+												type="number"
+												id="length"
+												value={customSize.length}
+												onChange={(e) =>
+													setCustomSize({
+														...customSize,
+														length: e.target.value,
+													})
+												}
+												className="mt-1 px-4 py-2 border rounded shadow w-full"
+												placeholder="Enter Length"
+											/>
+										</div>
+										<div>
+											<label
+												htmlFor="width"
+												className="block text-sm font-medium"
+											>
+												Width{" "}
+												<span className="italic font-light text-sm">
+													(inches)
+												</span>
+											</label>
+											<input
+												type="number"
+												id="width"
+												value={customSize.width}
+												onChange={(e) =>
+													setCustomSize({
+														...customSize,
+														width: e.target.value,
+													})
+												}
+												className="mt-1 px-4 py-2 border rounded shadow w-full"
+												placeholder="Enter Width"
+											/>
+										</div>
+										<div>
+											<label
+												htmlFor="depth"
+												className="block text-sm font-medium"
+											>
+												Depth{" "}
+												<span className="italic font-light text-sm">
+													(inches)
+												</span>
+											</label>
+											<input
+												type="number"
+												id="depth"
+												value={customSize.depth}
+												onChange={(e) =>
+													setCustomSize({
+														...customSize,
+														depth: e.target.value,
+													})
+												}
+												className="mt-1 px-4 py-2 border rounded shadow w-full"
+												placeholder="Enter Depth"
+											/>
+										</div>
+									</div>
+								</div>
+							) : (
+								<ul className="mt-4 grid gap-4 sm:grid-cols-1">
+									{Object.entries(chairSizes).map(
+										([key, { name, dimensions }]) => (
+											<li
+												key={key}
+												onClick={() => setSelectedSize({ name, dimensions })}
+												className={`border p-4 rounded-lg shadow-sm transition-shadow cursor-pointer ${
+													selectedSize?.name === name
+														? "border-blue-600 bg-blue-50 shadow-md"
+														: "border-gray-200 hover:shadow-md"
+												}`}
+											>
+												<h4
+													className={`text-lg font-semibold ${
+														selectedSize?.name === name
+															? "text-blue-600"
+															: "text-gray-700"
+													}`}
+												>
+													{name}
+												</h4>
+												<p className="text-sm text-gray-600">
+													<span className="font-medium">Height:</span>{" "}
+													{dimensions.height}"
+												</p>
+												<p className="text-sm text-gray-600">
+													<span className="font-medium">Width:</span>{" "}
+													{dimensions.width}"
+												</p>
+												<p className="text-sm text-gray-600">
+													<span className="font-medium">Depth:</span>{" "}
+													{dimensions.depth}"
+												</p>
+											</li>
+										)
+									)}
+								</ul>
+							)}
+						</div>
+					)}
+					{selectedModel === "door" && (
 						<div className="bg-gray-50 shadow rounded p-6 mt-6">
 							<h3 className="text-xl font-bold text-gray-800 mb-4">
 								Available Chair Sizes
