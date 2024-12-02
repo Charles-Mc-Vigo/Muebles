@@ -1,47 +1,62 @@
-import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
+import Header from "./Header";
+import Footer from "./Footer";
+import { useNavigate } from "react-router-dom"; // Use for navigation (optional for pre-order action)
 
 const SearchResults = () => {
   const location = useLocation();
-  const [results, setResults] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const searchResults = location.state?.searchResults || [];
+  const navigate = useNavigate(); // Navigate hook if needed for pre-order or details page
 
-  // Extract the query from the URL
-  const query = new URLSearchParams(location.search).get("query");
-
-  useEffect(() => {
-    if (query) {
-      fetch(`/api/furnitures/search?query=${query}`)
-        .then((response) => response.json())
-        .then((data) => {
-          setResults(data);
-          setIsLoading(false);
-        })
-        .catch((error) => {
-          console.error("Error fetching search results:", error);
-          setIsLoading(false);
-        });
-    }
-  }, [query]);
+  // Handle pre-order button click
+  const handlePreOrder = (productId) => {
+    // Example: Navigate to a pre-order page or trigger any other action
+    console.log("Pre-order clicked for product ID:", productId);
+    // navigate(`/pre-order/${productId}`); // Optionally, navigate to a specific pre-order page
+  };
 
   return (
-    <div className="max-w-7xl mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Search Results</h1>
-      {isLoading ? (
-        <p>Loading...</p>
-      ) : results.length > 0 ? (
-        <ul>
-          {results.map((item) => (
-            <li key={item._id} className="border p-4 rounded mb-2">
-              <h3 className="text-lg font-bold">{item.name}</h3>
-              <p>Category ID: {item.categoryId}</p>
-              <p>Materials: {item.materials.join(", ")}</p>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p>No results found for "{query}".</p>
-      )}
+    <div>
+      <Header />
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
+        {searchResults.length > 0 ? (
+          searchResults.map((result) => (
+            <div
+              key={result._id}
+              className="bg-white border border-gray-200 rounded-lg shadow-lg p-4 hover:shadow-xl transition-all cursor-pointer"
+            >
+              <div className="flex flex-col items-center">
+                {/* Image */}
+                <img
+                  src={result.images[0]} // Assuming the first image is the main one
+                  alt={result.name}
+                  className="w-full h-48 object-cover mb-4 rounded-md"
+                />
+
+                {/* Product Name */}
+                <h3 className="text-xl font-semibold text-gray-800">{result.name}</h3>
+
+                {/* Price */}
+                <p className="text-lg text-teal-600 font-bold mb-4">${result.price}</p>
+
+                {/* Description (optional) */}
+                <p className="text-gray-600 text-sm mb-4">{result.description}</p>
+
+                {/* Pre-order Button */}
+                <button
+                  onClick={() => handlePreOrder(result._id)}
+                  className="bg-teal-600 text-white px-6 py-2 rounded-md hover:bg-teal-700 transition-colors"
+                >
+                  Pre-order
+                </button>
+              </div>
+            </div>
+          ))
+        ) : (
+          <p>No results to display</p>
+        )}
+      </div>
+      <Footer />
     </div>
   );
 };
