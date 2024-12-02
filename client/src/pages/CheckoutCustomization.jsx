@@ -14,7 +14,8 @@ const CheckoutCustomization = () => {
 		);
 	}
 
-	const { model, quantity, customSize } = formData;
+	const { model, quantity, size } = formData;
+	console.log(size)
 
 	// State for payment option, method, delivery mode, and proof of payment
 	const [paymentOption, setPaymentOption] = useState(
@@ -83,7 +84,7 @@ const CheckoutCustomization = () => {
 					selectedDesign: formData.selectedDesign,
 					selectedWoodType: formData.selectedWoodType,
 				},
-				customSize,
+				size,
 				paymentMethod,
 				paymentOption,
 				proofOfPayment,
@@ -184,16 +185,19 @@ const CheckoutCustomization = () => {
 						<div className="space-y-2">
 							<h2 className="text-xl font-semibold mb-4">Custom Size</h2>
 							<p>
-								<strong>Height:</strong> {customSize.height} inches
+								<strong>Name:</strong> {size?.name || "Not specified"}
 							</p>
 							<p>
-								<strong>Length:</strong> {customSize.length} inches
+								<strong>Height:</strong> {size.height || size.dimensions?.height} inches
 							</p>
 							<p>
-								<strong>Width:</strong> {customSize.width} inches
+								<strong>Length:</strong> {size.length || size.dimensions?.length} inches
 							</p>
 							<p>
-								<strong>Depth:</strong> {customSize.depth} inches
+								<strong>Width:</strong> {size.width || size.dimensions?.width} inches
+							</p>
+							<p>
+								<strong>Depth:</strong> {size.depth || size.dimensions?.depth} inches
 							</p>
 						</div>
 					</div>

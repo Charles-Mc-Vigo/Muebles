@@ -68,7 +68,7 @@ const ProductCustomization = () => {
 	const [selectedSofaArmrest, setSelectedSofaArmrest] = useState("");
 	const [selectedSofaWood, setSelectedSofaWood] = useState("");
 	const [quantity, setQuantity] = useState(1); // Initial quantity set to 1
-	const [size, setSize] = useState(null);
+	const [selectedSize, setSelectedSize] = useState(null);
 	const [isCustomSizeVisible, setCustomSizeVisible] = useState(false);
 
 	const toggleCustomSize = () => {
@@ -89,6 +89,8 @@ const ProductCustomization = () => {
 			return newQuantity > 0 ? newQuantity : 1; // Prevent negative quantity
 		});
 	};
+
+	console.log(selectedSize)
 
 	// Handlers for each part selection
 	const handleBackrestChange = (design) => {
@@ -152,11 +154,11 @@ const ProductCustomization = () => {
 		if (selectedModel === "chair") {
 			formData = {
 				model: "chair",
-				selectedBackrest,
-				selectedSeat,
-				selectedWood,
+				selectedBackrest: selectedBackrest,
+				selectedSeat :  selectedSeat,
+				selectedWood : selectedWood,
 				quantity,
-				customSize,
+				size: selectedSize || customSize,
 			};
 		} else if (selectedModel === "sofa") {
 			formData = {
@@ -165,7 +167,7 @@ const ProductCustomization = () => {
 				selectedArmrest: selectedSofaArmrest,
 				selectedWood: selectedSofaWood,
 				quantity,
-				customSize,
+				size: selectedSize || customSize,
 			};
 		} else if (selectedModel === "door") {
 			formData = {
@@ -173,12 +175,12 @@ const ProductCustomization = () => {
 				selectedDesign: selectedDoorDesign,
 				selectedWoodType: selectedDoorWoodType,
 				quantity,
-				customSize,
+				size: selectedSize || customSize,
 			};
 		}
 
 		console.log("FormData: ", formData);
-		navigate("/customize-product/pre-order", { state: formData });
+		navigate("/customize-product/checkout", { state: formData });
 	};
 
 	return (
@@ -457,7 +459,7 @@ const ProductCustomization = () => {
 					{/* Quantity Input for Furniture */}
 					<div className="bg-white shadow w-full flex justify-center rounded p-4 mt-4">
 						<div className="flex items-center space-x-4 mt-2">
-						<h3 className="text-lg font-semibold">Quantity</h3>
+							<h3 className="text-lg font-semibold">Quantity</h3>
 							<button
 								onClick={() => handleQuantityChange(-1)}
 								className="px-4 py-2 bg-gray-300 rounded-full hover:bg-gray-400"
@@ -603,9 +605,20 @@ const ProductCustomization = () => {
 										([key, { name, dimensions }]) => (
 											<li
 												key={key}
-												className="border border-gray-200 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow"
+												onClick={() => setSelectedSize({ name, dimensions })}
+												className={`border p-4 rounded-lg shadow-sm transition-shadow cursor-pointer ${
+													selectedSize?.name === name
+														? "border-blue-600 bg-blue-50 shadow-md"
+														: "border-gray-200 hover:shadow-md"
+												}`}
 											>
-												<h4 className="text-lg font-semibold text-gray-700">
+												<h4
+													className={`text-lg font-semibold ${
+														selectedSize?.name === name
+															? "text-blue-600"
+															: "text-gray-700"
+													}`}
+												>
 													{name}
 												</h4>
 												<p className="text-sm text-gray-600">
@@ -625,6 +638,20 @@ const ProductCustomization = () => {
 									)}
 								</ul>
 							)}
+						</div>
+					)}
+
+					{/* Display Selected Material Price */}
+					{selectedModel === "chair" && selectedWood && (
+						<div>
+							<div className="mt-4">
+								<p className="text-sm font-medium">
+									Material Price:{" "}
+									<span className="text-gray-800 font-semibold">
+										${chairMaterials[selectedWood]?.price}
+									</span>
+								</p>
+							</div>
 						</div>
 					)}
 

@@ -46,6 +46,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import PreOrder from "./pages/PreOrder";
 import Rating from "./pages/Rating";
 import GenerateReport from "./components/GenerateReport";
+import CheckoutCustomization from "./pages/CheckoutCustomization";
 // import LoadingSpinner from "./components/LoadingSpinner";
 
 export default function App() {
@@ -105,6 +106,10 @@ export default function App() {
 						path="/pre-order/:furnitureId"
 						element={<ProtectedRoute element={PreOrder} />}
 					/>
+					<Route
+						path="/customize-product/checkout"
+						element={<ProtectedRoute element={CheckoutCustomization} />}
+					/>
 					<Route path="/cart" element={<ProtectedRoute element={Cart} />} />
 					<Route path="/delivery-info" element={<DeliveryInfo />} />
 					<Route
@@ -146,7 +151,9 @@ export default function App() {
 					/>
 					<Route
 						path={`/generate-report`}
-						element={<ProtectedRoute element={GenerateReport} adminOnly={true} />}
+						element={
+							<ProtectedRoute element={GenerateReport} adminOnly={true} />
+						}
 					/>
 					<Route
 						path="/dashboard/setting/admin-profile/view"
