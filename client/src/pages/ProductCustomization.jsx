@@ -327,7 +327,7 @@ const ProductCustomization = () => {
     }
 
     console.log("FormData: ", formData);
-    // navigate("/customize-product/checkout", { state: formData });
+    navigate("/customize-product/checkout", { state: formData });
 };
 
 
