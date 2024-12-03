@@ -338,7 +338,7 @@ export default function SignUp() {
 		<div className="min-h-screen flex flex-col bg-gray-100">
 			<Header />
 			<div className="flex-grow flex justify-center items-center mb-3 mt-5">
-				<div className="w-full max-w-4xl p-8 mx-4 md:mx-auto bg-white shadow-lg rounded-lg flex flex-col md:flex-row border-4 border-teal-500">
+				<div className="w-full max-w-4xl p-8 mx-4 md:mx-auto bg-white shadow-lg rounded-lg flex flex-col md:flex-row border-4 border-green-500">
 					
 					{/* Left side with background image */}
 					<div
@@ -529,8 +529,8 @@ export default function SignUp() {
 							</div>
 							<button
 								type="submit"
-								className={`p-3 rounded-lg text-white font-bold uppercase hover:hover:bg-teal-700 ${
-									loading ? "bg-teal-500" : "bg-teal-500"
+								className={`p-3 rounded-lg text-white font-bold uppercase hover:hover:bg-green-700 ${
+									loading ? "bg-green-500" : "bg-green-500"
 								}`}
 								disabled={loading}
 							>

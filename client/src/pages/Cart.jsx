@@ -268,14 +268,14 @@ const Cart = () => {
 		<div className="flex flex-col min-h-screen">
 			<Header isLogin={true} cartCount={true} />
 			<main className="flex-grow w-2/4 mx-auto p-4 mt-5">
-				<div className="flex items-center mb-4 gap-5 border-b-2 border-teal-600">
+				<div className="flex items-center mb-4 gap-5 border-b-2 border-green-600">
 					<button
 						onClick={() => navigate(-1)}
-						className="text-gray-500 mr-2 hover:text-teal-600"
+						className="text-gray-500 mr-2 hover:text-green-600"
 					>
 						<IoMdArrowRoundBack size={40} />
 					</button>
-					<h2 className="text-2xl font-semibold text-teal-600">Your Cart</h2>
+					<h2 className="text-2xl font-semibold text-green-600">Your Cart</h2>
 					<button
 						onClick={clearCart}
 						disabled={loading}
@@ -285,7 +285,7 @@ const Cart = () => {
 					</button>
 				</div>
 				{items.length === 0 ? (
-					<p className="text-center font-bold text-2xl text-teal-600">
+					<p className="text-center font-bold text-2xl text-green-600">
 						Your cart is empty.
 					</p>
 				) : (
@@ -294,7 +294,7 @@ const Cart = () => {
 						<div className="bg-white shadow-2xl mt-2 border-t rounded-2xl">
 							<div className="mt-2 p-2 flex items-center text-black font-medium">
 								<div className="flex flex-grow mr-2">
-									<FaLocationDot className="mr-2 text-teal-600 text-xl" />
+									<FaLocationDot className="mr-2 text-green-600 text-xl" />
 									<div className="flex items-center">
 										{user.firstname || "N/A"} {user.lastname || "N/A"}{" "}
 										{user.phoneNumber || "N/A"}
@@ -318,7 +318,7 @@ const Cart = () => {
 								)}
 								<button
 									onClick={() => navigate("/address/new")}
-									className="text-teal-600 flex items-center font-semibold mr-5"
+									className="text-green-600 flex items-center font-semibold mr-5"
 								>
 									<MdOutlineKeyboardArrowRight
 										style={{ fontSize: "3rem" }}
@@ -329,8 +329,8 @@ const Cart = () => {
 						</div>
 						{/* Product information & delivery */}
 						<div className="py-4 mt-2 bg-white rounded-xl border-t ">
-							<div className="flex text-2xl font-semibold border-b border-teal-500">
-								<BsShop className="text-2xl text-teal-600 ml-2" />
+							<div className="flex text-2xl font-semibold border-b border-green-500">
+								<BsShop className="text-2xl text-green-600 ml-2" />
 								<h1 className="text-2xl ml-2">JCKAME</h1>
 							</div>
 							<div>
@@ -402,7 +402,7 @@ const Cart = () => {
 														)}
 													</p>
 													<button
-														className="ml-4 text-teal-600 hover:teal-red-800"
+														className="ml-4 text-green-600 hover:green-red-800"
 														onClick={() => removeItem(item.furnitureId._id)}
 													>
 														Remove
@@ -414,9 +414,9 @@ const Cart = () => {
 								</ul>
 							</div>
 							{/* Delivery Method  */}
-							<div className="flex flex-col pl-2  border rounded-xl shadow-xl border-teal-500">
+							<div className="flex flex-col pl-2  border rounded-xl shadow-xl border-green-500">
 								<div className="flex items-center text-xl font-semibold ml-4 mb-5 px-3 py-2">
-									<FaTruckFast className="mr-2 text-teal-600" />
+									<FaTruckFast className="mr-2 text-green-600" />
 									<span>Delivery Option:</span>
 								</div>
 								<div className="flex gap-3 text-lg font-normal pr-2 ml-6 mb-2">
@@ -505,8 +505,8 @@ const Cart = () => {
 									onClick={(event) => handlePaymentMethodClick("GCash", event)}
 									className={`rounded relative p-2 transition-all duration-200 ${
 										selectedPaymentMethod === "GCash"
-											? "border-2 border-teal-600 bg-white shadow-lg transform scale-105"
-											: "border border-gray-300 bg-slate-200 hover:border-teal-400"
+											? "border-2 border-green-600 bg-white shadow-lg transform scale-105"
+											: "border border-gray-300 bg-slate-200 hover:border-green-400"
 									}`}
 								>
 									<img
@@ -515,7 +515,7 @@ const Cart = () => {
 										className="w-20 h-20 object-contain rounded"
 									/>
 									{selectedPaymentMethod === "GCash" && (
-										<div className="absolute -top-2 -right-2 w-6 h-6 bg-teal-600 rounded-full flex items-center justify-center">
+										<div className="absolute -top-2 -right-2 w-6 h-6 bg-green-600 rounded-full flex items-center justify-center">
 											<span className="text-white text-sm">✓</span>
 										</div>
 									)}
@@ -526,8 +526,8 @@ const Cart = () => {
 									onClick={(event) => handlePaymentMethodClick("Maya", event)}
 									className={`rounded relative p-2 transition-all duration-200 ${
 										selectedPaymentMethod === "Maya"
-											? "border-2 border-teal-600 bg-white shadow-lg transform scale-105"
-											: "border border-gray-300 bg-slate-200 hover:border-teal-400"
+											? "border-2 border-green-600 bg-white shadow-lg transform scale-105"
+											: "border border-gray-300 bg-slate-200 hover:border-green-400"
 									}`}
 								>
 									<img
@@ -536,7 +536,7 @@ const Cart = () => {
 										className="w-20 h-20 object-contain rounded"
 									/>
 									{selectedPaymentMethod === "Maya" && (
-										<div className="absolute -top-2 -right-2 w-6 h-6 bg-teal-600 rounded-full flex items-center justify-center">
+										<div className="absolute -top-2 -right-2 w-6 h-6 bg-green-600 rounded-full flex items-center justify-center">
 											<span className="text-white text-sm">✓</span>
 										</div>
 									)}
@@ -565,13 +565,13 @@ const Cart = () => {
 									</div>
 									{/* Image Upload Section */}
 									<div className="flex-1 max-w-md pt-5">
-										<h2 className="text-2xl font-semibold text-teal-600 mb-4">
+										<h2 className="text-2xl font-semibold text-green-600 mb-4">
 											Upload Proof of Payment
 										</h2>
 										<input
 											type="file"
 											onChange={handleFileUpload}
-											className="mb-4 w-full border border-gray-300 rounded-md px-3 py-2 text-gray-600 focus:border-teal-600 focus:ring-teal-500"
+											className="mb-4 w-full border border-gray-300 rounded-md px-3 py-2 text-gray-600 focus:border-green-600 focus:ring-green-500"
 										/>
 										{uploadMessage && <p>{uploadMessage}</p>}
 									</div>
@@ -592,13 +592,13 @@ const Cart = () => {
 									</div>
 									{/* Image Upload Section */}
 									<div className="flex-1 max-w-md pt-5">
-										<h2 className="text-2xl font-semibold text-teal-600 mb-4">
+										<h2 className="text-2xl font-semibold text-green-600 mb-4">
 											Upload Proof of Payment
 										</h2>
 										<input
 											type="file"
 											onChange={handleFileUpload}
-											className="mb-4 w-full border border-gray-300 rounded-md px-3 py-2 text-gray-600 focus:border-teal-600 focus:ring-teal-500"
+											className="mb-4 w-full border border-gray-300 rounded-md px-3 py-2 text-gray-600 focus:border-green-600 focus:ring-green-500"
 										/>
 										{uploadMessage && <p>{uploadMessage}</p>}
 									</div>
@@ -654,7 +654,7 @@ const Cart = () => {
 							</div>
 
 							{/* For payment. need design improvement */}
-							<div className="border-t border-teal-600 pt-4 mt-5">
+							<div className="border-t border-green-600 pt-4 mt-5">
 								<div className="flex justify-between mb-4">
 									<button
 										onClick={() => navigate(-1)}
@@ -663,7 +663,7 @@ const Cart = () => {
 										Continue Shopping
 									</button>
 									<button
-										className="bg-teal-500 text-white px-4 py-2 rounded hover:bg-teal-800"
+										className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-800"
 										disabled={loading}
 										onClick={preOrderFromCart}
 									>

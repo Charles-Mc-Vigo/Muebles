@@ -95,7 +95,7 @@ const Footer = () => {
               placeholder="jckamewoodworks@gmail.com"
               className="p-2 w-full border border-gray-300 rounded mb-4"
             />
-            <Link to="#" onClick={()=>alert("Unavailable for now hihiih")} className="bg-teal-500 text-white py-2 px-4 rounded inline-block"
+            <Link to="#" onClick={()=>alert("Unavailable for now hihiih")} className="bg-green-500 text-white py-2 px-4 rounded inline-block"
             >
               Subscribe
             </Link>
@@ -109,16 +109,16 @@ const Footer = () => {
             <a href="https://www.facebook.com/ItsmeJeyC"
               target="blank"
               rel="noopener noreferrer"
-              className="text-gray-600 hover:text-teal-600">
+              className="text-gray-600 hover:text-green-600">
               <FaFacebook size={24} />
             </a>
             <a href="https://www.instagram.com/jckame_woodworks/"
               target="blank"
               rel="noopener noreferrer"
-              className="text-gray-600 hover:text-teal-600">
+              className="text-gray-600 hover:text-green-600">
               <FaInstagram size={24} />
             </a>
-            <a href="#" className="text-gray-600 hover:text-teal-600">
+            <a href="#" className="text-gray-600 hover:text-green-600">
               <FaTiktok size={24} />
             </a>
           </div>

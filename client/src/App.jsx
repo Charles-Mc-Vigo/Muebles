@@ -36,6 +36,7 @@ import InventoryPage from "./pages/InventoryPage";
 import PaymentMethod from "./components/PaymentMethod";
 import EditUserProfile from "./components/EditUserProfile";
 import EditAdminProfile from "./components/EditAdminProfile";
+import AdminProfile from "./components/AdminProfile";
 
 import ViewOrder from "./components/ViewOrder";
 import AddNewAddress from "./components/AddNewAddress";
@@ -126,11 +127,12 @@ export default function App() {
 					{/* Admin routes */}
 					<Route path="/admin-login" element={<AdminLogin />} />
 					<Route path="/admin-signup" element={<AdminSignUp />} />
+					<Route path="/admin-profile-view" element={<AdminProfile />} />
 					<Route
 						path="/admin-signup/verify-account/:adminId"
 						element={<AdminVerify />}
 					/>
-					<Route
+					<Routes
 						path="/view-request/:adminId"
 						element={
 							<ProtectedRoute element={ViewPendingRequest} adminOnly={true} />

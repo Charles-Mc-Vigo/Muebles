@@ -387,7 +387,7 @@ const EditUserProfile = () => {
 				<div className="flex items-center gap-5 mb-6">
 					<button
 						onClick={() => navigate(-1)} // Navigate to the previous page
-						className="text-gray-500 hover:text-teal-600"
+						className="text-gray-500 hover:text-green-600"
 					>
 						<IoMdArrowRoundBack size={28} />{" "}
 						{/* Adjust the icon size to better match the text */}
@@ -505,7 +505,7 @@ const EditUserProfile = () => {
 						<input type="file" accept="image/*" onChange={handleImageChange} />
 						<button
 							type="submit"
-							className="w-full bg-teal-500 text-white p-3 rounded-lg font-semibold"
+							className="w-full bg-green-500 text-white p-3 rounded-lg font-semibold"
 						>
 							Save Changes
 						</button>

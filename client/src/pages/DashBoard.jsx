@@ -97,22 +97,14 @@ const Dashboard = () => {
     "add-product": <ProductManagement />,
     inventory: <Inventory />,
 
-    "view-transaction": <TransactionHistory />,
-
     "order-management": <OrderManagement />,
 
 		"product-customization": <ProductCustomization />,
     "track-delivery": (
       <h2 className="text-2xl font-semibold">Track Delivery Content</h2>
     ),
-    "manage-delivery": <DeliveryManagement/> ,
-
     Furniture: <Maintenance />,
 	
-    Services: <ServiceSection />,
-    "repair-hardware": (
-      <h2 className="text-2xl font-semibold">Repair Hardware Content</h2>
-    ),
   };
 
 	return (
@@ -189,44 +181,11 @@ const Dashboard = () => {
 
             {/* Transaction Section */}
 
-            <NavItem
-              icon={faHandshake}
-              label="Transaction"
-              isActive={activeSection.startsWith("transaction")}
-              onClick={() => toggleDropdown("transaction")}
-              hasDropdown
-              isOpen={dropdowns.transaction}
-            />
-            {dropdowns.transaction && (
-              <ul className="ml-8 space-y-2">
-                <DropdownItem
-                  label="View Transactions"
-                  section="view-transaction"
-                  currentSection={activeSection}
-                  onClick={setActiveSection}
-                />
-              </ul>
-            )}
+            
+          
 
             {/* Delivery Section */}
-            <NavItem
-              icon={faTruck}
-              label="Delivery"
-              isActive={activeSection.startsWith("delivery")}
-              onClick={() => toggleDropdown("delivery")}
-              hasDropdown
-              isOpen={dropdowns.delivery}
-            />
-            {dropdowns.delivery && (
-              <ul className="ml-8 space-y-2">
-                <DropdownItem
-                  label="Manage Delivery"
-                  section="manage-delivery"
-                  currentSection={activeSection}
-                  onClick={setActiveSection}
-                />
-              </ul>
-            )}
+            
 
             {/* Maintenance Section */}
             <NavItem

@@ -35,7 +35,7 @@ const About = () => {
       <section className="flex flex-col items-center p-5 bg- ">
         <div className="w-full max-w-4xl p-10 rounded-xl">
           <h1 className="text-4xl font-bold font-serif ">The JCKAME Story</h1>
-          <div className="w-2/5 h-1 bg-teal-500 mb-6"></div>
+          <div className="w-2/5 h-1 bg-green-500 mb-6"></div>
           <div className="flex flex-col md:flex-row gap-8">
             <img
               src="/landingimage/LOGO.jpg"
@@ -61,7 +61,7 @@ const About = () => {
           </div>
         </div>
       </section>
-      <div className="justify-evenly flex w-full  h-1/2 bg-teal-500 mb-5">
+      <div className="justify-evenly flex w-full  h-1/2 bg-green-500 mb-5">
         <h1 className="text-3xl font-bold text-white border-r-2 p-2 border-white my-4 ">
           100+
           <p className="text-xl font-normal">Customer Satisfied</p>
@@ -89,7 +89,7 @@ const About = () => {
             commitment to quality and integrity.
           </p>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 p-2 gap-5 bg-teal-500 w-full ">
+        <div className="grid grid-cols-1 md:grid-cols-3 p-2 gap-5 bg-green-500 w-full ">
           <div className="flex flex-col items-center text-center bg-white p-4 rounded-lg shadow-md hover:scale-90 transition-transform duration-300 ">
             <img
               src="/Advertisement/aboutsicon/Integrity.png"
@@ -172,7 +172,7 @@ const About = () => {
       <section className="flex flex-col items-center p-5 bg-white ">
         <div className="w-full max-w-4xl p-10 rounded-xl">
           <h1 className="text-4xl font-bold font-serif">Our Commitment</h1>
-          <div className="h-1 w-2/5 bg-teal-500 mb-6"></div>
+          <div className="h-1 w-2/5 bg-green-500 mb-6"></div>
           <div className="flex flex-col md:flex-row-reverse">
             <Slider {...settings} className="w-full md:w-2/5">
               <div>
@@ -229,7 +229,7 @@ const About = () => {
         }}
       >
         <Link to="/home">
-        <button className="px-6  py-3 bg-transparent border-white border mt-20 text-white font-bold text-lg rounded-lg shadow-md hover:bg-teal-600 transition-all">
+        <button className="px-6  py-3 bg-transparent border-white border mt-20 text-white font-bold text-lg rounded-lg shadow-md hover:bg-green-600 transition-all">
           Shop Now
         </button>
         </Link>
