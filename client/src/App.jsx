@@ -36,6 +36,7 @@ import InventoryPage from "./pages/InventoryPage";
 import PaymentMethod from "./components/PaymentMethod";
 import EditUserProfile from "./components/EditUserProfile";
 import EditAdminProfile from "./components/EditAdminProfile";
+import SearchResults from "./components/SearchResults";
 
 import GenerateReport from "./components/GenerateReport";
 import ViewOrder from "./components/ViewOrder";
@@ -45,7 +46,7 @@ import ViewPendingRequest from "./pages/ViewPendingRequest";
 import ErrorBoundary from "./components/ErrorBoundary";
 import PreOrder from "./pages/PreOrder";
 import ReviewPage from "./pages/ReviewPage";
-import SearchResults from "./components/SearchResults";
+
 // import LoadingSpinner from "./components/LoadingSpinner";
 
 
