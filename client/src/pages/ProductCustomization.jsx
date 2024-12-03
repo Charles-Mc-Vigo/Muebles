@@ -45,6 +45,7 @@ const chairSizes = {
 			depth: 18,
 			length: 0,
 		},
+		price: 3000,
 	},
 };
 
@@ -69,11 +70,37 @@ const ProductCustomization = () => {
 	const [selectedSofaWood, setSelectedSofaWood] = useState("");
 	const [quantity, setQuantity] = useState(1); // Initial quantity set to 1
 	const [selectedSize, setSelectedSize] = useState(null);
+	const [customSizePrice, setCustomSizePrice] = useState(null);
+	const [price, setPrice] = useState(null);
 	const [isCustomSizeVisible, setCustomSizeVisible] = useState(false);
+	const [isCustomSize, setIsCustomSize] = useState(false); // Toggle state for custom size
+
 
 	const toggleCustomSize = () => {
 		setCustomSizeVisible((prev) => !prev);
+		setSelectedSize(null);
+		setCustomSizePrice(null);
 	};
+	const handleSizeSelection = (key) => {
+		setSelectedSize(key);
+		// Set the price based on the selected size
+		if (chairSizes[key]) {
+			setPrice(chairSizes[key].price); // Set price for standard size
+		} else {
+			setPrice(customSizePrice); // Set price for custom size
+		}
+	};
+
+	useEffect(() => {
+		if (!isCustomSize) {
+				setCustomSize({
+						height: '',
+						width: '',
+						depth: '',
+						length: '',
+				});
+		}
+}, [isCustomSize]);
 
 	const [customSize, setCustomSize] = useState({
 		height: "",
@@ -81,6 +108,41 @@ const ProductCustomization = () => {
 		width: "",
 		depth: "",
 	});
+
+	const calculateCustomSizePrice = () => {
+		const { height, width, depth, length } = customSize;
+		// Convert to numbers and handle empty inputs
+		const h = parseFloat(height) || 0;
+		const w = parseFloat(width) || 0;
+		const d = parseFloat(depth) || 0;
+		const l = parseFloat(length) || 0;
+
+		// Pricing logic
+		const pricePerCubicInch = 0.002; // Adjust this value based on your pricing model
+		const lengthFeePerInch = 0.1;
+
+		// Calculate volume and price
+		const volume = h * w * d;
+		const volumePrice = volume * pricePerCubicInch;
+		const lengthFee = l * lengthFeePerInch;
+
+		// Calculate total custom size price
+		const totalPrice = volumePrice + lengthFee;
+
+		// Add the price of the selected wood if applicable
+		const woodPrice = selectedWood
+			? chairMaterials[selectedWood]?.price || 0
+			: 0;
+			console.log(woodPrice)
+
+		// Set the custom size price including the wood price
+		setCustomSizePrice(totalPrice + woodPrice);
+	};
+
+	useEffect(() => {
+		// Recalculate price whenever custom size changes
+		calculateCustomSizePrice();
+	}, [customSize]);
 
 	// Handle increase/decrease
 	const handleQuantityChange = (change) => {
@@ -145,10 +207,8 @@ const ProductCustomization = () => {
 			alert("Please select a piece of furniture to checkout.");
 			return;
 		}
-
 		// Prepare the formData based on the selected model
 		let formData;
-
 		if (selectedModel === "chair") {
 			formData = {
 				model: "chair",
@@ -157,6 +217,10 @@ const ProductCustomization = () => {
 				selectedWood: selectedWood,
 				quantity,
 				size: selectedSize || customSize,
+				price: selectedSize
+					? chairSizes[selectedSize]?.price +
+					  (chairMaterials[selectedWood]?.price || 0)
+					: customSizePrice,
 			};
 		} else if (selectedModel === "sofa") {
 			formData = {
@@ -176,9 +240,8 @@ const ProductCustomization = () => {
 				size: selectedSize || customSize,
 			};
 		}
-
 		console.log("FormData: ", formData);
-		navigate("/customize-product/checkout", { state: formData });
+		// navigate("/customize-product/checkout", { state: formData });
 	};
 
 	return (
@@ -600,10 +663,10 @@ const ProductCustomization = () => {
 							) : (
 								<ul className="mt-4 grid gap-4 sm:grid-cols-1">
 									{Object.entries(chairSizes).map(
-										([key, { name, dimensions }]) => (
+										([key, { name, dimensions, price }]) => (
 											<li
 												key={key}
-												onClick={() => setSelectedSize({ name, dimensions })}
+												onClick={() => handleSizeSelection(key)}
 												className={`border p-4 rounded-lg shadow-sm transition-shadow cursor-pointer ${
 													selectedSize?.name === name
 														? "border-blue-600 bg-blue-50 shadow-md"
@@ -628,8 +691,16 @@ const ProductCustomization = () => {
 													{dimensions.width}"
 												</p>
 												<p className="text-sm text-gray-600">
+													<span className="font-medium">Length:</span>{" "}
+													{dimensions.length}"
+												</p>
+												<p className="text-sm text-gray-600">
 													<span className="font-medium">Depth:</span>{" "}
 													{dimensions.depth}"
+												</p>
+												<p className="text-sm text-gray-600">
+													<span className="font-medium">Price:</span> PHP{" "}
+													{price}
 												</p>
 											</li>
 										)
@@ -955,7 +1026,7 @@ const ProductCustomization = () => {
 						</div>
 					)}
 
-					{/* Display Selected Material Price */}
+					{/* Display Selected Material Price
 					{selectedModel === "chair" && selectedWood && (
 						<div>
 							<div className="mt-4">
@@ -967,6 +1038,34 @@ const ProductCustomization = () => {
 								</p>
 							</div>
 						</div>
+					)} */}
+					{/* Display Selected Material Price */}
+					{selectedModel === "chair" && selectedSize && (
+						<div>
+							<div className="mt-4">
+								<p className="text-sm font-medium">
+									Size Price:{" "}
+									<span className="text-gray-800 font-semibold">
+										${chairSizes[selectedSize]?.price}
+									</span>
+								</p>
+							</div>
+						</div>
+					)}
+					{isCustomSizeVisible && (
+						<>
+							{/* Display Selected Material Price */}
+							{selectedModel === "chair" && customSizePrice && (
+								<div className="mt-4">
+									<p className="text-sm font-medium">
+										Custom Size Price:{" "}
+										<span className="text-gray-800 font-semibold">
+											₱{customSizePrice.toFixed(2)}
+										</span>
+									</p>
+								</div>
+							)}
+						</>
 					)}
 
 					<button
