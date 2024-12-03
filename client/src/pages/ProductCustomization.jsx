@@ -75,7 +75,6 @@ const ProductCustomization = () => {
 	const [isCustomSizeVisible, setCustomSizeVisible] = useState(false);
 	const [isCustomSize, setIsCustomSize] = useState(false); // Toggle state for custom size
 
-
 	const toggleCustomSize = () => {
 		setCustomSizeVisible((prev) => !prev);
 		setSelectedSize(null);
@@ -93,14 +92,14 @@ const ProductCustomization = () => {
 
 	useEffect(() => {
 		if (!isCustomSize) {
-				setCustomSize({
-						height: '',
-						width: '',
-						depth: '',
-						length: '',
-				});
+			setCustomSize({
+				height: "",
+				width: "",
+				depth: "",
+				length: "",
+			});
 		}
-}, [isCustomSize]);
+	}, [isCustomSize]);
 
 	const [customSize, setCustomSize] = useState({
 		height: "",
@@ -133,7 +132,7 @@ const ProductCustomization = () => {
 		const woodPrice = selectedWood
 			? chairMaterials[selectedWood]?.price || 0
 			: 0;
-			console.log(woodPrice)
+		console.log(woodPrice);
 
 		// Set the custom size price including the wood price
 		setCustomSizePrice(totalPrice + woodPrice);
