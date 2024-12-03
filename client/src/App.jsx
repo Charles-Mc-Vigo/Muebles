@@ -156,10 +156,10 @@ export default function App() {
 							<ProtectedRoute element={GenerateReport} adminOnly={true} />
 						}
 					/>
-					<Route
+					{/* <Route
 						path="/dashboard/setting/admin-profile/view"
 						element={<ProtectedRoute element={AdminProfile} adminOnly={true} />}
-					/>
+					/> */}
 					<Route
 						path="/dashboard/setting/admin-profile/edit"
 						element={

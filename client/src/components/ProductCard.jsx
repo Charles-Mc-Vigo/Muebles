@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
 
 const ProductCard = ({
   id,
@@ -87,7 +88,7 @@ const ProductCard = ({
           {showPreOrder && (
             <button
               onClick={() => navigate(`/pre-order/${id}`)}
-              className="w-full bg-teal-500 hover:bg-teal-600 text-white py-2 rounded-md"
+              className="w-full bg-green-500 hover:bg-green-600 text-white py-2 rounded-md"
             >
               Pre-order
             </button>

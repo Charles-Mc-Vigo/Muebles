@@ -210,7 +210,7 @@ const Home = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-teal-600"></div>
+        <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-green-600"></div>
       </div>
     );
   }
@@ -310,7 +310,7 @@ const Home = () => {
         {/* Filter Button (Mobile) */}
         <button
           onClick={toggleFilter}
-          className="md:hidden fixed bottom-4 right-4 z-30 bg-teal-600 text-white p-4 rounded-full shadow-lg"
+          className="md:hidden fixed bottom-4 right-4 z-30 bg-green-600 text-white p-4 rounded-full shadow-lg"
           aria-label="Toggle filters"
         >
           <FaFilter className="text-xl" />
@@ -326,15 +326,15 @@ const Home = () => {
               onClick={toggleFilter}
             />
             <div
-              className={`fixed md:static right-0 top-0 h-full w-72 bg-white border-teal-500 border-l-2 rounded-l-xl p-2 items-baseline overflow-y-auto transform transition-transform duration-300 ${
+              className={`fixed md:static right-0 top-0 h-full w-72 bg-white border-green-500 border-l-2 rounded-l-xl p-2 items-baseline overflow-y-auto transform transition-transform duration-300 ${
                 isFilterOpen ? "translate-x-0" : "translate-x-full"
               } md:transform-none`}
             >
               <div className="flex items-center p-2 justify-between">
-                <h1 className="text-3xl font-semibold text-teal-600 ">JCKAME</h1>
+                <h1 className="text-3xl font-semibold text-green-600 ">JCKAME</h1>
                 <button
                   onClick={toggleFilter}
-                  className="md:hidden text-teal-500 hover:text-teal-800"
+                  className="md:hidden text-green-500 hover:text-green-800"
                 >
                   <FaTimes className="text-3xl" />
                 </button>
@@ -342,7 +342,7 @@ const Home = () => {
               {/* FilterSection in Main */}
               <div className="mt-5 p-2 gap-2 flex-col">
                 <div className="flex items-baseline mb-2">
-                  <FaFilter className="text-2xl mb-1 text-teal-600 " />
+                  <FaFilter className="text-2xl mb-1 text-green-600 " />
                   <h1 className="text-2xl text-justify font-semibold px-2">Filter</h1>
                 </div>
                 <FilterContent />
@@ -391,7 +391,7 @@ const Home = () => {
               <div className="mt-6 flex justify-between">
                 <button
                   onClick={handlePreviousPage}
-                  className="bg-teal-500 text-white py-2 px-4 rounded-xl hover:bg-teal-700"
+                  className="bg-green-500 text-white py-2 px-4 rounded-xl hover:bg-green-700"
                   disabled={currentPage === 1}
                 >
                   Previous
@@ -401,7 +401,7 @@ const Home = () => {
                 </span>
                 <button
                   onClick={handleNextPage}
-                  className="bg-teal-500 text-white py-2 px-4 rounded-xl hover:bg-teal-700"
+                  className="bg-green-500 text-white py-2 px-4 rounded-xl hover:bg-green-700"
                   disabled={currentPage === totalPages}
                 >
                   Next

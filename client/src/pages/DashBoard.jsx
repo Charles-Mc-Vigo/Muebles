@@ -116,9 +116,9 @@ const Dashboard = () => {
   };
 
 	return (
-		<div className="flex h-screen bg-gray-300">
+		<div className="flex h-screen bg-gray-100">
 			{/* Sidebar */}
-			<aside className="w-64 bg-teal-600  flex flex-col items-center rounded-l-3xl ml-1 h-50 mt-2 mb-2">
+			<aside className="w-64 bg-green-500  flex flex-col items-center rounded-l-3xl ml-1 h-50 mt-2 mb-2">
 				<div className="flex flex-col items-center p-5 m-5">
 					<img
 						src="/landingimage/LOGO.jpg"
