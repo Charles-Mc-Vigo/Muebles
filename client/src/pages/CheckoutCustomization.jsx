@@ -39,6 +39,7 @@ const CheckoutCustomization = () => {
 	const [uploadMessage, setUploadMessage] = useState("");
 
 	const [selectedDeliveryMode, setSelectedDeliveryMode] = useState("Delivery");
+	const [proofOfPayment, setProofOfPayment] = useState(null);
 	const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
 	const [paymentOptionVisible, setPaymentOptionVisible] = useState(false);
 	const [user, setUser] = useState({}); // For storing fetched user data
@@ -98,7 +99,6 @@ const CheckoutCustomization = () => {
 				selectedArmrest,
 				selectedDesign,
 				selectedWood,
-				selectedWoodType,
 			};
 
 			const orderData = {
