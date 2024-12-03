@@ -37,6 +37,7 @@ import PaymentMethod from "./components/PaymentMethod";
 import EditUserProfile from "./components/EditUserProfile";
 import EditAdminProfile from "./components/EditAdminProfile";
 
+import GenerateReport from "./components/GenerateReport";
 import ViewOrder from "./components/ViewOrder";
 import AddNewAddress from "./components/AddNewAddress";
 import ViewUserOrder from "./components/ViewUserOrder";
@@ -112,6 +113,7 @@ export default function App() {
 
 					{/* Admin routes */}
 					<Route path="/admin-login" element={<AdminLogin />} />
+					<Route path="/generate-report" element={<GenerateReport />} />
 					<Route path="/admin-signup" element={<AdminSignUp />} />
 					<Route
 						path="/admin-signup/verify-account/:adminId"
