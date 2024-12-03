@@ -50,7 +50,7 @@ const CheckoutCustomization = () => {
 			}
 		};
 
-		fetchUser(); // Call the function to fetch data when the component mounts
+		fetchUser();
 	}, []);
 
 	const handlePaymentOptionChange = (event) => {

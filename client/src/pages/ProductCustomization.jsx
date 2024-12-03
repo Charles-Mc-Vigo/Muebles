@@ -11,96 +11,67 @@ import { useNavigate } from "react-router-dom";
 
 const RotatingObject = ({ children }) => {
 	const groupRef = useRef();
-
 	useFrame(() => {
 		if (groupRef.current) {
 			groupRef.current.rotation.y += 0.0;
 		}
 	});
-
 	return <group ref={groupRef}>{children}</group>;
 };
 
 const chairMaterials = {
-	Narra: {
-		name: "Narra",
-		price: 9000,
-	},
-	Mahogany: {
-		name: "Mahogany",
-		price: 3000,
-	},
-	Acacia: {
-		name: "Acacia",
-		price: 3000,
-	},
+	Narra: { name: "Narra", price: 9000 },
+	Mahogany: { name: "Mahogany", price: 3000 },
+	Acacia: { name: "Acacia", price: 3000 },
 };
 
 const chairSizes = {
 	Standard: {
 		name: "Standard",
-		dimensions: {
-			height: 35,
-			width: 21,
-			depth: 18,
-			length: 0,
-		},
-		price: 3000,
+		dimensions: { height: 35, width: 21, depth: 18, length: 0 },
+	},
+};
+
+const doorMaterials = {
+	Narra: { name: "Narra", price: 12000 },
+	Mahogany: { name: "Mahogany", price: 5000 },
+	Acacia: { name: "Acacia", price: 5000 },
+};
+
+const doorSizes = {
+	Standard_Main_Door: {
+		name: "Standard Main Door",
+	},
+};
+const sofaMaterials = {
+	Narra: { name: "Narra", price: 80000 },
+	Mahogany: { name: "Mahogany", price: 5000 },
+	Acacia: { name: "Acacia", price: 5000 },
+};
+
+const sofaSizes = {
+	Minimalist_Size: {
+		name: "Minimalist Size",
 	},
 };
 
 const ProductCustomization = () => {
 	const navigate = useNavigate();
-	const canvasRef = useRef(null); // Reference for the canvas
-
-	// State for selected model
+	const canvasRef = useRef(null);
 	const [selectedModel, setSelectedModel] = useState("chair");
-	// for chair
 	const [selectedBackrest, setSelectedBackrest] = useState("");
 	const [selectedSeat, setSelectedSeat] = useState("");
 	const [selectedWood, setSelectedWood] = useState("");
-
-	// for door
 	const [selectedDoorDesign, setselectedDoorDesign] = useState("");
 	const [selectedDoorWoodType, setSelectedDoorWoodType] = useState("");
-
-	// for sofa
 	const [selectedSofaBackrest, setSelectedSofaBackrest] = useState("");
 	const [selectedSofaArmrest, setSelectedSofaArmrest] = useState("");
 	const [selectedSofaWood, setSelectedSofaWood] = useState("");
-	const [quantity, setQuantity] = useState(1); // Initial quantity set to 1
+	const [quantity, setQuantity] = useState(1);
 	const [selectedSize, setSelectedSize] = useState(null);
-	const [customSizePrice, setCustomSizePrice] = useState(null);
-	const [price, setPrice] = useState(null);
+	const [customSizePrice, setCustomSizePrice] = useState(0);
+	const [price, setPrice] = useState(0);
 	const [isCustomSizeVisible, setCustomSizeVisible] = useState(false);
-	const [isCustomSize, setIsCustomSize] = useState(false); // Toggle state for custom size
-
-	const toggleCustomSize = () => {
-		setCustomSizeVisible((prev) => !prev);
-		setSelectedSize(null);
-		setCustomSizePrice(null);
-	};
-	const handleSizeSelection = (key) => {
-		setSelectedSize(key);
-		// Set the price based on the selected size
-		if (chairSizes[key]) {
-			setPrice(chairSizes[key].price); // Set price for standard size
-		} else {
-			setPrice(customSizePrice); // Set price for custom size
-		}
-	};
-
-	useEffect(() => {
-		if (!isCustomSize) {
-			setCustomSize({
-				height: "",
-				width: "",
-				depth: "",
-				length: "",
-			});
-		}
-	}, [isCustomSize]);
-
 	const [customSize, setCustomSize] = useState({
 		height: "",
 		length: "",
@@ -108,85 +79,111 @@ const ProductCustomization = () => {
 		depth: "",
 	});
 
-	const calculateCustomSizePrice = () => {
-		const { height, width, depth, length } = customSize;
-		// Convert to numbers and handle empty inputs
-		const h = parseFloat(height) || 0;
-		const w = parseFloat(width) || 0;
-		const d = parseFloat(depth) || 0;
-		const l = parseFloat(length) || 0;
+	const toggleCustomSize = () => {
+    setCustomSizeVisible((prev) => !prev);
+    setCustomSize({ height: "", length: "", width: "", depth: "" });
+    setSelectedSize(null);
 
-		// Pricing logic
-		const pricePerCubicInch = 0.002; // Adjust this value based on your pricing model
-		const lengthFeePerInch = 0.1;
+    // Reset price when exiting custom size
+    if (isCustomSizeVisible) {
+        const basePrice = chairMaterials[selectedWood]?.price || 0;
+        setPrice(basePrice * quantity);
+    }
+};
 
-		// Calculate volume and price
-		const volume = h * w * d;
-		const volumePrice = volume * pricePerCubicInch;
-		const lengthFee = l * lengthFeePerInch;
 
-		// Calculate total custom size price
-		const totalPrice = volumePrice + lengthFee;
 
-		// Add the price of the selected wood if applicable
-		const woodPrice = selectedWood
-			? chairMaterials[selectedWood]?.price || 0
-			: 0;
-		console.log(woodPrice);
+const handleSizeSelection = (key) => {
+	setSelectedSize(key);
 
-		// Set the custom size price including the wood price
-		setCustomSizePrice(totalPrice + woodPrice);
-	};
+	if (key === "Standard") {
+			const basePrice = chairMaterials[selectedWood]?.price || 0;
+			setPrice(basePrice * quantity);
+	} else {
+			setPrice(customSizePrice * quantity); // Apply custom size price
+	}
+};
+
+
+const calculateCustomSizePrice = () => {
+	const { height, width, depth, length } = customSize;
+	const h = parseFloat(height) || 0;
+	const w = parseFloat(width) || 0;
+	const d = parseFloat(depth) || 0;
+	const l = parseFloat(length) || 0;
+
+	const pricePerCubicInch = 0.002;
+	const lengthFeePerInch = 0.1;
+
+	const volume = h * w * d;
+	const volumePrice = volume * pricePerCubicInch;
+	const lengthFee = l * lengthFeePerInch;
+	const woodPrice = chairMaterials[selectedWood]?.price || 0;
+
+	const customPrice = (volumePrice + lengthFee + woodPrice) * quantity;
+	setCustomSizePrice(customPrice);
+	setPrice(customPrice); // Update overall price
+};
 
 	useEffect(() => {
-		// Recalculate price whenever custom size changes
 		calculateCustomSizePrice();
-	}, [customSize]);
+	}, [customSize, selectedWood]);
 
-	// Handle increase/decrease
 	const handleQuantityChange = (change) => {
 		setQuantity((prevQuantity) => {
 			const newQuantity = prevQuantity + change;
-			return newQuantity > 0 ? newQuantity : 1; // Prevent negative quantity
+			return newQuantity > 0 ? newQuantity : 1;
 		});
 	};
 
-	// Handlers for each part selection
 	const handleBackrestChange = (design) => {
 		if (selectedModel === "chair") setSelectedBackrest(design);
 	};
+
 	const handleSeatChange = (design) => {
 		if (selectedModel === "chair") setSelectedSeat(design);
 	};
 
 	const handleWoodChange = (e) => {
-		if (selectedModel === "chair") setSelectedWood(e.target.value);
+		const woodType = e.target.value;
+		if (selectedModel === "chair") {
+			setSelectedWood(woodType);
+			// Update price based on selected wood
+			setPrice(chairMaterials[woodType]?.price || 0);
+		}
 	};
 
-	// handle backrest of sofa
 	const handleSofaBackrest = (design) => {
 		if (selectedModel === "sofa") setSelectedSofaBackrest(design);
 	};
+
 	const handleSofaArmrest = (design) => {
 		if (selectedModel === "sofa") setSelectedSofaArmrest(design);
 	};
 
 	const handleSofaWoodChange = (e) => {
-		if (selectedModel === "sofa") setSelectedSofaWood(e.target.value);
+		const woodType = e.target.value;
+		if (selectedModel === "sofa") {
+			setSelectedSofaWood(woodType);
+			// Update price based on selected wood
+			setPrice(chairMaterials[woodType]?.price || 0);
+		}
 	};
 
-	// for door
 	const handleDoorDesignChange = (design) => {
 		if (selectedModel === "door") setselectedDoorDesign(design);
 	};
 
 	const handleDoorWoodChange = (e) => {
-		if (selectedModel === "door") setSelectedDoorWoodType(e.target.value);
+		const woodType = e.target.value;
+		if (selectedModel === "door") {
+			setSelectedDoorWoodType(woodType);
+			// Update price based on selected wood
+			setPrice(chairMaterials[woodType]?.price || 0);
+		}
 	};
-	// console.log(selectedWood);
-	// Reset customization when model changes
+
 	useEffect(() => {
-		// Reset all states based on the selected model
 		if (selectedModel === "chair") {
 			setSelectedBackrest("");
 			setSelectedSeat("");
@@ -201,40 +198,63 @@ const ProductCustomization = () => {
 		}
 	}, [selectedModel]);
 
-	const handleSubmit = async () => {
+	const validateForm = () => {
 		if (!selectedModel) {
 			alert("Please select a piece of furniture to checkout.");
-			return;
+			return false;
 		}
-		// Prepare the formData based on the selected model
+		if (selectedModel === "chair") {
+			if (!selectedBackrest || !selectedSeat || !selectedWood) {
+				alert("Chair backrest, seat design, and wood type are required.");
+				return false;
+			}
+		}
+		if (selectedModel === "sofa") {
+			if (!selectedSofaBackrest || !selectedSofaArmrest || !selectedSofaWood) {
+				alert("Sofa backrest, armrest design, and wood type are required.");
+				return false;
+			}
+		}
+		if (selectedModel === "door") {
+			if (!selectedDoorDesign || !selectedDoorWoodType) {
+				alert("Door design and wood type are required.");
+				return false;
+			}
+		}
+		return true;
+	};
+
+	const handleSubmit = async () => {
+		if (!validateForm()) return;
+
 		let formData;
 		if (selectedModel === "chair") {
 			formData = {
 				model: "chair",
-				selectedBackrest: selectedBackrest,
-				selectedSeat: selectedSeat,
-				selectedWood: selectedWood,
+				selectedBackrest,
+				selectedSeat,
+				selectedWood,
 				quantity,
 				size: selectedSize || customSize,
-				price: selectedSize
-					? chairSizes[selectedSize]?.price +
-					  (chairMaterials[selectedWood]?.price || 0)
-					: customSizePrice,
+				price:
+					selectedSize === "Standard"
+						? chairMaterials[selectedWood]?.price
+						: customSizePrice,
 			};
 		} else if (selectedModel === "sofa") {
 			formData = {
 				model: "sofa",
-				selectedSofaBackrest: selectedSofaBackrest,
-				selectedSofaArmrest: selectedSofaArmrest,
-				selectedSofaWood: selectedSofaWood,
+				selectedSofaBackrest,
+				selectedSofaArmrest,
+				selectedSofaWood,
 				quantity,
 				size: selectedSize || customSize,
 			};
 		} else if (selectedModel === "door") {
 			formData = {
 				model: "door",
-				selectedDoorDesign: selectedDoorDesign,
-				selectedDoorWoodType: selectedDoorWoodType,
+				selectedDoorDesign,
+				selectedDoorWoodType,
 				quantity,
 				size: selectedSize || customSize,
 			};
@@ -243,27 +263,42 @@ const ProductCustomization = () => {
 		// navigate("/customize-product/checkout", { state: formData });
 	};
 
+	const calculateTotalPrice = () => {
+    if (selectedModel === "chair") {
+        const basePrice = chairMaterials[selectedWood]?.price || 0;
+        return isCustomSizeVisible ? customSizePrice : basePrice * quantity;
+    } else if (selectedModel === "sofa") {
+        return quantity * (sofaMaterials[selectedSofaWood]?.price || 0);
+    } else if (selectedModel === "door") {
+        return quantity * (doorMaterials[selectedDoorWoodType]?.price || 0);
+    }
+    return 0;
+};
+
+
+useEffect(() => {
+	const updatedPrice = calculateTotalPrice();
+	setPrice(updatedPrice);
+}, [selectedModel, selectedWood, customSizePrice, isCustomSizeVisible, quantity]);
+
+
+
+	const totalPrice = calculateTotalPrice();
+
+
 	return (
 		<div className="flex flex-col h-screen">
 			<Header isLogin={true} />
 			<div className="flex-grow flex flex-col md:flex-row bg-gray-100 p-4">
-				{/* Canvas for the 3D model */}
 				<div className="flex-grow md:w-2/3 flex items-center justify-center">
 					<Canvas ref={canvasRef}>
-						{/* <ambientLight intensity={0.5} />
-						<directionalLight position={[10, 10, 10]} /> */}
 						<ambientLight intensity={0.7} color="#ffffff" />
-
-						{/* Directional Light: Add strong directional lighting */}
 						<directionalLight
 							position={[5, 10, 5]}
 							intensity={1.2}
 							castShadow
 						/>
-
-						{/* Optional: Add Point Light for localized illumination */}
 						<pointLight position={[0, 5, 0]} intensity={0.8} color="#ffd700" />
-						{/* Conditionally render models */}
 						{selectedModel === "chair" && (
 							<RotatingObject>
 								<Chair
@@ -291,14 +326,9 @@ const ProductCustomization = () => {
 							</RotatingObject>
 						)}
 						<OrbitControls minDistance={2} maxDistance={10} />
-
-						{/* commented for now kase ano. ayaw ko na eh */}
-						{/* enableZoom={false} */}
 					</Canvas>
 				</div>
-				{/* Customization Controls */}
 				<div className="md:w-1/3 flex flex-col space-y-4 p-4">
-					{/* Model Selection Dropdown */}
 					<div className="flex justify-center mb-4">
 						<select
 							value={selectedModel}
@@ -310,10 +340,8 @@ const ProductCustomization = () => {
 							<option value="door">Door</option>
 						</select>
 					</div>
-					{/* Chair Customization Controls */}
 					{selectedModel === "chair" && (
 						<>
-							{/* Backrest Options */}
 							<div className="bg-white shadow rounded p-4">
 								<h3 className="text-lg font-semibold">Backrest Options</h3>
 								<div className="flex gap-4 mt-2">
@@ -343,8 +371,6 @@ const ProductCustomization = () => {
 									))}
 								</div>
 							</div>
-
-							{/* Seats Options */}
 							<div className="bg-white shadow rounded p-4 mt-4">
 								<h3 className="text-lg font-semibold">Seats Options</h3>
 								<div className="flex gap-4 mt-2">
@@ -372,8 +398,6 @@ const ProductCustomization = () => {
 									))}
 								</div>
 							</div>
-
-							{/* Wood Options */}
 							<div className="bg-white shadow rounded p-4 mt-4">
 								<h3 className="text-lg font-semibold">Woods Available</h3>
 								<select
@@ -393,7 +417,6 @@ const ProductCustomization = () => {
 							</div>
 						</>
 					)}
-
 					{/* Sofa Customization Controls */}
 					{selectedModel === "sofa" && (
 						<>
@@ -439,7 +462,7 @@ const ProductCustomization = () => {
 										>
 											<img
 												src={`/Sofa/Armrest/${image}`}
-												alt={`Backrest ${index + 1}`}
+												alt={`Armrest ${index + 1}`}
 												className="w-20 h-20 object-cover"
 											/>
 										</div>
@@ -467,7 +490,7 @@ const ProductCustomization = () => {
 					{selectedModel === "door" && (
 						<>
 							<div className="bg-white shadow rounded p-4 mt-4">
-								<h3 className="text-lg font-semibold">Seats Options</h3>
+								<h3 className="text-lg font-semibold">Door Design Options</h3>
 								<div className="flex gap-4 mt-2">
 									{[
 										"Design1.jpg",
@@ -475,7 +498,7 @@ const ProductCustomization = () => {
 										"Design3.jpg",
 										"Design4.jpg",
 										"Design5.jpg",
-										"Design4.jpg",
+										"Design6.jpg",
 										"Design7.jpg",
 									].map((image, index) => (
 										<div
@@ -515,7 +538,6 @@ const ProductCustomization = () => {
 							</div>
 						</>
 					)}
-
 					{/* Quantity Input for Furniture */}
 					<div className="bg-white shadow w-full flex justify-center rounded p-4 mt-4">
 						<div className="flex items-center space-x-4 mt-2">
@@ -529,7 +551,9 @@ const ProductCustomization = () => {
 							<input
 								type="number"
 								value={quantity}
-								onChange={(e) => setQuantity(Number(e.target.value))}
+								onChange={(e) =>
+									setQuantity(Math.max(1, Number(e.target.value)))
+								}
 								className="w-16 text-center px-4 py-2 border rounded shadow"
 								min="1"
 							/>
@@ -541,7 +565,7 @@ const ProductCustomization = () => {
 							</button>
 						</div>
 					</div>
-
+					{/* Size Customization for Chair */}
 					{selectedModel === "chair" && (
 						<div className="bg-gray-50 shadow rounded p-6 mt-6">
 							<h3 className="text-xl font-bold text-gray-800 mb-4">
@@ -558,156 +582,64 @@ const ProductCustomization = () => {
 								</button>
 							</div>
 							{isCustomSizeVisible ? (
-								<div className="bg-white shadow rounded p-4 mt-4">
-									<h3 className="text-lg font-semibold">Custom Size</h3>
-									<div className="grid grid-cols-2 gap-4 mt-2">
-										<div>
-											<label
-												htmlFor="height"
-												className="block text-sm font-medium"
-											>
-												Height{" "}
-												<span className="italic font-light text-sm">
-													(inches)
-												</span>
-											</label>
-											<input
-												type="number"
-												id="height"
-												value={customSize.height}
-												onChange={(e) =>
-													setCustomSize({
-														...customSize,
-														height: e.target.value,
-													})
-												}
-												className="mt-1 px-4 py-2 border rounded shadow w-full"
-												placeholder="Enter Height"
-											/>
-										</div>
-										<div>
-											<label
-												htmlFor="length"
-												className="block text-sm font-medium"
-											>
-												Length{" "}
-												<span className="italic font-light text-sm">
-													(inches)
-												</span>
-											</label>
-											<input
-												type="number"
-												id="length"
-												value={customSize.length}
-												onChange={(e) =>
-													setCustomSize({
-														...customSize,
-														length: e.target.value,
-													})
-												}
-												className="mt-1 px-4 py-2 border rounded shadow w-full"
-												placeholder="Enter Length"
-											/>
-										</div>
-										<div>
-											<label
-												htmlFor="width"
-												className="block text-sm font-medium"
-											>
-												Width{" "}
-												<span className="italic font-light text-sm">
-													(inches)
-												</span>
-											</label>
-											<input
-												type="number"
-												id="width"
-												value={customSize.width}
-												onChange={(e) =>
-													setCustomSize({
-														...customSize,
-														width: e.target.value,
-													})
-												}
-												className="mt-1 px-4 py-2 border rounded shadow w-full"
-												placeholder="Enter Width"
-											/>
-										</div>
-										<div>
-											<label
-												htmlFor="depth"
-												className="block text-sm font-medium"
-											>
-												Depth{" "}
-												<span className="italic font-light text-sm">
-													(inches)
-												</span>
-											</label>
-											<input
-												type="number"
-												id="depth"
-												value={customSize.depth}
-												onChange={(e) =>
-													setCustomSize({
-														...customSize,
-														depth: e.target.value,
-													})
-												}
-												className="mt-1 px-4 py-2 border rounded shadow w-full"
-												placeholder="Enter Depth"
-											/>
-										</div>
-									</div>
+								<div className="flex flex-col space-y-4">
+									<input
+										type="number"
+										placeholder="Height (inches)"
+										value={customSize.height}
+										onChange={(e) =>
+											setCustomSize({ ...customSize, height: e.target.value })
+										}
+										className="px-4 py-2 border rounded shadow"
+									/>
+									<input
+										type="number"
+										placeholder="Width (inches)"
+										value={customSize.width}
+										onChange={(e) =>
+											setCustomSize({ ...customSize, width: e.target.value })
+										}
+										className="px-4 py-2 border rounded shadow"
+									/>
+									<input
+										type="number"
+										placeholder="Depth (inches)"
+										value={customSize.depth}
+										onChange={(e) =>
+											setCustomSize({ ...customSize, depth: e.target.value })
+										}
+										className="px-4 py-2 border rounded shadow"
+									/>
+									<input
+										type="number"
+										placeholder="Length (inches)"
+										value={customSize.length}
+										onChange={(e) =>
+											setCustomSize({ ...customSize, length: e.target.value })
+										}
+										className="px-4 py-2 border rounded shadow"
+									/>
 								</div>
 							) : (
-								<ul className="mt-4 grid gap-4 sm:grid-cols-1">
-									{Object.entries(chairSizes).map(
-										([key, { name, dimensions, price }]) => (
-											<li
-												key={key}
-												onClick={() => handleSizeSelection(key)}
-												className={`border p-4 rounded-lg shadow-sm transition-shadow cursor-pointer ${
-													selectedSize?.name === name
-														? "border-blue-600 bg-blue-50 shadow-md"
-														: "border-gray-200 hover:shadow-md"
-												}`}
-											>
-												<h4
-													className={`text-lg font-semibold ${
-														selectedSize?.name === name
-															? "text-blue-600"
-															: "text-gray-700"
-													}`}
-												>
-													{name}
-												</h4>
-												<p className="text-sm text-gray-600">
-													<span className="font-medium">Height:</span>{" "}
-													{dimensions.height}"
-												</p>
-												<p className="text-sm text-gray-600">
-													<span className="font-medium">Width:</span>{" "}
-													{dimensions.width}"
-												</p>
-												<p className="text-sm text-gray-600">
-													<span className="font-medium">Length:</span>{" "}
-													{dimensions.length}"
-												</p>
-												<p className="text-sm text-gray-600">
-													<span className="font-medium">Depth:</span>{" "}
-													{dimensions.depth}"
-												</p>
-												<p className="text-sm text-gray-600">
-													<span className="font-medium">Price:</span> PHP{" "}
-													{price}
-												</p>
-											</li>
-										)
-									)}
-								</ul>
+								<div className="flex flex-col space-y-2">
+									{Object.keys(chairSizes).map((key) => (
+										<button
+											key={key}
+											onClick={() => handleSizeSelection(key)}
+											className={`px-4 py-2 border rounded shadow ${
+												selectedSize === key
+													? "bg-blue-500 text-white"
+													: "bg-white"
+											}`}
+										>
+											{key} - (Price based on wood type)
+										</button>
+									))}
+								</div>
 							)}
 						</div>
 					)}
+					{/* Size Customization for Chair */}
 					{selectedModel === "sofa" && (
 						<div className="bg-gray-50 shadow rounded p-6 mt-6">
 							<h3 className="text-xl font-bold text-gray-800 mb-4">
@@ -724,152 +656,68 @@ const ProductCustomization = () => {
 								</button>
 							</div>
 							{isCustomSizeVisible ? (
-								<div className="bg-white shadow rounded p-4 mt-4">
-									<h3 className="text-lg font-semibold">Custom Size</h3>
-									<div className="grid grid-cols-2 gap-4 mt-2">
-										<div>
-											<label
-												htmlFor="height"
-												className="block text-sm font-medium"
-											>
-												Height{" "}
-												<span className="italic font-light text-sm">
-													(inches)
-												</span>
-											</label>
-											<input
-												type="number"
-												id="height"
-												value={customSize.height}
-												onChange={(e) =>
-													setCustomSize({
-														...customSize,
-														height: e.target.value,
-													})
-												}
-												className="mt-1 px-4 py-2 border rounded shadow w-full"
-												placeholder="Enter Height"
-											/>
-										</div>
-										<div>
-											<label
-												htmlFor="length"
-												className="block text-sm font-medium"
-											>
-												Length{" "}
-												<span className="italic font-light text-sm">
-													(inches)
-												</span>
-											</label>
-											<input
-												type="number"
-												id="length"
-												value={customSize.length}
-												onChange={(e) =>
-													setCustomSize({
-														...customSize,
-														length: e.target.value,
-													})
-												}
-												className="mt-1 px-4 py-2 border rounded shadow w-full"
-												placeholder="Enter Length"
-											/>
-										</div>
-										<div>
-											<label
-												htmlFor="width"
-												className="block text-sm font-medium"
-											>
-												Width{" "}
-												<span className="italic font-light text-sm">
-													(inches)
-												</span>
-											</label>
-											<input
-												type="number"
-												id="width"
-												value={customSize.width}
-												onChange={(e) =>
-													setCustomSize({
-														...customSize,
-														width: e.target.value,
-													})
-												}
-												className="mt-1 px-4 py-2 border rounded shadow w-full"
-												placeholder="Enter Width"
-											/>
-										</div>
-										<div>
-											<label
-												htmlFor="depth"
-												className="block text-sm font-medium"
-											>
-												Depth{" "}
-												<span className="italic font-light text-sm">
-													(inches)
-												</span>
-											</label>
-											<input
-												type="number"
-												id="depth"
-												value={customSize.depth}
-												onChange={(e) =>
-													setCustomSize({
-														...customSize,
-														depth: e.target.value,
-													})
-												}
-												className="mt-1 px-4 py-2 border rounded shadow w-full"
-												placeholder="Enter Depth"
-											/>
-										</div>
-									</div>
+								<div className="flex flex-col space-y-4">
+									<input
+										type="number"
+										placeholder="Height (inches)"
+										value={customSize.height}
+										onChange={(e) =>
+											setCustomSize({ ...customSize, height: e.target.value })
+										}
+										className="px-4 py-2 border rounded shadow"
+									/>
+									<input
+										type="number"
+										placeholder="Width (inches)"
+										value={customSize.width}
+										onChange={(e) =>
+											setCustomSize({ ...customSize, width: e.target.value })
+										}
+										className="px-4 py-2 border rounded shadow"
+									/>
+									<input
+										type="number"
+										placeholder="Depth (inches)"
+										value={customSize.depth}
+										onChange={(e) =>
+											setCustomSize({ ...customSize, depth: e.target.value })
+										}
+										className="px-4 py-2 border rounded shadow"
+									/>
+									<input
+										type="number"
+										placeholder="Length (inches)"
+										value={customSize.length}
+										onChange={(e) =>
+											setCustomSize({ ...customSize, length: e.target.value })
+										}
+										className="px-4 py-2 border rounded shadow"
+									/>
 								</div>
 							) : (
-								<ul className="mt-4 grid gap-4 sm:grid-cols-1">
-									{Object.entries(chairSizes).map(
-										([key, { name, dimensions }]) => (
-											<li
-												key={key}
-												onClick={() => setSelectedSize({ name, dimensions })}
-												className={`border p-4 rounded-lg shadow-sm transition-shadow cursor-pointer ${
-													selectedSize?.name === name
-														? "border-blue-600 bg-blue-50 shadow-md"
-														: "border-gray-200 hover:shadow-md"
-												}`}
-											>
-												<h4
-													className={`text-lg font-semibold ${
-														selectedSize?.name === name
-															? "text-blue-600"
-															: "text-gray-700"
-													}`}
-												>
-													{name}
-												</h4>
-												<p className="text-sm text-gray-600">
-													<span className="font-medium">Height:</span>{" "}
-													{dimensions.height}"
-												</p>
-												<p className="text-sm text-gray-600">
-													<span className="font-medium">Width:</span>{" "}
-													{dimensions.width}"
-												</p>
-												<p className="text-sm text-gray-600">
-													<span className="font-medium">Depth:</span>{" "}
-													{dimensions.depth}"
-												</p>
-											</li>
-										)
-									)}
-								</ul>
+								<div className="flex flex-col space-y-2">
+									{Object.keys(sofaSizes).map((key) => (
+										<button
+											key={key}
+											onClick={() => handleSizeSelection(key)}
+											className={`px-4 py-2 border rounded shadow ${
+												selectedSize === key
+													? "bg-blue-500 text-white"
+													: "bg-white"
+											}`}
+										>
+											{key} - (Price based on wood type)
+										</button>
+									))}
+								</div>
 							)}
 						</div>
 					)}
+					{/* Size Customization for Chair */}
 					{selectedModel === "door" && (
 						<div className="bg-gray-50 shadow rounded p-6 mt-6">
 							<h3 className="text-xl font-bold text-gray-800 mb-4">
-								Available Chair Sizes
+								Available Door Sizes
 							</h3>
 							<div className="flex justify-end">
 								<button
@@ -882,198 +730,133 @@ const ProductCustomization = () => {
 								</button>
 							</div>
 							{isCustomSizeVisible ? (
-								<div className="bg-white shadow rounded p-4 mt-4">
-									<h3 className="text-lg font-semibold">Custom Size</h3>
-									<div className="grid grid-cols-2 gap-4 mt-2">
-										<div>
-											<label
-												htmlFor="height"
-												className="block text-sm font-medium"
-											>
-												Height{" "}
-												<span className="italic font-light text-sm">
-													(inches)
-												</span>
-											</label>
-											<input
-												type="number"
-												id="height"
-												value={customSize.height}
-												onChange={(e) =>
-													setCustomSize({
-														...customSize,
-														height: e.target.value,
-													})
-												}
-												className="mt-1 px-4 py-2 border rounded shadow w-full"
-												placeholder="Enter Height"
-											/>
-										</div>
-										<div>
-											<label
-												htmlFor="length"
-												className="block text-sm font-medium"
-											>
-												Length{" "}
-												<span className="italic font-light text-sm">
-													(inches)
-												</span>
-											</label>
-											<input
-												type="number"
-												id="length"
-												value={customSize.length}
-												onChange={(e) =>
-													setCustomSize({
-														...customSize,
-														length: e.target.value,
-													})
-												}
-												className="mt-1 px-4 py-2 border rounded shadow w-full"
-												placeholder="Enter Length"
-											/>
-										</div>
-										<div>
-											<label
-												htmlFor="width"
-												className="block text-sm font-medium"
-											>
-												Width{" "}
-												<span className="italic font-light text-sm">
-													(inches)
-												</span>
-											</label>
-											<input
-												type="number"
-												id="width"
-												value={customSize.width}
-												onChange={(e) =>
-													setCustomSize({
-														...customSize,
-														width: e.target.value,
-													})
-												}
-												className="mt-1 px-4 py-2 border rounded shadow w-full"
-												placeholder="Enter Width"
-											/>
-										</div>
-										<div>
-											<label
-												htmlFor="depth"
-												className="block text-sm font-medium"
-											>
-												Depth{" "}
-												<span className="italic font-light text-sm">
-													(inches)
-												</span>
-											</label>
-											<input
-												type="number"
-												id="depth"
-												value={customSize.depth}
-												onChange={(e) =>
-													setCustomSize({
-														...customSize,
-														depth: e.target.value,
-													})
-												}
-												className="mt-1 px-4 py-2 border rounded shadow w-full"
-												placeholder="Enter Depth"
-											/>
-										</div>
-									</div>
+								<div className="flex flex-col space-y-4">
+									<input
+										type="number"
+										placeholder="Height (inches)"
+										value={customSize.height}
+										onChange={(e) =>
+											setCustomSize({ ...customSize, height: e.target.value })
+										}
+										className="px-4 py-2 border rounded shadow"
+									/>
+									<input
+										type="number"
+										placeholder="Width (inches)"
+										value={customSize.width}
+										onChange={(e) =>
+											setCustomSize({ ...customSize, width: e.target.value })
+										}
+										className="px-4 py-2 border rounded shadow"
+									/>
+									<input
+										type="number"
+										placeholder="Depth (inches)"
+										value={customSize.depth}
+										onChange={(e) =>
+											setCustomSize({ ...customSize, depth: e.target.value })
+										}
+										className="px-4 py-2 border rounded shadow"
+									/>
+									<input
+										type="number"
+										placeholder="Length (inches)"
+										value={customSize.length}
+										onChange={(e) =>
+											setCustomSize({ ...customSize, length: e.target.value })
+										}
+										className="px-4 py-2 border rounded shadow"
+									/>
 								</div>
 							) : (
-								<ul className="mt-4 grid gap-4 sm:grid-cols-1">
-									{Object.entries(chairSizes).map(
-										([key, { name, dimensions }]) => (
-											<li
-												key={key}
-												onClick={() => setSelectedSize({ name, dimensions })}
-												className={`border p-4 rounded-lg shadow-sm transition-shadow cursor-pointer ${
-													selectedSize?.name === name
-														? "border-blue-600 bg-blue-50 shadow-md"
-														: "border-gray-200 hover:shadow-md"
-												}`}
-											>
-												<h4
-													className={`text-lg font-semibold ${
-														selectedSize?.name === name
-															? "text-blue-600"
-															: "text-gray-700"
-													}`}
-												>
-													{name}
-												</h4>
-												<p className="text-sm text-gray-600">
-													<span className="font-medium">Height:</span>{" "}
-													{dimensions.height}"
-												</p>
-												<p className="text-sm text-gray-600">
-													<span className="font-medium">Width:</span>{" "}
-													{dimensions.width}"
-												</p>
-												<p className="text-sm text-gray-600">
-													<span className="font-medium">Depth:</span>{" "}
-													{dimensions.depth}"
-												</p>
-											</li>
-										)
-									)}
-								</ul>
-							)}
-						</div>
-					)}
-
-					{/* Display Selected Material Price
-					{selectedModel === "chair" && selectedWood && (
-						<div>
-							<div className="mt-4">
-								<p className="text-sm font-medium">
-									Material Price:{" "}
-									<span className="text-gray-800 font-semibold">
-										${chairMaterials[selectedWood]?.price}
-									</span>
-								</p>
-							</div>
-						</div>
-					)} */}
-					{/* Display Selected Material Price */}
-					{selectedModel === "chair" && selectedSize && (
-						<div>
-							<div className="mt-4">
-								<p className="text-sm font-medium">
-									Size Price:{" "}
-									<span className="text-gray-800 font-semibold">
-										${chairSizes[selectedSize]?.price}
-									</span>
-								</p>
-							</div>
-						</div>
-					)}
-					{isCustomSizeVisible && (
-						<>
-							{/* Display Selected Material Price */}
-							{selectedModel === "chair" && customSizePrice && (
-								<div className="mt-4">
-									<p className="text-sm font-medium">
-										Custom Size Price:{" "}
-										<span className="text-gray-800 font-semibold">
-											₱{customSizePrice.toFixed(2)}
-										</span>
-									</p>
+								<div className="flex flex-col space-y-2">
+									{Object.keys(doorSizes).map((key) => (
+										<button
+											key={key}
+											onClick={() => handleSizeSelection(key)}
+											className={`px-4 py-2 border rounded shadow ${
+												selectedSize === key
+													? "bg-blue-500 text-white"
+													: "bg-white"
+											}`}
+										>
+											{key} - (Price based on wood type)
+										</button>
+									))}
 								</div>
 							)}
-						</>
+						</div>
 					)}
-
-					<button
-						type="submit"
-						onClick={handleSubmit}
-						className="px-4 py-2 bg-blue-500 text-white font-bold rounded hover:bg-blue-600 transition"
-					>
-						Checkout
-					</button>
+					{/* Pricing Summary Section */}
+					<div className="bg-white shadow rounded p-4 mt-6">
+						<h3 className="text-lg font-semibold">Pricing Summary</h3>
+						<div className="mt-2">
+							<p>
+								Model:{" "}
+								<strong>
+									{selectedModel.charAt(0).toUpperCase() +
+										selectedModel.slice(1)}
+								</strong>
+							</p>
+							{selectedModel === "chair" && (
+								<>
+									<p>
+										Backrest: <strong>{selectedBackrest}</strong>
+									</p>
+									<p>
+										Seat: <strong>{selectedSeat}</strong>
+									</p>
+									<p>
+										Wood Type: <strong>{selectedWood}</strong>
+									</p>
+									<p>
+										Size:{" "}
+										<strong>
+											{selectedSize ? selectedSize : "Custom Size"}
+										</strong>
+									</p>
+								</>
+							)}
+							{selectedModel === "sofa" && (
+								<>
+									<p>
+										Backrest: <strong>{selectedSofaBackrest}</strong>
+									</p>
+									<p>
+										Armrest: <strong>{selectedSofaArmrest}</strong>
+									</p>
+									<p>
+										Wood Type: <strong>{selectedSofaWood}</strong>
+									</p>
+								</>
+							)}
+							{selectedModel === "door" && (
+								<>
+									<p>
+										Door Design: <strong>{selectedDoorDesign}</strong>
+									</p>
+									<p>
+										Wood Type: <strong>{selectedDoorWoodType}</strong>
+									</p>
+								</>
+							)}
+							<p>
+								Quantity: <strong>{quantity}</strong>
+							</p>
+							<p>
+								Total Price: <strong>${price || 0}</strong>
+							</p>
+						</div>
+					</div>
+					{/* Checkout Button */}
+					<div className="flex justify-center mt-6">
+						<button
+							onClick={handleSubmit}
+							className="px-6 py-3 bg-green-600 text-white rounded hover:bg-green-700"
+						>
+							Checkout
+						</button>
+					</div>
 				</div>
 			</div>
 			<Footer />
