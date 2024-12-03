@@ -36,7 +36,6 @@ import InventoryPage from "./pages/InventoryPage";
 import PaymentMethod from "./components/PaymentMethod";
 import EditUserProfile from "./components/EditUserProfile";
 import EditAdminProfile from "./components/EditAdminProfile";
- import SearchResults from "./components/SearchResults";
 
 import ViewOrder from "./components/ViewOrder";
 import AddNewAddress from "./components/AddNewAddress";
