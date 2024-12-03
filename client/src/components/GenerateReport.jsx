@@ -163,7 +163,7 @@ const GenerateReport = () => {
           <div className="mt-4 text-center">
             <button
               onClick={generatePDF}
-              className="px-6 py-3 text-white font-semibold bg-green-600 hover:bg-green-700 rounded-md"
+              className="px-6 py-3 text-white font-semibold bg-teal-600 hover:bg-teal-700 rounded-md"
             >
               Download as PDF
             </button>
