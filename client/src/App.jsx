@@ -132,7 +132,7 @@ export default function App() {
 						path="/admin-signup/verify-account/:adminId"
 						element={<AdminVerify />}
 					/>
-					<Routes
+					<Route
 						path="/view-request/:adminId"
 						element={
 							<ProtectedRoute element={ViewPendingRequest} adminOnly={true} />
