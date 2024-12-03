@@ -7,6 +7,7 @@ import { FaFilter, FaTimes } from "react-icons/fa";
 import Select from "react-select";
 import "react-toastify/dist/ReactToastify.css";
 
+
 const Home = () => {
   // State variables
   const [furnitureData, setFurnitureData] = useState([]);
@@ -21,6 +22,9 @@ const Home = () => {
   const [priceRange, setPriceRange] = useState([0, 120000]);
   const itemsPerPage = 8;
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState(""); 
+  const [searchResults, setSearchResults] = useState([]);
+
 
   useEffect(() => {
     const fetchFurnitureData = async () => {
@@ -76,7 +80,24 @@ const Home = () => {
       console.error("Error fetching cart count:", error);
     }
   };
-
+  const handleSearch = async (query) => {
+    try {
+      setSearchQuery(query); 
+      const response = await fetch(`http://localhost:3000/api/search?query=${query}`);
+      const data = await response.json();
+      console.log("Search Results:", data); // Debugging
+      if (data && data.length > 0) {
+        setSearchResults(data);
+      } else {
+        setSearchResults([]); 
+      }
+    } catch (error) {
+      console.error("Error while searching:", error);
+      setSearchResults([]); 
+    }console.log("Search Results:", data);
+    
+  };
+  
   useEffect(() => {
     fetchCartCount();
   }, []);
@@ -85,19 +106,22 @@ const Home = () => {
   const incrementCartCount = () => setCartCount((prevCount) => prevCount + 1);
 
   const filteredFurnitureData = useMemo(() => {
+    const dataToFilter = searchResults.length > 0 ? searchResults : furnitureData;
+  
     if (
       selectedCategories.length === 0 &&
       selectedFurnitureTypes.length === 0 &&
       priceRange[0] === 0 &&
       priceRange[1] === 120000
     ) {
-      return furnitureData;
+      return dataToFilter;
     }
-    return furnitureData.filter((item) => {
+  
+    return dataToFilter.filter((item) => {
       const categoryMatch =
         selectedCategories.length === 0 ||
         selectedCategories.some((category) =>
-          item.category.name.includes(category.value)
+          item.category?.name?.includes(category.value)
         );
       const typeMatch =
         selectedFurnitureTypes.length === 0 ||
@@ -107,9 +131,12 @@ const Home = () => {
         );
       const priceMatch =
         item.price >= priceRange[0] && item.price <= priceRange[1];
+  
       return categoryMatch && typeMatch && priceMatch;
     });
-  }, [furnitureData, selectedCategories, selectedFurnitureTypes, priceRange]);
+  }, [furnitureData, searchResults, selectedCategories, selectedFurnitureTypes, priceRange]);
+  
+
 
   // Pagination logic
   const totalPages = Math.ceil(filteredFurnitureData.length / itemsPerPage);
@@ -252,7 +279,8 @@ const Home = () => {
 
   return (
     <div className="bg-white text-gray-800 flex flex-col min-h-screen">
-      <Header isLogin={true} cartCount={cartCount} />
+      <Header isLogin={true} cartCount={cartCount} onSearch={handleSearch}  />
+      {/* <SearchResults results={searchResults} /> */}
       <ToastContainer
         style={{ top: "80px", right: "50px" }}
         autoClose={3000}
@@ -312,13 +340,17 @@ const Home = () => {
                   <h1 className="text-2xl text-justify font-semibold px-2">Filter</h1>
                 </div>
                 <FilterContent />
+                {/*search section*/}
+
               </div>
             </div>
           </aside>
           {/* Products Grid */}
           <div className="flex-1 flex flex-col">
             <h2 className="text-2xl md:text-3xl font-bold text-center mb-8">
-              Furniture Sets
+              {searchResults.length > 0
+                ? `Search Results for "${searchQuery}"`
+                : "Furniture Sets"}
             </h2>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 md:gap-6">
               {currentItems.length > 0 ? (
@@ -342,7 +374,9 @@ const Home = () => {
                 ))
               ) : (
                 <p className="text-center col-span-full text-gray-500">
-                  No furniture sets available at the moment.
+                  {searchResults.length > 0
+                    ? "No results match your search."
+                    : "No furniture sets available at the moment."}
                 </p>
               )}
             </div>

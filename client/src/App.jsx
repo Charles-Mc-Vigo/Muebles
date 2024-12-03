@@ -36,6 +36,7 @@ import InventoryPage from "./pages/InventoryPage";
 import PaymentMethod from "./components/PaymentMethod";
 import EditUserProfile from "./components/EditUserProfile";
 import EditAdminProfile from "./components/EditAdminProfile";
+ import SearchResults from "./components/SearchResults";
 
 import ViewOrder from "./components/ViewOrder";
 import AddNewAddress from "./components/AddNewAddress";
@@ -57,7 +58,7 @@ export default function App() {
 					<Route path="/about" element={<About />} />
 					<Route path="/signup" element={<SignUp />} />
 					<Route path="/login" element={<Login />} />
-					<Route path="/search-result" element={<SearchResults />} />
+			        <Route path="/search-result" element={<SearchResults />} /> 
 					<Route path="/terms&condition" element={<TermsAndConditions />} />
 					<Route path="/payment-method" element={<PaymentMethod />} />
 					<Route
