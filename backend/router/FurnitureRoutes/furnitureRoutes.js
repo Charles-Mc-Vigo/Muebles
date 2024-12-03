@@ -46,12 +46,8 @@ router.get("/:furnitureId", getFurnitureById);
 
 // Search route for furniture
 // Function to handle searching by name
-router.get('/search', searchFurnitureByName);
-
-
-
-
-
-
-
+router.get('/search', (req, res, next) => {
+  console.log("Search route hit with query:", req.query.query);
+  next();
+}, searchFurnitureByName);
 module.exports = router;

@@ -44,6 +44,7 @@ import ViewPendingRequest from "./pages/ViewPendingRequest";
 import ErrorBoundary from "./components/ErrorBoundary";
 import PreOrder from "./pages/PreOrder";
 import ReviewPage from "./pages/ReviewPage";
+import SearchResults from "./components/SearchResults";
 // import LoadingSpinner from "./components/LoadingSpinner";
 
 
@@ -56,6 +57,7 @@ export default function App() {
 					<Route path="/about" element={<About />} />
 					<Route path="/signup" element={<SignUp />} />
 					<Route path="/login" element={<Login />} />
+					<Route path="/search-result" element={<SearchResults />} />
 					<Route path="/terms&condition" element={<TermsAndConditions />} />
 					<Route path="/payment-method" element={<PaymentMethod />} />
 					<Route

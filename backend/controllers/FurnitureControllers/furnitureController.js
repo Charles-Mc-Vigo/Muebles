@@ -328,7 +328,7 @@ exports.Archived = async (req, res) => {
 		await furniture.save();
 		res
 			.status(200)
-			.json({ success: `${furniture.name} has been archived successfully!` });
+			.json({ success: `${furniture.name} has been archived successfully! `});
 	} catch (error) {
 		console.error("Error archiving the furniture: ", error);
 		res.status(500).json({ error: "Server error!" });
