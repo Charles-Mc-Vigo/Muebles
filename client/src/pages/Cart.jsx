@@ -76,6 +76,7 @@ const Cart = () => {
 				setCount(data.cart.count);
 				setTotalAmount(data.cart.totalAmount);
 				setUser(data.cart.userId);
+				console.log(data.cart.userId)
 				const defaultAddress = data.cart.userId.addresses?.find(
 					(address) => address.isDefault
 				);
@@ -113,12 +114,18 @@ const Cart = () => {
 		}
 	}, [selectedAddress, user]);
 
-	const totalWithShipping =
-		paymentOption === "Partial Payment"
-			? (totalAmount / 2 + shippingFee).toFixed(2) // Half of the total amount plus shipping fee
-			: (totalAmount + shippingFee).toFixed(2); // Full payment total
+	const totalAmountWithShippingFee = (totalAmount + shippingFee).toFixed(2);
 
-	const partialPaymentAmount = (totalAmount / 2 + shippingFee).toFixed(2); // Calculate partial payment amount
+	// kapag partial payment
+	const partialPaymentAmount = ((totalAmount + shippingFee) / 2).toFixed(2);
+
+	const remainingBalance = (totalAmount + shippingFee - partialPaymentAmount).toFixed(2);
+
+	const montlyInstallment = (remainingBalance / 3).toFixed(2);
+
+	// kapag full payment
+	const fullPayment = totalAmountWithShippingFee;
+	// console.log("partial", partialPaymentAmount);
 
 	const handlePaymentMethodClick = (method) => {
 		setSelectedPaymentMethod(method);
@@ -149,11 +156,17 @@ const Cart = () => {
 		formData.append("shippingAddress", JSON.stringify(addressToSend));
 		formData.append("deliveryMode", deliveryMode);
 		formData.append("expectedDelivery", expectedDeliveryDate);
+		formData.append("totalAmount", totalAmount);
+		formData.append("shippingFee", shippingFee);
+		formData.append("totalAmountWithShippingFee", totalAmountWithShippingFee);
+		formData.append("partialPaymentAmount", partialPaymentAmount);
+		formData.append("remainingBalance", remainingBalance);
+		formData.append("montlyInstallment", montlyInstallment);
 
-		// // Log FormData contents
-		// for (const [key, value] of formData.entries()) {
-		// 	console.log(`${key}:`, value);
-		// }
+		// Log FormData contents
+		for (const [key, value] of formData.entries()) {
+			console.log(`${key}:`, value);
+		}
 
 		try {
 			const response = await fetch("http://localhost:3000/api/orders/create", {
@@ -169,7 +182,7 @@ const Cart = () => {
 			if (!data.ok) {
 				toast.error(data.error);
 			}
-			
+
 			const orderId = data.order._id;
 			await clearCart();
 			navigate(`/order-details/${orderId}`);
@@ -179,7 +192,6 @@ const Cart = () => {
 			setLoading(false);
 		}
 	};
-	
 
 	const updateQuantity = async (furnitureId, newQuantity) => {
 		if (newQuantity < 1) {
@@ -537,32 +549,63 @@ const Cart = () => {
 								</p>
 							)}
 						</div>
+
 						{/* QR code for payment */}
-						<div className="mt-5 p-5 bg-slate-200">
-							<h1 className="text-xl font-semibold mb-2">Scan the QR Code</h1>
-							<div className="flex items-start gap-8">
-								{/* QR Code Section */}
-								<div className="flex flex-col items-center">
-									<img
-										src="/payment-icon/qrcode.png"
-										alt="qrcode"
-										className="w-40 h-40 object-contain"
-									/>
-								</div>
-								{/* Image Upload Section */}
-								<div className="flex-1 max-w-md pt-5">
-									<h2 className="text-2xl font-semibold text-teal-600 mb-4">
-										Upload Proof of Payment
-									</h2>
-									<input
-										type="file"
-										onChange={handleFileUpload}
-										className="mb-4 w-full border border-gray-300 rounded-md px-3 py-2 text-gray-600 focus:border-teal-600 focus:ring-teal-500"
-									/>
-									{uploadMessage && <p>{uploadMessage}</p>}
+						{selectedPaymentMethod === "Maya" && (
+							<div className="mt-5 p-5 bg-slate-200">
+								<h1 className="text-xl font-semibold mb-2">Scan the QR Code</h1>
+								<div className="flex items-start gap-8">
+									{/* QR Code Section */}
+									<div className="flex flex-col items-center">
+										<img
+											src="/payment-icon/Maya-qr.png"
+											alt="qrcode"
+											className="w-40 h-40 object-contain"
+										/>
+									</div>
+									{/* Image Upload Section */}
+									<div className="flex-1 max-w-md pt-5">
+										<h2 className="text-2xl font-semibold text-teal-600 mb-4">
+											Upload Proof of Payment
+										</h2>
+										<input
+											type="file"
+											onChange={handleFileUpload}
+											className="mb-4 w-full border border-gray-300 rounded-md px-3 py-2 text-gray-600 focus:border-teal-600 focus:ring-teal-500"
+										/>
+										{uploadMessage && <p>{uploadMessage}</p>}
+									</div>
 								</div>
 							</div>
-						</div>
+						)}
+						{selectedPaymentMethod === "GCash" && (
+							<div className="mt-5 p-5 bg-slate-200">
+								<h1 className="text-xl font-semibold mb-2">Scan the QR Code</h1>
+								<div className="flex items-start gap-8">
+									{/* QR Code Section */}
+									<div className="flex flex-col items-center">
+										<img
+											src="/payment-icon/GCash-qr.png"
+											alt="qrcode"
+											className="w-40 h-40 object-contain"
+										/>
+									</div>
+									{/* Image Upload Section */}
+									<div className="flex-1 max-w-md pt-5">
+										<h2 className="text-2xl font-semibold text-teal-600 mb-4">
+											Upload Proof of Payment
+										</h2>
+										<input
+											type="file"
+											onChange={handleFileUpload}
+											className="mb-4 w-full border border-gray-300 rounded-md px-3 py-2 text-gray-600 focus:border-teal-600 focus:ring-teal-500"
+										/>
+										{uploadMessage && <p>{uploadMessage}</p>}
+									</div>
+								</div>
+							</div>
+						)}
+
 						{/* Payment Details */}
 						<div className="border-t-2 p-5 rounded-xl shadow-xl bg-white ">
 							<div className="mt-2 ">
@@ -570,27 +613,40 @@ const Cart = () => {
 								<div className="text-lg font-normal">
 									<div className="flex justify-between">
 										<span>Items total:</span>
-										<span>₱{totalAmount.toFixed(2)}</span>
+										<span>₱ {totalAmount.toFixed(2)}</span>
 									</div>
 									<div className="flex justify-between">
 										<span>Shipping Fee:</span>
-										<span>₱{shippingFee.toFixed(2)}</span>
+										<span>₱ {shippingFee.toFixed(2)}</span>
 									</div>
 									{/* payable amount dito */}
 									<div className="mt-5">
 										{paymentOption === "Partial Payment" ? (
-											<div className="flex justify-between">
-												<h3 className="text-lg font-semibold">
-													Partial Payment (50%):
-												</h3>
-												<p className="font-bold">PHP {partialPaymentAmount}</p>
+											<div className="flex flex-col">
+												<div className="flex justify-between">
+													<h3 className="font-semibold">Total:</h3>
+													<p>₱ {totalAmountWithShippingFee}</p>
+												</div>
+
+												<div className="flex justify-between">
+													<h3 className="font-semibold">
+														Partial Payment (50%):
+													</h3>
+													<p>₱ {partialPaymentAmount}</p>
+												</div>
+												<div className="flex justify-between">
+													<h3 className="font-semibold">
+														Montly Installment (3 months):
+													</h3>
+													<p>₱ {montlyInstallment}</p>
+												</div>
 											</div>
 										) : (
 											<div className="flex justify-between">
 												<h3 className="text-lg font-semibold">
 													Total Payment:
 												</h3>
-												<p className="font-bold">PHP {totalWithShipping}</p>
+												<p className="font-bold">PHP {fullPayment}</p>
 											</div>
 										)}
 									</div>
@@ -611,7 +667,7 @@ const Cart = () => {
 										disabled={loading}
 										onClick={preOrderFromCart}
 									>
-										{loading ? "Creating Pre-Order...":"Create Pre-Order"}
+										{loading ? "Creating Pre-Order..." : "Create Pre-Order"}
 									</button>
 								</div>
 							</div>

@@ -12,38 +12,40 @@ import {
 import { CgProfile } from "react-icons/cg";
 import { Link } from "react-router-dom";
 import Logout from "./Logout";
+import Notification from "./Notification";
 
-const Header = ({ isLogin, cartCount, }) => {
+const Header = ({ isLogin, }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [cartCount, setCartCount] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const navigate = useNavigate();
 
-  // Close menu when clicking outside
+  // Fetch cart count from API
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (
-        isMenuOpen &&
-        !event.target.closest(".mobile-menu") &&
-        !event.target.closest(".menu-button")
-      ) {
-        setIsMenuOpen(false);
+    const fetchCartCount = async () => {
+      try {
+        const response = await fetch("http://localhost:3000/api/cart", {
+          method: "GET",
+          credentials: "include",
+        });
+        if (!response.ok) throw new Error("Failed to fetch cart data");
+  
+        const data = await response.json();
+        // console.log("API Response:", data); // i-log for debugging hayst
+        
+        // Check if cart exists and set cartCount using 'count'
+        setCartCount(data?.cart?.count || 0);
+      } catch (error) {
+        console.error("Error fetching cart count:", error);
       }
     };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [isMenuOpen]);
-
-  // Prevent scroll when mobile menu is open
-  useEffect(() => {
-    document.body.style.overflow = isMenuOpen ? "hidden" : "unset";
-    return () => {
-      document.body.style.overflow = "unset";
-    };
-  }, [isMenuOpen]);
-
+  
+    if (isLogin) fetchCartCount();
+  }, [isLogin]);
+  
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
     setIsMobileSearchOpen(false);
@@ -89,7 +91,7 @@ const Header = ({ isLogin, cartCount, }) => {
   
 
   return (
-    <header className=" w-full bg-white shadow-xl rounded-xl ">
+    <header className="w-full bg-white shadow-xl rounded-xl">
       {/* Desktop Header */}
       <div className="hidden lg:block">
         <div className="max-w-7xl mx-auto px-4 py-4">
@@ -161,6 +163,18 @@ const Header = ({ isLogin, cartCount, }) => {
                   >
                     <FaBoxOpen className="inline-block mr-1 text-3xl" />
                   </Link>
+                </div>
+              )}
+
+              {isLogin && (
+                <div>
+                  <Notification/>
+                </div>
+              )}
+
+              {isLogin && (
+                <div>
+                  <Notification/>
                 </div>
               )}
               {/* User Icon with Collapsible Menu */}

@@ -6,8 +6,7 @@ import { ToastContainer, toast } from "react-toastify";
 import { FaFilter, FaTimes } from "react-icons/fa";
 import Select from "react-select";
 import "react-toastify/dist/ReactToastify.css";
-
-
+import { Link } from "react-router-dom";
 const Home = () => {
   // State variables
   const [furnitureData, setFurnitureData] = useState([]);
@@ -26,46 +25,53 @@ const Home = () => {
   const [searchResults, setSearchResults] = useState([]);
 
 
-  useEffect(() => {
-    const fetchFurnitureData = async () => {
-      try {
-        const response = await fetch("http://localhost:3000/api/furnitures", {
-          method: "GET",
-          credentials: "include",
-        });
-        const data = await response.json();
-        setFurnitureData(Array.isArray(data) ? data : data?.furnitures || []);
-      } catch (error) {
-        setError("Failed to fetch furniture sets");
-      } finally {
-        setLoading(false);
-      }
-    };
+	useEffect(() => {
+		const fetchFurnitureData = async () => {
+			try {
+				const response = await fetch("http://localhost:3000/api/furnitures", {
+					method: "GET",
+					credentials: "include",
+				});
+				const data = await response.json();
+				setFurnitureData(Array.isArray(data) ? data : data?.furnitures || []);
+			} catch (error) {
+				setError("Failed to fetch furniture sets");
+			} finally {
+				setLoading(false);
+			}
+		};
 
-    const fetchCategories = async () => {
-      try {
-        const response = await fetch("http://localhost:3000/api/categories");
-        const data = await response.json();
-        setCategories(data);
-      } catch (error) {
-        console.error("Failed to fetch categories:", error);
-      }
-    };
+		console.log("furnitureData", furnitureData);
+		console.log("categories", categories);
+		console.log("furniture types", furnitureTypes);
+		console.log("Current items kuno", currentItems);
 
-    const fetchFurnitureTypes = async () => {
-      try {
-        const response = await fetch("http://localhost:3000/api/furniture-types");
-        const data = await response.json();
-        setFurnitureTypes(data);
-      } catch (error) {
-        console.error("Failed to fetch furniture types:", error);
-      }
-    };
+		const fetchCategories = async () => {
+			try {
+				const response = await fetch("http://localhost:3000/api/categories");
+				const data = await response.json();
+				setCategories(data);
+			} catch (error) {
+				console.error("Failed to fetch categories:", error);
+			}
+		};
 
-    fetchFurnitureTypes();
-    fetchCategories();
-    fetchFurnitureData();
-  }, []);
+		const fetchFurnitureTypes = async () => {
+			try {
+				const response = await fetch(
+					"http://localhost:3000/api/furniture-types"
+				);
+				const data = await response.json();
+				setFurnitureTypes(data);
+			} catch (error) {
+				console.error("Failed to fetch furniture types:", error);
+			}
+		};
+
+		fetchFurnitureTypes();
+		fetchCategories();
+		fetchFurnitureData();
+	}, []);
 
   const fetchCartCount = async () => {
     try {
@@ -102,8 +108,8 @@ const Home = () => {
     fetchCartCount();
   }, []);
 
-  const showToast = (message, type) => toast[type](message);
-  const incrementCartCount = () => setCartCount((prevCount) => prevCount + 1);
+	const showToast = (message, type) => toast[type](message);
+	const incrementCartCount = () => setCartCount((prevCount) => prevCount + 1);
 
   const filteredFurnitureData = useMemo(() => {
     const dataToFilter = searchResults.length > 0 ? searchResults : furnitureData;
@@ -138,31 +144,31 @@ const Home = () => {
   
 
 
-  // Pagination logic
-  const totalPages = Math.ceil(filteredFurnitureData.length / itemsPerPage);
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredFurnitureData.slice(
-    indexOfFirstItem,
-    indexOfLastItem
-  );
+	// Pagination logic
+	const totalPages = Math.ceil(filteredFurnitureData.length / itemsPerPage);
+	const indexOfLastItem = currentPage * itemsPerPage;
+	const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+	const currentItems = filteredFurnitureData.slice(
+		indexOfFirstItem,
+		indexOfLastItem
+	);
 
-  const handleNextPage = () => {
-    if (currentPage < totalPages) setCurrentPage(currentPage + 1);
-  };
+	const handleNextPage = () => {
+		if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+	};
 
-  const handlePreviousPage = () => {
-    if (currentPage > 1) setCurrentPage(currentPage - 1);
-  };
+	const handlePreviousPage = () => {
+		if (currentPage > 1) setCurrentPage(currentPage - 1);
+	};
 
-  // Filter handlers
-  const handleCategoryChange = (selectedOption) => {
-    setSelectedCategories(selectedOption || []);
-  };
+	// Filter handlers
+	const handleCategoryChange = (selectedOption) => {
+		setSelectedCategories(selectedOption || []);
+	};
 
-  const handleFurnitureTypeChange = (selectedOption) => {
-    setSelectedFurnitureTypes(selectedOption || []);
-  };
+	const handleFurnitureTypeChange = (selectedOption) => {
+		setSelectedFurnitureTypes(selectedOption || []);
+	};
 
   const handlePriceRangeChange = (event) => {
     const value = event.target.value;
@@ -170,36 +176,36 @@ const Home = () => {
     setPriceRange([minPrice, maxPrice]);
   };
 
-  const customStyles = {
-    option: (provided, state) => ({
-      ...provided,
-      backgroundColor: state.isFocused ? "#38b2ac" : "white",
-      color: state.isFocused ? "white" : "black",
-    }),
-    control: (provided) => ({
-      ...provided,
-      width: "70%",
-      minWidth: "200px",
-      maxWidth: "100px",
-      "&:hover": { borderColor: "#38b2ac" },
-    }),
-  };
+	const customStyles = {
+		option: (provided, state) => ({
+			...provided,
+			backgroundColor: state.isFocused ? "#38b2ac" : "white",
+			color: state.isFocused ? "white" : "black",
+		}),
+		control: (provided) => ({
+			...provided,
+			width: "70%",
+			minWidth: "200px",
+			maxWidth: "100px",
+			"&:hover": { borderColor: "#38b2ac" },
+		}),
+	};
 
-  // Toggle mobile filter
-  const toggleFilter = () => {
-    setIsFilterOpen(!isFilterOpen);
-  };
+	// Toggle mobile filter
+	const toggleFilter = () => {
+		setIsFilterOpen(!isFilterOpen);
+	};
 
-  useEffect(() => {
-    if (isFilterOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "unset";
-    }
-    return () => {
-      document.body.style.overflow = "unset";
-    };
-  }, [isFilterOpen]);
+	useEffect(() => {
+		if (isFilterOpen) {
+			document.body.style.overflow = "hidden";
+		} else {
+			document.body.style.overflow = "unset";
+		}
+		return () => {
+			document.body.style.overflow = "unset";
+		};
+	}, [isFilterOpen]);
 
   if (loading) {
     return (

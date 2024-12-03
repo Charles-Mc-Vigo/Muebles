@@ -64,7 +64,7 @@ const OrderDetails = () => {
 
 	return (
 		<div>
-			<Header isLogin={true} cartCount={true} />
+			<Header isLogin={true} />
 			<div className="max-w-4xl mx-auto p-4 md:p-8 bg-white shadow-xl rounded-xl mt-5 mb-5 border-2">
 				<div className="flex items-center justify-between mb-6">
 					<button onClick={() => navigate(-1)} className="text-gray-500">
@@ -83,17 +83,11 @@ const OrderDetails = () => {
 					<div className="gap-2 text-gray-600 border-t border-teal-500 p-5">
 						<div className="grid grid-cols-1 sm:grid-cols-2 gap-2 items-baseline rounded-md border-teal-500 p-2 shadow-md">
 							<p className="font-base flex items-baseline">
-								<span className="font-semibold text-black">
-									Order ID:
-								</span>
-								<span className="ml-2 text-black">
-									{order.orderNumber}
-								</span>
+								<span className="font-semibold text-black">Order ID:</span>
+								<span className="ml-2 text-black">{order.orderNumber}</span>
 							</p>
 							<p className="flex items-baseline">
-								<span className="font-semibold text-gray-800">
-									Date:
-								</span>
+								<span className="font-semibold text-gray-800">Date:</span>
 								<span className="text-black ml-2">
 									{new Date(order.createdAt).toLocaleDateString("en-US", {
 										year: "numeric",
@@ -115,11 +109,17 @@ const OrderDetails = () => {
 									Status: {""}
 								</span>
 								<span
-									className={`${
+									className={`font-semibold ${
 										order.orderStatus === "pending"
 											? "text-yellow-600"
-											: "text-green-700"
-									} font-semibold`}
+											: order.orderStatus === "confirmed"
+											? "text-blue-600"
+											: order.orderStatus === "delivered"
+											? "text-green-700"
+											: order.orderStatus === "cancelled"
+											? "text-red-600"
+											: "text-gray-600" // Fallback color for any unexpected status
+									}`}
 								>
 									{order.orderStatus}
 								</span>
@@ -127,9 +127,7 @@ const OrderDetails = () => {
 
 							{/* Customer Details */}
 							<div className="flex items-baseline">
-								<h1 className="font-semibold text-black">
-									Client:
-								</h1>
+								<h1 className="font-semibold text-black">Client:</h1>
 								<p className="ml-2 text-black">
 									{order.user.firstname} {order.user.lastname}
 								</p>
@@ -139,12 +137,8 @@ const OrderDetails = () => {
 								<p className="ml-2 text-black">{order.user.email}</p>
 							</div>
 							<div className="flex">
-								<h1 className="font-semibold text-black">
-									Phone Number:
-								</h1>
-								<p className="ml-2 text-black">
-									{order.user.phoneNumber}
-								</p>
+								<h1 className="font-semibold text-black">Phone Number:</h1>
+								<p className="ml-2 text-black">{order.user.phoneNumber}</p>
 							</div>
 							<div className="flex items-baseline">
 								<h1 className="font-semibold text-black">Address:</h1>
@@ -197,8 +191,7 @@ const OrderDetails = () => {
 										</div>
 										<div className="mt-4 md:mt-0">
 											<p className="text-lg font-medium text-teal-700">
-												PHP {(item.price * item.quantity).toFixed(2)} X{" "}
-												<span> {item.quantity} </span>
+												PHP {order.totalAmount} X {item.quantity}
 											</p>
 										</div>
 									</li>
@@ -213,12 +206,13 @@ const OrderDetails = () => {
 							<h1>Payment Option: {order.paymentOption}</h1>
 							<h1>Delivery Option: {order.deliveryMode}</h1>
 							<h1>Expected Delivery: {order.expectedDelivery}</h1>
-							{/* <h1>Subtotal: PHP {order.subtotal.toFixed(2)}</h1> */}
 							<h1>Shipping Fee: ₱{order.shippingFee.toFixed(2)}</h1>
 							<div className="flex justify-end">
 								<p className="text-xl font-semibold mt-4 text-teal-700 pr-2 pb-2">
 									Total: ₱
-									{order.totalAmount ? order.totalAmount.toFixed(2) : "0.00"}
+									{order.totalAmountWithShipping
+										? order.totalAmountWithShipping.toFixed(2)
+										: "0.00"}
 								</p>
 							</div>
 						</div>
@@ -244,22 +238,57 @@ const OrderDetails = () => {
 									<p>Material: {order.material}</p>
 									<p>Color: {order.color}</p>
 									<p>Size: {order.size}</p>
-									<p className="font-semibold text-lg mt-5">Subtotal: <span className="font-normal">{order.subtotal} x {order.quantity}</span> </p>
+									<p>Quantity: {order.quantity}</p>
+									<p className="font-semibold text-lg mt-5">
+										Subtotal:{" "}
+										<span className="font-normal">₱ {order.subtotal}</span>{" "}
+									</p>
 								</div>
 							</div>
 						</div>
-						<div className="bg-white border flex flex-col border-teal-400 rounded-xl p-4 md:p-6 text-right gap-2">
-							<h1>Payment Option: {order.paymentOption}</h1>
-							<h1>Delivery Option: {order.deliveryMode}</h1>
-							<h1>Expected Delivery: {order.expectedDelivery}</h1>
-							{/* <h1>Subtotal: PHP {order.subtotal.toFixed(2)}</h1> */}
-							<h1>Shipping Fee: ₱{order.shippingFee.toFixed(2)}</h1>
-							<div className="flex justify-end">
-								<p className="text-xl font-semibold mt-4 text-teal-700 pr-2 pb-2">
-									Total: ₱
-									{order.totalAmount ? order.totalAmount.toFixed(2) : "0.00"}
-								</p>
+						<div className="bg-white border flex border-teal-400 rounded-xl p-4 md:p-6 text-right gap-2">
+							<div className="flex flex-1">
 							</div>
+							{order.paymentOption === "Full Payment" ? (
+								<div>
+									<h1>Payment Option: {order.paymentOption}</h1>
+									<h1>Delivery Option: {order.deliveryMode}</h1>
+									<h1>Expected Delivery: {order.expectedDelivery}</h1>
+									<h1>Shipping Fee: ₱ {order.shippingFee.toFixed(2)}</h1>
+									<div className="flex justify-end">
+										<p className="text-xl font-semibold mt-4 text-teal-700 pr-2 pb-2">
+											Total: ₱
+											{order.totalAmountWithShipping
+												? order.totalAmountWithShipping.toFixed(2)
+												: "0.00"}
+										</p>
+									</div>
+								</div>
+							) : (
+								<div>
+									<h1>Payment Option: {order.paymentOption}</h1>
+									<h1>Delivery Option: {order.deliveryMode}</h1>
+									<h1>Expected Delivery: {order.expectedDelivery}</h1>
+									<h1>Shipping Fee: ₱ {order.shippingFee}</h1>
+									<br />
+									<h1>
+										Partial Payment (50%): ₱ {order.partialPayment.toFixed(2)}
+									</h1>
+									<h1>
+										Remaing Balance: ₱ {order.remainingBalance.toFixed(2)}
+									</h1>
+									<h1>
+										Monthly Installment: ₱ {order.monthlyInstallment.toFixed(2)}
+									</h1>
+									<p className="text-lg font-semibold mt-4 text-teal-700 pr-2 pb-2">
+										Total Amount: ₱
+										{order.totalAmountWithShipping
+											? order.totalAmountWithShipping.toFixed(2)
+											: "0.00"}
+									</p>
+									<br />
+								</div>
+							)}
 						</div>
 					</div>
 				)}

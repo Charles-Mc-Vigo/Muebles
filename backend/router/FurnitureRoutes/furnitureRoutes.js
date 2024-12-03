@@ -12,9 +12,10 @@ const {
   UnArchived,
   ArchivedFurnitures,
   searchFurnitureByName,
+  checkIfRated,
 } = require("../../controllers/FurnitureControllers/furnitureController");
 
-const { checkAdminAuth } = require("../../middlewares/checkAuth");
+const { checkAdminAuth, checkUserAuth } = require("../../middlewares/checkAuth");
 
 // Get all furnitures
 // GET - /api/furnitures
@@ -44,6 +45,7 @@ router.post("/unarchive/:furnitureId", checkAdminAuth, UnArchived);
 // GET - /api/furnitures/:furnitureId
 router.get("/:furnitureId", getFurnitureById);
 
+<<<<<<< HEAD
 // Search route for furniture
 // Function to handle searching by name
 router.get('/search', (req, res, next) => {
@@ -51,3 +53,8 @@ router.get('/search', (req, res, next) => {
   next();
 }, searchFurnitureByName);
 module.exports = router;
+=======
+router.get('/check-if-rated/:furnitureId', checkUserAuth, checkIfRated);
+
+module.exports = router;
+>>>>>>> 26ecce36172239d107d20d6534052955fb7e5358
