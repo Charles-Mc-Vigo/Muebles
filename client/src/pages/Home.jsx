@@ -165,19 +165,20 @@ const Home = () => {
 	};
 
 	// Filter handlers
-	const handleCategoryChange = (selectedOption) => {
-		setSelectedCategories(selectedOption || []);
-	};
-
-	const handleFurnitureTypeChange = (selectedOption) => {
-		setSelectedFurnitureTypes(selectedOption || []);
-	};
-
-	const handlePriceRangeChange = (event) => {
-		const value = event.target.value;
-		const [minPrice, maxPrice] = value.split("-").map(Number);
-		setPriceRange([minPrice, maxPrice]);
-	};
+  const handleCategoryChange = (selectedOption) => {
+    setSelectedCategories(selectedOption || []);
+  };
+  
+  const handleFurnitureTypeChange = (selectedOption) => {
+    setSelectedFurnitureTypes(selectedOption || []);
+  };
+  
+  const handlePriceRangeChange = (event) => {
+    const value = event.target.value;
+    const [minPrice, maxPrice] = value.split("-").map(Number);
+    setPriceRange([minPrice, maxPrice]);
+  };
+  
 
 	const customStyles = {
 		option: (provided, state) => ({
@@ -227,65 +228,67 @@ const Home = () => {
 		);
 	}
 
-	const FilterContent = () => (
-		<div className="flex flex-col flex-wrap justify-between w-full">
-			{/* Filter Categories */}
-			<div className="w-full lg:w-3/4 xl:w-2/3 mb-5 p-2">
-				<h2 className="text-xl text-justify font-semibold mb-2">Categories</h2>
-				<Select
-					isMulti
-					options={categories.map((category) => ({
-						value: category?.name,
-						label: category?.name,
-					}))}
-					value={selectedCategories}
-					onChange={handleCategoryChange}
-					placeholder="Select Categories"
-					styles={customStyles}
-				/>
-			</div>
-			{/* Filter Furniture Types */}
-			<div className="w-full lg:w-5/6 xl:w-3/4 mb-5 p-2">
-				<h2 className="text-xl font-semibold mb-2 whitespace-nowrap ">
-					Furniture Types
-				</h2>
-				<Select
-					isMulti
-					options={furnitureTypes.map((type) => ({
-						value: type.name,
-						label: type.name,
-					}))}
-					value={selectedFurnitureTypes}
-					onChange={handleFurnitureTypeChange}
-					placeholder="Select Furniture Types"
-					styles={customStyles}
-				/>
-			</div>
-			{/* Price Range Dropdown */}
-			<div className="w-full lg:w-5/6 xl:w-3/4">
-				<h1 className="text-xl font-semibold mb-1">Price Range</h1>
-				<select
-					value={`${priceRange[0]}-${priceRange[1]}`} // Set the value to the current price range
-					onChange={handlePriceRangeChange}
-					className="border border-gray-300 rounded p-2"
-				>
-					<option value="0-10000">₱0 - ₱10,000</option>
-					<option value="10001-20000">₱10,001 - ₱20,000</option>
-					<option value="20001-30000">₱20,001 - ₱30,000</option>
-					<option value="30001-40000">₱30,001 - ₱40,000</option>
-					<option value="40001-50000">₱40,001 - ₱50,000</option>
-					<option value="50001-60000">₱50,001 - ₱60,000</option>
-					<option value="60001-70000">₱60,001 - ₱70,000</option>
-					<option value="70001-80000">₱70,001 - ₱80,000</option>
-					<option value="80001-90000">₱80,001 - ₱90,000</option>
-					<option value="90001-100000">₱90,001 - ₱100,000</option>
-					<option value="100001-120000">₱100,001 - ₱120,000</option>
-					<option value="120001-150000">₱120,001 - ₱150,000</option>
-				</select>
-			</div>
-		</div>
-	);
-	
+  const FilterContent = () => (
+    <div className="flex flex-col flex-wrap justify-between w-full">
+      {/* Filter Categories */}
+      <div className="w-full lg:w-3/4 xl:w-2/3 mb-5 p-2">
+        <h2 className="text-xl text-justify font-semibold mb-2">Categories</h2>
+        <Select
+          isMulti
+          options={categories.map((category) => ({
+            value: category?.name,
+            label: category?.name,
+          }))}
+          value={selectedCategories}
+          onChange={handleCategoryChange}
+          placeholder="Select Categories"
+          styles={customStyles}
+        />
+      </div>
+      {/* Filter Furniture Types */}
+      <div className="w-full lg:w-5/6 xl:w-3/4 mb-5 p-2">
+        <h2 className="text-xl font-semibold mb-2 whitespace-nowrap">
+          Furniture Types
+        </h2>
+        <Select
+          isMulti
+          options={furnitureTypes.map((type) => ({
+            value: type.name,
+            label: type.name,
+          }))}
+          value={selectedFurnitureTypes}
+          onChange={handleFurnitureTypeChange}
+          placeholder="Select Furniture Types"
+          styles={customStyles}
+        />
+      </div>
+      {/* Price Range Dropdown */}
+      <div className="flex flex-col flex-wrap justify-between w-full">
+    <div className="w-full lg:w-5/6 xl:w-3/4 ml-3">
+      <h1 className="text-xl font-semibold mb-1">Price Range</h1>
+      <select
+        value={`${priceRange[0]}-${priceRange[1]}`}
+        onChange={handlePriceRangeChange}
+        className="border border-gray-300 rounded p-2"
+      >
+        <option value="0-10000">₱0 - ₱10,000</option>
+        <option value="10001-20000">₱10,001 - ₱20,000</option>
+        <option value="20001-30000">₱20,001 - ₱30,000</option>
+        <option value="30001-40000">₱30,001 - ₱40,000</option>
+        <option value="40001-50000">₱40,001 - ₱50,000</option>
+        <option value="50001-60000">₱50,001 - ₱60,000</option>
+        <option value="60001-70000">₱60,001 - ₱70,000</option>
+        <option value="70001-80000">₱70,001 - ₱80,000</option>
+        <option value="80001-90000">₱80,001 - ₱90,000</option>
+        <option value="90001-100000">₱90,001 - ₱100,000</option>
+        <option value="100001-120000">₱100,001 - ₱120,000</option>
+        <option value="120001-150000">₱120,001 - ₱150,000</option>
+      </select>
+    </div>
+  </div>
+    </div>
+  );
+  
 
 	return (
 		<div className="bg-white text-gray-800 flex flex-col min-h-screen">

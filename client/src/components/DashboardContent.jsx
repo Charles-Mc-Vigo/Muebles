@@ -103,7 +103,7 @@ const Dashboard = () => {
         </div>
         <div className="bg-white shadow-lg rounded-lg p-4 text-center">
           <h1 className="text-xl font-bold">Total Revenue</h1>
-          <p className="text-2xl text-green-600">₱ {totalRevenue.toFixed(2)}</p>
+          <p className="text-2xl text-black-600">₱ {totalRevenue.toFixed(2)}</p>
         </div>
         <div className="bg-white shadow-lg rounded-lg p-4 text-center">
           <h1 className="text-xl font-bold">Outstanding Balance</h1>
@@ -122,7 +122,7 @@ const Dashboard = () => {
         </div>
         <div className="bg-white shadow-lg rounded-lg p-4 text-center">
           <h1 className="text-xl font-bold">Delivered</h1>
-          <p className="text-2xl text-green-600">{ordersByStatus.delivered}</p>
+          <p className="text-2xl text-black-600">{ordersByStatus.delivered}</p>
         </div>
         <div className="bg-white shadow-lg rounded-lg p-4 text-center">
           <h1 className="text-xl font-bold">Cancelled</h1>
@@ -133,7 +133,7 @@ const Dashboard = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
         <div className="bg-white shadow-lg rounded-lg p-4 text-center">
           <h1 className="text-xl font-bold">Full Payment Orders</h1>
-          <p className="text-2xl text-green-600">{ordersByPaymentType.fullPayment}</p>
+          <p className="text-2xl text-black-600">{ordersByPaymentType.fullPayment}</p>
         </div>
         <div className="bg-white shadow-lg rounded-lg p-4 text-center">
           <h1 className="text-xl font-bold">Partial Payment Orders</h1>

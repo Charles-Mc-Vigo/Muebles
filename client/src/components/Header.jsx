@@ -99,7 +99,7 @@ const Header = ({ isLogin }) => {
             {/* Logo */}
             <button
               onClick={() => (window.location.href = "/home")}
-              className="text-3xl font-bold text-green-600 whitespace-nowrap"
+              className="text-3xl font-bold text-teal-600 whitespace-nowrap"
             >
               MUEBLES
             </button>
@@ -111,11 +111,11 @@ const Header = ({ isLogin }) => {
                   placeholder="What are you looking for?"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full border border-gray-300 px-4 py-2 rounded-l-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full border border-gray-300 px-4 py-2 rounded-l-md focus:outline-none focus:ring-2 focus:ring-teal-500"
                 />
                 <button
                   type="submit"
-                  className="bg-green-600 text-white px-6 py-2 rounded-r-md hover:bg-green-700 transition-colors"
+                  className="bg-teal-600 text-white px-6 py-2 rounded-r-md hover:bg-teal-700 transition-colors"
                 >
                   <FaSearch className="text-lg" />
                 </button>
@@ -136,7 +136,7 @@ const Header = ({ isLogin }) => {
             <div className="flex items-center gap-8">
               <Link
                 to="/delivery-info"
-                className="flex items-center gap-3 hover:text-green-600 transition-colors"
+                className="flex items-center gap-3 hover:text-teal-600 transition-colors"
               >
                 <FaTruck className="text-2xl" />
                 <div className="hidden xl:block">
@@ -149,16 +149,16 @@ const Header = ({ isLogin }) => {
                 <div className="flex  items-center gap-7">
                   {/* Shopping Cart Link */}
                   <Link to="/cart" className="relative">
-                    <FaShoppingCart className="text-3xl hover:text-green-600 transition-colors" />
+                    <FaShoppingCart className="text-3xl hover:text-teal-600 transition-colors" />
                     {cartCount > 0 && (
-                      <span className="absolute -top-2  bg-green-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                      <span className="absolute -top-2  bg-teal-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
                         {cartCount}
                       </span>
                     )}
                   </Link>
                   <Link
                     to="/orders"
-                    className="block py-2 text-sm text-gray-700 hover:text-green-500 transition-colors"
+                    className="block py-2 text-sm text-gray-700 hover:text-teal-500 transition-colors"
                     onClick={() => setIsUserMenuOpen(false)}
                   >
                     <FaBoxOpen className="inline-block mr-1 text-3xl" />
@@ -178,7 +178,7 @@ const Header = ({ isLogin }) => {
                   <>
                     <button
                       onClick={toggleUserMenu}
-                      className="flex items-center hover:text-green-600 transition-colors"
+                      className="flex items-center hover:text-teal-600 transition-colors"
                     >
                       <FaUser className="text-2xl" />
                     </button>
@@ -206,14 +206,14 @@ const Header = ({ isLogin }) => {
                   <div className="flex items-center gap-2 text-sm">
                     <Link
                       to="/login"
-                      className="hover:text-green-600 transition-colors"
+                      className="hover:text-teal-600 transition-colors"
                     >
                       Login
                     </Link>
                     <span>|</span>
                     <Link
                       to="/signup"
-                      className="hover:text-green-600 transition-colors"
+                      className="hover:text-teal-600 transition-colors"
                     >
                       Sign Up
                     </Link>
@@ -239,7 +239,7 @@ const Header = ({ isLogin }) => {
           Services
         </Link>
         <div className="flex items-center space-x-2 text-sm text-black py-2 m-2">
-          <span className="text-green-500 text-base font-bold">•</span>
+          <span className="text-teal-500 text-base font-bold">•</span>
           <Link
             to="https://tinyurl.com/5avjxzav"
             target="blank"
@@ -261,7 +261,7 @@ const Header = ({ isLogin }) => {
             >
               <FaBars className="text-xl" />
             </button>
-            <Link to="/" className="text-2xl font-bold text-green-600">
+            <Link to="/" className="text-2xl font-bold text-teal-600">
               MUEBLES
             </Link>
             <div className="flex items-center gap-4">
@@ -274,9 +274,9 @@ const Header = ({ isLogin }) => {
               </button>
               {isLogin && (
                 <Link to="/cart" className="relative">
-                  <FaShoppingCart className="text-2xl hover:text-green-600 transition-colors" />
+                  <FaShoppingCart className="text-2xl hover:text-teal-600 transition-colors" />
                   {cartCount > 0 && (
-                    <span className="absolute -top-2 -right-2 bg-green-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                    <span className="absolute -top-2 -right-2 bg-teal-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
                       {cartCount}
                     </span>
                   )}
@@ -291,9 +291,9 @@ const Header = ({ isLogin }) => {
                 <input
                   type="text"
                   placeholder="What are you looking for?"
-                  className="w-full border border-gray-300 px-4 py-2 rounded-l-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                  className="w-full border border-gray-300 px-4 py-2 rounded-l-md focus:outline-none focus:ring-2 focus:ring-teal-500"
                 />
-                <button className="bg-green-600 text-white px-6 py-2 rounded-r-md">
+                <button className="bg-teal-600 text-white px-6 py-2 rounded-r-md">
                   <FaSearch />
                 </button>
               </div>
@@ -303,12 +303,12 @@ const Header = ({ isLogin }) => {
         {/* Mobile Menu */}
         {isMenuOpen && (
           <div className="fixed inset-0 bg-transparent   bg-opacity-50 z-40">
-            <div className="mobile-menu fixed inset-y-0 left-0 w-64 bg-gray-100 shadow-xl border border-green-500 rounded-br-xl rounded-tr-xl z-50 overflow-y-auto">
+            <div className="mobile-menu fixed inset-y-0 left-0 w-64 bg-gray-100 shadow-xl border border-teal-500 rounded-br-xl rounded-tr-xl z-50 overflow-y-auto">
               <div className="p-2  m-2">
-                <div className="flex justify-start text-green-400  ">
+                <div className="flex justify-start text-teal-400  ">
                   <button
                     onClick={toggleMenu}
-                    className="p-2  hover:text-green-700 rounded-md transition-colors"
+                    className="p-2  hover:text-teal-700 rounded-md transition-colors"
                     aria-label="Close menu"
                   >
                     <FaTimes className="text-3xl" />
@@ -319,55 +319,55 @@ const Header = ({ isLogin }) => {
                     <div className="flex flex-col  py-3 px-2 font-serif gap-5 items-baseline">
                       <Link
                         to="/my-profile/view"
-                        className="flex items-center font-normal p-1 gap-2 rounded-md text-base tex-black hover:bg-green-600 transition-colors"
+                        className="flex items-center font-normal p-1 gap-2 rounded-md text-base tex-black hover:bg-teal-600 transition-colors"
                         onClick={toggleMenu}
                       >
-                        <CgProfile className="inline-block text-green-600 text-4xl hover:text-green-600" />
+                        <CgProfile className="inline-block text-teal-600 text-4xl hover:text-teal-600" />
                         Manage Account
                       </Link>
                       <Link
                         to="/cart"
-                        className="block py-2 p-1 text-center rounded-md text-black text-normal text-lg hover:bg-green-700 transition-colors"
+                        className="block py-2 p-1 text-center rounded-md text-black text-normal text-lg hover:bg-teal-700 transition-colors"
                       >
                         <div className="flex items-center gap-2 font-normal text-xl  justify-center">
-                          <FaShoppingCart className="text-green-600 text-4xl" />
+                          <FaShoppingCart className="text-teal-600 text-4xl" />
                           <span>Cart</span>
                         </div>
                       </Link>
 
                       <Link
-                        className="text-black  font-normal text-lg hover:text-green-500"
+                        className="text-black  font-normal text-lg hover:text-teal-500"
                         to="/home"
                       >
                         All Furnitures
                       </Link>
                       <Link
-                        className="text-black  font-normal text-lg hover:text-green-500"
+                        className="text-black  font-normal text-lg hover:text-teal-500"
                         to="/about"
                       >
                         About Us
                       </Link>
                       <Link
-                        className="text-black  font-normal text-lg hover:text-green-500 "
+                        className="text-black  font-normal text-lg hover:text-teal-500 "
                         to="/featured"
                       >
                         Featured
                       </Link>
                       <Link
-                        className="text-black  font-normal text-lg hover:text-green-500"
+                        className="text-black  font-normal text-lg hover:text-teal-500"
                         to="/service-page"
                       >
                         Services
                       </Link>
                       <div className="flex items-center gap-1  text-black py-2 ">
-                        <span className="text-green-500  text-lg font-bold">
+                        <span className="text-teal-500  text-lg font-bold">
                           •
                         </span>
                         <Link
                           to="https://tinyurl.com/5avjxzav"
                           target="blank"
                           rel="noopener noreferrer"
-                          className="text-black font-normal text-base hover:text-green-500"
+                          className="text-black font-normal text-base hover:text-teal-500"
                         >
                           Store Location
                         </Link>
@@ -378,13 +378,13 @@ const Header = ({ isLogin }) => {
                     <div className="flex flex-col gap-4">
                       <Link
                         to="/login"
-                        className="block px-4 py-2 text-center rounded-md text-black hover:bg-green-700 transition-colors"
+                        className="block px-4 py-2 text-center rounded-md text-black hover:bg-teal-700 transition-colors"
                       >
                         Login
                       </Link>
                       <Link
                         to="/signup"
-                        className="block px-4 py-2 text-center rounded-md text-black hover:bg-green-700 transition-colors"
+                        className="block px-4 py-2 text-center rounded-md text-black hover:bg-teal-700 transition-colors"
                       >
                         Sign Up
                       </Link>
