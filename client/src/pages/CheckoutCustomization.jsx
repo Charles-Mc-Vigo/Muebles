@@ -14,10 +14,22 @@ const CheckoutCustomization = () => {
 		);
 	}
 
-	const { model, quantity, size } = formData;
-	console.log("Form Data :", formData);
+	// Extract data from formData
+	const {
+		model,
+		quantity,
+		size,
+		selectedBackrest,
+		selectedSeat,
+		selectedArmrest,
+		selectedDesign,
+		selectedWood,
+		selectedWoodType,
+		dimensions,
+		imageUrl,
+	} = formData;
 
-	// State for payment option, method, delivery mode, and proof of payment
+	// State for payment, delivery, and proof of payment
 	const [paymentOption, setPaymentOption] = useState(
 		formData.paymentOption || "Full Payment"
 	);
@@ -30,7 +42,7 @@ const CheckoutCustomization = () => {
 	const [deliveryMode, setDeliveryMode] = useState(
 		formData.deliveryMode || "Delivery"
 	);
-	const [user, setUser] = useState("");
+	const [user, setUser] = useState({}); // For storing fetched user data
 
 	useEffect(() => {
 		const fetchUser = async () => {
@@ -43,8 +55,7 @@ const CheckoutCustomization = () => {
 					throw new Error("Failed to fetch user data");
 				}
 				const data = await response.json();
-				setUser(data); // Store the user data in the state
-				console.log(data);
+				setUser(data);
 			} catch (error) {
 				console.error("Error fetching user data:", error);
 			}
@@ -53,41 +64,26 @@ const CheckoutCustomization = () => {
 		fetchUser();
 	}, []);
 
-	const handlePaymentOptionChange = (event) => {
-		setPaymentOption(event.target.value);
-	};
+	const handlePaymentOptionChange = (event) => setPaymentOption(event.target.value);
+	const handlePaymentMethodChange = (event) => setPaymentMethod(event.target.value);
+	const handleProofOfPaymentChange = (event) => setProofOfPayment(event.target.files[0]);
+	const handleDeliveryModeChange = (event) => setDeliveryMode(event.target.value);
 
-	const handlePaymentMethodChange = (event) => {
-		setPaymentMethod(event.target.value);
-	};
-
-	const handleProofOfPaymentChange = (event) => {
-		setProofOfPayment(event.target.files[0]); // Store the file
-	};
-
-	const handleDeliveryModeChange = (event) => {
-		setDeliveryMode(event.target.value);
-	};
-
-	// Function to handle order creation using fetch
 	const createCustomizationOrder = async () => {
 		try {
 			const furnitureDetails = {
 				model,
 				quantity,
-				selectedBackrest: formData.selectedBackrest,
-				selectedSeat: formData.selectedSeat,
-				selectedDesign: formData.selectedDesign,
-				selectedWoodType: formData.selectedWoodType,
+				selectedBackrest,
+				selectedSeat,
+				selectedArmrest,
+				selectedDesign,
+				selectedWood,
+				selectedWoodType,
 			};
-	
-			// Conditionally add selectedArmrest if the model is not a chair
-			if (model !== "chair") {
-				furnitureDetails.selectedDesign = formData.selectedDesign;
-			}
-	
+
 			const orderData = {
-				user: user,
+				user,
 				furnitureDetails,
 				size,
 				paymentMethod,
@@ -95,8 +91,10 @@ const CheckoutCustomization = () => {
 				proofOfPayment,
 				deliveryMode,
 			};
-	
-			// Uncomment the following lines to make the API call
+
+			console.log("Order Data:", orderData);
+
+			// Uncomment the following lines to send data to the server
 			// const response = await fetch("/api/orders", {
 			// 	method: "POST",
 			// 	headers: {
@@ -104,11 +102,7 @@ const CheckoutCustomization = () => {
 			// 	},
 			// 	body: JSON.stringify(orderData),
 			// });
-			// if (!response.ok) {
-			// 	throw new Error("Failed to create order");
-			// }
-			// const responseData = await response.json();
-			console.log("Order created successfully:", orderData);
+			// if (!response.ok) throw new Error("Failed to create order");
 		} catch (error) {
 			console.error("Error creating order:", error);
 		}
@@ -116,199 +110,101 @@ const CheckoutCustomization = () => {
 
 	return (
 		<div className="container mx-auto p-6">
-			<h1 className="text-3xl font-bold text-center mb-8"></h1>
+			<h1 className="text-3xl font-bold text-center mb-8">Checkout</h1>
 			<div className="space-y-6">
+				{/* User Details */}
 				<div className="bg-white p-6 shadow-lg rounded-lg border border-gray-200">
-					<div className="space-y-2">
-						<h2 className="text-2xl font-semibold mb-4">User Details</h2>
-						<p>
-							{user.firstname} {user.lastname}
-						</p>
-						<p>{user.email}</p>
-						<p>{user.phoneNumber}</p>
-						<p>
-							{user?.addresses
-								?.filter((address) => address.isDefault)
-								?.map((address, index) => (
-									<span key={index}>
-										{address.streetAddress}, {address.barangay},{" "}
-										{address.municipality}, {address.zipCode}
-									</span>
-								)) || "No default address"}
-						</p>
-					</div>
+					<h2 className="text-2xl font-semibold mb-4">User Details</h2>
+					<p>{user.firstname} {user.lastname}</p>
+					<p>{user.email}</p>
+					<p>{user.phoneNumber}</p>
+					<p>
+						{user?.addresses?.filter(addr => addr.isDefault)?.[0]?.streetAddress || "No default address found"}
+					</p>
 				</div>
 
-				{/* Custom Size */}
-				<div className="bg-white p-6 shadow-lg rounded-lg border flex border-gray-200">
-					<div className="space-y-2 flex-1 flex flex-col">
+				{/* Furniture Details */}
+				<div className="bg-white p-6 shadow-lg rounded-lg border border-gray-200 flex">
+					<div className="flex-1">
 						<h2 className="text-2xl font-semibold mb-4">Furniture Details</h2>
-						<p>
-							<strong>Model:</strong>{" "}
-							{model.charAt(0).toUpperCase() + model.slice(1)}
-						</p>
-						<p>
-							<strong>Quantity:</strong> {quantity}
-						</p>
+						<p><strong>Model:</strong> {model}</p>
+						<p><strong>Quantity:</strong> {quantity}</p>
 						{model === "chair" && (
 							<>
-								<p>
-									<strong>Backrest:</strong> {formData.selectedBackrest}
-								</p>
-								<p>
-									<strong>Seat:</strong> {formData.selectedSeat}
-								</p>
-								<p>
-									<strong>Wood Type:</strong> {formData.selectedWood}
-								</p>
+								<p><strong>Backrest:</strong> {selectedBackrest}</p>
+								<p><strong>Seat:</strong> {selectedSeat}</p>
+								<p><strong>Wood:</strong> {selectedWood}</p>
 							</>
 						)}
 						{model === "sofa" && (
 							<>
-								<p>
-									<strong>Sofa Backrest:</strong> {formData.selectedBackrest}
-								</p>
-								<p>
-									<strong>Sofa Armrest:</strong> {formData.selectedArmrest}
-								</p>
-								<p>
-									<strong>Wood Type:</strong> {formData.selectedWood}
-								</p>
+								<p><strong>Backrest:</strong> {selectedBackrest}</p>
+								<p><strong>Armrest:</strong> {selectedArmrest}</p>
+								<p><strong>Wood:</strong> {selectedWood}</p>
 							</>
 						)}
 						{model === "door" && (
 							<>
-								<p>
-									<strong>Door Design:</strong> {formData.selectedDesign}
-								</p>
-								<p>
-									<strong>Wood Type:</strong> {formData.selectedWoodType}
-								</p>
+								<p><strong>Design:</strong> {selectedDesign}</p>
+								<p><strong>Wood Type:</strong> {selectedWoodType}</p>
 							</>
 						)}
-						<div className="space-y-2">
-							<h2 className="text-xl font-semibold mb-4">Size</h2>
-							<p>
-								<strong>Name:</strong> {size?.name || "Not specified"}
-							</p>
-							<p>
-								<strong>Height:</strong> {size.height || size.dimensions?.height} inches
-							</p>
-							<p>
-								<strong>Length:</strong> {size.length || size.dimensions?.length} inches
-							</p>
-							<p>
-								<strong>Width:</strong> {size.width || size.dimensions?.width} inches
-							</p>
-							<p>
-								<strong>Depth:</strong> {size.depth || size.dimensions?.depth} inches
-							</p>
+
+						{/* Dimensions */}
+						<div className="mt-4">
+							<h3 className="text-xl font-semibold">Dimensions</h3>
+							<p><strong>Height:</strong> {dimensions?.height || size?.height || "N/A"} inches</p>
+							<p><strong>Width:</strong> {dimensions?.width || size?.width || "N/A"} inches</p>
+							<p><strong>Depth:</strong> {dimensions?.depth || size?.depth || "N/A"} inches</p>
+							<p><strong>Length:</strong> {dimensions?.length || size?.length || "N/A"} inches</p>
 						</div>
 					</div>
-
-					{/* Add image container here to be added later */}
-					<div className="mt-4 flex flex-1 items-center text-center bg-slate-300">
+					<div className="flex-1 flex items-center justify-center">
 						<img
-							src={formData.imageUrl || "placeholder-image.jpg"}
+							src={imageUrl || "placeholder-image.jpg"}
 							alt={`${model} preview`}
-							className="w-full h-64 object-cover rounded-lg shadow-sm"
+							className="w-64 h-64 object-cover rounded-lg shadow"
 						/>
 					</div>
 				</div>
 
 				{/* Payment Options */}
 				<div className="bg-white p-6 shadow-lg rounded-lg border border-gray-200">
-					<div className="space-y-4">
-						<div>
-							<label
-								htmlFor="paymentOption"
-								className="block text-lg font-semibold"
-							>
-								Payment Option
-							</label>
-							<select
-								id="paymentOption"
-								value={paymentOption}
-								onChange={handlePaymentOptionChange}
-								className="mt-2 p-3 w-full border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-							>
-								<option value="Full Payment">Full Payment</option>
-								<option value="Partial Payment">Partial Payment</option>
-							</select>
-						</div>
-
-						<div>
-							<label
-								htmlFor="paymentMethod"
-								className="block text-lg font-semibold"
-							>
-								Payment Method
-							</label>
-							<select
-								id="paymentMethod"
-								value={paymentMethod}
-								onChange={handlePaymentMethodChange}
-								className="mt-2 p-3 w-full border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-							>
-								<option value="GCash">GCash</option>
-								<option value="Maya">Maya</option>
-							</select>
-						</div>
-
-						{["GCash", "Maya"].includes(paymentMethod) && (
-							<div>
-								<label
-									htmlFor="proofOfPayment"
-									className="block text-lg font-semibold"
-								>
-									Proof of Payment
-								</label>
-								<div className="mt-2">
-									<img
-										src="https://via.placeholder.com/150"
-										alt="Example QR Code"
-										className="mb-2"
-									/>
-									<input
-										type="file"
-										id="proofOfPayment"
-										onChange={handleProofOfPaymentChange}
-										className="mt-2 p-3 w-full border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-									/>
-								</div>
-							</div>
-						)}
+					<h3 className="text-xl font-semibold mb-4">Payment Options</h3>
+					<div>
+						<label htmlFor="paymentOption" className="block">Payment Option</label>
+						<select id="paymentOption" value={paymentOption} onChange={handlePaymentOptionChange} className="w-full mt-2">
+							<option value="Full Payment">Full Payment</option>
+							<option value="Partial Payment">Partial Payment</option>
+						</select>
 					</div>
+					<div>
+						<label htmlFor="paymentMethod" className="block mt-4">Payment Method</label>
+						<select id="paymentMethod" value={paymentMethod} onChange={handlePaymentMethodChange} className="w-full mt-2">
+							<option value="GCash">GCash</option>
+							<option value="Maya">Maya</option>
+						</select>
+					</div>
+					{["GCash", "Maya"].includes(paymentMethod) && (
+						<div className="mt-4">
+							<label htmlFor="proofOfPayment">Upload Proof of Payment</label>
+							<input type="file" id="proofOfPayment" onChange={handleProofOfPaymentChange} className="w-full mt-2" />
+						</div>
+					)}
 				</div>
 
 				{/* Delivery Mode */}
 				<div className="bg-white p-6 shadow-lg rounded-lg border border-gray-200">
-					<h3 className="text-xl font-semibold mb-4">Delivery Mode</h3>
-					<div>
-						<label
-							htmlFor="deliveryMode"
-							className="block text-lg font-semibold"
-						>
-							Delivery Mode
-						</label>
-						<select
-							id="deliveryMode"
-							value={deliveryMode}
-							onChange={handleDeliveryModeChange}
-							className="mt-2 p-3 w-full border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-						>
-							<option value="Pick">Pick</option>
-							<option value="Delivery">Delivery</option>
-						</select>
-					</div>
+					<h3 className="text-xl font-semibold">Delivery Mode</h3>
+					<select id="deliveryMode" value={deliveryMode} onChange={handleDeliveryModeChange} className="w-full mt-2">
+						<option value="Pick">Pick</option>
+						<option value="Delivery">Delivery</option>
+					</select>
 				</div>
 
 				{/* Confirm Button */}
-				<div className="mt-6 text-center">
-					<button
-						onClick={createCustomizationOrder}
-						className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 focus:outline-none"
-					>
+				<div className="text-center mt-6">
+					<button onClick={createCustomizationOrder} className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
 						Confirm and Create Order
 					</button>
 				</div>
