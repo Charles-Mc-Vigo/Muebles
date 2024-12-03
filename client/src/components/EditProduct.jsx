@@ -242,8 +242,9 @@ const EditProduct = () => {
 	}
 
 	return (
-		<div className="max-w-4xl mx-auto p-6 bg-white shadow-md rounded-lg">
-			<h2 className="text-2xl font-semibold mb-6 text-gray-800">
+		<div className="max-w mx-auto p-6 bg-white shadow-md rounded-lg">
+			<div></div>
+			<h2 className="text-2xl font-semibold  mb-6 text-gray-800 ">
 				Edit Product
 			</h2>
 			<form onSubmit={handleSubmit} className="space-y-6">

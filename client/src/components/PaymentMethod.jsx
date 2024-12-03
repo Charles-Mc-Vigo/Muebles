@@ -7,7 +7,7 @@ const PaymentMethod = () => {
     <div>
       <section className="bg-white max-w-full">
         <Header />
-        <div className="m-5 border flex flex-col items-center justify-center text-center border-teal-500 rounded-xl p-5">
+        <div className="m-5 border flex flex-col items-center justify-center text-center border-green-500 rounded-xl p-5">
           <h1 className="text-2xl md:text-3xl font-bold mb-2">
             About Our Payment Method
           </h1>
@@ -19,7 +19,7 @@ const PaymentMethod = () => {
         </div>
         <section>
           <div className="grid grid-cols-2 gap-4">
-            <div className="container rounded-xl shadow-xl bg-gray-100 max-w-4xl m-5 p-5 flex items-center border-teal-500 border">
+            <div className="container rounded-xl shadow-xl bg-gray-100 max-w-4xl m-5 p-5 flex items-center border-green-500 border">
               <div className="flex-1">
                 <h3 className="text-xl md:text-2xl font-semibold mb-2">
                   Online Payment with GCash
@@ -33,7 +33,7 @@ const PaymentMethod = () => {
                 </p>
               </div>
             </div>
-            <div className="container rounded-xl shadow-xl bg-gray-100 max-w-4xl m-5 p-5 flex items-center border-teal-500 border">
+            <div className="container rounded-xl shadow-xl bg-gray-100 max-w-4xl m-5 p-5 flex items-center border-green-500 border">
               <div className="flex-1">
                 <h3 className="text-xl md:text-2xl font-semibold mb-2">
                   Over-the-Counter Payments
@@ -49,7 +49,7 @@ const PaymentMethod = () => {
             </div>
           </div>
         </section>
-        <div className="m-5 shadow-xl bg-white rounded-xl border border-teal-500 flex flex-col items-center justify-center text-center p-10">
+        <div className="m-5 shadow-xl bg-white rounded-xl border border-green-500 flex flex-col items-center justify-center text-center p-10">
           <p className="text-black font-medium text-justify text-lg md:text-xl mb-2">
             To secure your order, a 50% down payment is required upon finalizing
             the transaction. The remaining 50% is due upon delivery.

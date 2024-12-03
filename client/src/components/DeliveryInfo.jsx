@@ -91,32 +91,32 @@ const Delivery = () => {
                     <tr>
                       <td className="px-4 py-2 border">Boac</td>
                       <td className="px-4 py-2 border">4900</td>
-                      <td className="px-4 py-2 border">₱100</td>
+                      <td className="px-4 py-2 border">₱ 500</td>
                     </tr>
                     <tr>
                       <td className="px-4 py-2 border">Mogpog</td>
                       <td className="px-4 py-2 border">4901</td>
-                      <td className="px-4 py-2 border">₱150</td>
+                      <td className="px-4 py-2 border">₱ 700</td>
                     </tr>
                     <tr>
                       <td className="px-4 py-2 border">Gasan</td>
                       <td className="px-4 py-2 border">4905</td>
-                      <td className="px-4 py-2 border">₱150</td>
+                      <td className="px-4 py-2 border">₱ 500</td>
                     </tr>
                     <tr>
                       <td className="px-4 py-2 border">Buenavista</td>
                       <td className="px-4 py-2 border">4904</td>
-                      <td className="px-4 py-2 border">₱200</td>
+                      <td className="px-4 py-2 border">₱ 800</td>
                     </tr>
                     <tr>
                       <td className="px-4 py-2 border">Torrijos</td>
                       <td className="px-4 py-2 border">4903</td>
-                      <td className="px-4 py-2 border">₱250</td>
+                      <td className="px-4 py-2 border">₱ 3,000</td>
                     </tr>
                     <tr>
                       <td className="px-4 py-2 border">Sta. Cruz</td>
                       <td className="px-4 py-2 border">4902</td>
-                      <td className="px-4 py-2 border">₱200</td>
+                      <td className="px-4 py-2 border">₱ 3,000</td>
                     </tr>
                   </tbody>
                 </table>

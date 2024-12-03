@@ -25,7 +25,6 @@ import ProductDetails from "./components/ProductDetails";
 import EditProduct from "./components/EditProduct";
 import DeliveryInfo from "./components/DeliveryInfo";
 import AdminPendingPage from "./pages/AdminPendingPage";
-import AdminProfile from "./components/AdminProfile";
 import UserProfile from "./components/UserProfile";
 import TermsAndConditions from "./pages/TermsandCondition";
 import DeliveryManagement from "./pages/DeliveryManagement";
@@ -37,6 +36,7 @@ import InventoryPage from "./pages/InventoryPage";
 import PaymentMethod from "./components/PaymentMethod";
 import EditUserProfile from "./components/EditUserProfile";
 import EditAdminProfile from "./components/EditAdminProfile";
+import AdminProfile from "./components/AdminProfile";
 
 import ViewOrder from "./components/ViewOrder";
 import AddNewAddress from "./components/AddNewAddress";
@@ -47,6 +47,7 @@ import PreOrder from "./pages/PreOrder";
 import Rating from "./pages/Rating";
 import GenerateReport from "./components/GenerateReport";
 import CheckoutCustomization from "./pages/CheckoutCustomization";
+import SearchResults from "./components/SearchResults";
 // import LoadingSpinner from "./components/LoadingSpinner";
 
 export default function App() {
@@ -58,6 +59,7 @@ export default function App() {
 					<Route path="/about" element={<About />} />
 					<Route path="/signup" element={<SignUp />} />
 					<Route path="/login" element={<Login />} />
+			        <Route path="/search-result" element={<SearchResults />} /> 
 					<Route path="/terms&condition" element={<TermsAndConditions />} />
 					<Route path="/payment-method" element={<PaymentMethod />} />
 					<Route
@@ -125,6 +127,7 @@ export default function App() {
 					{/* Admin routes */}
 					<Route path="/admin-login" element={<AdminLogin />} />
 					<Route path="/admin-signup" element={<AdminSignUp />} />
+					<Route path="/admin-profile-view" element={<AdminProfile />} />
 					<Route
 						path="/admin-signup/verify-account/:adminId"
 						element={<AdminVerify />}
@@ -155,10 +158,10 @@ export default function App() {
 							<ProtectedRoute element={GenerateReport} adminOnly={true} />
 						}
 					/>
-					<Route
+					{/* <Route
 						path="/dashboard/setting/admin-profile/view"
 						element={<ProtectedRoute element={AdminProfile} adminOnly={true} />}
-					/>
+					/> */}
 					<Route
 						path="/dashboard/setting/admin-profile/edit"
 						element={

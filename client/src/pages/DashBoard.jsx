@@ -62,7 +62,7 @@ const Dashboard = () => {
         ${
           isActive
             ? "bg-white rounded-l-3xl"
-            : "hover:bg-white hover:rounded-l-3xl"
+            : "hover:bg-gray-300 hover:rounded-l-3xl"
         }`}
       onClick={onClick}
     >
@@ -82,7 +82,7 @@ const Dashboard = () => {
         ${
           currentSection === section
             ? "bg-white rounded-l-3xl"
-            : "hover:bg-white rounded-l-3xl"
+            : "hover:bg-gray-300 rounded-l-3xl"
         }`}
       onClick={() => onClick(section)}
     >
@@ -97,39 +97,32 @@ const Dashboard = () => {
     "add-product": <ProductManagement />,
     inventory: <Inventory />,
 
-    "view-transaction": <TransactionHistory />,
-
     "order-management": <OrderManagement />,
 
 		"product-customization": <ProductCustomization />,
     "track-delivery": (
       <h2 className="text-2xl font-semibold">Track Delivery Content</h2>
     ),
-    "manage-delivery": <DeliveryManagement/> ,
-
     Furniture: <Maintenance />,
 	
-    Services: <ServiceSection />,
-    "repair-hardware": (
-      <h2 className="text-2xl font-semibold">Repair Hardware Content</h2>
-    ),
   };
 
 	return (
 		<div className="flex h-screen bg-gray-100">
 			{/* Sidebar */}
-			<aside className="w-64 bg-oliveGreen text-white flex flex-col items-center rounded-l-3xl ml-1 h-50 mt-2 mb-2">
+			<aside className="w-64 bg-green-500  flex flex-col items-center rounded-l-3xl ml-1 h-50 mt-2 mb-2">
 				<div className="flex flex-col items-center p-5 m-5">
 					<img
 						src="/landingimage/LOGO.jpg"
 						alt="LOGO"
-						className="w-12 h-12 rounded-full"
+						className="w-32 h-32 rounded-full object-contain"
+            
 					/>
-					<h1 className="mt-3">JCKAME</h1>
+					<h1 className="mt-3 text-3xl text-white font-semibold">JCKAME</h1>
 				</div>
 
-				<nav className="w-full flex-grow">
-					<ul className="space-y-4">
+				<nav className="w-full flex-grow font-normal text-lg">
+					<ul className="space-y-4 ">
 						<NavItem
 							icon={faBox}
 							label="Dashboard"
@@ -188,44 +181,11 @@ const Dashboard = () => {
 
             {/* Transaction Section */}
 
-            <NavItem
-              icon={faHandshake}
-              label="Transaction"
-              isActive={activeSection.startsWith("transaction")}
-              onClick={() => toggleDropdown("transaction")}
-              hasDropdown
-              isOpen={dropdowns.transaction}
-            />
-            {dropdowns.transaction && (
-              <ul className="ml-8 space-y-2">
-                <DropdownItem
-                  label="View Transactions"
-                  section="view-transaction"
-                  currentSection={activeSection}
-                  onClick={setActiveSection}
-                />
-              </ul>
-            )}
+            
+          
 
             {/* Delivery Section */}
-            <NavItem
-              icon={faTruck}
-              label="Delivery"
-              isActive={activeSection.startsWith("delivery")}
-              onClick={() => toggleDropdown("delivery")}
-              hasDropdown
-              isOpen={dropdowns.delivery}
-            />
-            {dropdowns.delivery && (
-              <ul className="ml-8 space-y-2">
-                <DropdownItem
-                  label="Manage Delivery"
-                  section="manage-delivery"
-                  currentSection={activeSection}
-                  onClick={setActiveSection}
-                />
-              </ul>
-            )}
+            
 
             {/* Maintenance Section */}
             <NavItem

@@ -335,10 +335,11 @@ export default function SignUp() {
 };
 
 	return (
-		<div className="min-h-screen flex flex-col">
+		<div className="min-h-screen flex flex-col bg-gray-100">
 			<Header />
 			<div className="flex-grow flex justify-center items-center mb-3 mt-5">
-				<div className="w-full max-w-4xl p-8 mx-4 md:mx-auto bg-white shadow-lg rounded-lg flex flex-col md:flex-row border-4 border-green-200">
+				<div className="w-full max-w-4xl p-8 mx-4 md:mx-auto bg-white shadow-lg rounded-lg flex flex-col md:flex-row border-4 border-green-500">
+					
 					{/* Left side with background image */}
 					<div
 						className="hidden md:flex md:w-1/2 items-center bg-contain justify-center rounded-l-lg"
@@ -528,8 +529,8 @@ export default function SignUp() {
 							</div>
 							<button
 								type="submit"
-								className={`p-3 rounded-lg text-white font-bold uppercase hover:opacity-80 disabled:opacity-70 ${
-									loading ? "bg-blue-400" : "bg-blue-500"
+								className={`p-3 rounded-lg text-white font-bold uppercase hover:hover:bg-green-700 ${
+									loading ? "bg-green-500" : "bg-green-500"
 								}`}
 								disabled={loading}
 							>

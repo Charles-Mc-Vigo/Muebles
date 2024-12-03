@@ -167,7 +167,7 @@ function ProductDetails({ admin }) {
 				return (
 					<div
 						id="description"
-						className="grid items-center text-justify p-4 bg-white shadow-xl border-teal-500 border rounded-lg max-w-full sm:p-6 md:p-8 lg:px-12"
+						className="grid items-center text-justify p-4 bg-white shadow-xl border-green-500 border rounded-lg max-w-full sm:p-6 md:p-8 lg:px-12"
 					>
 						<h2 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-2 sm:mb-4 lg:mb-6 ml-2 sm:ml-5">
 							Product Description
@@ -175,7 +175,7 @@ function ProductDetails({ admin }) {
 						<p className="text-gray-800 mb-3 sm:mb-4 lg:mb-6 ml-2 sm:ml-5">
 							{furnitureData.description || "No description available."}
 						</p>
-						<div className="border-t border-teal-500 pt-4 sm:pt-6 lg:pt-8">
+						<div className="border-t border-green-500 pt-4 sm:pt-6 lg:pt-8">
 							{/* Materials Section */}
 							<ul className="mb-4 sm:mb-6">
 								<li className="ml-2 sm:ml-5">
@@ -203,7 +203,7 @@ function ProductDetails({ admin }) {
 							</ul>
 
 							{/* Sizes Section */}
-							<ul className="mb-4 sm:mb-6 border-t-2 pt-5 sm:pt-6 border-teal-500">
+							<ul className="mb-4 sm:mb-6 border-t-2 pt-5 sm:pt-6 border-green-500">
 								<li className="ml-2 sm:ml-5">
 									<div className="flex justify-between">
 										<h3 className="text-base sm:text-lg font-semibold">
@@ -233,7 +233,7 @@ function ProductDetails({ admin }) {
 							</ul>
 
 							{/* Colors Section */}
-							<ul className="mb-4 sm:mb-6 border-t-2 border-teal-500 pt-5 sm:pt-6">
+							<ul className="mb-4 sm:mb-6 border-t-2 border-green-500 pt-5 sm:pt-6">
 								<li className="ml-2 sm:ml-5">
 									<h3 className="text-lg sm:text-xl font-semibold">Colors:</h3>
 									{furnitureData.colors?.length > 0 ? (
@@ -252,7 +252,7 @@ function ProductDetails({ admin }) {
 							</ul>
 
 							{/* Disclaimer Section */}
-							<ul className="mb-4 sm:mb-6 pt-5 sm:pt-6 border-t-2 border-teal-500">
+							<ul className="mb-4 sm:mb-6 pt-5 sm:pt-6 border-t-2 border-green-500">
 								<li className="ml-2 sm:ml-5">
 									<h3 className="text-xl sm:text-2xl font-semibold">
 										Disclaimer
@@ -274,7 +274,7 @@ function ProductDetails({ admin }) {
 				return (
 					<div
 						id="warranty"
-						className="p-4 sm:p-6 md:p-8 bg-white shadow-xl border-teal-500 border rounded-lg max-w-full"
+						className="p-4 sm:p-6 md:p-8 bg-white shadow-xl border-green-500 border rounded-lg max-w-full"
 					>
 						<h2 className="text-xl sm:text-2xl font-bold mb-4">Warranty</h2>
 						<p className="text-gray-700 text-sm sm:text-base">
@@ -286,7 +286,7 @@ function ProductDetails({ admin }) {
 				return (
 					<div
 						id="care-guide"
-						className="p-4 sm:p-6 md:p-8 bg-white shadow-xl border-teal-500 border rounded-lg max-w-full"
+						className="p-4 sm:p-6 md:p-8 bg-white shadow-xl border-green-500 border rounded-lg max-w-full"
 					>
 						<h2 className="text-xl sm:text-2xl font-bold mb-4">Care Guide</h2>
 						<p className="text-gray-700 text-sm sm:text-base">
@@ -317,10 +317,10 @@ function ProductDetails({ admin }) {
 					<Header isLogin={true} />
 					<div className="w-full h-auto p-5 flex flex-col lg:flex-row">
 						<div className="flex flex-col lg:flex-row lg:w-full justify-center p-5">
-							<div className="flex flex-col rounded-xl p-5 border-2 border-teal-600 sm:mb-5 md:mb-5 max-w-2/5 shadow-lg shadow-gray-300">
+							<div className="flex flex-col rounded-xl p-5 border-2 border-green-600 sm:mb-5 md:mb-5 max-w-2/5 shadow-lg shadow-gray-300">
 								<button
 									onClick={() => navigate(-1)}
-									className="text-gray-500 mr-2 hover:text-teal-600"
+									className="text-gray-500 mr-2 hover:text-green-600"
 								>
 									<IoMdArrowRoundBack size={40} />
 								</button>
@@ -375,19 +375,19 @@ function ProductDetails({ admin }) {
 								</div>
 							</div>
 							{/* right section */}
-							<div className="flex-1 max-w-3xl border-2 border-teal-500 p-5 bg-white rounded-lg shadow-lg  lg:ml-5 ">
+							<div className="flex-1 max-w-3xl border-2 border-green-500 p-5 bg-white rounded-lg shadow-lg  lg:ml-5 ">
 								<h1 className="text-3xl font-bold">{furnitureData.name}</h1>
 								<div className="mt-2">
-									<p className="border-b-2 py-2 border-teal-500 text-2xl mb-3">
+									<p className="border-b-2 py-2 border-green-500 text-2xl mb-3">
 										Price : {price}
 									</p>
-									<p className="text-2xl border-b-2 py-2 border-teal-500 mb-3">
+									<p className="text-2xl border-b-2 py-2 border-green-500 mb-3">
 										Estimated Completion Time (ECT):{" "}
 										{furnitureData.furnitureType.ECT} Days
 									</p>
 								</div>
 								{/* Color Selection */}
-								<div className="mb-4 rounded-md p-2 border-b-2 border-teal-500">
+								<div className="mb-4 rounded-md p-2 border-b-2 border-green-500">
 									<label className="block font-semibold text-2xl">
 										Colors: {selectedColor || "None"}
 									</label>
@@ -398,7 +398,7 @@ function ProductDetails({ admin }) {
 												onClick={() => handleColorClick(color)}
 												className={`w-16 h-16 rounded-full border cursor-pointer relative flex items-center justify-center transition-transform transform hover:scale-110 ${
 													selectedColor === color.name
-														? "bg-teal-600 text-black"
+														? "bg-green-600 text-black"
 														: "text-black"
 												}`}
 												style={{ backgroundColor: color.hex }}
@@ -407,17 +407,17 @@ function ProductDetails({ admin }) {
 									</div>
 								</div>
 								{/* Materials Section */}
-								<div className="mt-4 border-b-2 border-teal-500 pb-4">
+								<div className="mt-4 border-b-2 border-green-500 pb-4">
 									<h2 className="text-2xl font-semibold">Materials</h2>
 									<div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 p-1">
 										{furnitureData.materials?.map((material) => (
 											<span
 												key={material.id}
 												onClick={() => handleMaterialClick(material)}
-												className={`border text-xl border-teal-600 px-2 py-1 rounded-md cursor-pointer transition ${
+												className={`border text-xl border-green-600 px-2 py-1 rounded-md cursor-pointer transition ${
 													selectedMaterial === material.name
-														? "bg-teal-600 text-white"
-														: "text-teal-600"
+														? "bg-green-600 text-white"
+														: "text-green-600"
 												}`}
 											>
 												{material.name}
@@ -433,10 +433,10 @@ function ProductDetails({ admin }) {
 											<span
 												key={size.id}
 												onClick={() => handleSizeClick(size)}
-												className={`border mb-2 p-5 text-base border-teal-600 rounded-md cursor-pointer transition ${
+												className={`border mb-2 p-5 text-base border-green-600 rounded-md cursor-pointer transition ${
 													selectedSize === size.label
-														? "bg-teal-600 text-white"
-														: "text-teal-600"
+														? "bg-green-600 text-white"
+														: "text-green-600"
 												}`}
 											>
 												{size.label}
@@ -461,7 +461,7 @@ function ProductDetails({ admin }) {
 									<button
 										onClick={addToCart}
 										disabled={loading}
-										className="text-teal-500 hover:bg-teal-500 hover:text-white border border-teal-500 text-xl font-semibold px-4 rounded-md transition-colors duration-300 flex-1 py-2"
+										className="text-green-500 hover:bg-green-500 hover:text-white border border-green-500 text-xl font-semibold px-4 rounded-md transition-colors duration-300 flex-1 py-2"
 									>
 										{loading ? "Adding..." : "Add to cart"}
 									</button>
@@ -471,7 +471,7 @@ function ProductDetails({ admin }) {
 					</div>
 
 					{/* Rating Section */}
-					<div className="p-4 sm:p-6 md:p-8 bg-white shadow-xl border-teal-500 border rounded-lg max-w-full">
+					<div className="p-4 sm:p-6 md:p-8 bg-white shadow-xl border-green-500 border rounded-lg max-w-full">
 						<h2 className="text-2xl font-bold text-gray-800 mb-6">
 							Customer Ratings
 						</h2>
@@ -482,7 +482,7 @@ function ProductDetails({ admin }) {
 										key={rating._id}
 										className="flex items-start bg-gray-50 p-4 rounded-lg shadow-md"
 									>
-										<div className="w-12 h-12 rounded-full bg-teal-100 flex items-center justify-center text-teal-500 font-bold text-lg">
+										<div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center text-green-500 font-bold text-lg">
 											{rating.user.firstname.charAt(0)}
 										</div>
 										<div className="ml-4 flex-1">
@@ -508,7 +508,7 @@ function ProductDetails({ admin }) {
 								{visibleRatings < ratings.length && (
 									<button
 										onClick={() => setVisibleRatings(visibleRatings + 5)}
-										className="w-full text-teal-600 font-medium py-2 mt-4 border-t border-gray-200 hover:underline"
+										className="w-full text-green-600 font-medium py-2 mt-4 border-t border-gray-200 hover:underline"
 									>
 										Show More
 									</button>
@@ -520,15 +520,15 @@ function ProductDetails({ admin }) {
 					</div>
 
 					{/* Content Mapping  */}
-					<div className="border-t-2 border-teal-500 w-full p-4 sm:p-6 md:p-8">
+					<div className="border-t-2 border-green-500 w-full p-4 sm:p-6 md:p-8">
 						<nav className="flex flex-wrap items-center justify-center space-x-4 sm:space-x-8 text-lg sm:text-xl">
 							{/* Description Button */}
 							<button
 								onClick={() => setActiveTab("description")}
 								className={`px-4 py-2 rounded-lg transition text-sm sm:text-base md:text-lg ${
 									activeTab === "description"
-										? "bg-teal-600 text-white"
-										: "hover:text-teal-600"
+										? "bg-green-600 text-white"
+										: "hover:text-green-600"
 								}`}
 							>
 								Description
@@ -539,8 +539,8 @@ function ProductDetails({ admin }) {
 								onClick={() => setActiveTab("warranty")}
 								className={`px-4 py-2 rounded-lg transition text-sm sm:text-base md:text-lg ${
 									activeTab === "warranty"
-										? "bg-teal-600 text-white"
-										: "hover:text-teal-600"
+										? "bg-green-600 text-white"
+										: "hover:text-green-600"
 								}`}
 							>
 								Warranty
@@ -551,8 +551,8 @@ function ProductDetails({ admin }) {
 								onClick={() => setActiveTab("care-guide")}
 								className={`px-4 py-2 rounded-lg transition text-sm sm:text-base md:text-lg ${
 									activeTab === "care-guide"
-										? "bg-teal-600 text-white"
-										: "hover:text-teal-600"
+										? "bg-green-600 text-white"
+										: "hover:text-green-600"
 								}`}
 							>
 								How to Care

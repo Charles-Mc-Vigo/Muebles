@@ -67,7 +67,7 @@ const Logout = ({ isAdmin, isUser }) => {
         <button
           onClick={handleLogout}
           disabled={loading}
-          className={`flex items-center justify-center gap-2 bg-teal-600 text-black font-bold py-3 px-6 w-full rounded-lg shadow-lg hover:bg-teal-800 transition duration-200 ${
+          className={`flex items-center justify-center gap-2 bg-green-600 text-black font-bold py-3 px-6 w-full rounded-lg shadow-lg hover:bg-green-800 transition duration-200 ${
             loading ? "opacity-50 cursor-not-allowed" : ""
           }`}
         >

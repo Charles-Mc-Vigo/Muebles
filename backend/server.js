@@ -13,6 +13,7 @@ const furnitureTypeRoutes = require('../backend/router/FurnitureRoutes/furniture
 const materialsRoutes = require('./router/FurnitureRoutes/materialsRoutes');
 const colorRoutes = require('../backend/router/FurnitureRoutes/colorRoutes');
 const sizeRoutes = require('../backend/router/FurnitureRoutes/sizeRoutes');
+const searchRoutes = require ('./router/FurnitureRoutes/searchRoutes');
 
 // User routes
 const userRoutes = require('../backend/router/User/userRoutes');
@@ -70,6 +71,7 @@ app.use("/api/cart", cartRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/orders", orderRoutes);
 app.use('/api/ratings',ratingRoutes);
+app.use("/api/search", searchRoutes);
 
 // Global error handling middleware
 app.use((err, req, res, next) => {

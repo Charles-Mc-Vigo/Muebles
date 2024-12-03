@@ -70,18 +70,18 @@ const OrderDetails = () => {
 					<button onClick={() => navigate(-1)} className="text-gray-500">
 						<IoMdArrowRoundBack size={30} />
 					</button>
-					<h1 className="text-2xl md:text-3xl font-bold text-teal-600 text-center flex-grow">
+					<h1 className="text-2xl md:text-3xl font-bold text-green-600 text-center flex-grow">
 						Order Details
 					</h1>
 				</div>
 
 				{/* Order Summary */}
 				<div className="pb-6 mb-2">
-					<h2 className="flex justify-between text-xl md:text-2xl ml-2 font-semibold text-teal-700 mb-4">
+					<h2 className="flex justify-between text-xl md:text-2xl ml-2 font-semibold text-green-700 mb-4">
 						Order Summary <span>{order.type}</span>
 					</h2>
-					<div className="gap-2 text-gray-600 border-t border-teal-500 p-5">
-						<div className="grid grid-cols-1 sm:grid-cols-2 gap-2 items-baseline rounded-md border-teal-500 p-2 shadow-md">
+					<div className="gap-2 text-gray-600 border-t border-green-500 p-5">
+						<div className="grid grid-cols-1 sm:grid-cols-2 gap-2 items-baseline rounded-md border-green-500 p-2 shadow-md">
 							<p className="font-base flex items-baseline">
 								<span className="font-semibold text-black">Order ID:</span>
 								<span className="ml-2 text-black">{order.orderNumber}</span>
@@ -159,8 +159,8 @@ const OrderDetails = () => {
 				</div>
 
 				{order.type === "Cart" ? (
-					<div className="border-t shadow-xl border-teal-400 bg-white rounded-xl mb-5 p-4 md:p-5">
-						<h2 className="text-xl md:text-2xl font-semibold text-teal-700 mb-4">
+					<div className="border-t shadow-xl border-green-400 bg-white rounded-xl mb-5 p-4 md:p-5">
+						<h2 className="text-xl md:text-2xl font-semibold text-green-700 mb-4">
 							Items
 						</h2>
 						<div>
@@ -190,7 +190,7 @@ const OrderDetails = () => {
 											</div>
 										</div>
 										<div className="mt-4 md:mt-0">
-											<p className="text-lg font-medium text-teal-700">
+											<p className="text-lg font-medium text-green-700">
 												PHP {order.totalAmount} X {item.quantity}
 											</p>
 										</div>
@@ -202,13 +202,13 @@ const OrderDetails = () => {
 								</li>
 							)}
 						</div>
-						<div className="bg-white border flex flex-col border-teal-400 rounded-xl p-4 md:p-6 text-right gap-2">
+						<div className="bg-white border flex flex-col border-green-400 rounded-xl p-4 md:p-6 text-right gap-2">
 							<h1>Payment Option: {order.paymentOption}</h1>
 							<h1>Delivery Option: {order.deliveryMode}</h1>
 							<h1>Expected Delivery: {order.expectedDelivery}</h1>
 							<h1>Shipping Fee: ₱{order.shippingFee.toFixed(2)}</h1>
 							<div className="flex justify-end">
-								<p className="text-xl font-semibold mt-4 text-teal-700 pr-2 pb-2">
+								<p className="text-xl font-semibold mt-4 text-green-700 pr-2 pb-2">
 									Total: ₱
 									{order.totalAmountWithShipping
 										? order.totalAmountWithShipping.toFixed(2)
@@ -218,8 +218,8 @@ const OrderDetails = () => {
 						</div>
 					</div>
 				) : (
-					<div className="border-t shadow-xl border-teal-400 bg-white rounded-xl mb-5 p-4 md:p-5">
-						<h2 className="text-xl md:text-2xl font-semibold text-teal-700 mb-4">
+					<div className="border-t shadow-xl border-green-400 bg-white rounded-xl mb-5 p-4 md:p-5">
+						<h2 className="text-xl md:text-2xl font-semibold text-green-700 mb-4">
 							Item
 						</h2>
 						<div>
@@ -246,7 +246,7 @@ const OrderDetails = () => {
 								</div>
 							</div>
 						</div>
-						<div className="bg-white border flex border-teal-400 rounded-xl p-4 md:p-6 text-right gap-2">
+						<div className="bg-white border flex border-green-400 rounded-xl p-4 md:p-6 text-right gap-2">
 							<div className="flex flex-1">
 							</div>
 							{order.paymentOption === "Full Payment" ? (
@@ -256,7 +256,7 @@ const OrderDetails = () => {
 									<h1>Expected Delivery: {order.expectedDelivery}</h1>
 									<h1>Shipping Fee: ₱ {order.shippingFee.toFixed(2)}</h1>
 									<div className="flex justify-end">
-										<p className="text-xl font-semibold mt-4 text-teal-700 pr-2 pb-2">
+										<p className="text-xl font-semibold mt-4 text-green-700 pr-2 pb-2">
 											Total: ₱
 											{order.totalAmountWithShipping
 												? order.totalAmountWithShipping.toFixed(2)
@@ -280,7 +280,7 @@ const OrderDetails = () => {
 									<h1>
 										Monthly Installment: ₱ {order.monthlyInstallment.toFixed(2)}
 									</h1>
-									<p className="text-lg font-semibold mt-4 text-teal-700 pr-2 pb-2">
+									<p className="text-lg font-semibold mt-4 text-green-700 pr-2 pb-2">
 										Total Amount: ₱
 										{order.totalAmountWithShipping
 											? order.totalAmountWithShipping.toFixed(2)
@@ -295,8 +295,8 @@ const OrderDetails = () => {
 
 				{/* Proof of Payment */}
 				{order.proofOfPayment && (
-					<div className="border-t border-teal-500 p-4 md:p-6 mb-6 rounded-xl shadow-xl">
-						<h2 className="text-xl md:text-2xl font-semibold text-teal-700 mb-2">
+					<div className="border-t border-green-500 p-4 md:p-6 mb-6 rounded-xl shadow-xl">
+						<h2 className="text-xl md:text-2xl font-semibold text-green-700 mb-2">
 							Proof of Payment
 						</h2>
 						<div className="flex flex-col md:flex-row items-start gap-8">
@@ -309,7 +309,7 @@ const OrderDetails = () => {
 							</div>
 							<div className="flex flex-col flex-1">
 								<div className="flex-1 bg-green-50 p-4 md:p-6 rounded-lg">
-									<h3 className="text-lg md:text-xl font-semibold text-teal-700 mb-2">
+									<h3 className="text-lg md:text-xl font-semibold text-green-700 mb-2">
 										Thank You for Your Purchase!
 									</h3>
 									<p className="text-black text-base mb-2">

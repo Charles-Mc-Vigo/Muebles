@@ -338,7 +338,7 @@ exports.Archived = async (req, res) => {
 		await furniture.save();
 		res
 			.status(200)
-			.json({ success: `${furniture.name} has been archived successfully!` });
+			.json({ success: `${furniture.name} has been archived successfully! `});
 	} catch (error) {
 		console.error("Error archiving the furniture: ", error);
 		res.status(500).json({ error: "Server error!" });
@@ -406,3 +406,26 @@ exports.checkIfRated = async (req, res) => {
 };
 
 
+exports.searchFurnitureByName = async (req, res) => {
+	const { query } = req.query; // Retrieve the search query from the query string
+  
+	if (!query) {
+	  return res.status(400).json({ message: "Search query is required" });
+	}
+  
+	try {
+	  // Use a case-insensitive regex search to find furniture by name
+	  const furnitureItems = await Furniture.find({
+		name: { $regex: query, $options: 'i' } // 'i' makes the search case-insensitive
+	  });
+  
+	  if (furnitureItems.length === 0) {
+		return res.status(404).json({ message: "No furniture items found" });
+	  }
+  
+	  res.json(furnitureItems); // Send back the found furniture items
+	} catch (error) {
+	  console.error("Error in search:", error);
+	  res.status(500).json({ message: "Error searching for furniture", error });
+	}
+  };
