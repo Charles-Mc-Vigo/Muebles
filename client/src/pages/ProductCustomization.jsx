@@ -115,34 +115,46 @@ const ProductCustomization = () => {
 	};
 
 	const calculateCustomSizePrice = () => {
-		const { height, width, depth, length } = customSize;
-		const h = parseFloat(height) || 0;
-		const w = parseFloat(width) || 0;
-		const d = parseFloat(depth) || 0;
-		const l = parseFloat(length) || 0;
+    const { height, width, depth, length } = customSize;
+    const h = parseFloat(height) || 0;
+    const w = parseFloat(width) || 0;
+    const d = parseFloat(depth) || 0;
+    const l = parseFloat(length) || 0;
 
-		const pricePerCubicInch = 0.002; // Example pricing logic
-		const lengthFeePerInch = 0.1;
+    const pricePerCubicInch = 0.002; // Example pricing logic
+    const lengthFeePerInch = 0.1;
 
-		const volume = h * w * d;
-		const volumePrice = volume * pricePerCubicInch;
-		const lengthFee = l * lengthFeePerInch;
+    let volume = 0;
+    let volumePrice = 0;
+    let lengthFee = 0;
 
-		let woodPrice = 0;
+    // Calculate volume price only if all necessary dimensions are present
+    if (h > 0 && w > 0 && d > 0) {
+        volume = h * w * d;
+        volumePrice = volume * pricePerCubicInch;
+    }
 
-		// Dynamically select the wood price based on the model
-		if (selectedModel === "chair") {
-			woodPrice = chairMaterials[selectedWood]?.price || 0;
-		} else if (selectedModel === "sofa") {
-			woodPrice = sofaMaterials[selectedSofaWood]?.price || 0;
-		} else if (selectedModel === "door") {
-			woodPrice = doorMaterials[selectedDoorWoodType]?.price || 0;
-		}
+    // Calculate length fee only if length is relevant
+    if (l > 0) {
+        lengthFee = l * lengthFeePerInch;
+    }
 
-		// Calculate custom size price
-		const customPrice = (volumePrice + lengthFee + woodPrice) * quantity;
-		setCustomSizePrice(customPrice); // Update state with the custom size price
-	};
+    let woodPrice = 0;
+
+    // Dynamically select the wood price based on the model
+    if (selectedModel === "chair") {
+        woodPrice = chairMaterials[selectedWood]?.price || 0;
+    } else if (selectedModel === "sofa") {
+        woodPrice = sofaMaterials[selectedSofaWood]?.price || 0;
+    } else if (selectedModel === "door") {
+        woodPrice = doorMaterials[selectedDoorWoodType]?.price || 0;
+    }
+
+    // Calculate custom size price
+    const customPrice = (volumePrice + lengthFee + woodPrice) * quantity;
+    setCustomSizePrice(customPrice); // Update state with the custom size price
+};
+
 
 	useEffect(() => {
 		if (isCustomSizeVisible) {
@@ -294,9 +306,9 @@ const ProductCustomization = () => {
     } else if (selectedModel === "sofa") {
         formData = {
             model: "sofa",
-            selectedSofaBackrest : selectedSofaBackrest,
-            selectedSofaArmrest : selectedSofaArmrest,
-            selectedSofaWood : selectedSofaWood,
+            selectedBackrest : selectedSofaBackrest,
+            selectedArmrest : selectedSofaArmrest,
+            selectedWood : selectedSofaWood,
             quantity,
             size: selectedSize || "Minimalist_Size", // Default to Minimalist Size if no size is selected
             dimensions, // Include the dimensions
@@ -305,8 +317,8 @@ const ProductCustomization = () => {
     } else if (selectedModel === "door") {
         formData = {
             model: "door",
-            selectedDoorDesign : selectedDoorDesign,
-            selectedDoorWoodType : selectedDoorWoodType,
+            selectedDesign : selectedDoorDesign,
+            selectedWood : selectedDoorWoodType,
             quantity,
             size: selectedSize || "Standard_Main_Door", // Default to Standard Main Door if no size is selected
             dimensions, // Include the dimensions

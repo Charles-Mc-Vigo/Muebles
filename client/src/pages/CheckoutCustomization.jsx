@@ -19,15 +19,16 @@ const CheckoutCustomization = () => {
 		model,
 		quantity,
 		size,
+		price,
 		selectedBackrest,
 		selectedSeat,
 		selectedArmrest,
 		selectedDesign,
 		selectedWood,
-		selectedWoodType,
 		dimensions,
-		imageUrl,
 	} = formData;
+
+	console.log("Form DAta: ", formData)
 
 	// State for payment, delivery, and proof of payment
 	const [paymentOption, setPaymentOption] = useState(
