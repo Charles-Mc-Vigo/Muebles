@@ -5,9 +5,9 @@ import Header from "../components/Header";
 import { ToastContainer, toast } from "react-toastify";
 import { FaFilter, FaTimes } from "react-icons/fa";
 import Select from "react-select";
-import Slider from "react-slider";
-import "react-toastify/dist/ReactToastify.css";
 import { Link } from "react-router-dom";
+import "react-toastify/dist/ReactToastify.css";
+
 const Home = () => {
 	// State variables
 	const [furnitureData, setFurnitureData] = useState([]);
@@ -22,6 +22,9 @@ const Home = () => {
 	const [priceRange, setPriceRange] = useState([0, 120000]);
 	const itemsPerPage = 8;
 	const [isFilterOpen, setIsFilterOpen] = useState(false);
+	const [searchQuery, setSearchQuery] = useState("");
+	const [searchResults, setSearchResults] = useState([]);
+	
 
 	useEffect(() => {
 		const fetchFurnitureData = async () => {
@@ -38,11 +41,6 @@ const Home = () => {
 				setLoading(false);
 			}
 		};
-
-		console.log("furnitureData", furnitureData);
-		console.log("categories", categories);
-		console.log("furniture types", furnitureTypes);
-		console.log("Current items kuno", currentItems);
 
 		const fetchCategories = async () => {
 			try {
@@ -84,6 +82,25 @@ const Home = () => {
 			console.error("Error fetching cart count:", error);
 		}
 	};
+	const handleSearch = async (query) => {
+		try {
+			setSearchQuery(query);
+			const response = await fetch(
+				`http://localhost:3000/api/search?query=${query}`
+			);
+			const data = await response.json();
+			console.log("Search Results:", data); // Debugging
+			if (data && data.length > 0) {
+				setSearchResults(data);
+			} else {
+				setSearchResults([]);
+			}
+		} catch (error) {
+			console.error("Error while searching:", error);
+			setSearchResults([]);
+		}
+		console.log("Search Results:", data);
+	};
 
 	useEffect(() => {
 		fetchCartCount();
@@ -93,35 +110,42 @@ const Home = () => {
 	const incrementCartCount = () => setCartCount((prevCount) => prevCount + 1);
 
 	const filteredFurnitureData = useMemo(() => {
+		const dataToFilter =
+			searchResults.length > 0 ? searchResults : furnitureData;
+
 		if (
 			selectedCategories.length === 0 &&
 			selectedFurnitureTypes.length === 0 &&
 			priceRange[0] === 0 &&
 			priceRange[1] === 120000
 		) {
-			return furnitureData;
+			return dataToFilter;
 		}
 
-		return furnitureData.filter((item) => {
+		return dataToFilter.filter((item) => {
 			const categoryMatch =
 				selectedCategories.length === 0 ||
 				selectedCategories.some((category) =>
-					item.category.name.includes(category.value)
+					item.category?.name?.includes(category.value)
 				);
-
 			const typeMatch =
 				selectedFurnitureTypes.length === 0 ||
 				selectedFurnitureTypes.some(
 					(type) =>
 						item.furnitureType?.name?.toLowerCase() === type.value.toLowerCase()
 				);
-
 			const priceMatch =
 				item.price >= priceRange[0] && item.price <= priceRange[1];
 
 			return categoryMatch && typeMatch && priceMatch;
 		});
-	}, [furnitureData, selectedCategories, selectedFurnitureTypes, priceRange]);
+	}, [
+		furnitureData,
+		searchResults,
+		selectedCategories,
+		selectedFurnitureTypes,
+		priceRange,
+	]);
 
 	// Pagination logic
 	const totalPages = Math.ceil(filteredFurnitureData.length / itemsPerPage);
@@ -149,8 +173,10 @@ const Home = () => {
 		setSelectedFurnitureTypes(selectedOption || []);
 	};
 
-	const handlePriceChange = (value) => {
-		setPriceRange(value);
+	const handlePriceRangeChange = (event) => {
+		const value = event.target.value;
+		const [minPrice, maxPrice] = value.split("-").map(Number);
+		setPriceRange([minPrice, maxPrice]);
 	};
 
 	const customStyles = {
@@ -204,8 +230,7 @@ const Home = () => {
 	const FilterContent = () => (
 		<div className="flex flex-col flex-wrap justify-between w-full">
 			{/* Filter Categories */}
-
-			<div className="w-full lg:w-3/4 xl:w-2/3 mb-5  p-2">
+			<div className="w-full lg:w-3/4 xl:w-2/3 mb-5 p-2">
 				<h2 className="text-xl text-justify font-semibold mb-2">Categories</h2>
 				<Select
 					isMulti
@@ -220,7 +245,7 @@ const Home = () => {
 				/>
 			</div>
 			{/* Filter Furniture Types */}
-			<div className="w-full lg:w-5/6 xl:w-3/4 mb-5  p-2">
+			<div className="w-full lg:w-5/6 xl:w-3/4 mb-5 p-2">
 				<h2 className="text-xl font-semibold mb-2 whitespace-nowrap ">
 					Furniture Types
 				</h2>
@@ -236,43 +261,43 @@ const Home = () => {
 					styles={customStyles}
 				/>
 			</div>
+			{/* Price Range Dropdown */}
 			<div className="w-full lg:w-5/6 xl:w-3/4">
 				<h1 className="text-xl font-semibold mb-1">Price Range</h1>
-				<Slider
-					min={0}
-					max={120000}
-					step={100}
-					value={priceRange}
-					onChange={handlePriceChange}
-					range
-					renderTrack={(props, state) => (
-						<div {...props} className="bg-gray-500" />
-					)}
-					renderThumb={(props, state) => (
-						<div
-							{...props}
-							className="bg-teal-600 w-4 h-4 rounded-full border-2"
-						/>
-					)}
-				/>
-				<div className="flex justify-between gap-5 mt-5 items-baseline border-t-2">
-					<span>₱{priceRange[0]}</span>
-					<span>₱{priceRange[1]}</span>
-				</div>
+				<select
+					value={`${priceRange[0]}-${priceRange[1]}`} // Set the value to the current price range
+					onChange={handlePriceRangeChange}
+					className="border border-gray-300 rounded p-2"
+				>
+					<option value="0-10000">₱0 - ₱10,000</option>
+					<option value="10001-20000">₱10,001 - ₱20,000</option>
+					<option value="20001-30000">₱20,001 - ₱30,000</option>
+					<option value="30001-40000">₱30,001 - ₱40,000</option>
+					<option value="40001-50000">₱40,001 - ₱50,000</option>
+					<option value="50001-60000">₱50,001 - ₱60,000</option>
+					<option value="60001-70000">₱60,001 - ₱70,000</option>
+					<option value="70001-80000">₱70,001 - ₱80,000</option>
+					<option value="80001-90000">₱80,001 - ₱90,000</option>
+					<option value="90001-100000">₱90,001 - ₱100,000</option>
+					<option value="100001-120000">₱100,001 - ₱120,000</option>
+					<option value="120001-150000">₱120,001 - ₱150,000</option>
+				</select>
 			</div>
 		</div>
 	);
+	
 
 	return (
 		<div className="bg-white text-gray-800 flex flex-col min-h-screen">
-			<Header isLogin={true} />
+			<Header isLogin={true} cartCount={cartCount} onSearch={handleSearch} />
+			{/* <SearchResults results={searchResults} /> */}
 			<ToastContainer
 				style={{ top: "80px", right: "50px" }}
 				autoClose={3000}
 				hideProgressBar
 			/>
 			{/* Hero Section */}
-			<section className="relative w-full h-60 sm:h-80 md:h-96">
+			<section className="relative w-full h-48 sm:h-64 md:h-80">
 				<img
 					src="https://images.pexels.com/photos/245219/pexels-photo-245219.jpeg?auto=compress&cs=tinysrgb&w=600"
 					alt="Shop Hero"
@@ -295,7 +320,6 @@ const Home = () => {
 					</Link>
 				</div>
 			</section>
-
 			{/* Main Content */}
 			<div className="flex flex-col max-w-7xl mx-auto w-full px-4 py-8 mb-2">
 				{/* Filter Button (Mobile) */}
@@ -332,7 +356,6 @@ const Home = () => {
 									<FaTimes className="text-3xl" />
 								</button>
 							</div>
-
 							{/* FilterSection in Main */}
 							<div className="mt-5 p-2 gap-2 flex-col">
 								<div className="flex items-baseline mb-2">
@@ -342,13 +365,16 @@ const Home = () => {
 									</h1>
 								</div>
 								<FilterContent />
+								{/*search section*/}
 							</div>
 						</div>
 					</aside>
 					{/* Products Grid */}
 					<div className="flex-1 flex flex-col">
 						<h2 className="text-2xl md:text-3xl font-bold text-center mb-8">
-							Furniture Sets
+							{searchResults.length > 0
+								? `Search Results for ${searchQuery}`
+								: "Furniture Sets"}
 						</h2>
 						<div className="grid grid-cols-2 sm:grid-cols-4 gap-4 md:gap-6">
 							{currentItems.length > 0 ? (
@@ -372,7 +398,9 @@ const Home = () => {
 								))
 							) : (
 								<p className="text-center col-span-full text-gray-500">
-									No furniture sets available at the moment.
+									{searchResults.length > 0
+										? "No results match your search."
+										: "No furniture sets available at the moment."}
 								</p>
 							)}
 						</div>
