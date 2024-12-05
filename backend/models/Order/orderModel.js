@@ -94,8 +94,13 @@ const orderSchema = new mongoose.Schema(
     monthlyInstallment: {
       type: Number,
     },
-    dueDate: {
-      type: Date,
+    dueDates: {
+      type: [Date], // Array of dates for due dates
+      default: [], // Default to an empty array
+    },
+    isPaid : {
+      type:Boolean,
+      default: false
     },
     interest: {
       type: Number
@@ -134,6 +139,18 @@ orderSchema.pre("save", async function (next) {
       .toString()
       .padStart(4, "0");
     this.orderNumber = `ORD-${date.getFullYear()}${randomNum}`;
+  }
+  next();
+});
+
+orderSchema.pre("save", function (next) {
+  if (this.isNew && this.type === "Pre-Order" && this.dueDates.length === 0) {
+    const now = new Date();
+    this.dueDates = [
+      new Date(now.getFullYear(), now.getMonth() + 1, now.getDate()),
+      new Date(now.getFullYear(), now.getMonth() + 2, now.getDate()),
+      new Date(now.getFullYear(), now.getMonth() + 3, now.getDate()),
+    ];
   }
   next();
 });
@@ -286,6 +303,7 @@ orderSchema.statics.createFromCart = async function (
       monthlyInstallment: undefined,
       interest: undefined,
       lastPaymentDate: undefined,
+      isPaid:true
     };
   } else if (paymentOption === "Partial Payment") {
     // For partial payment, include all relevant fields
