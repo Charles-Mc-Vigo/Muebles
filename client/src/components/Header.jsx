@@ -232,12 +232,6 @@ const Header = ({ isLogin }) => {
         <Link className="text-black py-2 hover:underline m-2" to="/about">
           About Us
         </Link>
-        <Link
-          className="text-black py-2 hover:underline m-2"
-          to="/service-page"
-        >
-          Services
-        </Link>
         <div className="flex items-center space-x-2 text-sm text-black py-2 m-2">
           <span className="text-teal-500 text-base font-bold">•</span>
           <Link
