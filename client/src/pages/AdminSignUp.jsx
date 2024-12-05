@@ -92,11 +92,12 @@ export default function AdminSignUp() {
 				</select>
 				<input
 					type="tel"
-					placeholder="+639XXXXXXXXX"
+					placeholder="09XXXXXXXXX"
 					id="phoneNumber"
 					required
 					className="bg-slate-100 p-3 rounded-lg"
 					onChange={handleChange}
+					maxLength={11}
 				/>
 				<input
 					type="email"
