@@ -3,25 +3,19 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faBox,
   faListUl,
-  faTruck,
   faChevronDown,
   faChevronUp,
-  faHandshake,
   faWrench,
 } from "@fortawesome/free-solid-svg-icons";
 import ProductManagement from "./ProductManagement";
 import Inventory from "../components/Inventory";
-import ServiceSection from "../components/Services";
 import ViewProduct from "../components/ViewProduct";
 import DashboardContent from "../components/DashboardContent";
 import Maintenance from "../components/Maintenance";
-import Logout from "../components/Logout";
 import HamburgerMenu from "../components/HamburgerMenu";
 import Notification from "../components/Notification";
 import ProductCustomization from "./ProductCustomization";
 import OrderManagement from "./OrderManagement";
-import TransactionHistory from "./TransactionHistory";
-import DeliveryManagement from "./DeliveryManagement";
 
 const Dashboard = () => {
   // State management for dropdowns
@@ -201,12 +195,6 @@ const Dashboard = () => {
                 <DropdownItem
                   label="Furniture"
                   section="Furniture"
-                  currentSection={activeSection}
-                  onClick={setActiveSection}
-                />
-                <DropdownItem
-                  label="Services"
-                  section="Services"
                   currentSection={activeSection}
                   onClick={setActiveSection}
                 />

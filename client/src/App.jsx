@@ -48,6 +48,7 @@ import Rating from "./pages/Rating";
 import GenerateReport from "./components/GenerateReport";
 import CheckoutCustomization from "./pages/CheckoutCustomization";
 import SearchResults from "./components/SearchResults";
+import Repair from "./pages/Repair";
 // import LoadingSpinner from "./components/LoadingSpinner";
 
 export default function App() {
@@ -86,6 +87,10 @@ export default function App() {
 					<Route
 						path="/password-reset/request"
 						element={<PasswordResetRequest />}
+					/>
+					<Route
+						path="/repair/:orderId/"
+						element={<ProtectedRoute element={Repair} />}
 					/>
 					<Route
 						path="/password-reset/verify/:userId"
@@ -158,10 +163,7 @@ export default function App() {
 							<ProtectedRoute element={GenerateReport} adminOnly={true} />
 						}
 					/>
-					{/* <Route
-						path="/dashboard/setting/admin-profile/view"
-						element={<ProtectedRoute element={AdminProfile} adminOnly={true} />}
-					/> */}
+
 					<Route
 						path="/dashboard/setting/admin-profile/edit"
 						element={

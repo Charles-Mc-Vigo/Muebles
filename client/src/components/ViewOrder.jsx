@@ -127,10 +127,9 @@ const ViewOrder = () => {
 							"Confirmed",
 							"Delivered",
 							"Cancelled",
-							"Shipped",
 							"Out for Delivery",
 							"Failed to Delivery",
-							"Returned",
+							"Repaired",
 						].map((status) => (
 							<button
 								key={status}
@@ -182,13 +181,11 @@ const ViewOrder = () => {
 				? "bg-green-100 text-green-800"
 				: order.orderStatus === "cancelled"
 				? "bg-red-100 text-red-800"
-				: order.orderStatus === "shipped"
-				? "bg-purple-100 text-purple-800"
 				: order.orderStatus === "out for delivery"
 				? "bg-orange-100 text-orange-800"
 				: order.orderStatus === "failed to deliver"
 				? "bg-gray-100 text-gray-800"
-				: order.orderStatus === "returned"
+				: order.orderStatus === "repaired"
 				? "bg-pink-100 text-pink-800"
 				: ""
 		}`}
@@ -213,11 +210,6 @@ const ViewOrder = () => {
 													<FaTimesCircle className="mr-2" /> Cancelled
 												</>
 											)}
-											{order.orderStatus === "shipped" && (
-												<>
-													<FaRoute className="mr-2" /> Shipped
-												</>
-											)}
 											{order.orderStatus === "out for delivery" && (
 												<>
 													<FaShippingFast className="mr-2" /> Out for Delivery
@@ -231,7 +223,7 @@ const ViewOrder = () => {
 											)}
 											{order.orderStatus === "returned" && (
 												<>
-													<FaBoxOpen className="mr-2" /> Returned
+													<FaBoxOpen className="mr-2" /> Repaired
 												</>
 											)}
 										</span>
@@ -316,11 +308,6 @@ const ViewOrder = () => {
 															<h1>Your order is being processed</h1>
 														</div>
 													)}
-													{order.orderStatus === "shipped" && (
-														<div className="p-5 text-right bg-purple-200">
-															<h1>Your order has been shipped</h1>
-														</div>
-													)}
 													{order.orderStatus === "out for delivery" && (
 														<div className="p-5 text-right bg-orange-200">
 															<h1>Your order is out for delivery</h1>
@@ -338,7 +325,7 @@ const ViewOrder = () => {
 													)}
 													{order.orderStatus === "returned" && (
 														<div className="p-5 text-right bg-pink-200">
-															<h1>Your order has been returned</h1>
+															<h1>Your order has been repaired</h1>
 														</div>
 													)}
 													{order.orderStatus === "cancelled" && (
@@ -425,15 +412,26 @@ const ViewOrder = () => {
 												Confirm Delivery
 											</button>
 										) : (
-											<div>
+											<div className="flex gap-5">
 												{order.orderStatus === "delivered" &&
 												order.isDelivered ? (
-													<button
+													<>
+																										<button
+														onClick={() => navigate(`/repair/:orderId`)}
+														className="px-16 py-2 rounded-lg bg-blue-200 text-blue-600 hover:bg-blue-600 hover:text-white"
+													>
+														
+														Repair
+													</button>
+																										<button
 														onClick={() => navigate(`/rating/${order._id}`)}
 														className="px-16 py-2 rounded-lg bg-blue-200 text-blue-600 hover:bg-blue-600 hover:text-white"
 													>
+														
 														Rate
 													</button>
+													</>
+													
 												) : (
 													<div>
 														{order.isDelivered && (
@@ -444,7 +442,7 @@ const ViewOrder = () => {
 													</div>
 												)}
 											</div>
-										)}
+									)}
 
 										{order.orderStatus === "pending" && (
 											<button

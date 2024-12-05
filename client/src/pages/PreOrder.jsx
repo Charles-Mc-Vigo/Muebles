@@ -498,7 +498,7 @@ const PreOrder = () => {
 									{quantity}
 								</span>
 								<button
-									onClick={() => setQuantity((prev) => Math.min(prev + 1))}
+									onClick={() => setQuantity((prev) => Math.min(prev + 1,10))}
 									className="border border-teal-600 bg-white text-teal-600 px-3 py-1 rounded-r-md hover:bg-teal-600 hover:text-white transition"
 								>
 									+
@@ -515,20 +515,25 @@ const PreOrder = () => {
 								</span>
 							</label>
 							<div className="flex justify-end flex-wrap mb-5 gap-2 ">
-								{furnitureData.colors?.map((color) => (
-									<div
-										key={color._id}
-										onClick={() => handleColorClick(color)}
-										className={`w-10 h-10 rounded-full border cursor-pointer relative flex items-center justify-center transition-transform transform hover:scale-110 ${
-											selectedColor === color.name
-												? "bg-teal-600 text-black"
-												: "text-black"
-										}`}
-										style={{ backgroundColor: color.hex }}
-									></div>
-								))}
-							</div>
-
+							{furnitureData.colors?.map((color) => (
+								<div 
+								key={color._id}
+								onClick={() => handleColorClick(color)}
+								className={`w-10 h-10 rounded-full border cursor-pointer relative flex items-center justify-center transition-transform transform hover:scale-110 ${
+									selectedColor === color.name
+									? "border border-gray-300 bg-slate-200 hover:border-teal-400"
+									: "text-black"
+								 }`}
+								  style={{ backgroundColor: color.hex }}
+								  >
+									{selectedColor === color.name && (
+										<div className="absolute top-0 right-0 w-6 h-6 bg-green-600 rounded-full flex items-center justify-center">
+											<span className="text-white text-sm">✓</span>
+											</div>
+										)}
+										</div>
+									))}
+									</div>									
 							{/* Materials Section */}
 							<div className="border-b-2 border-teal-500">
 								<h2 className="flex justify-between mb-5 font-semibold">
@@ -629,12 +634,49 @@ const PreOrder = () => {
 
 								{/* Payment Descriptions */}
 								{paymentOption === "Partial Payment" && (
+									<>
+									<label className="italic text-xs text-justify">	
+										<strong>Partial Payment (3-Month Plan):</strong> Pay in installments with a minimum 
+										of at least 50% down payment. The remaining balance can be split over 3 months. 
+										A 3% interest fee will be applied if the customer will be late in payments.
+									</label>
 									<div className="p-5 bg-gray-100 rounded mb-5">
-										<strong>Partial Payment (3-Month Plan):</strong> Pay in
-										installments with 50% down payment. Remaining balance can be
-										paid over a minimum of 3 months. A 3% interest applies if
-										payments are not made on time.
+																	{/* payable amount dito */}
+							<div className="mt-5">
+								{paymentOption === "Partial Payment" ? (
+									<div>
+										<div className="flex justify-between">
+											<h3 className="font-semibold">
+												Partial Payment (50%):
+											</h3>
+											<p>₱ {partialPayment}</p>
+										</div>
+										<div className="flex justify-between">
+											<h3 className="font-semibold">
+												Remaining Balance:
+											</h3>
+											<p>₱ {remainingBalance || 0}</p>
+										</div>
+										<div className="flex justify-between">
+											<h3 className="font-semibold">
+												Monthly Installment for 3 months:
+											</h3>
+											<p>₱ {montlyInstallment || 0}</p>
+										</div>
 									</div>
+								) : (
+									<div className="flex justify-between">
+										<h3 className="text-lg font-semibold">Total Payment:</h3>
+										<p className="font-bold">
+											PHP {totalAmountWithShippingFee}
+										</p>
+									</div>
+								)}
+							</div>
+
+									</div>
+									</>
+
 								)}
 
 								{paymentOption === "Full Payment" && (
@@ -804,38 +846,7 @@ const PreOrder = () => {
 								<span>Total Amount :</span>
 								<span>₱ {totalAmountWithShippingFee || 0}</span>
 							</div>
-							{/* payable amount dito */}
-							<div className="mt-5">
-								{paymentOption === "Partial Payment" ? (
-									<div>
-										<div className="flex justify-between">
-											<h3 className="font-semibold">
-												Partial Payment (50%):
-											</h3>
-											<p>₱ {partialPayment}</p>
-										</div>
-										<div className="flex justify-between">
-											<h3 className="font-semibold">
-												Remaining Balance:
-											</h3>
-											<p>₱ {remainingBalance || 0}</p>
-										</div>
-										<div className="flex justify-between">
-											<h3 className="font-semibold">
-												Monthly Installment for 3 months:
-											</h3>
-											<p>₱ {montlyInstallment || 0}</p>
-										</div>
-									</div>
-								) : (
-									<div className="flex justify-between">
-										<h3 className="text-lg font-semibold">Total Payment:</h3>
-										<p className="font-bold">
-											PHP {totalAmountWithShippingFee}
-										</p>
-									</div>
-								)}
-							</div>
+
 						</div>
 					</div>
 
