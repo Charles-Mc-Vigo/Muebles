@@ -434,7 +434,43 @@ const orderController = {
 			console.error("Error generating report:", error);
 			res.status(500).json({ message: "Error generating report" });
 		}
+	},
+
+	requestForRepair: async (req, res) => {
+		try {
+			const { orderId } = req.params;
+			const { reason } = req.body;
+	
+			// Validate input
+			if (!reason) {
+				return res.status(400).json({ message: "Please provide a valid reason for repair." });
+			}
+	
+			// Find the order
+			const orderForRepair = await Order.findById(orderId).populate('user');
+			if (!orderForRepair) {
+				return res.status(404).json({ message: "Order not found!" });
+			}
+
+			if(orderForRepair?.repairRequest?.status === "approved") return res.status(400).json({message:"Request for repair was accepted. Please wait for the Repairman"})
+	
+			// Update repair request details
+			orderForRepair.repairRequest = {
+				requested: true,
+				reason: reason,
+				status: "pending"
+			};
+	
+			await orderForRepair.save();
+	
+			res.status(201).json({ message: "Request for repair was successfully submitted." });
+		} catch (error) {
+			console.error("Error requesting for repair: ", error);
+			res.status(500).json({ message: "Server error!" });
+		}
 	}
+	
 };
+
 
 module.exports = orderController;

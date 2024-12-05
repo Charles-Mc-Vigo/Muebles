@@ -9,7 +9,9 @@ const Notification = () => {
 	const [notification, setNotification] = useState({
 		requests: [],
 		orders: [],
+		requestRepairs: [],
 	});
+	
 	const [isOpen, setIsOpen] = useState(false);
 	const [fetchError, setFetchError] = useState(null); // New state for fetch error
 	const navigate = useNavigate();
@@ -20,30 +22,50 @@ const Notification = () => {
 
 	const fetchNotifications = async () => {
 		try {
-			const [requestsResponse, ordersResponse] = await Promise.all([
-				fetch("http://localhost:3000/api/admin/notifications/pending-request", {
-					method: "GET",
-					credentials: "include",
-				}),
-				fetch("http://localhost:3000/api/admin/notifications/pending-orders", {
-					method: "GET",
-					credentials: "include",
-				}),
-			]);
+			const [requestsResponse, ordersResponse, repairRequestResponse] =
+				await Promise.all([
+					fetch(
+						"http://localhost:3000/api/admin/notifications/pending-request",
+						{
+							method: "GET",
+							credentials: "include",
+						}
+					),
+					fetch(
+						"http://localhost:3000/api/admin/notifications/pending-orders",
+						{
+							method: "GET",
+							credentials: "include",
+						}
+					),
+					fetch(
+						"http://localhost:3000/api/admin/notifications/requesting-for-repair",
+						{
+							method: "GET",
+							credentials: "include",
+						}
+					),
+				]);
 
-			if (!requestsResponse.ok || !ordersResponse.ok) {
-				// Instead of throwing an error, set the fetchError state
+			if (
+				!requestsResponse.ok ||
+				!ordersResponse.ok ||
+				!repairRequestResponse.ok
+			) {
 				setFetchError("Failed to fetch notifications. Please try again later.");
 				return;
 			}
 
 			const requestsData = await requestsResponse.json();
 			const ordersData = await ordersResponse.json();
+			const repairRequestData = await repairRequestResponse.json();
+
 			setNotification({
 				requests: requestsData.length > 0 ? requestsData : [],
 				orders: ordersData.length > 0 ? ordersData : [],
+				requestRepairs: repairRequestData.length > 0 ? repairRequestData : [],
 			});
-			setFetchError(null); // Clear the error if fetch was successful
+			setFetchError(null); // Clear any previous errors
 		} catch (error) {
 			console.error("Error fetching notifications:", error);
 			setFetchError("An error occurred while fetching notifications.");
@@ -93,6 +115,25 @@ const Notification = () => {
 		}
 	};
 
+	const viewRepairRequest = async (orderId) => {
+		try {
+			const response = await fetch(
+				`http://localhost:3000/api/admin/notifications/view-repair-request/${orderId}`,
+				{
+					method: "GET",
+					credentials: "include",
+				}
+			);
+			if (!response.ok) {
+				throw new Error("Failed to view the repair request");
+			}
+			navigate(`/view-repair-request/${orderId}`);
+		} catch (error) {
+			console.error("Error viewing the repair request: ", error);
+			alert("Error viewing repair request: " + error.message);
+		}
+	};
+
 	return (
 		<div className="relative">
 			<button
@@ -101,7 +142,7 @@ const Notification = () => {
 			>
 				<FontAwesomeIcon icon={faBell} size="lg" />
 				{/* Notification Badge */}
-				{notification.requests.length > 0 || notification.orders.length > 0 ? (
+				{notification.requests.length > 0 || notification.orders.length > 0 || notification.requestRepairs.length > 0? (
 					<span className="absolute top-0 right-0 inline-block w-2 h-2 bg-red-600 rounded-full"></span>
 				) : null}
 			</button>
@@ -111,7 +152,9 @@ const Notification = () => {
 						<h4 className="font-bold mb-2 text-center text-red-600">
 							{fetchError}
 						</h4>
-					) : notification.requests.length === 0 && notification.orders.length === 0 ? (
+					) : notification.requests.length === 0 &&
+					  notification.orders.length === 0 &&
+					  notification.requestRepairs.length === 0 ? (
 						<h4 className="font-bold mb-2 text-center text-gray-500">
 							No notifications
 						</h4>
@@ -136,6 +179,21 @@ const Notification = () => {
 									</span>
 									<p className="text-gray-500 text-s mt-5">
 										Placed on: {new Date(order.createdAt).toLocaleString()}
+									</p>
+								</div>
+							</li>
+						))}
+					</ul>
+					<ul className="text-sm">
+						{notification.requestRepairs.map((order, index) => (
+							<li key={index} className="mb-5">
+								<div className="bg-slate-50 p-2 rounded">
+									<span onClick={() => viewRepairRequest(order._id)}>
+										{order.user?.firstname} is requesting a repair for Order #
+										{order.orderNumber}.
+									</span>
+									<p className="text-gray-500 text-s mt-5">
+										Requested on: {new Date(order.createdAt).toLocaleString()}
 									</p>
 								</div>
 							</li>

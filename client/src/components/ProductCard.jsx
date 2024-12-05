@@ -9,7 +9,6 @@ const ProductCard = ({
 	images,
 	name,
 	price,
-	description,
 	showPreOrder,
 	showUpdateButton,
 	showArchiveButton,

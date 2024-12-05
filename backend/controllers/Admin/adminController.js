@@ -568,3 +568,97 @@ exports.ViewRequest = async (req,res) => {
 		res.status(500).json({message:"Server error!"});
 	}
 }
+
+// Fetch all orders with repair requests
+exports.requestingForRepair = async (req, res) => {
+  try {
+    const repairRequests = await Order.find({ "repairRequest.status": "pending" }).populate("user");
+    res.status(200).json(repairRequests);
+  } catch (error) {
+    console.log("Error fetching repair requests:", error);
+    res.status(500).json({ message: "Server error!" });
+  }
+};
+
+
+// Approve a specific repair request
+exports.approvedRepairRequest = async (req, res) => {
+  try {
+    const { orderId } = req.params;
+
+    // Find the order
+    const orderToApprove = await Order.findById(orderId);
+    if (!orderToApprove) {
+      return res.status(404).json({ message: "Order not found!" });
+    }
+
+    // Check if repair was requested
+    if (!orderToApprove.repairRequest?.requested) {
+      return res.status(400).json({ message: "No repair request found for this order." });
+    }
+
+    // Approve the repair request
+    orderToApprove.repairRequest.status = "approved";
+    orderToApprove.repairRequest.requested = false;
+    await orderToApprove.save();
+
+    res.status(200).json({ message: "Repair request approved successfully." });
+  } catch (error) {
+    console.log("Error approving repair request:", error);
+    res.status(500).json({ message: "Server error!" });
+  }
+};
+
+exports.updateRepairStatus = async (req, res) => {
+  try {
+    const { orderId } = req.params;
+
+    // Find the order
+    const orderToUpdate = await Order.findById(orderId);
+    if (!orderToUpdate) {
+      return res.status(404).json({ message: "Order not found!" });
+    }
+
+    // Check if repair was requested
+    if (!orderToUpdate.repairRequest?.requested) {
+      return res.status(400).json({ message: "No repair request found for this order." });
+    }
+
+    // Approve the repair request
+    orderToUpdate.repairRequest.status = "completed";
+    orderToUpdate.repairRequest.requested = false;
+    await orderToUpdate.save();
+
+    res.status(200).json({ message: "Repair status was updated successfully." });
+  } catch (error) {
+    console.log("Error approving repair request:", error);
+    res.status(500).json({ message: "Server error!" });
+  }
+};
+
+
+
+// view a specific repair request
+exports.viewRepairRequest = async (req, res) => {
+  try {
+    const { orderId } = req.params;
+
+    // Find the order
+    const order = await Order.findById(orderId).populate('user');
+    if (!order) {
+      return res.status(404).json({ message: "Order not found!" });
+    }
+
+    // Check if repair was requested
+    if (!order.repairRequest?.requested) {
+      return res.status(400).json({ message: "No repair request found for this order." });
+    }
+
+    res.status(200).json(order);
+  } catch (error) {
+    console.log("Error viewing repair request:", error);
+    res.status(500).json({ message: "Server error!" });
+  }
+};
+
+

@@ -49,6 +49,7 @@ import GenerateReport from "./components/GenerateReport";
 import CheckoutCustomization from "./pages/CheckoutCustomization";
 import SearchResults from "./components/SearchResults";
 import Repair from "./pages/Repair";
+import RepairRequest from "./components/RepairRequest";
 // import LoadingSpinner from "./components/LoadingSpinner";
 
 export default function App() {
@@ -60,7 +61,7 @@ export default function App() {
 					<Route path="/about" element={<About />} />
 					<Route path="/signup" element={<SignUp />} />
 					<Route path="/login" element={<Login />} />
-			        <Route path="/search-result" element={<SearchResults />} /> 
+					<Route path="/search-result" element={<SearchResults />} />
 					<Route path="/terms&condition" element={<TermsAndConditions />} />
 					<Route path="/payment-method" element={<PaymentMethod />} />
 					<Route
@@ -81,6 +82,10 @@ export default function App() {
 						element={<ProtectedRoute element={AddNewAddress} />}
 					/>
 					<Route
+						path="/view-repair-request/:orderId"
+						element={<ProtectedRoute element={RepairRequest} />}
+					/>
+					<Route
 						path="/rating/:orderId"
 						element={<ProtectedRoute element={Rating} />}
 					/>
@@ -89,7 +94,7 @@ export default function App() {
 						element={<PasswordResetRequest />}
 					/>
 					<Route
-						path="/repair/:orderId/"
+						path="/request-for-repair/:orderId"
 						element={<ProtectedRoute element={Repair} />}
 					/>
 					<Route

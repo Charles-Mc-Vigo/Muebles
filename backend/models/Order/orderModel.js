@@ -116,6 +116,19 @@ const orderSchema = new mongoose.Schema(
       type:Boolean,
       default:false
     },
+    repairRequest: {
+      status: { 
+        type: String, 
+        default: "not set"
+      },
+      reason: { 
+        type: String
+      },
+      requested: { 
+        type: Boolean, 
+        default: false
+      }
+    },
     type: {
       type: String,
       enum: ["Cart", "Pre-Order"],

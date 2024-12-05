@@ -40,7 +40,7 @@ const ViewOrder = () => {
 			setOrders(ordersData);
 			// const furnitureIds = orders.map((order) => order.furniture._id);
 			// console.log(furnitureIds);
-			console.log(ordersData)
+			console.log(ordersData);
 		} catch (error) {
 			console.log("Error fetching orders", error);
 			setErrorMessage(error.message);
@@ -170,6 +170,10 @@ const ViewOrder = () => {
 											<FaBoxOpen className="mr-2 text-blue-500" />
 											Order ID: {order.orderNumber}
 										</h2>
+										{/* <p className="px-5 py-2 bg-slate-100 rounded-md">
+											{order.repairRequest?.requested === true && "Request was"}
+											{order.repairRequest?.requested === true && "Requested"}
+										</p> */}
 										<span
 											className={`px-4 py-2 rounded-full text-sm font-medium flex items-center
     ${
@@ -221,7 +225,7 @@ const ViewOrder = () => {
 													Failed
 												</>
 											)}
-											{order.orderStatus === "returned" && (
+											{order.orderStatus === "repaired" && (
 												<>
 													<FaBoxOpen className="mr-2" /> Repaired
 												</>
@@ -323,7 +327,7 @@ const ViewOrder = () => {
 															<h1>Delivery attempt failed</h1>
 														</div>
 													)}
-													{order.orderStatus === "returned" && (
+													{order.orderStatus === "repaired" && (
 														<div className="p-5 text-right bg-pink-200">
 															<h1>Your order has been repaired</h1>
 														</div>
@@ -416,22 +420,21 @@ const ViewOrder = () => {
 												{order.orderStatus === "delivered" &&
 												order.isDelivered ? (
 													<>
-																										<button
-														onClick={() => navigate(`/repair/:orderId`)}
-														className="px-16 py-2 rounded-lg bg-blue-200 text-blue-600 hover:bg-blue-600 hover:text-white"
-													>
-														
-														Repair
-													</button>
-																										<button
-														onClick={() => navigate(`/rating/${order._id}`)}
-														className="px-16 py-2 rounded-lg bg-blue-200 text-blue-600 hover:bg-blue-600 hover:text-white"
-													>
-														
-														Rate
-													</button>
+														<button
+															onClick={() =>
+																navigate(`/request-for-repair/${order._id}`)
+															}
+															className="px-16 py-2 rounded-lg bg-blue-200 text-blue-600 hover:bg-blue-600 hover:text-white"
+														>
+															{order.repairRequest?.requested === true ? "Requested" : "Repair"}
+														</button>
+														<button
+															onClick={() => navigate(`/rating/${order._id}`)}
+															className="px-16 py-2 rounded-lg bg-blue-200 text-blue-600 hover:bg-blue-600 hover:text-white"
+														>
+															Rate
+														</button>
 													</>
-													
 												) : (
 													<div>
 														{order.isDelivered && (
@@ -442,7 +445,7 @@ const ViewOrder = () => {
 													</div>
 												)}
 											</div>
-									)}
+										)}
 
 										{order.orderStatus === "pending" && (
 											<button
