@@ -40,6 +40,7 @@ const ViewOrder = () => {
 			setOrders(ordersData);
 			// const furnitureIds = orders.map((order) => order.furniture._id);
 			// console.log(furnitureIds);
+			console.log(ordersData)
 		} catch (error) {
 			console.log("Error fetching orders", error);
 			setErrorMessage(error.message);

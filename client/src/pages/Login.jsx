@@ -35,7 +35,7 @@ export default function Login() {
 			});
 			if (!response.ok) {
 				const errorData = await response.json();
-				toast.error(errorData.message || "Something went wrong!");
+				toast.error(errorData.error);
 				return;
 			}
 			const data = await response.json();
@@ -46,8 +46,9 @@ export default function Login() {
 		} catch (error) {
 			console.error("Log in error", error);
 			toast.error(error.message || "Log in failed");
+		} finally {
+			setLoading(false);
 		}
-		setLoading(false);
 	};
 
 	return (
