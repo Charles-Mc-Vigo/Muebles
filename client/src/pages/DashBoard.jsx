@@ -9,6 +9,7 @@ import {
   faHandshake,
   faWrench,
 } from "@fortawesome/free-solid-svg-icons";
+import { TbReportSearch } from "react-icons/tb";
 import ProductManagement from "./ProductManagement";
 import Inventory from "../components/Inventory";
 import ServiceSection from "../components/Services";
@@ -22,6 +23,7 @@ import ProductCustomization from "./ProductCustomization";
 import OrderManagement from "./OrderManagement";
 import TransactionHistory from "./TransactionHistory";
 import DeliveryManagement from "./DeliveryManagement";
+import GenerateReport from "../components/GenerateReport";
 
 const Dashboard = () => {
   // State management for dropdowns
@@ -96,9 +98,8 @@ const Dashboard = () => {
     "view-products": <ViewProduct />,
     "add-product": <ProductManagement />,
     inventory: <Inventory />,
-
     "order-management": <OrderManagement />,
-
+    "generate-report": <GenerateReport/>,
 		"product-customization": <ProductCustomization />,
     "track-delivery": (
       <h2 className="text-2xl font-semibold">Track Delivery Content</h2>
@@ -179,14 +180,13 @@ const Dashboard = () => {
               onClick={() => setActiveSection("inventory")}
             />
 
-            {/* Transaction Section */}
-
-            
-          
-
-            {/* Delivery Section */}
-            
-
+          {/* Generate Report*/}
+          <NavItem
+              icon={TbReportSearch}
+              label="Generate Report"
+              isActive={activeSection === "Generate-Report"}
+              onClick={() => setActiveSection("generate-report")}
+            />
             {/* Maintenance Section */}
             <NavItem
               icon={faWrench}

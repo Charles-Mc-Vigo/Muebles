@@ -397,6 +397,7 @@ export default function SignUp() {
 								className="bg-slate-100 p-3 rounded-lg"
 								onChange={handleChange}
 								value={formData.phoneNumber}
+								maxLength={11}
 							/>
 							<select
 								name="municipality"

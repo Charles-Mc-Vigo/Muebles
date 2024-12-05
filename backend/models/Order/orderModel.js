@@ -144,7 +144,7 @@ orderSchema.pre("save", async function (next) {
 });
 
 orderSchema.pre("save", function (next) {
-  if (this.isNew && this.type === "Pre-Order" && this.dueDates.length === 0) {
+  if (this.isNew && this.paymentOption === "Partial Payment" && this.dueDates.length === 0) {
     const now = new Date();
     this.dueDates = [
       new Date(now.getFullYear(), now.getMonth() + 1, now.getDate()),
@@ -229,6 +229,7 @@ orderSchema.statics.preOrder = async function (
       monthlyInstallment: undefined,
       interest: undefined,
       lastPaymentDate: undefined,
+      isPaid:true
     };
   } else if (paymentOption === "Partial Payment") {
     // For partial payment, include all relevant fields

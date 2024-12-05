@@ -319,7 +319,7 @@ const Home = () => {
 						to="/product-customization"
 						className="mt-6 px-6 py-3 bg-white text-black font-bold rounded-md hover:bg-gray-200 transition"
 					>
-						Try It Now
+						Customize Now!
 					</Link>
 				</div>
 			</section>
@@ -393,6 +393,7 @@ const Home = () => {
 										showPreOrder={true}
 										showUpdateButton={false}
 										showToast={showToast}
+										showCart={true}
 										onAddToCart={() => {
 											incrementCartCount();
 											fetchCartCount();

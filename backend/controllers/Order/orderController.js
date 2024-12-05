@@ -245,6 +245,28 @@ const orderController = {
 			});
 		}
 	},
+	generateMonthlyOrders: async (req, res) => {
+		try {
+			const startOfMonth = new Date();
+			startOfMonth.setDate(1); // Set to the first day of the month
+			startOfMonth.setHours(0, 0, 0, 0); // Set time to 00:00:00
+
+			const endOfMonth = new Date(); // This will be the current date
+			endOfMonth.setHours(23, 59, 59, 999); // Set time to the end of today
+
+			// Query for successful orders only (delivered and isDelivered=true)
+			const successfulOrders = await Order.find({
+				createdAt: { $gte: startOfMonth, $lte: endOfMonth },
+				orderStatus: "delivered", // Status must be 'delivered'
+				isDelivered: true, // Order must be marked as delivered
+			});
+
+			res.status(200).json({ orders: successfulOrders });
+		} catch (error) {
+			console.error("Error generating report:", error);
+			res.status(500).json({ message: "Error generating report" });
+		}
+	},
 
 	// Get single order details
 	getOrderDetails: async (req, res) => {
