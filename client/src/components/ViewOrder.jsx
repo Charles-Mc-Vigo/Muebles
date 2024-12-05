@@ -347,7 +347,6 @@ const ViewOrder = () => {
 														</div>
 													)}
 												</h3>
-
 												<p>Payment: {order.paymentOption}</p>
 												<div className="space-y-4">
 													{order.items.map((item, itemIndex) => (
