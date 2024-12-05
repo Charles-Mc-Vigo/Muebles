@@ -109,7 +109,7 @@ const AdminEditProfile = () => {
                 name="name"
                 value={profile.name|| ""}
                 onChange={handleInputChange}
-                className="mb-4 px-3 py-2 border border-gray-300 rounded-md w-full focus:outline-none focus:border-teal-600"
+                className="mb-4 px-3 py-2 border border-gray-300 rounded-md w-full focus:outline-none focus:border-green-600"
             />
 
             <label className="block mb-2 text-sm font-medium text-gray-700">Email</label>
@@ -118,7 +118,7 @@ const AdminEditProfile = () => {
                 name="email"
                 value={profile.email || ""}
                 onChange={handleInputChange}
-                className="mb-4 px-3 py-2 border border-gray-300 rounded-md w-full focus:outline-none focus:border-teal-600"
+                className="mb-4 px-3 py-2 border border-gray-300 rounded-md w-full focus:outline-none focus:border-green-600"
             />
 
             <label className="block mb-2 text-sm font-medium text-gray-700">Role</label>
@@ -127,12 +127,12 @@ const AdminEditProfile = () => {
                 name="role"
                 value={profile.role || ""}
                 onChange={handleInputChange}
-                className="mb-4 px-3 py-2 border border-gray-300 rounded-md w-full focus:outline-none focus:border-teal-600"
+                className="mb-4 px-3 py-2 border border-gray-300 rounded-md w-full focus:outline-none focus:border-green-600"
             />
 
             <button
                 onClick={handleSaveChanges}
-                className="w-full py-2 px-4 bg-teal-600 text-white rounded-md hover:bg-teal-700 focus:outline-none"
+                className="w-full py-2 px-4 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none"
             >
                 Save Changes
             </button>

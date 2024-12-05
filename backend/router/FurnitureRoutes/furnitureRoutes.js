@@ -1,8 +1,5 @@
 const express = require("express");
 const router = express.Router();
-
-
-
 const {
   createFurniture,
   getAllFurnitures,
@@ -12,9 +9,10 @@ const {
   UnArchived,
   ArchivedFurnitures,
   searchFurnitureByName,
+  checkIfRated,
 } = require("../../controllers/FurnitureControllers/furnitureController");
 
-const { checkAdminAuth } = require("../../middlewares/checkAuth");
+const { checkAdminAuth, checkUserAuth } = require("../../middlewares/checkAuth");
 
 // Get all furnitures
 // GET - /api/furnitures

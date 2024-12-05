@@ -2,6 +2,8 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const cookieParser = require('cookie-parser');
+const scheduleInterestJob = require("./jobs/applyInterestJob");
+
 
 // Router imports
 const authCheckRouter = require('./router/authCheck');
@@ -23,6 +25,9 @@ const orderRoutes = require('../backend/router/Order/orderRoutes');
 // Cart routes
 const cartRoutes = require('./router/Cart/cartRoutes');
 
+// Rating router
+const ratingRoutes = require('./router/Rating/ratingRoutes');
+
 // Database connection
 const connectDB = require("./database/db");
 
@@ -41,6 +46,8 @@ const prodServer = async () => {
 
 // Start the server in production or development
 prodServer();
+scheduleInterestJob();
+
 
 // Middlewares
 app.use(express.json({ limit: '50mb' }));  // Increase limit as necessary
@@ -63,6 +70,7 @@ app.use("/api/sizes", sizeRoutes);
 app.use("/api/cart", cartRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/orders", orderRoutes);
+app.use('/api/ratings',ratingRoutes);
 app.use("/api/search", searchRoutes);
 
 // Global error handling middleware

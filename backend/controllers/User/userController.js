@@ -11,6 +11,8 @@ const {
 	sendPasswordResetVerificationCode,
 } = require("../../utils/EmailVerification");
 const createToken = require("../../utils/tokenUtils");
+const Furniture = require("../../models/Furniture/furnitureModel");
+const Rating = require('../../models/Rating/ratingModel');
 
 exports.getAllUsers = async (req, res) => {
 	try {
@@ -177,13 +179,9 @@ exports.passwordReset = async (req, res) => {
 exports.getUserId = async (req, res) => {
 	try {
 		const { userId } = req.params;
-		const filters = req.query; // Get any additional query parameters for filtering
-
-		// Add the userId as part of the filter criteria
-		filters._id = userId;
 
 		// Use findOne with the combined filters
-		const user = await User.findOne(filters);
+		const user = await User.findById(userId);
 
 		if (!user) return res.status(404).json({ message: "User not found!" });
 

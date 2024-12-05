@@ -215,7 +215,7 @@ const UserProfile = () => {
         <div className="button-container mt-5 flex flex-col space-y-4">
           <Link
             to="/my-profile/edit"
-            className="bg-teal-500 text-white px-6 py-3 rounded-md hover:bg-teal-600 transition duration-300 text-center"
+            className="bg-green-500 text-white px-6 py-3 rounded-md hover:bg-green-600 transition duration-300 text-center"
           >
             Edit Profile
           </Link>
@@ -287,8 +287,8 @@ const UserProfile = () => {
               onClick={() => setActiveSection("manageAccount")}
               className={`block font-bold ${
                 activeSection === "manageAccount"
-                  ? "text-teal-600"
-                  : "hover:text-teal-600"
+                  ? "text-green-600"
+                  : "hover:text-green-600"
               }`}
             >
               Manage My Account
@@ -297,8 +297,8 @@ const UserProfile = () => {
               onClick={() => setActiveSection("personalProfile")}
               className={`block ${
                 activeSection === "personalProfile"
-                  ? "text-teal-600"
-                  : "hover:text-teal-600"
+                  ? "text-green-600"
+                  : "hover:text-green-600"
               }`}
             >
               My Profile
@@ -307,8 +307,8 @@ const UserProfile = () => {
               onClick={() => setActiveSection("addressBook")}
               className={`block ${
                 activeSection === "addressBook"
-                  ? "text-teal-600"
-                  : "hover:text-teal-600"
+                  ? "text-green-600"
+                  : "hover:text-green-600"
               }`}
             >
               Address
@@ -317,8 +317,8 @@ const UserProfile = () => {
               onClick={() => setActiveSection("myOrders")}
               className={`block font-bold ${
                 activeSection === "myOrders"
-                  ? "text-teal-600"
-                  : "hover:text-teal-600"
+                  ? "text-green-600"
+                  : "hover:text-green-600"
               }`}
             >
               My Orders

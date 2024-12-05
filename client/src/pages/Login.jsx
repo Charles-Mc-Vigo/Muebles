@@ -35,7 +35,7 @@ export default function Login() {
 			});
 			if (!response.ok) {
 				const errorData = await response.json();
-				toast.error(errorData.message || "Something went wrong!");
+				toast.error(errorData.error);
 				return;
 			}
 			const data = await response.json();
@@ -46,8 +46,9 @@ export default function Login() {
 		} catch (error) {
 			console.error("Log in error", error);
 			toast.error(error.message || "Log in failed");
+		} finally {
+			setLoading(false);
 		}
-		setLoading(false);
 	};
 
 	return (
@@ -62,7 +63,7 @@ export default function Login() {
 					backgroundRepeat: "no-repeat",
 				}}
 			>
-				<div className="bg-teal-800 bg-opacity-90 p-10 md:p-12 rounded-lg max-w-lg w-full relative shadow-lg">
+				<div className="bg-green-800 bg-opacity-90 p-10 md:p-12 rounded-lg max-w-lg w-full relative shadow-lg">
 					{/* Back Button */}
 					<button
 						onClick={() => navigate(-1)}

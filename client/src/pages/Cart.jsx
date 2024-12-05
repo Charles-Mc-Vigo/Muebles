@@ -76,6 +76,7 @@ const Cart = () => {
 				setCount(data.cart.count);
 				setTotalAmount(data.cart.totalAmount);
 				setUser(data.cart.userId);
+				console.log(data.cart.userId)
 				const defaultAddress = data.cart.userId.addresses?.find(
 					(address) => address.isDefault
 				);
@@ -113,12 +114,18 @@ const Cart = () => {
 		}
 	}, [selectedAddress, user]);
 
-	const totalWithShipping =
-		paymentOption === "Partial Payment"
-			? (totalAmount / 2 + shippingFee).toFixed(2) // Half of the total amount plus shipping fee
-			: (totalAmount + shippingFee).toFixed(2); // Full payment total
+	const totalAmountWithShippingFee = (totalAmount + shippingFee).toFixed(2);
 
-	const partialPaymentAmount = (totalAmount / 2 + shippingFee).toFixed(2); // Calculate partial payment amount
+	// kapag partial payment
+	const partialPaymentAmount = ((totalAmount + shippingFee) / 2).toFixed(2);
+
+	const remainingBalance = (totalAmount + shippingFee - partialPaymentAmount).toFixed(2);
+
+	const montlyInstallment = (remainingBalance / 3).toFixed(2);
+
+	// kapag full payment
+	const fullPayment = totalAmountWithShippingFee;
+	// console.log("partial", partialPaymentAmount);
 
 	const handlePaymentMethodClick = (method) => {
 		setSelectedPaymentMethod(method);
@@ -149,11 +156,17 @@ const Cart = () => {
 		formData.append("shippingAddress", JSON.stringify(addressToSend));
 		formData.append("deliveryMode", deliveryMode);
 		formData.append("expectedDelivery", expectedDeliveryDate);
+		formData.append("totalAmount", totalAmount);
+		formData.append("shippingFee", shippingFee);
+		formData.append("totalAmountWithShippingFee", totalAmountWithShippingFee);
+		formData.append("partialPaymentAmount", partialPaymentAmount);
+		formData.append("remainingBalance", remainingBalance);
+		formData.append("montlyInstallment", montlyInstallment);
 
-		// // Log FormData contents
-		// for (const [key, value] of formData.entries()) {
-		// 	console.log(`${key}:`, value);
-		// }
+		// Log FormData contents
+		for (const [key, value] of formData.entries()) {
+			console.log(`${key}:`, value);
+		}
 
 		try {
 			const response = await fetch("http://localhost:3000/api/orders/create", {
@@ -169,7 +182,7 @@ const Cart = () => {
 			if (!data.ok) {
 				toast.error(data.error);
 			}
-			
+
 			const orderId = data.order._id;
 			await clearCart();
 			navigate(`/order-details/${orderId}`);
@@ -179,7 +192,6 @@ const Cart = () => {
 			setLoading(false);
 		}
 	};
-	
 
 	const updateQuantity = async (furnitureId, newQuantity) => {
 		if (newQuantity < 1) {
@@ -256,14 +268,14 @@ const Cart = () => {
 		<div className="flex flex-col min-h-screen">
 			<Header isLogin={true} cartCount={true} />
 			<main className="flex-grow w-2/4 mx-auto p-4 mt-5">
-				<div className="flex items-center mb-4 gap-5 border-b-2 border-teal-600">
+				<div className="flex items-center mb-4 gap-5 border-b-2 border-green-600">
 					<button
 						onClick={() => navigate(-1)}
-						className="text-gray-500 mr-2 hover:text-teal-600"
+						className="text-gray-500 mr-2 hover:text-green-600"
 					>
 						<IoMdArrowRoundBack size={40} />
 					</button>
-					<h2 className="text-2xl font-semibold text-teal-600">Your Cart</h2>
+					<h2 className="text-2xl font-semibold text-green-600">Your Cart</h2>
 					<button
 						onClick={clearCart}
 						disabled={loading}
@@ -273,7 +285,7 @@ const Cart = () => {
 					</button>
 				</div>
 				{items.length === 0 ? (
-					<p className="text-center font-bold text-2xl text-teal-600">
+					<p className="text-center font-bold text-2xl text-green-600">
 						Your cart is empty.
 					</p>
 				) : (
@@ -282,7 +294,7 @@ const Cart = () => {
 						<div className="bg-white shadow-2xl mt-2 border-t rounded-2xl">
 							<div className="mt-2 p-2 flex items-center text-black font-medium">
 								<div className="flex flex-grow mr-2">
-									<FaLocationDot className="mr-2 text-teal-600 text-xl" />
+									<FaLocationDot className="mr-2 text-green-600 text-xl" />
 									<div className="flex items-center">
 										{user.firstname || "N/A"} {user.lastname || "N/A"}{" "}
 										{user.phoneNumber || "N/A"}
@@ -306,7 +318,7 @@ const Cart = () => {
 								)}
 								<button
 									onClick={() => navigate("/address/new")}
-									className="text-teal-600 flex items-center font-semibold mr-5"
+									className="text-green-600 flex items-center font-semibold mr-5"
 								>
 									<MdOutlineKeyboardArrowRight
 										style={{ fontSize: "3rem" }}
@@ -317,8 +329,8 @@ const Cart = () => {
 						</div>
 						{/* Product information & delivery */}
 						<div className="py-4 mt-2 bg-white rounded-xl border-t ">
-							<div className="flex text-2xl font-semibold border-b border-teal-500">
-								<BsShop className="text-2xl text-teal-600 ml-2" />
+							<div className="flex text-2xl font-semibold border-b border-green-500">
+								<BsShop className="text-2xl text-green-600 ml-2" />
 								<h1 className="text-2xl ml-2">JCKAME</h1>
 							</div>
 							<div>
@@ -390,7 +402,7 @@ const Cart = () => {
 														)}
 													</p>
 													<button
-														className="ml-4 text-teal-600 hover:teal-red-800"
+														className="ml-4 text-green-600 hover:green-red-800"
 														onClick={() => removeItem(item.furnitureId._id)}
 													>
 														Remove
@@ -402,9 +414,9 @@ const Cart = () => {
 								</ul>
 							</div>
 							{/* Delivery Method  */}
-							<div className="flex flex-col pl-2  border rounded-xl shadow-xl border-teal-500">
+							<div className="flex flex-col pl-2  border rounded-xl shadow-xl border-green-500">
 								<div className="flex items-center text-xl font-semibold ml-4 mb-5 px-3 py-2">
-									<FaTruckFast className="mr-2 text-teal-600" />
+									<FaTruckFast className="mr-2 text-green-600" />
 									<span>Delivery Option:</span>
 								</div>
 								<div className="flex gap-3 text-lg font-normal pr-2 ml-6 mb-2">
@@ -493,8 +505,8 @@ const Cart = () => {
 									onClick={(event) => handlePaymentMethodClick("GCash", event)}
 									className={`rounded relative p-2 transition-all duration-200 ${
 										selectedPaymentMethod === "GCash"
-											? "border-2 border-teal-600 bg-white shadow-lg transform scale-105"
-											: "border border-gray-300 bg-slate-200 hover:border-teal-400"
+											? "border-2 border-green-600 bg-white shadow-lg transform scale-105"
+											: "border border-gray-300 bg-slate-200 hover:border-green-400"
 									}`}
 								>
 									<img
@@ -503,7 +515,7 @@ const Cart = () => {
 										className="w-20 h-20 object-contain rounded"
 									/>
 									{selectedPaymentMethod === "GCash" && (
-										<div className="absolute -top-2 -right-2 w-6 h-6 bg-teal-600 rounded-full flex items-center justify-center">
+										<div className="absolute -top-2 -right-2 w-6 h-6 bg-green-600 rounded-full flex items-center justify-center">
 											<span className="text-white text-sm">✓</span>
 										</div>
 									)}
@@ -514,8 +526,8 @@ const Cart = () => {
 									onClick={(event) => handlePaymentMethodClick("Maya", event)}
 									className={`rounded relative p-2 transition-all duration-200 ${
 										selectedPaymentMethod === "Maya"
-											? "border-2 border-teal-600 bg-white shadow-lg transform scale-105"
-											: "border border-gray-300 bg-slate-200 hover:border-teal-400"
+											? "border-2 border-green-600 bg-white shadow-lg transform scale-105"
+											: "border border-gray-300 bg-slate-200 hover:border-green-400"
 									}`}
 								>
 									<img
@@ -524,7 +536,7 @@ const Cart = () => {
 										className="w-20 h-20 object-contain rounded"
 									/>
 									{selectedPaymentMethod === "Maya" && (
-										<div className="absolute -top-2 -right-2 w-6 h-6 bg-teal-600 rounded-full flex items-center justify-center">
+										<div className="absolute -top-2 -right-2 w-6 h-6 bg-green-600 rounded-full flex items-center justify-center">
 											<span className="text-white text-sm">✓</span>
 										</div>
 									)}
@@ -537,32 +549,63 @@ const Cart = () => {
 								</p>
 							)}
 						</div>
+
 						{/* QR code for payment */}
-						<div className="mt-5 p-5 bg-slate-200">
-							<h1 className="text-xl font-semibold mb-2">Scan the QR Code</h1>
-							<div className="flex items-start gap-8">
-								{/* QR Code Section */}
-								<div className="flex flex-col items-center">
-									<img
-										src="/payment-icon/qrcode.png"
-										alt="qrcode"
-										className="w-40 h-40 object-contain"
-									/>
-								</div>
-								{/* Image Upload Section */}
-								<div className="flex-1 max-w-md pt-5">
-									<h2 className="text-2xl font-semibold text-teal-600 mb-4">
-										Upload Proof of Payment
-									</h2>
-									<input
-										type="file"
-										onChange={handleFileUpload}
-										className="mb-4 w-full border border-gray-300 rounded-md px-3 py-2 text-gray-600 focus:border-teal-600 focus:ring-teal-500"
-									/>
-									{uploadMessage && <p>{uploadMessage}</p>}
+						{selectedPaymentMethod === "Maya" && (
+							<div className="mt-5 p-5 bg-slate-200">
+								<h1 className="text-xl font-semibold mb-2">Scan the QR Code</h1>
+								<div className="flex items-start gap-8">
+									{/* QR Code Section */}
+									<div className="flex flex-col items-center">
+										<img
+											src="/payment-icon/Maya-qr.png"
+											alt="qrcode"
+											className="w-40 h-40 object-contain"
+										/>
+									</div>
+									{/* Image Upload Section */}
+									<div className="flex-1 max-w-md pt-5">
+										<h2 className="text-2xl font-semibold text-green-600 mb-4">
+											Upload Proof of Payment
+										</h2>
+										<input
+											type="file"
+											onChange={handleFileUpload}
+											className="mb-4 w-full border border-gray-300 rounded-md px-3 py-2 text-gray-600 focus:border-green-600 focus:ring-green-500"
+										/>
+										{uploadMessage && <p>{uploadMessage}</p>}
+									</div>
 								</div>
 							</div>
-						</div>
+						)}
+						{selectedPaymentMethod === "GCash" && (
+							<div className="mt-5 p-5 bg-slate-200">
+								<h1 className="text-xl font-semibold mb-2">Scan the QR Code</h1>
+								<div className="flex items-start gap-8">
+									{/* QR Code Section */}
+									<div className="flex flex-col items-center">
+										<img
+											src="/payment-icon/GCash-qr.png"
+											alt="qrcode"
+											className="w-40 h-40 object-contain"
+										/>
+									</div>
+									{/* Image Upload Section */}
+									<div className="flex-1 max-w-md pt-5">
+										<h2 className="text-2xl font-semibold text-green-600 mb-4">
+											Upload Proof of Payment
+										</h2>
+										<input
+											type="file"
+											onChange={handleFileUpload}
+											className="mb-4 w-full border border-gray-300 rounded-md px-3 py-2 text-gray-600 focus:border-green-600 focus:ring-green-500"
+										/>
+										{uploadMessage && <p>{uploadMessage}</p>}
+									</div>
+								</div>
+							</div>
+						)}
+
 						{/* Payment Details */}
 						<div className="border-t-2 p-5 rounded-xl shadow-xl bg-white ">
 							<div className="mt-2 ">
@@ -570,27 +613,40 @@ const Cart = () => {
 								<div className="text-lg font-normal">
 									<div className="flex justify-between">
 										<span>Items total:</span>
-										<span>₱{totalAmount.toFixed(2)}</span>
+										<span>₱ {totalAmount.toFixed(2)}</span>
 									</div>
 									<div className="flex justify-between">
 										<span>Shipping Fee:</span>
-										<span>₱{shippingFee.toFixed(2)}</span>
+										<span>₱ {shippingFee.toFixed(2)}</span>
 									</div>
 									{/* payable amount dito */}
 									<div className="mt-5">
 										{paymentOption === "Partial Payment" ? (
-											<div className="flex justify-between">
-												<h3 className="text-lg font-semibold">
-													Partial Payment (50%):
-												</h3>
-												<p className="font-bold">PHP {partialPaymentAmount}</p>
+											<div className="flex flex-col">
+												<div className="flex justify-between">
+													<h3 className="font-semibold">Total:</h3>
+													<p>₱ {totalAmountWithShippingFee}</p>
+												</div>
+
+												<div className="flex justify-between">
+													<h3 className="font-semibold">
+														Partial Payment (50%):
+													</h3>
+													<p>₱ {partialPaymentAmount}</p>
+												</div>
+												<div className="flex justify-between">
+													<h3 className="font-semibold">
+														Montly Installment (3 months):
+													</h3>
+													<p>₱ {montlyInstallment}</p>
+												</div>
 											</div>
 										) : (
 											<div className="flex justify-between">
 												<h3 className="text-lg font-semibold">
 													Total Payment:
 												</h3>
-												<p className="font-bold">PHP {totalWithShipping}</p>
+												<p className="font-bold">PHP {fullPayment}</p>
 											</div>
 										)}
 									</div>
@@ -598,7 +654,7 @@ const Cart = () => {
 							</div>
 
 							{/* For payment. need design improvement */}
-							<div className="border-t border-teal-600 pt-4 mt-5">
+							<div className="border-t border-green-600 pt-4 mt-5">
 								<div className="flex justify-between mb-4">
 									<button
 										onClick={() => navigate(-1)}
@@ -607,11 +663,11 @@ const Cart = () => {
 										Continue Shopping
 									</button>
 									<button
-										className="bg-teal-500 text-white px-4 py-2 rounded hover:bg-teal-800"
+										className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-800"
 										disabled={loading}
 										onClick={preOrderFromCart}
 									>
-										{loading ? "Creating Pre-Order...":"Create Pre-Order"}
+										{loading ? "Creating Pre-Order..." : "Create Pre-Order"}
 									</button>
 								</div>
 							</div>

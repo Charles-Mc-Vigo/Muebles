@@ -45,7 +45,7 @@ export default function Hero() {
               </p>
               <div className="flex justify-center lg:justify-start">
                 <button
-                  className="flex items-center text-base lg:text-lg font-semibold gap-3 rounded-md py-3 px-6 bg-teal-500 text-white hover:opacity-80 transition-all"
+                  className="flex items-center text-base lg:text-lg font-semibold gap-3 rounded-md py-3 px-6 bg-green-500 text-white hover:opacity-80 transition-all"
                   onClick={toHomePage}
                 >
                   Shop now!

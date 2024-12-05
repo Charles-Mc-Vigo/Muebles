@@ -60,7 +60,7 @@ const HamburgerMenu = () => {
                                 <p>{error}</p>
                             ) : profile ? (
                                 <div className="text-center">
-                                    <p className="text-2xl text-teal-600 font-semibold mb-5">JCKAME</p>
+                                    <p className="text-2xl text-green-600 font-semibold mb-5">JCKAME</p>
                                     <img
                                         src={profile?.avatarUrl || "/default-avatar.png"}
                                         alt="Profile"
@@ -75,7 +75,7 @@ const HamburgerMenu = () => {
                                 <FontAwesomeIcon icon={faUser} />
                                 <span className="ml-2">Profile</span>
                            
-                            <Link to="/dashboard/setting/admin-profile/view" className="flex items-center space-x-2 text-gray-700 hover:text-teal-600">
+                            <Link to="admin-profile-view" className="flex items-center space-x-2 text-gray-700 hover:text-green-600">
                                 <FontAwesomeIcon icon={faCog} />
                                 <span>Settings</span>
                             </Link>

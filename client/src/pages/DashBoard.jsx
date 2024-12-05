@@ -9,6 +9,7 @@ import {
   faHandshake,
   faWrench,
 } from "@fortawesome/free-solid-svg-icons";
+import { TbReportSearch } from "react-icons/tb";
 import ProductManagement from "./ProductManagement";
 import Inventory from "../components/Inventory";
 import ServiceSection from "../components/Services";
@@ -22,6 +23,7 @@ import ProductCustomization from "./ProductCustomization";
 import OrderManagement from "./OrderManagement";
 import TransactionHistory from "./TransactionHistory";
 import DeliveryManagement from "./DeliveryManagement";
+import GenerateReport from "../components/GenerateReport";
 
 const Dashboard = () => {
   // State management for dropdowns
@@ -96,29 +98,20 @@ const Dashboard = () => {
     "view-products": <ViewProduct />,
     "add-product": <ProductManagement />,
     inventory: <Inventory />,
-
-    "view-transaction": <TransactionHistory />,
-
     "order-management": <OrderManagement />,
-
+    "generate-report": <GenerateReport/>,
 		"product-customization": <ProductCustomization />,
     "track-delivery": (
       <h2 className="text-2xl font-semibold">Track Delivery Content</h2>
     ),
-    "manage-delivery": <DeliveryManagement/> ,
-
     Furniture: <Maintenance />,
 	
-    Services: <ServiceSection />,
-    "repair-hardware": (
-      <h2 className="text-2xl font-semibold">Repair Hardware Content</h2>
-    ),
   };
 
 	return (
-		<div className="flex h-screen bg-gray-300">
+		<div className="flex h-screen bg-gray-100">
 			{/* Sidebar */}
-			<aside className="w-64 bg-teal-600  flex flex-col items-center rounded-l-3xl ml-1 h-50 mt-2 mb-2">
+			<aside className="w-64 bg-green-500  flex flex-col items-center rounded-l-3xl ml-1 h-50 mt-2 mb-2">
 				<div className="flex flex-col items-center p-5 m-5">
 					<img
 						src="/landingimage/LOGO.jpg"
@@ -187,47 +180,13 @@ const Dashboard = () => {
               onClick={() => setActiveSection("inventory")}
             />
 
-            {/* Transaction Section */}
-
-            <NavItem
-              icon={faHandshake}
-              label="Transaction"
-              isActive={activeSection.startsWith("transaction")}
-              onClick={() => toggleDropdown("transaction")}
-              hasDropdown
-              isOpen={dropdowns.transaction}
+          {/* Generate Report*/}
+          <NavItem
+              icon={TbReportSearch}
+              label="Generate Report"
+              isActive={activeSection === "Generate-Report"}
+              onClick={() => setActiveSection("generate-report")}
             />
-            {dropdowns.transaction && (
-              <ul className="ml-8 space-y-2">
-                <DropdownItem
-                  label="View Transactions"
-                  section="view-transaction"
-                  currentSection={activeSection}
-                  onClick={setActiveSection}
-                />
-              </ul>
-            )}
-
-            {/* Delivery Section */}
-            <NavItem
-              icon={faTruck}
-              label="Delivery"
-              isActive={activeSection.startsWith("delivery")}
-              onClick={() => toggleDropdown("delivery")}
-              hasDropdown
-              isOpen={dropdowns.delivery}
-            />
-            {dropdowns.delivery && (
-              <ul className="ml-8 space-y-2">
-                <DropdownItem
-                  label="Manage Delivery"
-                  section="manage-delivery"
-                  currentSection={activeSection}
-                  onClick={setActiveSection}
-                />
-              </ul>
-            )}
-
             {/* Maintenance Section */}
             <NavItem
               icon={faWrench}

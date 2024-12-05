@@ -36,19 +36,20 @@ import InventoryPage from "./pages/InventoryPage";
 import PaymentMethod from "./components/PaymentMethod";
 import EditUserProfile from "./components/EditUserProfile";
 import EditAdminProfile from "./components/EditAdminProfile";
-import SearchResults from "./components/SearchResults";
+import AdminProfile from "./components/AdminProfile";
 
-import GenerateReport from "./components/GenerateReport";
 import ViewOrder from "./components/ViewOrder";
 import AddNewAddress from "./components/AddNewAddress";
 import ViewUserOrder from "./components/ViewUserOrder";
 import ViewPendingRequest from "./pages/ViewPendingRequest";
 import ErrorBoundary from "./components/ErrorBoundary";
 import PreOrder from "./pages/PreOrder";
-import ReviewPage from "./pages/ReviewPage";
-
+import Rating from "./pages/Rating";
+import GenerateReport from "./components/GenerateReport";
+import CheckoutCustomization from "./pages/CheckoutCustomization";
+import SearchResults from "./components/SearchResults";
+import Repair from "./pages/Repair";
 // import LoadingSpinner from "./components/LoadingSpinner";
-
 
 export default function App() {
 	return (
@@ -80,8 +81,16 @@ export default function App() {
 						element={<ProtectedRoute element={AddNewAddress} />}
 					/>
 					<Route
+						path="/rating/:orderId"
+						element={<ProtectedRoute element={Rating} />}
+					/>
+					<Route
 						path="/password-reset/request"
 						element={<PasswordResetRequest />}
+					/>
+					<Route
+						path="/repair/:orderId/"
+						element={<ProtectedRoute element={Repair} />}
 					/>
 					<Route
 						path="/password-reset/verify/:userId"
@@ -99,9 +108,14 @@ export default function App() {
 						path={`/order-details/:orderId`}
 						element={<ProtectedRoute element={OrderDetails} />}
 					/>
+
 					<Route
 						path="/pre-order/:furnitureId"
 						element={<ProtectedRoute element={PreOrder} />}
+					/>
+					<Route
+						path="/customize-product/checkout"
+						element={<ProtectedRoute element={CheckoutCustomization} />}
 					/>
 					<Route path="/cart" element={<ProtectedRoute element={Cart} />} />
 					<Route path="/delivery-info" element={<DeliveryInfo />} />
@@ -109,13 +123,17 @@ export default function App() {
 						path="/orders"
 						element={<ProtectedRoute element={ViewOrder} />}
 					/>
-					<Route path="/product-review" element={<ReviewPage />} />
+					<Route
+						path="/product-customization"
+						element={<ProtectedRoute element={ProductCustomization} />}
+					/>
 					{/* <Route path="/create-review" element={<CreateReview />} /> */}
 
 					{/* Admin routes */}
 					<Route path="/admin-login" element={<AdminLogin />} />
 					<Route path="/generate-report" element={<GenerateReport />} />
 					<Route path="/admin-signup" element={<AdminSignUp />} />
+					<Route path="/admin-profile-view" element={<AdminProfile />} />
 					<Route
 						path="/admin-signup/verify-account/:adminId"
 						element={<AdminVerify />}
@@ -140,7 +158,19 @@ export default function App() {
 						path="/dashboard"
 						element={<ProtectedRoute element={DashBoard} adminOnly={true} />}
 					/>
-					
+					<Route
+						path={`/generate-report`}
+						element={
+							<ProtectedRoute element={GenerateReport} adminOnly={true} />
+						}
+					/>
+
+					<Route
+						path="/dashboard/setting/admin-profile/edit"
+						element={
+							<ProtectedRoute element={EditAdminProfile} adminOnly={true} />
+						}
+					/>
 					<Route
 						path="/table"
 						element={<ProtectedRoute element={ProductTable} adminOnly={true} />}
