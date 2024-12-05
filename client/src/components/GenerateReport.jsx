@@ -42,39 +42,53 @@ const GenerateReport = () => {
   }, []); // Empty dependency array means this runs once on mount
 
   const generatePDF = () => {
+    if (!orders || orders.length === 0) {
+      alert("No data available to generate the report.");
+      return;
+    }
+
     const doc = new jsPDF();
     doc.setFontSize(20);
     doc.text("Successful Monthly Orders Report", 105, 10, { align: "center" });
+
     const columns = [
       { title: "Order Number", dataKey: "orderNumber" },
       { title: "Total Amount", dataKey: "totalAmount" },
       { title: "Order Status", dataKey: "orderStatus" },
       { title: "Date", dataKey: "date" },
     ];
+
     const rows = orders.map((order) => ({
-      orderNumber: order.orderNumber,
-      totalAmount: `₱${order.totalAmountWithShipping.toLocaleString()}`,
-      orderStatus: order.orderStatus,
+      orderNumber: order._id,
+      totalAmount: `₱${(order.totalAmountWithShipping || 0).toLocaleString()}`,
+      orderStatus: order.orderStatus || "N/A",
       date: new Date(order.createdAt).toLocaleString(),
     }));
+
+    console.log("Rows for PDF:", rows); // Debugging rows data
+
     const totalAmount = orders.reduce(
-      (sum, order) => sum + order.totalAmountWithShipping,
+      (sum, order) => sum + (order.totalAmountWithShipping || 0),
       0
     );
+
     doc.autoTable({
       head: [columns.map((col) => col.title)],
-      body: rows,
+      body: rows.map((row) =>
+        columns.map((col) => row[col.dataKey])
+      ),
       startY: 20,
       margin: { top: 30 },
       theme: "grid",
     });
-    // Add overall total at the bottom
+
     doc.text(
       `Overall Total: ₱${totalAmount.toLocaleString()}`,
       105,
       doc.previousAutoTable.finalY + 10,
       { align: "center" }
     );
+
     doc.save("Muebles_Monthly_Orders_Report.pdf");
   };
 
@@ -85,14 +99,18 @@ const GenerateReport = () => {
           Generate Successful Monthly Report
         </h1>
         <p className="mb-6 text-gray-600">
-          The report for successfully delivered orders is shown below. You can also download it as a PDF.
+          The report for successfully delivered orders is shown below. You can
+          also download it as a PDF.
         </p>
       </div>
       {loading ? (
         <p>Loading report...</p> // Show loading message while fetching
       ) : (
         <>
-          {noOrdersMessage && <p className="text-red-500">{noOrdersMessage}</p>} {/* Display message if no orders */}
+          {noOrdersMessage && (
+            <p className="text-red-500">{noOrdersMessage}</p>
+          )}{" "}
+          {/* Display message if no orders */}
           {isReportVisible && (
             <div className="mt-8 w-full max-w-6xl bg-white rounded-lg shadow-md p-4 border-2">
               <h1 className="text-3xl font-bold text-center">Sales Report</h1>
@@ -113,7 +131,7 @@ const GenerateReport = () => {
                 <thead>
                   <tr className="border-b">
                     <th className="px-4 py-2 text-left">Date</th>
-                    <th className="px-4 py-2 text-left">Order Number</th>
+                    <th className="px-4 py-2 text-left">Order ID</th>
                     <th className="px-4 py-2 text-left">Total Amount</th>
                     <th className="px-4 py-2 text-left">Order Status</th>
                   </tr>
@@ -124,7 +142,7 @@ const GenerateReport = () => {
                       <td className="px-4 py-2">
                         {new Date(order.createdAt).toLocaleString()}
                       </td>
-                      <td className="px-4 py-2">{order.orderNumber}</td>
+                      <td className="px-4 py-2">{order._id}</td>
                       <td className="px-4 py-2">
                         ₱{order.totalAmountWithShipping.toLocaleString()}
                       </td>
@@ -137,7 +155,10 @@ const GenerateReport = () => {
               <div className="mt-4 text-right text-lg font-bold">
                 Total Sales: ₱
                 {orders
-                  .reduce((sum, order) => sum + order.totalAmountWithShipping, 0)
+                  .reduce(
+                    (sum, order) => sum + (order.totalAmountWithShipping || 0),
+                    0
+                  )
                   .toLocaleString()}
               </div>
             </div>
@@ -145,8 +166,10 @@ const GenerateReport = () => {
           <div className="mt-4 text-center">
             <button
               onClick={generatePDF}
-              className={`px-6 py-3 text-white font-semibold bg-green-600 hover:bg-teal-700 rounded-md ${orders.length === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
-              disabled={orders.length === 0} 
+              className={`px-6 py-3 text-white font-semibold bg-green-600 hover:bg-teal-700 rounded-md ${
+                orders.length === 0 ? "opacity-50 cursor-not-allowed" : ""
+              }`}
+              disabled={orders.length === 0}
             >
               Download as PDF
             </button>

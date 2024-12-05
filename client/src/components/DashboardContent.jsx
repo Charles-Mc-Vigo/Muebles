@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import FurnitureOrderForm from "./FurnitureOrderForm";
 
 const Dashboard = () => {
   const [orders, setOrders] = useState([]);
@@ -138,9 +139,14 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="container mx-auto p-4 border-2">
-     <div className="mb-2 flex justify-end ">
-      <button className="bg-green-300 rounded-lg text-xl p-3 hover:bg-green-500">Create New Order</button>
+    <div className="container mx-auto p-4 ">
+      <div className="mb-2 flex justify-end">
+        <Link
+          to="/walkin"
+          className="bg-green-300 rounded-lg text-xl p-3 hover:bg-green-500 inline-block"
+        >
+          Create New Order
+        </Link>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <div className="bg-white shadow-lg rounded-lg p-4 text-center">
@@ -148,48 +154,12 @@ const Dashboard = () => {
           <p className="text-2xl text-blue-600">{totalOrders}</p>
         </div>
         <div className="bg-white shadow-lg rounded-lg p-4 text-center">
-          <h1 className="text-xl font-bold">Total Revenue</h1>
-          <p className="text-2xl text-black-600">₱ {totalRevenue.toFixed(2)}</p>
-        </div>
-        <div className="bg-white shadow-lg rounded-lg p-4 text-center">
-          <h1 className="text-xl font-bold">Outstanding Balance</h1>
-          <p className="text-2xl text-red-600">
-            ₱ {outstandingBalance.toFixed(2)}
-          </p>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <div className="bg-white shadow-lg rounded-lg p-4 text-center">
-          <h1 className="text-xl font-bold">Pending</h1>
-          <p className="text-2xl text-blue-600">{ordersByStatus.pending}</p>
-        </div>
-        <div className="bg-white shadow-lg rounded-lg p-4 text-center">
           <h1 className="text-xl font-bold">Confirmed</h1>
           <p className="text-2xl text-yellow-600">{ordersByStatus.confirmed}</p>
         </div>
         <div className="bg-white shadow-lg rounded-lg p-4 text-center">
-          <h1 className="text-xl font-bold">Delivered</h1>
-          <p className="text-2xl text-black-600">{ordersByStatus.delivered}</p>
-        </div>
-        <div className="bg-white shadow-lg rounded-lg p-4 text-center">
-          <h1 className="text-xl font-bold">Cancelled</h1>
-          <p className="text-2xl text-red-600">{ordersByStatus.cancelled}</p>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-        <div className="bg-white shadow-lg rounded-lg p-4 text-center">
-          <h1 className="text-xl font-bold">Full Payment Orders</h1>
-          <p className="text-2xl text-black-600">
-            {ordersByPaymentType.fullPayment}
-          </p>
-        </div>
-        <div className="bg-white shadow-lg rounded-lg p-4 text-center">
-          <h1 className="text-xl font-bold">Partial Payment Orders</h1>
-          <p className="text-2xl text-yellow-600">
-            {ordersByPaymentType.partialPayment}
-          </p>
+          <h1 className="text-xl font-bold">Total Revenue</h1>
+          <p className="text-2xl text-black-600">₱ {totalRevenue.toFixed(2)}</p>
         </div>
       </div>
       <div className="bg-white rounded-lg">
@@ -269,7 +239,6 @@ const Dashboard = () => {
           </tbody>
         </table>
       </div>
-      
     </div>
   );
 };

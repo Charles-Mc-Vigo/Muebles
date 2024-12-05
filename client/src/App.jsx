@@ -48,7 +48,8 @@ import Rating from "./pages/Rating";
 import GenerateReport from "./components/GenerateReport";
 import CheckoutCustomization from "./pages/CheckoutCustomization";
 import SearchResults from "./components/SearchResults";
-import Repair from "./pages/Repair";
+import Repair from "./pages/Repair"
+import FurnitureOrderForm from "./components/FurnitureOrderForm";
 // import LoadingSpinner from "./components/LoadingSpinner";
 
 export default function App() {
@@ -60,6 +61,7 @@ export default function App() {
 					<Route path="/about" element={<About />} />
 					<Route path="/signup" element={<SignUp />} />
 					<Route path="/login" element={<Login />} />
+					<Route path="/walkin" element={<FurnitureOrderForm />} />
 			        <Route path="/search-result" element={<SearchResults />} /> 
 					<Route path="/terms&condition" element={<TermsAndConditions />} />
 					<Route path="/payment-method" element={<PaymentMethod />} />
