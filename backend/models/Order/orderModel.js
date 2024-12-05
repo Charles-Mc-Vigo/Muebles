@@ -64,7 +64,7 @@ const orderSchema = new mongoose.Schema(
     },
     orderStatus: {
       type: String,
-      enum: ["pending", "confirmed", "delivered", "cancelled","shipped", "out for delivery", "returned","failed delivery"],
+      enum: ["pending", "confirmed", "delivered", "cancelled", "out for delivery", "repaired", "failed delivery"],
       default: "pending",
     },
     deliveryMode: {
@@ -95,8 +95,8 @@ const orderSchema = new mongoose.Schema(
       type: Number,
     },
     dueDates: {
-      type: [Date], // Array of dates for due dates
-      default: [], // Default to an empty array
+      type: [Date],
+      default: [],
     },
     isPaid : {
       type:Boolean,

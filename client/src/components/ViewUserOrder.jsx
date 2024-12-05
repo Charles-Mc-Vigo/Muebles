@@ -207,7 +207,7 @@ const ViewUserOrder = () => {
 												? "text-red-600"
 												: order.orderStatus === "failed to deliver"
 												? "text-red-500"
-												: order.orderStatus === "returned"
+												: order.orderStatus === "repaired"
 												? "text-pink-600"
 												: "text-gray-600"
 										}`}
@@ -227,11 +227,10 @@ const ViewUserOrder = () => {
 							>
 								<option value="pending">Pending</option>
 								<option value="confirmed">Confirmed</option>
-								<option value="shipped">Shipped</option>
 								<option value="out for delivery">Out for Delivery</option>
 								<option value="delivered">Delivered</option>
 								<option value="failed to deliver">Failed to Deliver</option>
-								<option value="returned">Returned</option>
+								<option value="repaired">Repaired</option>
 								<option value="cancelled">Cancelled</option>
 							</select>
 							{order.isConfirmed ? (
