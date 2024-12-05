@@ -505,7 +505,7 @@ const EditUserProfile = () => {
 						<input type="file" accept="image/*" onChange={handleImageChange} />
 						<button
 							type="submit"
-							className="w-full bg-teal-500 text-white p-3 rounded-lg font-semibold"
+							className="w-full bg-gray-500 text-white p-3 rounded-lg font-semibold"
 						>
 							Save Changes
 						</button>

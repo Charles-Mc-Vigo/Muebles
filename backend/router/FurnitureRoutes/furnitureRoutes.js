@@ -1,6 +1,5 @@
 const express = require("express");
 const router = express.Router();
-
 const {
   createFurniture,
   getAllFurnitures,
@@ -9,9 +8,11 @@ const {
   Archived,
   UnArchived,
   ArchivedFurnitures,
+  searchFurnitureByName,
+  checkIfRated,
 } = require("../../controllers/FurnitureControllers/furnitureController");
 
-const { checkAdminAuth } = require("../../middlewares/checkAuth");
+const { checkAdminAuth, checkUserAuth } = require("../../middlewares/checkAuth");
 
 // Get all furnitures
 // GET - /api/furnitures
@@ -41,4 +42,10 @@ router.post("/unarchive/:furnitureId", checkAdminAuth, UnArchived);
 // GET - /api/furnitures/:furnitureId
 router.get("/:furnitureId", getFurnitureById);
 
+// Search route for furniture
+// Function to handle searching by name
+router.get('/search', (req, res, next) => {
+  console.log("Search route hit with query:", req.query.query);
+  next();
+}, searchFurnitureByName);
 module.exports = router;

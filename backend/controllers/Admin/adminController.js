@@ -473,10 +473,10 @@ exports.AcceptOrder = async (req, res) => {
 		if (!admin) return res.status(404).json({ message: "Admin not found!" });
 
 		// Check if the current admin is a Manager
-		if (admin.role !== "Manager") {
+		if (admin.role !== "Manager" && admin.role !== "Admin") {
 			return res
 				.status(403)
-				.json({ message: "Action denied: Admin Manager only!" });
+				.json({ message: "Action denied: Admin and Manager only!" });
 		}
 
 		const { orderId } = req.params;
@@ -486,6 +486,7 @@ exports.AcceptOrder = async (req, res) => {
 		if (!orderToAccept) return res.status(404).json({ message: "Order not found!" });
 		
 		orderToAccept.orderStatus = "confirmed";
+		orderToAccept.isConfirmed = true
 		const orderUpdate = await orderToAccept.save();
 		res.status(200).json({ message: "Order was accepted", orderUpdate });
 	} catch (error) {
@@ -501,10 +502,10 @@ exports.cancelOrder = async (req, res) => {
 		if (!admin) return res.status(404).json({ message: "Admin not found!" });
 
 		// Check if the current admin is a Manager
-		if (admin.role !== "Manager") {
+		if (admin.role !== "Manager" && admin.role !== "Admin") {
 			return res
 				.status(403)
-				.json({ message: "Action denied: Admin Manager only!" });
+				.json({ message: "Action denied: Admin and Manager only!" });
 		}
 
 		const { orderId } = req.params;
@@ -528,7 +529,8 @@ exports.getOrderId = async (req,res) => {
 		const {orderId} = req.params;
 		const exisitingOrder = await Order.findById(orderId)
 		.populate('user')
-		.populate('items.furniture');
+		.populate('items.furniture',"name images price");
+
 
 		if(!exisitingOrder) return res.status(404).json({error:"Order not found!"});
 

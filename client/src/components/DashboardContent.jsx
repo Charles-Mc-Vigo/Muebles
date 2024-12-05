@@ -1,92 +1,144 @@
-import React from 'react';
-import { FaCheck, FaEye, FaTimes } from "react-icons/fa";
+import React, { useState, useEffect } from 'react';
 
 const Dashboard = () => {
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const response = await fetch('http://localhost:3000/api/orders');
+        const data = await response.json();
+
+        console.log(data);
+
+        // Ensure that the data is an array
+        if (Array.isArray(data)) {
+          setOrders(data);
+        } else {
+          console.error('API did not return an array');
+        }
+      } catch (error) {
+        console.error('Error fetching orders:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOrders();
+  }, []);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  // Ensure orders is an array before using reduce
+  if (!Array.isArray(orders)) {
+    return <div>Something went wrong with the data format.</div>;
+  }
+
+  // Calculate order stats
+  const totalOrders = orders.length;
+
+  // Calculate total revenue (excluding pending orders)
+  const totalRevenue = orders.reduce((sum, order) => {
+    const totalAmountWithShipping = order.totalAmountWithShipping;
+    // Only include confirmed or delivered orders
+    if (
+      (order.orderStatus === 'confirmed' || order.orderStatus === 'delivered') && 
+      !isNaN(totalAmountWithShipping)
+    ) {
+      return sum + totalAmountWithShipping;
+    }
+    return sum;
+  }, 0);
+
+  // Calculate total paid (excluding pending orders)
+  const totalPaid = orders.reduce((sum, order) => {
+    const totalAmount = order.totalAmount;
+    const remainingBalance = order.remainingBalance || 0;
+    // Only include confirmed or delivered orders
+    if (
+      (order.orderStatus === 'confirmed' || order.orderStatus === 'delivered') &&
+      !isNaN(totalAmount) && !isNaN(remainingBalance)
+    ) {
+      return sum + (totalAmount - remainingBalance);
+    }
+    return sum;
+  }, 0);
+
+  // Calculate outstanding balance (excluding pending orders)
+  const outstandingBalance = orders.reduce((sum, order) => {
+    const remainingBalance = order.remainingBalance || 0;
+    // Only include confirmed or delivered orders
+    if (
+      (order.orderStatus === 'confirmed' || order.orderStatus === 'delivered') &&
+      !isNaN(remainingBalance)
+    ) {
+      return sum + remainingBalance;
+    }
+    return sum;
+  }, 0);
+
+  // Orders by status
+  const ordersByStatus = {
+    pending: orders.filter(order => order.orderStatus === 'pending').length,
+    confirmed: orders.filter(order => order.orderStatus === 'confirmed').length,
+    delivered: orders.filter(order => order.orderStatus === 'delivered').length,
+    cancelled: orders.filter(order => order.orderStatus === 'cancelled').length,
+  };
+
+  // Orders by payment type
+  const ordersByPaymentType = {
+    fullPayment: orders.filter(order => order.paymentOption === 'Full Payment').length,
+    partialPayment: orders.filter(order => order.paymentOption === 'Partial Payment').length,
+  };
+
   return (
     <div className="container mx-auto p-4">
-      {/* Top Stats Section */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        {/* Total Sales */}
-        <div className="bg-white shadow-lg rounded-lg p-4">
-          <p className="text-gray-500">Total Sales</p>
-          <h2 className="text-3xl font-bold text-blue-600">₱0</h2>
-          <p className="text-green-500">₱0</p>
+        <div className="bg-white shadow-lg rounded-lg p-4 text-center">
+          <h1 className="text-xl font-bold">Total Orders</h1>
+          <p className="text-2xl text-blue-600">{totalOrders}</p>
         </div>
-        {/* Total Revenue */}
-        <div className="bg-white shadow-lg rounded-lg p-4">
-          <p className="text-gray-500">Total Revenue</p>
-          <h2 className="text-3xl font-bold text-blue-600">₱0</h2>
-          <p className="text-green-500">₱0</p>
+        <div className="bg-white shadow-lg rounded-lg p-4 text-center">
+          <h1 className="text-xl font-bold">Total Revenue</h1>
+          <p className="text-2xl text-black-600">₱ {totalRevenue.toFixed(2)}</p>
         </div>
-        {/* Today's Visitors */}
-        <div className="bg-white shadow-lg rounded-lg p-4">
-          <p className="text-gray-500">Today's Visitors</p>
-          <h2 className="text-3xl font-bold text-blue-600">0</h2>
-          <p className="text-green-500">0</p>
+        <div className="bg-white shadow-lg rounded-lg p-4 text-center">
+          <h1 className="text-xl font-bold">Outstanding Balance</h1>
+          <p className="text-2xl text-red-600">₱ {outstandingBalance.toFixed(2)}</p>
         </div>
       </div>
-      {/* Recent Orders Section */}
-      <div className="mt-6 bg-white shadow-lg rounded-lg p-4">
-        <h3 className="text-xl font-bold mb-4">New Orders</h3>
-        <table className="min-w-full table-auto">
-          <thead>
-            <tr>
-              <th className="px-4 py-2">Product</th>
-              <th className="px-4 py-2">Order ID</th>
-              <th className="px-4 py-2">Purchase On</th>
-              <th className="px-4 py-2">Amount</th>
-              <th className="px-4 py-2">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {/* Example row */}
-            <tr>
-              <td className="border px-4 py-2">Upuan</td>
-              <td className="border px-4 py-2">#287695</td>
-              <td className="border px-4 py-2">Dec 5th, 2020</td>
-              <td className="border px-4 py-2">₱560.00</td>
-              <td className="border px-4 py-2 flex space-x-2">
-                <button className="text-green-500 hover:text-green-700">
-                  <FaCheck />
-                </button>
-                <button className="text-blue-500 hover:text-blue-700">
-                  <FaEye />
-                </button>
-                <button className="text-red-500 hover:text-red-700">
-                  <FaTimes />
-                </button>
-              </td>
-            </tr>
-            {/* Repeat rows as necessary */}
-          </tbody>
-        </table>
+
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <div className="bg-white shadow-lg rounded-lg p-4 text-center">
+          <h1 className="text-xl font-bold">Pending</h1>
+          <p className="text-2xl text-blue-600">{ordersByStatus.pending}</p>
+        </div>
+        <div className="bg-white shadow-lg rounded-lg p-4 text-center">
+          <h1 className="text-xl font-bold">Confirmed</h1>
+          <p className="text-2xl text-yellow-600">{ordersByStatus.confirmed}</p>
+        </div>
+        <div className="bg-white shadow-lg rounded-lg p-4 text-center">
+          <h1 className="text-xl font-bold">Delivered</h1>
+          <p className="text-2xl text-black-600">{ordersByStatus.delivered}</p>
+        </div>
+        <div className="bg-white shadow-lg rounded-lg p-4 text-center">
+          <h1 className="text-xl font-bold">Cancelled</h1>
+          <p className="text-2xl text-red-600">{ordersByStatus.cancelled}</p>
+        </div>
       </div>
-      {/* Delivery Progress */}
-      <div className="mt-6 bg-white shadow-lg rounded-lg p-4">
-        <h3 className="text-xl font-bold mb-4">Delivery Progress</h3>
-        <ul>
-          <li className="flex justify-between items-center mb-2">
-            <span>Living Room</span>
-            <div className="w-2/3 bg-gray-300 h-4 rounded-lg overflow-hidden">
-              <div className="bg-green-500 h-full" style={{ width: '60%' }}></div>
-            </div>
-            <span className="ml-2 text-gray-500">60%</span>
-          </li>
-          <li className="flex justify-between items-center mb-2">
-            <span>Bed Room</span>
-            <div className="w-2/3 bg-gray-300 h-4 rounded-lg overflow-hidden">
-              <div className="bg-green-500 h-full" style={{ width: '40%' }}></div>
-            </div>
-            <span className="ml-2 text-gray-500">40%</span>
-          </li>
-          <li className="flex justify-between items-center">
-            <span>Dining Room</span>
-            <div className="w-2/3 bg-gray-300 h-4 rounded-lg overflow-hidden">
-              <div className="bg-green-500 h-full" style={{ width: '20%' }}></div>
-            </div>
-            <span className="ml-2 text-gray-500">20%</span>
-          </li>
-        </ul>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <div className="bg-white shadow-lg rounded-lg p-4 text-center">
+          <h1 className="text-xl font-bold">Full Payment Orders</h1>
+          <p className="text-2xl text-black-600">{ordersByPaymentType.fullPayment}</p>
+        </div>
+        <div className="bg-white shadow-lg rounded-lg p-4 text-center">
+          <h1 className="text-xl font-bold">Partial Payment Orders</h1>
+          <p className="text-2xl text-yellow-600">{ordersByPaymentType.partialPayment}</p>
+        </div>
       </div>
     </div>
   );

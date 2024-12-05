@@ -1,13 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { FaArrowRight, FaArrowLeft } from "react-icons/fa";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import Header from "./Header";
 import Footer from "./Footer";
 import { IoMdArrowRoundBack } from "react-icons/io";
 import LoadingSpinner from "./LoadingSpinner";
-import ProductReview from "./ProductReview";
 
 function ProductDetails({ admin }) {
 	const { id } = useParams();
@@ -24,6 +21,9 @@ function ProductDetails({ admin }) {
 	const [sizePrice, setSizePrice] = useState(null);
 	const [ECT, setECT] = useState(null);
 	const [activeTab, setActiveTab] = useState("description");
+	const [ratings, setRatings] = useState([]); // State for ratings
+	const [visibleRatings, setVisibleRatings] = useState(5); // Start with 5 ratings
+
 
 	// console.log(price);
 
@@ -52,7 +52,30 @@ function ProductDetails({ admin }) {
 				setLoading(false);
 			}
 		};
+
+		const fetchRatings = async () => {
+			try {
+				const response = await fetch(
+					`http://localhost:3000/api/ratings/${id}`,
+					{
+						method: "GET",
+						credentials: "include",
+					}
+				);
+				if (!response.ok) {
+					throw new Error("Failed to fetch ratings");
+				}
+				const data = await response.json();
+				setRatings(data); // Set the ratings state
+				// console.log(data)
+			} catch (error) {
+				console.error("Error fetching ratings:", error);
+				throw new Error("Error fetching ratings. Please try again.");
+			}
+		};
+
 		fetchFurnitureDetails();
+		fetchRatings(); // Fetch ratings when the component mounts
 	}, [id]);
 
 	const handleColorClick = (color) => {
@@ -95,8 +118,7 @@ function ProductDetails({ admin }) {
 			toast.error("Please select color, material, and size.");
 			return;
 		}
-
-		setLoading(true); // Start loading
+		setLoading(true);
 		const item = {
 			furnitureId: id,
 			quantity: 1,
@@ -106,7 +128,6 @@ function ProductDetails({ admin }) {
 			price: price,
 			ECT: ECT,
 		};
-
 		try {
 			const response = await fetch("http://localhost:3000/api/cart", {
 				method: "POST",
@@ -116,20 +137,26 @@ function ProductDetails({ admin }) {
 				credentials: "include",
 				body: JSON.stringify(item),
 			});
-
 			const data = await response.json();
 			if (!response.ok) {
 				throw new Error(data.error || "Failed to add item to cart.");
 			}
+			console.log("Adding to cart was successful");
+			alert(data.message);
 
-			toast.success(data.success);
+			// Reset the form fields
+			setSelectedColor(null);
+			setSelectedMaterial(null);
+			setSelectedSize(null);
+			setMaterialPrice(null);
+			setSizePrice(null);
 		} catch (error) {
 			console.error("Error adding item to cart:", error);
-			toast.error(
+		alert(
 				error.message || "Error adding item to cart. Please try again."
 			);
 		} finally {
-			setLoading(false); // Stop loading in both success and error cases
+			setLoading(false);
 		}
 	};
 
@@ -255,18 +282,6 @@ function ProductDetails({ admin }) {
 						</p>
 					</div>
 				);
-			case "review":
-				return (
-					<div
-						id="review"
-						className="p-4 sm:p-6 md:p-8 bg-white shadow-xl border-teal-500 border rounded-lg max-w-full"
-					>
-						<h2 className="text-xl sm:text-2xl font-bold mb-4">
-							Customer Reviews
-						</h2>
-						<ProductReview />
-					</div>
-				);
 			case "care-guide":
 				return (
 					<div
@@ -299,7 +314,7 @@ function ProductDetails({ admin }) {
 				<LoadingSpinner />
 			) : (
 				<section className="bg-white">
-					<Header isLogin={true} cartCount={true} />
+					<Header isLogin={true} />
 					<div className="w-full h-auto p-5 flex flex-col lg:flex-row">
 						<div className="flex flex-col lg:flex-row lg:w-full justify-center p-5">
 							<div className="flex flex-col rounded-xl p-5 border-2 border-teal-600 sm:mb-5 md:mb-5 max-w-2/5 shadow-lg shadow-gray-300">
@@ -454,6 +469,56 @@ function ProductDetails({ admin }) {
 							</div>
 						</div>
 					</div>
+
+					{/* Rating Section */}
+					<div className="p-4 sm:p-6 md:p-8 bg-white shadow-xl border-teal-500 border rounded-lg max-w-full">
+						<h2 className="text-2xl font-bold text-gray-800 mb-6">
+							Customer Ratings
+						</h2>
+						{ratings.length > 0 ? (
+							<div className="space-y-4">
+								{ratings.slice(0, visibleRatings).map((rating) => (
+									<div
+										key={rating._id}
+										className="flex items-start bg-gray-50 p-4 rounded-lg shadow-md"
+									>
+										<div className="w-12 h-12 rounded-full bg-teal-100 flex items-center justify-center text-teal-500 font-bold text-lg">
+											{rating.user.firstname.charAt(0)}
+										</div>
+										<div className="ml-4 flex-1">
+											<p className="text-gray-800 font-semibold">
+												{rating.user.firstname}
+											</p>
+											<div className="flex items-center mt-1">
+												<span className="font-bold text-yellow-500 text-lg">
+													{Array(rating.rating).fill("⭐").join("")}
+												</span>
+												<span className="ml-2 text-sm text-gray-600">
+													({rating.rating}/5)
+												</span>
+											</div>
+											{rating.review && (
+												<p className="mt-2 text-gray-600 italic">
+													"{rating.review}"
+												</p>
+											)}
+										</div>
+									</div>
+								))}
+								{visibleRatings < ratings.length && (
+									<button
+										onClick={() => setVisibleRatings(visibleRatings + 5)}
+										className="w-full text-teal-600 font-medium py-2 mt-4 border-t border-gray-200 hover:underline"
+									>
+										Show More
+									</button>
+								)}
+							</div>
+						) : (
+							<p className="text-gray-500 text-center">No ratings yet.</p>
+						)}
+					</div>
+
 					{/* Content Mapping  */}
 					<div className="border-t-2 border-teal-500 w-full p-4 sm:p-6 md:p-8">
 						<nav className="flex flex-wrap items-center justify-center space-x-4 sm:space-x-8 text-lg sm:text-xl">
@@ -481,18 +546,6 @@ function ProductDetails({ admin }) {
 								Warranty
 							</button>
 
-							{/* Review Button */}
-							<button
-								onClick={() => setActiveTab("review")}
-								className={`px-4 py-2 rounded-lg transition text-sm sm:text-base md:text-lg ${
-									activeTab === "review"
-										? "bg-teal-600 text-white"
-										: "hover:text-teal-600"
-								}`}
-							>
-								Review
-							</button>
-
 							{/* How to Care Button */}
 							<button
 								onClick={() => setActiveTab("care-guide")}
@@ -508,7 +561,6 @@ function ProductDetails({ admin }) {
 					</div>
 
 					<div className="p-8 bg-white">{renderTabContent()}</div>
-					<ToastContainer />
 					<Footer />
 				</section>
 			)}

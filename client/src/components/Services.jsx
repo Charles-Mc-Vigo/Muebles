@@ -5,7 +5,7 @@ const ServiceSection = () => {
   const [selectedType, setSelectedType] = useState('');
 
   const categories = ['Living Room', 'Bedroom', 'Dining Room'];
-  const types = []; // Add types later when needed
+  const types = [];
 
   const products = [
     { name: 'Sofa', category: 'Living Room', type: 'Couch' },

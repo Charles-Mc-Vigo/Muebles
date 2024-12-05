@@ -40,6 +40,7 @@ function ViewProduct() {
 			);
 			const data = await response.json();
 			setArchivedFurnitures(data || []);
+			fetchFurniture();
 		} catch (error) {
 			setError(error.message);
 		} finally {
@@ -58,6 +59,7 @@ function ViewProduct() {
 			);
 			const data = await response.json();
 			setArchivedCategories(data || []);
+			fetchArchivedCategories();
 		} catch (error) {
 			setError(error.message);
 		} finally {
@@ -76,7 +78,7 @@ function ViewProduct() {
 		fetchFurniture();
 	};
 
-	const refreshArchiveFurnitureList = () => {
+	const refreshArchiveFurnitureList = async () => {
 		fetchArchivedFurnitures();
 	};
 
@@ -88,6 +90,7 @@ function ViewProduct() {
 		setShowArchived(false);
 		setShowArchivedCategories(false); // Reset to show active furniture
 		setShowDropdown(false);
+		fetchFurniture();
 	};
 
 	const showArchivedFurniture = () => {
@@ -117,7 +120,7 @@ function ViewProduct() {
 				archivedCategories.filter((category) => category._id !== categoryId)
 			);
 			// Refresh the archived categories after unarchiving
-			await fetchArchivedCategories();
+			fetchArchivedCategories();
 		} catch (error) {
 			setError(error.message);
 		}

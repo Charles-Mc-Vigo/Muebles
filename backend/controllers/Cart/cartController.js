@@ -5,37 +5,53 @@ const Furniture = require("../../models/Furniture/furnitureModel");
 
 // View Cart
 exports.viewCart = async (req, res) => {
-	try {
-		// Find the user by ID
-		const user = await User.findById(req.user._id);
-		if (!user) return res.status(404).json({ message: "User not found!" });
+  try {
+    const user = await User.findById(req.user._id);
+    if (!user) return res.status(404).json({ message: "User not found!" });
 
-		// Find the cart and populate the items and user details
-		const cart = await Cart.findOne({ userId: user._id })
-			.populate({
-				path: "items.furnitureId",
-				select: "name description price images colors furnitureType"
-			})
-			.populate({
-				path: "userId",
-				select: "firstname lastname email phoneNumber addresses",
-			});
+		// console.log("User information", user)
 
-		// If cart is empty
-		if (!cart) {
-			return res.status(200).json({
-				success: true,
-				message: "Cart is empty",
-				data: { items: [], count: 0, totalAmount: 0 },
-			});
-		}
+    const cart = await Cart.findOne({ userId: user._id })
+      .populate({
+        path: "items.furnitureId",
+        select: "name description price images colors furnitureType",
+      })
+      .populate({
+        path: "userId",
+        select: "firstname lastname email phoneNumber addresses",
+      });
 
-		res.status(200).json({ success: true, cart });
-	} catch (error) {
-		console.error("Error in viewing the cart", error);
-		res.status(500).json({ message: "Server error!" });
-	}
+			// console.log(cart.userId.addresses)
+
+    if (!cart) {
+      return res.status(200).json({
+        success: true,
+        message: "Cart is empty",
+        data: { items: [], count: 0, totalAmount: 0 },
+      });
+    }
+
+    // Ensure count is recalculated
+    const itemCount = cart.items.reduce((total, item) => total + item.quantity, 0);
+    cart.count = itemCount; // Update the count
+
+    await cart.save();
+
+    res.status(200).json({
+      success: true,
+      cart: {
+				userId: user,
+        items: cart.items,
+        count: cart.count,
+        totalAmount: cart.totalAmount,
+      },
+    });
+  } catch (error) {
+    console.error("Error in viewing the cart", error);
+    res.status(500).json({ message: "Server error!" });
+  }
 };
+
 
 // Add to Cart
 exports.addToCart = async (req, res) => {
@@ -108,7 +124,7 @@ exports.addToCart = async (req, res) => {
 			{ path: "items.furnitureId", select: "name description price image furnitureType" },
 		]);
 
-		res.status(200).json({ success: "Item added to cart successfully", cart });
+		res.status(200).json({ message: "Item added to cart successfully", cart });
 	} catch (error) {
 		console.error("Error in adding to cart", error);
 		res.status(500).json({ error: "Server error!" });

@@ -1,8 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
 
 const ProductCard = ({
   id,
@@ -17,25 +16,16 @@ const ProductCard = ({
   onArchiveSuccess,
   onUnArchiveSuccess,
 }) => {
-  // Function to truncate the description
-  const truncateDescription = (desc, maxLength) => {
-    // Ensure description is a string before checking its length
-    if (typeof desc !== "string") {
-      return "";
-    }
-    return desc.length > maxLength
-      ? `${desc.substring(0, maxLength)}...`
-      : desc;
-  };
-
-  const maxnameLength = 15;
-  const maxDescriptionLength = 60;
   const navigate = useNavigate();
+
+  const truncateText = (text, maxLength) => {
+    if (typeof text !== "string") return "";
+    return text.length > maxLength ? `${text.substring(0, maxLength)}...` : text;
+  };
 
   const archiveItem = async (e) => {
     e.stopPropagation();
     if (!window.confirm("Are you sure you want to archive this item?")) return;
-
     try {
       const response = await fetch(
         `http://localhost:3000/api/furnitures/archive/${id}`,
@@ -46,18 +36,16 @@ const ProductCard = ({
         }
       );
       const data = await response.json();
-      toast.success(data.success);
+      alert(data.success);
       onArchiveSuccess();
     } catch (error) {
-      toast.error("Error archiving item. Please try again.");
+      throw new Error("Error archiving item. Please try again.");
     }
   };
 
   const unarchiveItem = async (e) => {
     e.stopPropagation();
-    if (!window.confirm("Are you sure you want to unarchive this item?"))
-      return;
-
+    if (!window.confirm("Are you sure you want to unarchive this item?")) return;
     try {
       const response = await fetch(
         `http://localhost:3000/api/furnitures/unarchive/${id}`,
@@ -68,71 +56,72 @@ const ProductCard = ({
         }
       );
       const data = await response.json();
-      toast.success(data.success);
+      alert(data.success);
       onUnArchiveSuccess();
     } catch (error) {
-      toast.error("Error unarchiving item. Please try again.");
+      throw new Error("Error unarchiving item. Please try again.");
     }
   };
 
-	return (
-		<div className="bg-white border-2 rounded-md shadow-lg transition-transform transform hover:scale-105 p-6 flex flex-col justify-between w-auto">
-			<Link to={`/furnitures/${id}`} className="flex-grow">
-				{images && images.length > 0 && (
-					<img
-						src={`data:image/jpeg;base64,${images[0]}`}
-						alt={name}
-						className="w-full h-40 object-contain rounded-md mb-4"
-					/>
-				)}
-				<div>
-					<h3 className="text-xl font-bold text-gray-800">{name}</h3>
-					<p className="mt-2 text-lg text-green-600">{price}</p>
-					<p className="mt-2 text-gray-500">
-						{truncateDescription(description, maxDescriptionLength)}
-					</p>
-				</div>
-			</Link>
-			<div className="mt-4 flex flex-col">
-				{showPreOrder && (
-					<button
-						onClick={()=> navigate(`/pre-order/${id}`)}
-						className="bg-teal-500 text-white font-semibold py-2 rounded-md text-center w-full hover:bg-teal-300"
-					>
-						Pre-order
-					</button>
-				)}
-				{showUpdateButton && (
-					<button
-						onClick={(e) => {
-							e.stopPropagation();
-							window.location.href = `/furnitures/edit/${id}`;
-						}}
-						className="bg-green-600 hover:bg-green-700 text-white py-2 rounded-md transition-colors duration-300 text-center mt-2"
-					>
-						Update Furniture
-					</button>
-				)}
-				{showArchiveButton && (
-					<button
-						onClick={archiveItem}
-						className="bg-red-600 hover:bg-red-700 text-white py-2 rounded-md transition-colors duration-300 mt-2"
-					>
-						Archive
-					</button>
-				)}
-				{showUnArchivedButton && (
-					<button
-						onClick={unarchiveItem}
-						className="bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-md transition-colors duration-300 mt-2"
-					>
-						Unarchive
-					</button>
-				)}
-			</div>
-			<ToastContainer />
-		</div>
-	);
+  return (
+    <div className="flex flex-col bg-white border border-gray-200 rounded-md shadow-md hover:shadow-lg transition-transform transform hover:scale-105 w-full max-w-sm p-4">
+      <Link to={`/furnitures/${id}`} className="mb-4">
+        {images && images.length > 0 ? (
+          <img
+            src={`data:image/jpeg;base64,${images[0]}`}
+            alt={name}
+            className="w-full h-48 object-contain rounded-md"
+          />
+        ) : (
+          <div className="w-full h-48 bg-gray-100 flex items-center justify-center rounded-md">
+            <span className="text-gray-400">No Image</span>
+          </div>
+        )}
+      </Link>
+      <div className="flex flex-col justify-between flex-grow">
+        <h3 className="text-xl font-bold text-gray-800 truncate">
+          {truncateText(name, 20)}
+        </h3>
+        <p className="text-black text-lg mt-2">₱{price}</p>
+     
+        <div className="mt-4 space-y-2">
+          {showPreOrder && (
+            <button
+              onClick={() => navigate(`/pre-order/${id}`)}
+              className="w-full bg-teal-500 hover:bg-teal-600 text-white py-2 rounded-md"
+            >
+              Pre-order
+            </button>
+          )}
+          {showUpdateButton && (
+            <button
+              onClick={() => navigate(`/furnitures/edit/${id}`)}
+              className="w-full bg-teal-500 hover:bg-teal-600 text-white py-2 rounded-md"
+            >
+              Update Furniture
+            </button>
+          )}
+          {showArchiveButton && (
+            <button
+              onClick={archiveItem}
+              className="w-full bg-red-500 hover:bg-red-600 text-white py-2 rounded-md"
+            >
+              Archive
+            </button>
+          )}
+          {showUnArchivedButton && (
+            <button
+              onClick={unarchiveItem}
+              className="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-md"
+            >
+              Unarchive
+            </button>
+          )}
+        </div>
+      </div>
+      <ToastContainer />
+    </div>
+  );
 };
 
 export default ProductCard;

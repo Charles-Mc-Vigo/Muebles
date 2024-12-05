@@ -517,7 +517,7 @@ const AddNewAddress = () => {
 									{address.municipality}, {address.barangay} - {address.zipCode}
 								</p>
 								{address.isDefault && (
-									<span className="text-green-500 font-medium">
+									<span className="text-black-500 font-medium">
 										Default Address
 									</span>
 								)}
@@ -531,7 +531,7 @@ const AddNewAddress = () => {
 								</button>
 								{!address.isDefault && (
 									<button
-										className="bg-green-500 hover:bg-green-700 text-white py-2 px-8 rounded-lg"
+										className="bg-teal-500 hover:bg-teal-700 text-white py-2 px-8 rounded-lg"
 										onClick={() => handleSetDefaultAddress(address._id)}
 									>
 										Set as Default
