@@ -393,6 +393,7 @@ const Home = () => {
 										showPreOrder={true}
 										showUpdateButton={false}
 										showToast={showToast}
+										showCart={true}
 										onAddToCart={() => {
 											incrementCartCount();
 											fetchCartCount();
