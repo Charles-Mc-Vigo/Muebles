@@ -103,16 +103,22 @@ const Cart = () => {
 	}, []);
 
 	useEffect(() => {
-		if (user?.addresses?.length > 0 && selectedAddress) {
-			const address = user.addresses.find(
-				(address) => address._id === selectedAddress
-			);
-			const fee = shippingFees[address?.municipality] || 0;
-			setShippingFee(fee);
-		} else {
-			setShippingFee(0);
-		}
-	}, [selectedAddress, user]);
+    if (user?.addresses?.length > 0 && selectedAddress) {
+        const address = user.addresses.find(
+            (address) => address._id === selectedAddress
+        );
+
+        // Check if the delivery mode is 'pickup'
+        if (deliveryMode === "pickup") {
+            setShippingFee(0); // No shipping fee for pick up
+        } else {
+            const fee = shippingFees[address?.municipality] || 0;
+            setShippingFee(fee);
+        }
+    } else {
+        setShippingFee(0);
+    }
+}, [selectedAddress, user, deliveryMode]); // Added deliveryMode to dependencies
 
 	const totalAmountWithShippingFee = (totalAmount + shippingFee).toFixed(2);
 

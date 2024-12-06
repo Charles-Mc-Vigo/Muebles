@@ -115,7 +115,7 @@ function ProductDetails({ admin }) {
 	const addToCart = async (e) => {
 		e.preventDefault();
 		if (!selectedColor || !selectedMaterial || !selectedSize) {
-			toast.error("Please select color, material, and size.");
+			alert("Please select color, material, and size.");
 			return;
 		}
 		setLoading(true);
