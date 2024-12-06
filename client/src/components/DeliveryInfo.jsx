@@ -80,7 +80,7 @@ const Delivery = () => {
               {/* Delivery Table */}
               <div className="border border-gray-300 rounded-lg overflow-hidden mb-6">
                 <table className="min-w-full table-auto bg-white text-left">
-                  <thead className="bg-green-100">
+                  <thead className="bg-gray-100">
                     <tr>
                       <th className="px-4 py-2 border">Town</th>
                       <th className="px-4 py-2 border">Zipcode</th>
@@ -91,32 +91,32 @@ const Delivery = () => {
                     <tr>
                       <td className="px-4 py-2 border">Boac</td>
                       <td className="px-4 py-2 border">4900</td>
-                      <td className="px-4 py-2 border">₱ 500</td>
+                      <td className="px-4 py-2 border">₱100</td>
                     </tr>
                     <tr>
                       <td className="px-4 py-2 border">Mogpog</td>
                       <td className="px-4 py-2 border">4901</td>
-                      <td className="px-4 py-2 border">₱ 700</td>
+                      <td className="px-4 py-2 border">₱150</td>
                     </tr>
                     <tr>
                       <td className="px-4 py-2 border">Gasan</td>
                       <td className="px-4 py-2 border">4905</td>
-                      <td className="px-4 py-2 border">₱ 500</td>
+                      <td className="px-4 py-2 border">₱150</td>
                     </tr>
                     <tr>
                       <td className="px-4 py-2 border">Buenavista</td>
                       <td className="px-4 py-2 border">4904</td>
-                      <td className="px-4 py-2 border">₱ 800</td>
+                      <td className="px-4 py-2 border">₱200</td>
                     </tr>
                     <tr>
                       <td className="px-4 py-2 border">Torrijos</td>
                       <td className="px-4 py-2 border">4903</td>
-                      <td className="px-4 py-2 border">₱ 3,000</td>
+                      <td className="px-4 py-2 border">₱250</td>
                     </tr>
                     <tr>
                       <td className="px-4 py-2 border">Sta. Cruz</td>
                       <td className="px-4 py-2 border">4902</td>
-                      <td className="px-4 py-2 border">₱ 3,000</td>
+                      <td className="px-4 py-2 border">₱200</td>
                     </tr>
                   </tbody>
                 </table>

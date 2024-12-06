@@ -9,6 +9,7 @@ const Size = require("../../models/Furniture/sizeModel");
 const User = require("../../models/User/userModel");
 const Rating = require('../../models/Rating/ratingModel');
 
+
 // Multer setup for handling image uploads in memory
 const upload = multer({
 	storage: multer.memoryStorage(),
@@ -408,11 +409,9 @@ exports.checkIfRated = async (req, res) => {
 
 exports.searchFurnitureByName = async (req, res) => {
 	const { query } = req.query; // Retrieve the search query from the query string
-  
 	if (!query) {
 	  return res.status(400).json({ message: "Search query is required" });
 	}
-  
 	try {
 	  // Use a case-insensitive regex search to find furniture by name
 	  const furnitureItems = await Furniture.find({

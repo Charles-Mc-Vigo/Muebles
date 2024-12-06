@@ -50,6 +50,7 @@ import CheckoutCustomization from "./pages/CheckoutCustomization";
 import SearchResults from "./components/SearchResults";
 import Repair from "./pages/Repair";
 import RepairRequest from "./components/RepairRequest";
+import FurnitureOrderForm from "./components/FurnitureOrderForm";
 // import LoadingSpinner from "./components/LoadingSpinner";
 
 export default function App() {
@@ -62,6 +63,7 @@ export default function App() {
 					<Route path="/signup" element={<SignUp />} />
 					<Route path="/login" element={<Login />} />
 					<Route path="/search-result" element={<SearchResults />} />
+					<Route path="/walkin" element={<FurnitureOrderForm />} />
 					<Route path="/terms&condition" element={<TermsAndConditions />} />
 					<Route path="/payment-method" element={<PaymentMethod />} />
 					<Route
@@ -136,6 +138,7 @@ export default function App() {
 
 					{/* Admin routes */}
 					<Route path="/admin-login" element={<AdminLogin />} />
+					<Route path="/generate-report" element={<GenerateReport />} />
 					<Route path="/admin-signup" element={<AdminSignUp />} />
 					<Route path="/admin-profile-view" element={<AdminProfile />} />
 					<Route

@@ -97,12 +97,12 @@ const Header = ({ isLogin }) => {
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between gap-8">
             {/* Logo */}
-            <button
-              onClick={() => (window.location.href = "/home")}
+            <Link
+              to="/"
               className="text-3xl font-bold text-teal-600 whitespace-nowrap"
             >
               MUEBLES
-            </button>
+            </Link>
             {/* Search Bar */}
             <div className="flex-1 max-w-2xl">
               <form onSubmit={handleSearch} className="flex">
@@ -144,7 +144,6 @@ const Header = ({ isLogin }) => {
                   <p className="text-xs">Delivery Method</p>
                 </div>
               </Link>
-
               {isLogin && (
                 <div className="flex  items-center gap-7">
                   {/* Shopping Cart Link */}
@@ -195,7 +194,14 @@ const Header = ({ isLogin }) => {
                             Manage My Account
                           </Link>
                           <hr className="border-gray-200 py-2" />
-
+                          <Link
+                            to="/orders"
+                            className="block py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                            onClick={() => setIsUserMenuOpen(false)}
+                          >
+                            <FaBoxOpen className="inline-block mr-2 text-2xl" />
+                            My Order
+                          </Link>
                           <hr className="border-gray-200" />
                           <Logout isUser={true} />
                         </nav>
@@ -231,6 +237,12 @@ const Header = ({ isLogin }) => {
         </Link>
         <Link className="text-black py-2 hover:underline m-2" to="/about">
           About Us
+        </Link>
+        <Link
+          className="text-black py-2 hover:underline m-2"
+          to="/service-page"
+        >
+          Services
         </Link>
         <div className="flex items-center space-x-2 text-sm text-black py-2 m-2">
           <span className="text-teal-500 text-base font-bold">•</span>
