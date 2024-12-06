@@ -122,7 +122,7 @@ const GenerateReport = () => {
                   <p>Email: jckamewoodworks@gmail.com</p>
                 </div>
                 <img
-                  src="../../public/landingimage/LOGO.jpg"
+                  src="/landingimage/LOGO.jpg"
                   alt="Logo"
                   className="w-32 h-auto"
                 />
