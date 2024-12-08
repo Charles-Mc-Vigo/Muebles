@@ -35,7 +35,7 @@ const PreOrder = () => {
 	const [paymentOption, setSelectedPaymentOption] = useState("Partial Payment");
 	const [currentImageIndex, setCurrentImageIndex] = useState(0);
 	const [userInformationVisible, setUserInformationVisible] = useState(false);
-	const [paymentOptionVisible, setPaymentOptionVisible] = useState(false);
+	const [paymentOptionVisible, setPaymentOptionVisible] = useState(true);
 	const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
 	const [productDescriptionVisible, setProductDescriptionVisible] =
 		useState(false);
@@ -262,9 +262,10 @@ const PreOrder = () => {
 				throw new Error(response.message);
 			}
 			const data = await response.json();
-			if (!data.ok) {
-				alert(data.error);
-			}
+			// if (!data.ok) {
+			// 	alert(data.error);
+      //   return
+			// }
 			const orderId = data.preOrder._id;
 			navigate(`/order-details/${orderId}`);
 		} catch (error) {

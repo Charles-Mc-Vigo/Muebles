@@ -86,7 +86,7 @@ const ProductCard = ({
         <h3 className="text-xl font-bold text-gray-800 truncate">
           {truncateText(name, 20)}
         </h3>
-        <p className="text-black text-lg mt-2">₱{price}</p>
+        <p className="text-black text-lg mt-2">{price}</p>
 
         <div className="mt-4 space-y-2">
           <div className="flex gap-1">

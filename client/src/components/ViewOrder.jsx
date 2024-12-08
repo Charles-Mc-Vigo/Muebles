@@ -262,9 +262,28 @@ const ViewOrder = () => {
 																<p className="text-sm text-gray-600">
 																	Price: PHP {order.totalAmount}
 																</p>
-																<p className="text-sm text-gray-600">
-																	Expected Delivery: {order.expectedDelivery}
-																</p>
+																{order.expectedDelivery && (
+																	<p className="text-sm text-gray-600">
+																		Expected Delivery:{" "}
+																		{order.expectedDelivery.startDate &&
+																			new Date(
+																				order.expectedDelivery.startDate
+																			).toLocaleDateString("en-US", {
+																				year: "numeric",
+																				month: "long",
+																				day: "numeric",
+																			})}{" "}
+																		-{" "}
+																		{order.expectedDelivery.endDate &&
+																			new Date(
+																				order.expectedDelivery.endDate
+																			).toLocaleDateString("en-US", {
+																				year: "numeric",
+																				month: "long",
+																				day: "numeric",
+																			})}
+																	</p>
+																)}
 																<p className="text-sm text-gray-600">
 																	Delivery Mode: {order.deliveryMode}
 																</p>
@@ -426,7 +445,9 @@ const ViewOrder = () => {
 															}
 															className="px-16 py-2 rounded-lg bg-blue-200 text-blue-600 hover:bg-blue-600 hover:text-white"
 														>
-															{order.repairRequest?.requested === true ? "Requested" : "Repair"}
+															{order.repairRequest?.requested === true
+																? "Requested"
+																: "Repair"}
 														</button>
 														<button
 															onClick={() => navigate(`/rating/${order._id}`)}

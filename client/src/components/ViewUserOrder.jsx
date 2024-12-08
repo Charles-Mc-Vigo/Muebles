@@ -7,6 +7,8 @@ import "react-toastify/dist/ReactToastify.css";
 const ViewUserOrder = () => {
 	const { orderId } = useParams();
 	const [order, setOrder] = useState(null);
+	const [furnitureType, setFurnitureType] = useState(null);
+	const [materials, setMaterials] = useState([]);
 	const [loading, setLoading] = useState(false);
 	const [newStatus, setNewStatus] = useState(""); // State for new status
 
@@ -33,6 +35,13 @@ const ViewUserOrder = () => {
 			const existingOrder = await response.json();
 			setOrder(existingOrder);
 			setNewStatus(existingOrder.orderStatus); // Set the initial status
+
+			// Fetch furniture type after fetching the order
+			const furnitureTypeId = existingOrder.furniture?.furnitureType;
+			if (furnitureTypeId) {
+				await fetchFurnitureType(furnitureTypeId);
+				await fetchMaterials(furnitureTypeId);
+			}
 		} catch (error) {
 			toast.error("An error occurred while fetching order details.");
 		} finally {
@@ -40,8 +49,57 @@ const ViewUserOrder = () => {
 		}
 	};
 
+	const fetchFurnitureType = async (furnitureTypeId) => {
+		try {
+			const response = await fetch(
+				`http://localhost:3000/api/furniture-types/${furnitureTypeId}`,
+				{
+					method: "GET",
+					credentials: "include",
+					headers: {
+						"Content-Type": "application/json",
+					},
+				}
+			);
+			if (!response.ok) {
+				const errorData = await response.json();
+				toast.error(errorData.error || "Failed to fetch furniture type.");
+				return;
+			}
+			const existingFurnitureType = await response.json();
+			setFurnitureType(existingFurnitureType.name);
+		} catch (error) {
+			toast.error("An error occurred while fetching furniture type.");
+		}
+	};
+
+	const fetchMaterials = async (furnitureTypeId) => {
+		try {
+			const response = await fetch(
+				`http://localhost:3000/api/materials/${furnitureTypeId}`,
+				{
+					method: "GET",
+					credentials: "include",
+					headers: {
+						"Content-Type": "application/json",
+					},
+				}
+			);
+			if (!response.ok) {
+				const errorData = await response.json();
+				toast.error(errorData.error || "Failed to fetch materials.");
+				return;
+			}
+			const existingMaterials = await response.json();
+			setMaterials(existingMaterials);
+			console.log("Materials:", existingMaterials);
+		} catch (error) {
+			toast.error("An error occurred while fetching materials.");
+		}
+	};
+
 	useEffect(() => {
-		fetchOrder();
+		fetchOrder(); // Fetch order and furniture type in sequence
 	}, [orderId]);
 
 	const handleAccept = async () => {
@@ -281,6 +339,36 @@ const ViewUserOrder = () => {
 						</div>
 
 						<div className="overflow-x-auto">
+							{materials.length > 0 ? (
+								<table className="table-auto w-full border-collapse border border-gray-300">
+									<thead>
+										<tr className="bg-gray-200 text-gray-800">
+											<th className="border border-gray-300 px-4 py-2">
+												Material Name
+											</th>
+											<th className="border border-gray-300 px-4 py-2">
+												Stocks
+											</th>
+										</tr>
+									</thead>
+									<tbody>
+										{materials.map((material) => (
+											<tr key={material._id} className="text-gray-800">
+												<td className="border border-gray-300 px-4 py-2">
+													{material.name}
+												</td>
+												<td className="border border-gray-300 px-4 py-2">
+													{material.stocks}
+												</td>
+											</tr>
+										))}
+									</tbody>
+								</table>
+							) : (
+								<p className="text-red-500">
+									No materials found for this furniture type.
+								</p>
+							)}
 							<table className="min-w-full border-collapse border border-gray-200">
 								<thead>
 									<tr className="bg-gray-200">
@@ -403,6 +491,10 @@ const ViewUserOrder = () => {
 							</table>
 						</div>
 						<div className="mt-6 space-y-2">
+							<div className="flex justify-between text-gray-800">
+								<span>Furniture Type:</span>
+								<span>{furnitureType}</span>
+							</div>
 							<div className="flex justify-between text-gray-800">
 								<span>Subtotal:</span>
 								<span>₱{order.totalAmount?.toFixed(2) || "0.00"}</span>

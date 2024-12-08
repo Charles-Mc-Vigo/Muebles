@@ -11,6 +11,8 @@ const {
 } = require("../../utils/EmailVerification");
 const createToken = require("../../utils/tokenUtils");
 const Order = require("../../models/Order/orderModel");
+const Materials = require("../../models/Furniture/materialsModel");
+const FurnitureType = require("../../models/Furniture/furnitureTypeModel");
 
 // Admin login
 exports.AdminLogin = async (req, res) => {
@@ -466,34 +468,73 @@ exports.myProfile = async (req, res) => {
 };
 
 //accept order
+//accept order
 exports.AcceptOrder = async (req, res) => {
 	try {
+		// Validate Admin Role
 		const admin = await Admin.findById(req.admin._id);
-
 		if (!admin) return res.status(404).json({ message: "Admin not found!" });
 
-		// Check if the current admin is a Manager
 		if (admin.role !== "Manager" && admin.role !== "Admin") {
-			return res
-				.status(403)
-				.json({ message: "Action denied: Admin and Manager only!" });
+			return res.status(403).json({ message: "Action denied: Admin and Manager only!" });
 		}
 
+		// Find the order
 		const { orderId } = req.params;
-
 		const orderToAccept = await Order.findById(orderId);
-
 		if (!orderToAccept) return res.status(404).json({ message: "Order not found!" });
-		
+
+		// Validate furniture type
+		const furnitureType = orderToAccept.furniture?.furnitureType;
+		if (!furnitureType) return res.status(404).json({ message: "Furniture type not found!" });
+
+		const selectedFurnitureType = await FurnitureType.findById(furnitureType);
+		if (!selectedFurnitureType) {
+			return res.status(404).json({ message: "Selected furniture type not found!" });
+		}
+		console.log("Selected furniture type: ", selectedFurnitureType.name);
+
+
+		// Find selected material
+		const selectedMaterial = orderToAccept.material;
+		if (!selectedMaterial) {
+			return res.status(404).json({ message: "Selected material not found!" });
+		}
+		console.log("Selected Material: ", selectedMaterial);
+
+		const materials = await Materials.findOne({ name: selectedMaterial, furnitureTypeId:furnitureType });
+		if (!materials) {
+			return res.status(404).json({ message: "Material not found!" });
+		}
+		console.log("Material ID: ", materials._id);
+
+		// Check and update stocks
+		const updatedStocks = materials.stocks - orderToAccept.quantity;
+		console.log("materials stocks", materials.stocks)
+		console.log("order quantity", orderToAccept.quantity)
+		console.log("Updated Stocks: ", updatedStocks);
+
+		if (updatedStocks <= 0) {
+			return res.status(400).json({ message: "Stocks too low" });
+		}
+
+		await Materials.findByIdAndUpdate(materials._id, { stocks: updatedStocks });
+		console.log(`Materials updated: ${materials.name}, New Stocks: ${updatedStocks}`);
+
+		// Confirm the order
 		orderToAccept.orderStatus = "confirmed";
-		orderToAccept.isConfirmed = true
+		orderToAccept.isConfirmed = true;
 		const orderUpdate = await orderToAccept.save();
-		res.status(200).json({ message: "Order was accepted", orderUpdate });
+
+		console.log("Order accepted successfully:", orderUpdate);
+		return res.status(200).json({ message: "Order was accepted", order: orderUpdate });
+
 	} catch (error) {
 		console.error("Error accepting the order: ", error);
 		res.status(500).json({ message: "Server error!" });
 	}
 };
+
 
 exports.cancelOrder = async (req, res) => {
 	try {

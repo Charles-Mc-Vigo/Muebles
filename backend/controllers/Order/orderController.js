@@ -196,9 +196,9 @@ const orderController = {
 				lastPaymentDate
 			);
 
-			// await User.findByIdAndUpdate(userId, {
-			// 	$push: { orders: preOrder._id, proofOfPayment },
-			// });
+			await User.findByIdAndUpdate(userId, {
+				$push: { orders: preOrder._id, proofOfPayment },
+			});
 
 			// console.log(preOrder);
 			console.log(req.body);

@@ -11,6 +11,7 @@ const Table = ({
 	categoriesList,
 }) => {
 	const [editIndex, setEditIndex] = useState(null);
+
 	const handleEditClick = (index) => {
 		setEditIndex(index);
 	};
@@ -43,9 +44,8 @@ const Table = ({
 						key={rowIndex}
 						className="hover:bg-gray-100 transition-colors duration-200"
 					>
-						{/* Filter out 'id' when mapping through row keys */}
 						{Object.keys(row)
-							.filter((key) => key !== "id")
+							.filter((key) => key !== "id") // Exclude 'id' from display
 							.map((key, cellIndex) => (
 								<td key={cellIndex} className="border border-gray-300 p-2">
 									{editIndex === rowIndex ? (
@@ -78,7 +78,6 @@ const Table = ({
 									)}
 								</td>
 							))}
-
 						<td className="border border-gray-300 p-2 flex space-x-2">
 							{editIndex === rowIndex ? (
 								<button
@@ -101,7 +100,7 @@ const Table = ({
 										"Are you sure you want to archive this item?"
 									);
 									if (confirmArchive) {
-										onArchive(row.id); // Pass row.id to onArchive without displaying it
+										onArchive(row.id); // Pass row.id to onArchive
 									}
 								}}
 								className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
@@ -119,7 +118,7 @@ const Table = ({
 const Maintenance = () => {
 	const initialSizeState = {
 		label: "",
-		price:"",
+		price: "",
 		height: "",
 		length: "",
 		width: "",
@@ -158,6 +157,7 @@ const Maintenance = () => {
 		await fetchSizes();
 		await fetchMaterials();
 	};
+
 	useEffect(() => {
 		fetchData();
 	}, []);
@@ -178,19 +178,17 @@ const Maintenance = () => {
 
 	const fetchFurnitureTypes = async () => {
 		try {
-			const response = await fetch(
-				"http://localhost:3000/api/furniture-types",
-				{
-					method: "GET",
-					credentials: "include",
-				}
-			);
+			const response = await fetch("http://localhost:3000/api/furniture-types", {
+				method: "GET",
+				credentials: "include",
+			});
 			const data = await response.json();
 			setFurnitureTypes(data);
 		} catch (error) {
 			console.error("Error fetching furniture types:", error);
 		}
 	};
+
 	const handleArchive = async (entityType, entityId) => {
 		try {
 			const response = await fetch(
@@ -203,40 +201,26 @@ const Maintenance = () => {
 					credentials: "include",
 				}
 			);
-
 			if (!response.ok) {
 				throw new Error(`Failed to archive ${entityType} with ID: ${entityId}`);
 			}
-
 			toast.success(`Successfully archived ${entityType}`);
-			// console.log(`${entityType} with ID ${entityId} archived successfully`);
-
-			// Optionally, update the UI by removing or updating the entity in the respective state
+			// Update the UI by removing or updating the entity in the respective state
 			switch (entityType) {
 				case "sizes":
-					setSizes((prevSizes) =>
-						prevSizes.filter((size) => size._id !== entityId)
-					);
+					setSizes((prevSizes) => prevSizes.filter((size) => size._id !== entityId));
 					break;
 				case "categories":
-					setCategories((prevCategories) =>
-						prevCategories.filter((category) => category._id !== entityId)
-					);
+					setCategories((prevCategories) => prevCategories.filter((category) => category._id !== entityId));
 					break;
 				case "furniture-types":
-					setFurnitureTypes((prevTypes) =>
-						prevTypes.filter((type) => type._id !== entityId)
-					);
+					setFurnitureTypes((prevTypes) => prevTypes.filter((type) => type._id !== entityId));
 					break;
 				case "colors":
-					setColors((prevColors) =>
-						prevColors.filter((color) => color._id !== entityId)
-					);
+					setColors((prevColors) => prevColors.filter((color) => color._id !== entityId));
 					break;
 				case "materials":
-					setMaterials((prevMaterials) =>
-						prevMaterials.filter((material) => material._id !== entityId)
-					);
+					setMaterials((prevMaterials) => prevMaterials.filter((material) => material._id !== entityId));
 					break;
 				default:
 					break;
@@ -254,7 +238,6 @@ const Maintenance = () => {
 			});
 			const data = await response.json();
 			setCategories(data);
-			// console.log(data);
 		} catch (error) {
 			setCategories([]);
 			console.error("Failed to fetch categories:", error);
@@ -289,13 +272,9 @@ const Maintenance = () => {
 
 	const handleAddNewMaterial = async () => {
 		setLoading(true);
-		const { name, price, stocks, furnitureTypeId } = newMaterial; // Include furnitureTypeId
-
+		const { name, price, stocks, furnitureTypeId } = newMaterial;
 		if (!name || !price || !stocks || !furnitureTypeId) {
-			// Check for furnitureTypeId
-			toast.error(
-				"Please provide valid name, price, stocks, and select a furniture type."
-			);
+			toast.error("Please provide valid name, price, stocks, and select a furniture type.");
 			return;
 		}
 		try {
@@ -305,16 +284,11 @@ const Maintenance = () => {
 					"Content-Type": "application/json",
 				},
 				credentials: "include",
-				body: JSON.stringify({ name, price, stocks, furnitureTypeId }), // Include furnitureTypeId in the body
+				body: JSON.stringify({ name, price, stocks, furnitureTypeId }),
 			});
 			if (response.ok) {
 				toast.success("Material added successfully.");
-				setNewMaterial({
-					name: "",
-					price: "",
-					stocks: "",
-					furnitureTypeId: "",
-				}); // Reset input
+				setNewMaterial({ name: "", price: "", stocks: "", furnitureTypeId: "" });
 				fetchMaterials(); // Refresh the list
 			} else {
 				const errorData = await response.json();
@@ -329,11 +303,8 @@ const Maintenance = () => {
 
 	const handleAddNewSize = async () => {
 		setLoading(true);
-
 		if (!newSize.label || !selectedFurnitureType) {
-			toast.error(
-				"Please enter a valid size name and select a furniture type."
-			);
+			toast.error("Please enter a valid size name and select a furniture type.");
 			return;
 		}
 		try {
@@ -377,7 +348,6 @@ const Maintenance = () => {
 
 	const handleAddNewColor = async () => {
 		setLoading(true);
-
 		if (!newColor.name || !newColor.hex) {
 			toast.error("Please provide all color details.");
 			return;
@@ -389,10 +359,7 @@ const Maintenance = () => {
 					"Content-Type": "application/json",
 				},
 				credentials: "include",
-				body: JSON.stringify({
-					name: newColor.name,
-					hex: newColor.hex,
-				}),
+				body: JSON.stringify({ name: newColor.name, hex: newColor.hex }),
 			});
 			const data = await response.json();
 			if (!response.ok) {
@@ -410,7 +377,6 @@ const Maintenance = () => {
 
 	const handleAddNewItem = async () => {
 		setLoading(true);
-
 		if (
 			!newItemName &&
 			selectedFilter !== "Furniture Size" &&
@@ -422,17 +388,14 @@ const Maintenance = () => {
 		}
 		try {
 			if (selectedFilter === "Categories") {
-				const response = await fetch(
-					"http://localhost:3000/api/categories/add",
-					{
-						method: "POST",
-						headers: {
-							"Content-Type": "application/json",
-						},
-						credentials: "include",
-						body: JSON.stringify({ name: newItemName }),
-					}
-				);
+				const response = await fetch("http://localhost:3000/api/categories/add", {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					credentials: "include",
+					body: JSON.stringify({ name: newItemName }),
+				});
 				if (!response.ok) {
 					const errorData = await response.json();
 					throw new Error(errorData.message || "Failed to add category.");
@@ -441,36 +404,28 @@ const Maintenance = () => {
 				await fetchCategories(); // Refresh categories list
 			}
 
-			// furniture type
 			if (selectedFilter === "Furniture Types") {
 				if (!selectedCategory) {
 					setLoading(false);
 					toast.error("Please select a category.");
 					return;
 				}
-				const response = await fetch(
-					"http://localhost:3000/api/furniture-types/add",
-					{
-						method: "POST",
-						headers: {
-							"Content-Type": "application/json",
-						},
-						credentials: "include",
-						body: JSON.stringify({
-							name: newItemName,
-							ECT: ect,
-							categoryId: selectedCategory,
-						}),
-					}
-				);
-
+				const response = await fetch("http://localhost:3000/api/furniture-types/add", {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					credentials: "include",
+					body: JSON.stringify({
+						name: newItemName,
+						ECT: ect,
+						categoryId: selectedCategory,
+					}),
+				});
 				const responseData = await response.json();
 				if (!response.ok) {
-					throw new Error(
-						responseData.message || "Failed to add furniture type."
-					);
+					throw new Error(responseData.message || "Failed to add furniture type.");
 				}
-
 				setFurnitureTypes((prevTypes) =>
 					Array.isArray(prevTypes)
 						? [...prevTypes, responseData.newFurnitureType]
@@ -479,7 +434,6 @@ const Maintenance = () => {
 				toast.success(responseData.message);
 				await fetchFurnitureTypes();
 			}
-
 			resetInputFields();
 		} catch (error) {
 			toast.error(error.message);
@@ -489,16 +443,14 @@ const Maintenance = () => {
 
 	const handleEditItem = (rowIndex, key, value) => {
 		setLoading(true);
-
 		const updateItem = (items, setItems) => {
 			const updatedItems = [...items];
-			// Check if we are editing "Furniture Types"
-			if (selectedFilter === "Furniture Types" && key === "categoryId") {
-				updatedItems[rowIndex].categoryId = value;
-			} else {
-				updatedItems[rowIndex][key] = value;
+			// Update only allowed fields
+			if (key === "categoryId") {
+				updatedItems[rowIndex].categoryId = value; // Only allow editing categoryId
+			} else if (["name", "price", "stocks"].includes(key)) {
+				updatedItems[rowIndex][key] = value; // Update name, price, and stocks
 			}
-			// console.log("Updated Item:", updatedItems[rowIndex]); // Log the updated item
 			setItems(updatedItems);
 			setLoading(false);
 		};
@@ -538,7 +490,6 @@ const Maintenance = () => {
 		} else if (selectedFilter === "Furniture Materials") {
 			url = `http://localhost:3000/api/materials/edit/${item.id}`;
 		}
-
 		try {
 			const response = await fetch(url, {
 				method: "PUT",
@@ -546,7 +497,12 @@ const Maintenance = () => {
 					"Content-Type": "application/json",
 				},
 				credentials: "include",
-				body: JSON.stringify(item),
+				body: JSON.stringify({
+					// Send only the editable fields
+					name: item.name,
+					price: item.price,
+					stocks: item.stocks,
+				}),
 			});
 			if (response.ok) {
 				toast.success("Item updated successfully.");
