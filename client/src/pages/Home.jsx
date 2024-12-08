@@ -413,7 +413,7 @@ const Home = () => {
 							<div className="mt-6 flex justify-between">
 								<button
 									onClick={handlePreviousPage}
-									className="bg-teal-500 text-white py-2 px-4 rounded-xl hover:bg-teal-700"
+									className="bg-teal-500 text-white py-2 px-5 hover:bg-teal-700"
 									disabled={currentPage === 1}
 								>
 									Previous
@@ -423,7 +423,7 @@ const Home = () => {
 								</span>
 								<button
 									onClick={handleNextPage}
-									className="bg-teal-500 text-white py-2 px-4 rounded-xl hover:bg-teal-700"
+									className="bg-teal-500 text-white py-2 px-5 hover:bg-teal-700"
 									disabled={currentPage === totalPages}
 								>
 									Next
