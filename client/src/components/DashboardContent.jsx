@@ -1,5 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { MdOutlinePendingActions } from "react-icons/md";
+import { GiConfirmed } from "react-icons/gi";
+import { AiOutlineShoppingCart } from "react-icons/ai"; 
+import { FaMoneyBillWave } from "react-icons/fa"; 
+
 import FurnitureOrderForm from "./FurnitureOrderForm";
 
 const Dashboard = () => {
@@ -148,20 +153,37 @@ const Dashboard = () => {
           Create New Order
         </Link>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         <div className="bg-white shadow-lg rounded-lg p-4 text-center">
+          <div className="flex justify-center items-center mb-2">
+            <MdOutlinePendingActions className="text-3xl text-gray-600" />
+          </div>
+          <h1 className="text-xl font-bold">Pending Orders</h1>
+          <p className="text-2xl text-black-600">₱{ordersByStatus.pending}</p>
+        </div>
+        <div className="bg-white shadow-lg rounded-lg p-4 text-center">
+          <div className="flex justify-center items-center mb-2">
+            <AiOutlineShoppingCart className="text-3xl text-blue-600" />
+          </div>
           <h1 className="text-xl font-bold">Total Orders</h1>
           <p className="text-2xl text-blue-600">{totalOrders}</p>
         </div>
         <div className="bg-white shadow-lg rounded-lg p-4 text-center">
+          <div className="flex justify-center items-center mb-2">
+            <GiConfirmed className="text-3xl text-yellow-600" />
+          </div>
           <h1 className="text-xl font-bold">Confirmed</h1>
           <p className="text-2xl text-yellow-600">{ordersByStatus.confirmed}</p>
         </div>
         <div className="bg-white shadow-lg rounded-lg p-4 text-center">
+          <div className="flex justify-center items-center mb-2">
+            <FaMoneyBillWave className="text-3xl text-green-600" />
+          </div>
           <h1 className="text-xl font-bold">Total Revenue</h1>
           <p className="text-2xl text-black-600">₱ {totalRevenue.toFixed(2)}</p>
         </div>
       </div>
+
       <div className="bg-white rounded-lg">
         <div className="flex justify-between items-center p-5">
           <h1 className="text-2xl font-semibold">Current Orders</h1>

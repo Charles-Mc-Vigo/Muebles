@@ -9,32 +9,49 @@ const FurnitureOrderForm = () => {
     contact: "",
     orderDetails: "",
     paymentMethod: "",
-    paymentType: "", // Payment type (Partial or Full)
-    downPayment: "", // Down payment amount
+    paymentType: "",
+    downPayment: "",
     deliveryMethod: "",
-    totalAmount: 1000, // Example total amount
-    balance: 1000, // Balance starts as total amount
-    orderDate: "", // Order date
+    productPrice: 0,
+    shippingFee: 0,
+    totalAmount: 0,
+    balance: 0,
+    orderDate: "",
+    referenceNo: "",
   });
 
   const [error, setError] = useState(""); // State to handle error messages
 
   useEffect(() => {
-    // Update balance when payment type or down payment changes
-    if (formData.paymentType === "partial") {
-      const newBalance = formData.totalAmount - formData.downPayment;
-      setFormData((prevData) => ({
-        ...prevData,
-        balance: newBalance >= 0 ? newBalance : 0, // Ensure no negative balance
-      }));
-    } else {
-      // For full payment, balance is 0
-      setFormData((prevData) => ({
-        ...prevData,
-        balance: 0,
-      }));
-    }
-  }, [formData.downPayment, formData.paymentType, formData.totalAmount]);
+    const today = new Date().toISOString().split("T")[0];
+    setFormData((prevData) => ({ ...prevData, orderDate: today }));
+  }, []);
+
+  // Update totalAmount and balance when product price, shipping fee, down payment, or payment type changes
+  useEffect(() => {
+    const newShippingFee =
+      formData.deliveryMethod === "deliver"
+        ? parseFloat(formData.shippingFee)
+        : 0;
+    const newTotalAmount = parseFloat(formData.productPrice) + newShippingFee;
+    const newBalance =
+      formData.paymentType === "partial"
+        ? Math.max(newTotalAmount - (parseFloat(formData.downPayment) || 0), 0)
+        : 0;
+
+    setFormData((prevData) => ({
+      ...prevData,
+      totalAmount: newTotalAmount,
+      balance: newBalance,
+    }));
+  }, [
+    formData.productPrice,
+    formData.shippingFee,
+    formData.deliveryMethod,
+    formData.downPayment,
+    formData.paymentType,
+  ]);
+  
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -44,27 +61,82 @@ const FurnitureOrderForm = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log("Form Data being sent:", formData); // Log the form data before sending it
+
     // Validation for partial payment
-    if (formData.paymentType === "partial" && formData.downPayment > formData.totalAmount) {
+    if (
+      formData.paymentType === "partial" &&
+      parseFloat(formData.downPayment) > formData.totalAmount
+    ) {
       setError("Down payment cannot exceed the total amount.");
       return;
     } else {
       setError(""); // Clear any previous errors
     }
 
-    console.log("Form Submitted", formData);
-    // Add further logic to submit form data (e.g., sending to an API)
+    try {
+      // Log before sending the request to the backend
+      console.log("Sending data to the backend...");
+
+      // Send form data to your backend API using fetch
+      const response = await fetch("http://localhost:3000/api/walk-in-orders", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json", 
+        },
+        body: JSON.stringify(formData), 
+      });
+      console.log("Response Status:", response.status);
+      console.log("Response Body:", await response.text());
+
+      // Log response status
+      console.log("Response Status:", response.status);
+
+      if (response.ok) {
+        const data = await response.json(); // Get the response data
+        console.log("Order submitted successfully", data); // Log the success response
+        alert("Order Submitted Successfully!");
+
+        // Reset form data after submission
+        setFormData({
+          name: "",
+          address: "",
+          contact: "",
+          orderDetails: "",
+          paymentMethod: "",
+          paymentType: "",
+          downPayment: "",
+          deliveryMethod: "",
+          productPrice: 0,
+          shippingFee: 0,
+          totalAmount: 0,
+          balance: 0,
+          orderDate: new Date().toISOString().split("T")[0], // Reset to today's date
+          referenceNo: "",
+        });
+      } else {
+        // Log error if response is not okay
+        console.log("Failed to submit the order. Response:", response);
+        throw new Error("Failed to submit the order.");
+      }
+    } catch (error) {
+      // Log the error if the fetch request fails
+      console.error("Error submitting order", error);
+      setError("Failed to submit the order.");
+    }
   };
 
   return (
-    <div className="">
+    <div>
       <Header />
       <div className="max-w-2xl mx-auto p-6 bg-white shadow-lg mt-5 mb-5 rounded-lg">
         <h2 className="text-2xl font-semibold text-center mb-6">
           Walk-in Order Form
         </h2>
+        {error && <p className="text-red-500 text-sm">{error}</p>}{" "}
+        {/* Display error message at the top */}
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label
@@ -83,7 +155,6 @@ const FurnitureOrderForm = () => {
               className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
-
           <div className="mb-4">
             <label
               htmlFor="address"
@@ -100,7 +171,6 @@ const FurnitureOrderForm = () => {
               className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
             ></textarea>
           </div>
-
           <div className="mb-4">
             <label
               htmlFor="contact"
@@ -118,7 +188,6 @@ const FurnitureOrderForm = () => {
               className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
-
           <div className="mb-4">
             <label
               htmlFor="orderDetails"
@@ -135,6 +204,29 @@ const FurnitureOrderForm = () => {
             ></textarea>
           </div>
 
+          {/* Product Price */}
+          <div className="mb-4">
+            <label
+              htmlFor="productPrice"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Product Price:
+            </label>
+            <input
+              type="number"
+              id="productPrice"
+              name="productPrice"
+              value={formData.productPrice}
+              onChange={handleChange}
+              required
+              min="0"
+              step="100"
+              placeholder="Enter product price"
+              className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+          </div>
+
+          {/* Payment Method */}
           <div className="mb-4">
             <label
               htmlFor="paymentMethod"
@@ -158,6 +250,27 @@ const FurnitureOrderForm = () => {
             </select>
           </div>
 
+          {/* Reference Number (only for E-Wallet) */}
+          {formData.paymentMethod === "e-wallet" && (
+            <div className="mb-4">
+              <label
+                htmlFor="referenceNo"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Reference Number (for E-Wallet):
+              </label>
+              <input
+                type="text"
+                id="referenceNo"
+                name="referenceNo"
+                value={formData.referenceNo}
+                onChange={handleChange}
+                className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              />
+            </div>
+          )}
+
+          {/* Payment Type */}
           <div className="mb-4">
             <label
               htmlFor="paymentType"
@@ -181,7 +294,7 @@ const FurnitureOrderForm = () => {
             </select>
           </div>
 
-          {/* Show Down Payment Input only if Partial Payment is selected */}
+          {/* Down Payment Input */}
           {formData.paymentType === "partial" && (
             <div className="mb-4">
               <label
@@ -201,9 +314,7 @@ const FurnitureOrderForm = () => {
             </div>
           )}
 
-          {/* Show error message if down payment is invalid */}
-          {error && <p className="text-red-500 text-sm">{error}</p>}
-
+          {/* Delivery Method */}
           <div className="mb-4">
             <label
               htmlFor="deliveryMethod"
@@ -227,25 +338,30 @@ const FurnitureOrderForm = () => {
             </select>
           </div>
 
-          {/* Order Date Field */}
-          <div className="mb-4">
-            <label
-              htmlFor="orderDate"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Order Date:
-            </label>
-            <input
-              type="date"
-              id="orderDate"
-              name="orderDate"
-              value={formData.orderDate}
-              onChange={handleChange}
-              required
-              className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            />
-          </div>
+          {/* Shipping Fee */}
+          {formData.deliveryMethod === "deliver" && (
+            <div className="mb-4">
+              <label
+                htmlFor="shippingFee"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Shipping Fee:
+              </label>
+              <input
+                type="number"
+                id="shippingFee"
+                name="shippingFee"
+                value={formData.shippingFee}
+                onChange={handleChange}
+                min="0"
+                step="0.01"
+                placeholder="Enter shipping fee"
+                className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              />
+            </div>
+          )}
 
+          {/* Total Amount */}
           <div className="mb-4">
             <label className="block text-xl font-medium text-gray-700">
               Total Amount:
@@ -253,10 +369,9 @@ const FurnitureOrderForm = () => {
             <p className="mt-1 text-xl">₱{formData.totalAmount}</p>
           </div>
 
+          {/* Balance Due */}
           <div className="mb-4">
-            <label className="block text-xl text-gray-700">
-              Balance Due:
-            </label>
+            <label className="block text-xl text-gray-700">Balance Due:</label>
             <p className="mt-1 text-xl font-semibold">
               ₱{formData.balance.toFixed(2)}
             </p>
@@ -264,7 +379,7 @@ const FurnitureOrderForm = () => {
 
           <button
             type="submit"
-            className="w-full py-3 px-4 bg-indigo-600 text-white rounded-md font-semibold hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full py-3 px-4 bg-green-600 text-black text-xl rounded-md font-semibold hover:bg-green-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
           >
             Submit Order
           </button>

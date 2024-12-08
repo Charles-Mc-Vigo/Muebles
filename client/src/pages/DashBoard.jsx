@@ -28,7 +28,7 @@ const Dashboard = () => {
     maintenance: false,
   });
 
-  const [activeSection, setActiveSection] = useState("");
+  const [activeSection, setActiveSection] = useState("dashboard");
 
   // Load active section from localStorage
   useEffect(() => {

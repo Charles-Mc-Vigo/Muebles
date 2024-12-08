@@ -373,180 +373,185 @@ const PreOrder = () => {
           )}
         </div>
 
-				{/* 2nd Div */}
-				<div className="flex flex-col  rounded-xl p-5 border-2 border-teal-600 shadow-lg shadow-gray-300 w-full max-w-3/4 md:w-1/2 lg:w-1/4 min-h-[300px]">
-					<div className="">
-						<h1 className="text-2xl font-bold mb-2 ml-2 ">
-							{furnitureData.name}
-						</h1>
-						<p className="flex justify-between ml-2">
-							<span className="text-lg font-normal">
-								Estimated Completion Time:{" "}
-							</span>
-							<span className="text-lg">
-								{furnitureData.furnitureType?.ECT || "N/A"} Days
-							</span>
-						</p>
-					</div>
-					<div className=" p-2">
-						{/* product description */}
-						<div>
-							<div
-								onClick={() =>
-									setProductDescriptionVisible(!productDescriptionVisible)
-								}
-								className="cursor-pointer text-black flex justify-between items-center mt-2"
-							>
-								<span className="font-semibold">Product Description</span>
-								<span className="text-2xl">
-									{productDescriptionVisible ? (
-										<IoIosArrowUp />
-									) : (
-										<IoIosArrowDown />
-									)}
-								</span>
-							</div>
-							{productDescriptionVisible && (
-								<div className="mt-2 p-2 text-black">
-									<p>
-										{furnitureData.description || "No description available."}
-									</p>
-								</div>
-							)}
-						</div>
-						<div className="mt-2 py-2 ">
-							<div
-								onClick={() =>
-									setUserInformationVisible(!userInformationVisible)
-								}
-								className="cursor-pointer text-black flex justify-between items-center mt-2"
-							>
-								<span className="font-semibold">User Information</span>
-								<span className="text-2xl">
-									{userInformationVisible ? (
-										<IoIosArrowUp />
-									) : (
-										<IoIosArrowDown />
-									)}
-								</span>
-							</div>
-							{/* User Information Accordion */}
-							{userInformationVisible && (
-								<div className="bg-gray-200 p-2 flex flex-col gap-2 text-black">
-									<h1 className="flex justify-between">
-										Name:{" "}
-										<span className="mr-2">
-											{user.firstname} {user.lastname}
-										</span>
-									</h1>
-									<h1 className="flex justify-between">
-										Phone Number:{" "}
-										<span className="mr-2">{user.phoneNumber}</span>
-									</h1>
-									<h1 className="flex justify-between">
-										Email: <span className="mr-2">{user.email}</span>
-									</h1>
-								</div>
-							)}
-						</div>
-						{/* Address Section Below */}
-						<div className="text-base flex font-medium py-5 justify-between items-center border-t-2 border-teal-500">
-							<h1>Delivery Address</h1>
-							{user.addresses && user.addresses.length > 0 ? (
-								user.addresses
-									.filter((address) => address.isDefault)
-									.map((defaultAddress, index) => (
-										<p key={index} className="tracking-wide font-light p-2">
-											{defaultAddress.streetAddress}, {defaultAddress.barangay},{" "}
-											{defaultAddress.municipality}, {defaultAddress.zipCode}
-										</p>
-									))
-							) : (
-								<p>No addresses available</p>
-							)}
-							<button
-								onClick={() => navigate("/address/new")}
-								className="text-teal-600 flex items-center font-semibold"
-							>
-								<TbArrowsExchange2 style={{ fontSize: "2rem" }} />
-							</button>
-						</div>
-						{/* Buy Products */}
-						<div className="flex justify-between border-b-2 border-teal-500">
-							<label className="flex justify-between font-semibold mb-5">
-								Quantity
-							</label>
-							<div className="flex items-center gap-2 mb-5">
-								<button
-									onClick={() => setQuantity((prev) => Math.max(prev - 1, 1))}
-									className="border border-teal-600 bg-white text-teal-600 px-3 py-1 rounded-l-md hover:bg-teal-600 hover:text-white transition"
-								>
-									-
-								</button>
-								<span className="border border-teal-600 text-teal-600 px-5 py-1">
-									{quantity}
-								</span>
-								<button
-									onClick={() => setQuantity((prev) => Math.min(prev + 1,10))}
-									className="border border-teal-600 bg-white text-teal-600 px-3 py-1 rounded-r-md hover:bg-teal-600 hover:text-white transition"
-								>
-									+
-								</button>
-							</div>
-						</div>
+        {/* 2nd Div */}
+        <div className="flex flex-col  rounded-xl p-5 border-2 border-green-600 shadow-lg shadow-gray-300 w-full max-w-3/4 md:w-1/2 lg:w-1/4 min-h-[300px]">
+          <div className="">
+            <h1 className="text-2xl font-bold mb-2 ml-2 ">
+              {furnitureData.name}
+            </h1>
+            <p className="flex justify-between ml-2">
+              <span className="text-lg font-normal">
+                Estimated Completion Time:{" "}
+              </span>
+              <span className="text-lg">
+                {furnitureData.furnitureType?.ECT || "N/A"} Days
+              </span>
+            </p>
+          </div>
+          <div className=" p-2">
+            {/* product description */}
+            <div>
+              <div
+                onClick={() =>
+                  setProductDescriptionVisible(!productDescriptionVisible)
+                }
+                className="cursor-pointer text-black flex justify-between items-center mt-2"
+              >
+                <span className="font-semibold">Product Description</span>
+                <span className="text-2xl">
+                  {productDescriptionVisible ? (
+                    <IoIosArrowUp />
+                  ) : (
+                    <IoIosArrowDown />
+                  )}
+                </span>
+              </div>
+              {productDescriptionVisible && (
+                <div className="mt-2 p-2 text-black">
+                  <p>
+                    {furnitureData.description || "No description available."}
+                  </p>
+                </div>
+              )}
+            </div>
+            <div className="mt-2 py-2 ">
+              <div
+                onClick={() =>
+                  setUserInformationVisible(!userInformationVisible)
+                }
+                className="cursor-pointer text-black flex justify-between items-center mt-2"
+              >
+                <span className="font-semibold">User Information</span>
+                <span className="text-2xl">
+                  {userInformationVisible ? (
+                    <IoIosArrowUp />
+                  ) : (
+                    <IoIosArrowDown />
+                  )}
+                </span>
+              </div>
+              {/* User Information Accordion */}
+              {userInformationVisible && (
+                <div className="bg-gray-200 p-2 flex flex-col gap-2 text-black">
+                  <h1 className="flex justify-between">
+                    Name:{" "}
+                    <span className="mr-2">
+                      {user.firstname} {user.lastname}
+                    </span>
+                  </h1>
+                  <h1 className="flex justify-between">
+                    Phone Number:{" "}
+                    <span className="mr-2">{user.phoneNumber}</span>
+                  </h1>
+                  <h1 className="flex justify-between">
+                    Email: <span className="mr-2">{user.email}</span>
+                  </h1>
+                </div>
+              )}
+            </div>
+            {/* Address Section Below */}
+            <div className="text-base flex font-medium py-5 justify-between items-center border-t-2 border-green-500">
+              <h1>Delivery Address</h1>
+              {user.addresses && user.addresses.length > 0 ? (
+                user.addresses
+                  .filter((address) => address.isDefault)
+                  .map((defaultAddress, index) => (
+                    <p key={index} className="tracking-wide font-light p-2">
+                      {defaultAddress.streetAddress}, {defaultAddress.barangay},{" "}
+                      {defaultAddress.municipality}, {defaultAddress.zipCode}
+                    </p>
+                  ))
+              ) : (
+                <p>No addresses available</p>
+              )}
+              <button
+                onClick={() => navigate("/address/new")}
+                className="text-green-600 flex items-center font-semibold"
+              >
+                <TbArrowsExchange2 style={{ fontSize: "2rem" }} />
+              </button>
+            </div>
+            {/* Buy Products */}
+            <div className="flex justify-between border-b-2 border-green-500">
+              <label className="flex justify-between font-semibold mb-5">
+                Quantity
+              </label>
+              <div className="flex items-center gap-2 mb-5">
+                <button
+                  onClick={() => setQuantity((prev) => Math.max(prev - 1, 1))}
+                  className="border border-green-600 bg-white text-green-600 px-3 py-1 rounded-l-md hover:bg-green-600 hover:text-white transition"
+                >
+                  -
+                </button>
+                <span className="border border-green-600 text-green-600 px-5 py-1">
+                  {quantity}
+                </span>
+                <button
+                  onClick={() => setQuantity((prev) => Math.min(prev + 1, 10))}
+                  className="border border-green-600 bg-white text-green-600 px-3 py-1 rounded-r-md hover:bg-green-600 hover:text-white transition"
+                >
+                  +
+                </button>
+              </div>
+            </div>
 
-						{/* Colors Section */}
-						<div className="">
-							<label className="flex justify-between font-semibold mb-5">
-								Colors{" "}
-								<span className="font-normal">
-									{selectedColor || "Select color"}
-								</span>
-							</label>
-							<div className="flex justify-end flex-wrap mb-5 gap-2 ">
-							{furnitureData.colors?.map((color) => (
-								<div 
-								key={color._id}
-								onClick={() => handleColorClick(color)}
-								className={`w-10 h-10 rounded-full border cursor-pointer relative flex items-center justify-center transition-transform transform hover:scale-110 ${
-									selectedColor === color.name
-									? "border border-gray-300 bg-slate-200 hover:border-teal-400"
-									: "text-black"
-								 }`}
-								  style={{ backgroundColor: color.hex }}
-								  >
-									{selectedColor === color.name && (
-										<div className="absolute top-0 right-0 w-6 h-6 bg-green-600 rounded-full flex items-center justify-center">
-											<span className="text-white text-sm">✓</span>
-											</div>
-										)}
-										</div>
-									))}
-									</div>									
-							{/* Materials Section */}
-							<div className="border-b-2 border-teal-500">
-								<h2 className="flex justify-between mb-5 font-semibold">
-									Materials{" "}
-									<span className="font-normal">
-										{selectedMaterial || "Select material"}
-									</span>
-								</h2>
-								<div className="flex flex-col-1 text-xl space-x-2 mb-5 flex-wrap">
-									{furnitureData.materials?.map((material) => (
-										<span
-											key={material.id}
-											onClick={() => handleMaterialClick(material)}
-											className={`border border-teal-600 hover:bg-teal-600 hover:text-white px-2 py-1 rounded-md cursor-pointer transition ${
-												selectedMaterial === material.name
-													? "bg-teal-600 text-white"
-													: "text-teal-600"
-											}`}
-										>
-											{material.name}
-										</span>
-									))}
-								</div>
-							</div>
+            {/* Colors Section */}
+            <div className="">
+              <label className="flex justify-between font-semibold mb-5">
+                Colors{" "}
+                <span className="font-normal">
+                  {selectedColor || "Select color"}
+                </span>
+              </label>
+              <div className="flex justify-end flex-wrap mb-5 gap-2 ">
+                {furnitureData.colors?.map((color) => (
+                  <div
+                    key={color._id}
+                    onClick={() => handleColorClick(color)}
+                    className={`w-10 h-10 rounded-full border cursor-pointer relative flex items-center justify-center transition-transform transform hover:scale-110 ${
+                      selectedColor === color.name
+                        ? "border border-gray-300 bg-slate-200 hover:border-green-400"
+                        : "text-black"
+                    }`}
+                    style={{ backgroundColor: color.hex }}
+                  >
+                    {selectedColor === color.name && (
+                      <div className="absolute top-0 right-0 w-6 h-6 bg-green-600 rounded-full flex items-center justify-center">
+                        <span className="text-white text-sm">✓</span>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+              {/* Materials Section */}
+              <div className="border-b-2 border-green-500">
+                <h2 className="flex justify-between mb-5 font-semibold">
+                  Materials{" "}
+                  <span className="font-normal">
+                    {selectedMaterial || "Select material"}
+                  </span>
+                </h2>
+                <div className="flex flex-col-1 text-xl space-x-2 mb-5 flex-wrap">
+                  {furnitureData.materials?.map((material) => (
+                    <div
+                      key={material.id}
+                      onClick={() => handleMaterialClick(material)}
+                      className={`relative border border-green-600 hover:bg-green-600 hover:text-white px-2 py-1 rounded-md cursor-pointer transition ${
+                        selectedMaterial === material.name
+                          ? "bg-green-600 text-white"
+                          : "text-green-600"
+                      }`}
+                    >
+                      {material.name}
+                      {selectedMaterial === material.name && (
+                        <div className="absolute top-0 right-0 w-6 h-6 bg-green-600 rounded-full flex items-center justify-center">
+                          <span className="text-white text-sm">✓</span>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
 
               {/* Sizes Section */}
               {/* Sizes Section */}
@@ -673,32 +678,32 @@ const PreOrder = () => {
                         )}
                       </div>
                       {/* calculation payment */}
-                      <div className="mt-5 border border-green-600 p-5">
-                        <h1 className="font-semibold mb-2">Payment Details</h1>
-                        <div className="font-normal">
-                          <div className="flex justify-between">
-                            <span>Material Price:</span>
-                            <span>₱ {materialPrice || 0}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span>Size Price :</span>
-                            <span>₱ {sizePrice || 0}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span>Subtotal :</span>
-                            <span>₱ {subtotal || 0}</span>
-                          </div>
-                          <div className="flex justify-between mt-5">
-                            <span>Shipping Fee:</span>
-                            <span>₱ {shippingFee.toFixed(2)}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span>Total Amount :</span>
-                            <span>₱ {totalAmountWithShippingFee || 0}</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+						<div className="mt-5 border border-green-600 p-5">
+							<h1 className="font-semibold mb-2">Payment Details</h1>
+							<div className="font-normal">
+							<div className="flex justify-between">
+								<span>Material Price:</span>
+								<span>₱ {materialPrice || 0}</span>
+							</div>
+							<div className="flex justify-between">
+								<span>Size Price :</span>
+								<span>₱ {sizePrice || 0}</span>
+							</div>
+							<div className="flex justify-between">
+								<span>Subtotal :</span>
+								<span>₱ {subtotal || 0}</span>
+							</div>
+							<div className="flex justify-between mt-5">
+								<span>Shipping Fee:</span>
+								<span>₱ {shippingFee.toFixed(2)}</span>
+							</div>
+							<div className="flex justify-between">
+								<span>Total Amount :</span>
+								<span>₱ {totalAmountWithShippingFee || 0}</span>
+							</div>
+							</div>
+						</div>
+						</div>
                   </>
                 )}
 
