@@ -6,13 +6,10 @@ const colorSchema = new mongoose.Schema({
     required: true,
     unique: true
   },
-  rgb: {
-    type: String,
-    required: true
-  },
   hex: {
     type: String,
-    required: true
+    required: true,
+    match: /^#([0-9A-F]{3}){1,2}$/i,
   },
   isArchived:{
     type:Boolean,

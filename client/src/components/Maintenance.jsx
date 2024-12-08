@@ -128,7 +128,6 @@ const Maintenance = () => {
 	};
 	const initialColorState = {
 		name: "",
-		rgb: "",
 		hex: "",
 	};
 
@@ -379,7 +378,7 @@ const Maintenance = () => {
 	const handleAddNewColor = async () => {
 		setLoading(true);
 
-		if (!newColor.name || !newColor.rgb || !newColor.hex) {
+		if (!newColor.name || !newColor.hex) {
 			toast.error("Please provide all color details.");
 			return;
 		}
@@ -392,7 +391,6 @@ const Maintenance = () => {
 				credentials: "include",
 				body: JSON.stringify({
 					name: newColor.name,
-					rgb: newColor.rgb,
 					hex: newColor.hex,
 				}),
 			});
@@ -750,17 +748,13 @@ const Maintenance = () => {
 									newColor.name,
 									handleColorChange
 								)}
-								{renderInputField(
-									"RGB Value",
-									"rgb",
-									newColor.rgb,
-									handleColorChange
-								)}
+
 								{renderInputField(
 									"Hex Value",
 									"hex",
 									newColor.hex,
-									handleColorChange
+									handleColorChange,
+									"color"
 								)}
 							</>
 						)}
@@ -883,13 +877,12 @@ const Maintenance = () => {
 							<h2 className="text-2xl font-bold mb-4">Furniture Colors</h2>
 							<div className="max-h-96 overflow-y-auto">
 								<Table
-									headers={["Color Name", "RGB", "Hex"]}
+									headers={["Color Name", "Hex"]}
 									data={
 										Array.isArray(colors)
 											? colors.map((color) => ({
 													id: color._id,
 													name: color.name,
-													rgb: color.rgb,
 													hex: color.hex,
 											  }))
 											: []

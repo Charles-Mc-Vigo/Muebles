@@ -247,13 +247,20 @@ const ViewUserOrder = () => {
 								>
 									Update Status
 								</button>
-							)}	
+							)}
 						</div>
 					</div>
 
 					{/* Order Items */}
 					<div className="bg-white rounded-lg shadow-md p-6">
-						<h2 className="text-2xl font-semibold mb-4">Items</h2>
+						<div className="flex items-center justify-between mb-4">
+							<h2 className="text-2xl font-semibold">Items</h2>
+							<h2 className="text-right">
+								<span className="font-semibold">Expected Delivery:</span>
+								<span className="font-normal"> {order.expectedDelivery}</span>
+							</h2>
+						</div>
+
 						<div className="overflow-x-auto">
 							<table className="min-w-full border-collapse border border-gray-200">
 								<thead>
