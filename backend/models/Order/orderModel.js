@@ -71,7 +71,12 @@ const orderSchema = new mongoose.Schema(
       type: String,
     },
     expectedDelivery: {
-      type: String,
+      startDate: {
+        type: Date,
+      },
+      endDate: {
+        type: Date,
+      },
     },
     subtotal: {
       type: Number,
@@ -201,7 +206,7 @@ orderSchema.statics.preOrder = async function (
   paymentOption,
   shippingAddress,
   deliveryMode,
-  expectedDelivery,
+  expectedDeliveryObj,
   subtotal,
   totalAmount,
   shippingFee,
@@ -225,7 +230,7 @@ orderSchema.statics.preOrder = async function (
     paymentOption,
     shippingAddress,
     deliveryMode,
-    expectedDelivery,
+    expectedDelivery :expectedDeliveryObj,
     subtotal,
     totalAmount,
     shippingFee,
@@ -253,7 +258,7 @@ orderSchema.statics.preOrder = async function (
       monthlyInstallment,
 			dueDate,
       interest,
-      lastPaymentDate: lastPaymentDate || new Date(), // Set current date as last payment date
+      lastPaymentDate: lastPaymentDate || new Date(),
     };
   }
 

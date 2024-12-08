@@ -148,6 +148,15 @@ const orderController = {
 				return res.status(400).json({ error: "Proof of payment is required" });
 			}
 
+			const expectedDeliveryObj = JSON.parse(expectedDelivery || "{}");
+
+			// Validate parsed expectedDelivery
+			if (!expectedDeliveryObj.startDate || !expectedDeliveryObj.endDate) {
+				return res
+					.status(400)
+					.json({ error: "Invalid expected delivery dates" });
+			}
+
 			const proofOfPayment = req.file.buffer.toString("base64");
 			// Calculate due date only for partial payments
 			let dueDate = null;
@@ -155,6 +164,8 @@ const orderController = {
 				dueDate = new Date();
 				dueDate.setDate(dueDate.getDate() + 30); // Set due date to 30 days from now
 			}
+
+			console.log(expectedDelivery);
 
 			// Set interest and lastPaymentDate to undefined for full payments
 			const interest = paymentOption === "Full Payment" && undefined;
@@ -172,7 +183,7 @@ const orderController = {
 				paymentOption,
 				shippingAddress,
 				deliveryMode,
-				expectedDelivery,
+				expectedDeliveryObj,
 				subtotal,
 				totalAmount,
 				shippingFee,
@@ -185,11 +196,12 @@ const orderController = {
 				lastPaymentDate
 			);
 
-			await User.findByIdAndUpdate(userId, {
-				$push: { orders: preOrder._id, proofOfPayment },
-			});
+			// await User.findByIdAndUpdate(userId, {
+			// 	$push: { orders: preOrder._id, proofOfPayment },
+			// });
 
-			console.log(preOrder);
+			// console.log(preOrder);
+			console.log(req.body);
 
 			res.status(201).json({ message: "Pre-order created!", preOrder });
 		} catch (error) {
@@ -462,37 +474,45 @@ const orderController = {
 		try {
 			const { orderId } = req.params;
 			const { reason } = req.body;
-	
+
 			// Validate input
 			if (!reason) {
-				return res.status(400).json({ message: "Please provide a valid reason for repair." });
+				return res
+					.status(400)
+					.json({ message: "Please provide a valid reason for repair." });
 			}
-	
+
 			// Find the order
-			const orderForRepair = await Order.findById(orderId).populate('user');
+			const orderForRepair = await Order.findById(orderId).populate("user");
 			if (!orderForRepair) {
 				return res.status(404).json({ message: "Order not found!" });
 			}
 
-			if(orderForRepair?.repairRequest?.status === "approved") return res.status(400).json({message:"Request for repair was accepted. Please wait for the Repairman"})
-	
+			if (orderForRepair?.repairRequest?.status === "approved")
+				return res
+					.status(400)
+					.json({
+						message:
+							"Request for repair was accepted. Please wait for the Repairman",
+					});
+
 			// Update repair request details
 			orderForRepair.repairRequest = {
 				requested: true,
 				reason: reason,
-				status: "pending"
+				status: "pending",
 			};
-	
+
 			await orderForRepair.save();
-	
-			res.status(201).json({ message: "Request for repair was successfully submitted." });
+
+			res
+				.status(201)
+				.json({ message: "Request for repair was successfully submitted." });
 		} catch (error) {
 			console.error("Error requesting for repair: ", error);
 			res.status(500).json({ message: "Server error!" });
 		}
-	}
-	
+	},
 };
-
 
 module.exports = orderController;

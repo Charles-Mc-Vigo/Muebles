@@ -205,7 +205,30 @@ const OrderDetails = () => {
 						<div className="bg-white border flex flex-col border-black-400 rounded-xl p-4 md:p-6 text-right gap-2">
 							<h1>Payment Option: {order.paymentOption}</h1>
 							<h1>Delivery Option: {order.deliveryMode}</h1>
-							<h1>Expected Delivery: {order.expectedDelivery}</h1>
+							{order.expectedDelivery && (
+								<h1>
+									Expected Delivery:{" "}
+									{order.expectedDelivery.startDate &&
+										new Date(
+											order.expectedDelivery.startDate
+										).toLocaleDateString("en-US", {
+											year: "numeric",
+											month: "long",
+											day: "numeric",
+										})}{" "}
+									-{" "}
+									{order.expectedDelivery.endDate &&
+										new Date(order.expectedDelivery.endDate).toLocaleDateString(
+											"en-US",
+											{
+												year: "numeric",
+												month: "long",
+												day: "numeric",
+											}
+										)}
+								</h1>
+							)}
+
 							<h1>Shipping Fee: ₱{order.shippingFee.toFixed(2)}</h1>
 							<div className="flex justify-end">
 								<p className="text-xl font-semibold mt-4 text-black-700 pr-2 pb-2">
@@ -247,13 +270,33 @@ const OrderDetails = () => {
 							</div>
 						</div>
 						<div className="bg-white border flex border-black-400 rounded-xl p-4 md:p-6 text-right gap-2">
-							<div className="flex flex-1">
-							</div>
+							<div className="flex flex-1"></div>
 							{order.paymentOption === "Full Payment" ? (
 								<div>
 									<h1>Payment Option: {order.paymentOption}</h1>
 									<h1>Delivery Option: {order.deliveryMode}</h1>
-									<h1>Expected Delivery: {order.expectedDelivery}</h1>
+									{order.expectedDelivery && (
+										<h1>
+											Expected Delivery:{" "}
+											{order.expectedDelivery.startDate &&
+												new Date(
+													order.expectedDelivery.startDate
+												).toLocaleDateString("en-US", {
+													year: "numeric",
+													month: "long",
+													day: "numeric",
+												})}{" "}
+											-{" "}
+											{order.expectedDelivery.endDate &&
+												new Date(
+													order.expectedDelivery.endDate
+												).toLocaleDateString("en-US", {
+													year: "numeric",
+													month: "long",
+													day: "numeric",
+												})}
+										</h1>
+									)}
 									<h1>Shipping Fee: ₱ {order.shippingFee.toFixed(2)}</h1>
 									<div className="flex justify-end">
 										<p className="text-xl font-semibold mt-4 text-black-700 pr-2 pb-2">
@@ -268,7 +311,28 @@ const OrderDetails = () => {
 								<div>
 									<h1>Payment Option: {order.paymentOption}</h1>
 									<h1>Delivery Option: {order.deliveryMode}</h1>
-									<h1>Expected Delivery: {order.expectedDelivery}</h1>
+									{order.expectedDelivery && (
+										<h1>
+											Expected Delivery:{" "}
+											{order.expectedDelivery.startDate &&
+												new Date(
+													order.expectedDelivery.startDate
+												).toLocaleDateString("en-US", {
+													year: "numeric",
+													month: "long",
+													day: "numeric",
+												})}{" "}
+											-{" "}
+											{order.expectedDelivery.endDate &&
+												new Date(
+													order.expectedDelivery.endDate
+												).toLocaleDateString("en-US", {
+													year: "numeric",
+													month: "long",
+													day: "numeric",
+												})}
+										</h1>
+									)}
 									<h1>Shipping Fee: ₱ {order.shippingFee}</h1>
 									<br />
 									<h1>
