@@ -339,8 +339,10 @@ const ViewUserOrder = () => {
 						</div>
 
 						<div className="overflow-x-auto">
+							<h1 className="text-xl py-2">Stocks Monitoring</h1>
+
 							{materials.length > 0 ? (
-								<table className="table-auto w-full border-collapse border border-gray-300">
+								<table className="table-auto w-full border-collapse border border-gray-300 mb-4">
 									<thead>
 										<tr className="bg-gray-200 text-gray-800">
 											<th className="border border-gray-300 px-4 py-2">
@@ -357,7 +359,11 @@ const ViewUserOrder = () => {
 												<td className="border border-gray-300 px-4 py-2">
 													{material.name}
 												</td>
-												<td className="border border-gray-300 px-4 py-2">
+												<td
+													className={`border border-gray-300 px-4 py-2 ${
+														material.stocks <= 3 ? "text-red-500 font-bold" : ""
+													}`}
+												>
 													{material.stocks}
 												</td>
 											</tr>
