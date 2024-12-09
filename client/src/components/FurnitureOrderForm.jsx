@@ -4,6 +4,7 @@ import Footer from "./Footer";
 
 const FurnitureOrderForm = () => {
   const [formData, setFormData] = useState({
+    admin: "",
     name: "",
     address: "",
     contact: "",
@@ -20,7 +21,38 @@ const FurnitureOrderForm = () => {
     referenceNo: "",
   });
 
+  const [admins, setAdmins] = useState([]);
+  const [profile, setProfile] = useState({
+    firstname: "",
+    lastname: "",
+  });
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(""); // State to handle error messages
+
+  // Fetch admins from the backend
+  useEffect(() => {
+    const fetchAdmins = async () => {
+      try {
+        const response = await fetch("http://localhost:3000/api/admin", {
+          method: "GET",
+          credentials: "include", // Ensure the admin token is sent with the request
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch admins");
+        }
+
+        const data = await response.json(); // Assuming the response contains an array of admins
+        setAdmins(data); // Store the list of admins
+      } catch (err) {
+        setError(err.message); // Set error if any
+      } finally {
+        setLoading(false); // Set loading to false after the request
+      }
+    };
+
+    fetchAdmins();
+  }, []);
 
   useEffect(() => {
     const today = new Date().toISOString().split("T")[0];
@@ -51,7 +83,6 @@ const FurnitureOrderForm = () => {
     formData.downPayment,
     formData.paymentType,
   ]);
-  
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -84,9 +115,9 @@ const FurnitureOrderForm = () => {
       const response = await fetch("http://localhost:3000/api/walk-in-orders", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json", 
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData), 
+        body: JSON.stringify(formData),
       });
       console.log("Response Status:", response.status);
       console.log("Response Body:", await response.text());
@@ -140,10 +171,50 @@ const FurnitureOrderForm = () => {
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label
+              htmlFor="admin"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Admin:
+            </label>
+            {loading ? (
+              <p>Loading admins...</p> // Show loading message
+            ) : error ? (
+              <p className="text-red-500">Error: {error}</p> // Show error message
+            ) : (
+              <select
+                id="admin"
+                name="admin"
+                value={formData.admin}
+                onChange={handleChange}
+                required
+                className="mt-1 block w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              >
+                <option value="" disabled>
+                  Select Admin
+                </option>
+                {admins.length > 0 ? (
+                  admins.map((admin) => {
+                    console.log(admin); // Log admin object structure
+                    return (
+                      <option key={admin._id} value={admin._id}>
+                        {`${admin.firstname || ""} `}{" "}
+                        {/* Fallback if names are undefined */}
+                      </option>
+                    );
+                  })
+                ) : (
+                  <option disabled>No admins available</option> // Handle case when no admins are available
+                )}
+              </select>
+            )}
+          </div>
+
+          <div className="mb-4">
+            <label
               htmlFor="name"
               className="block text-sm font-medium text-gray-700"
             >
-              Name:
+              CustomerName:
             </label>
             <input
               type="text"

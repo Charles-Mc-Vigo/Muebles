@@ -31,11 +31,13 @@
     "nodemailer": "^6.9.15",
     "nodemon": "^3.1.4",
     "pdfkit": "^0.15.1",
+    "react-csv": "^2.2.2",
     "react-select": "^5.8.3",
     "react-slider": "^2.0.6",
     "swiper": "^11.1.15",
     "tailwindcss": "^2.2.19",
-    "validator": "^13.12.0"
+    "validator": "^13.12.0",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "concurrently": "^9.0.1",

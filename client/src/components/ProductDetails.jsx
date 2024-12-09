@@ -21,8 +21,8 @@ function ProductDetails({ admin }) {
 	const [sizePrice, setSizePrice] = useState(null);
 	const [ECT, setECT] = useState(null);
 	const [activeTab, setActiveTab] = useState("description");
-	const [ratings, setRatings] = useState([]); // State for ratings
-	const [visibleRatings, setVisibleRatings] = useState(5); // Start with 5 ratings
+	const [ratings, setRatings] = useState([]); 
+	const [visibleRatings, setVisibleRatings] = useState(5); 
 
 
 	// console.log(price);

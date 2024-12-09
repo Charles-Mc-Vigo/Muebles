@@ -198,8 +198,6 @@ const orderController = {
 		}
 	},
 
-	
-
 	Orders: async (req, res) => {
 		try {
 			const orders = await Order.find();
