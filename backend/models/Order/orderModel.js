@@ -5,7 +5,6 @@ const orderSchema = new mongoose.Schema(
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: true,
     },
     furniture: {
       type: Object,
@@ -51,16 +50,16 @@ const orderSchema = new mongoose.Schema(
     },
     paymentOption: {
       type: String,
-      require: true,
+      // require: true,
     },
     paymentMethod: {
       type: String,
       enum: ["GCash", "Maya"],
-      required: true,
+      // required: true,
     },
     proofOfPayment: {
       type: String,
-      required: true,
+      // required: true,
     },
     orderStatus: {
       type: String,
@@ -136,13 +135,18 @@ const orderSchema = new mongoose.Schema(
     },
     type: {
       type: String,
-      enum: ["Cart", "Pre-Order"],
-      required: true,
+      enum: ["Cart", "Pre-Order","ImageUpload"],
+      // required: true,
     },
     isCustomization:{
       type:Boolean,
       default:false
-    }
+    },
+    designImages: {
+      type: [String],  // Support multiple image uploads
+      required: true,
+    },
+    
   },
   {
     timestamps: true,
@@ -193,6 +197,16 @@ orderSchema.methods.applyInterest = async function () {
     }
   }
 };
+
+orderSchema.statics.createImageUploadOrder = async function (user, designImages) {
+  const orderData = {
+    user,
+    designImages,
+    type: "ImageUpload",
+  };
+  return this.create(orderData);
+};
+
 
 orderSchema.statics.preOrder = async function (
   user,

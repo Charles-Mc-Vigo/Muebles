@@ -210,6 +210,36 @@ const orderController = {
 		}
 	},
 
+	// Inside your route handler or controller
+	createImageUploadOrder: async (req, res) => {
+		try {
+			const { userData, designImages } = req.body;
+	
+			if (!designImages || !Array.isArray(designImages) || designImages.length === 0) {
+				return res.status(400).json({ error: "Valid design image is required" });
+			}
+			
+	
+			// Find the user
+			const existingUser = await User.findById(userData._id);
+			if (!existingUser) {
+				return res.status(404).json({ message: "User not found!" });
+			}
+	
+			// Create the order
+			const order = await Order.createImageUploadOrder(
+				existingUser._id,
+				designImages
+			);
+	
+			res.status(201).json({ message: "Order created successfully", order });
+		} catch (error) {
+			console.error("Error creating image upload order:", error);
+			res.status(500).json({ message: "Error creating order", error: error.message });
+		}
+	},
+	
+
 	Orders: async (req, res) => {
 		try {
 			const orders = await Order.find();
@@ -489,12 +519,10 @@ const orderController = {
 			}
 
 			if (orderForRepair?.repairRequest?.status === "approved")
-				return res
-					.status(400)
-					.json({
-						message:
-							"Request for repair was accepted. Please wait for the Repairman",
-					});
+				return res.status(400).json({
+					message:
+						"Request for repair was accepted. Please wait for the Repairman",
+				});
 
 			// Update repair request details
 			orderForRepair.repairRequest = {

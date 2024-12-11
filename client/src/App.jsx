@@ -51,6 +51,7 @@ import SearchResults from "./components/SearchResults";
 import Repair from "./pages/Repair";
 import RepairRequest from "./components/RepairRequest";
 import FurnitureOrderForm from "./components/FurnitureOrderForm";
+import ImageUpload from "./pages/ImageUpload";
 // import LoadingSpinner from "./components/LoadingSpinner";
 
 export default function App() {
@@ -134,7 +135,7 @@ export default function App() {
 						path="/product-customization"
 						element={<ProtectedRoute element={ProductCustomization} />}
 					/>
-					{/* <Route path="/create-review" element={<CreateReview />} /> */}
+					<Route path="/upload-images-design" element={<ImageUpload />} />
 
 					{/* Admin routes */}
 					<Route path="/admin-login" element={<AdminLogin />} />

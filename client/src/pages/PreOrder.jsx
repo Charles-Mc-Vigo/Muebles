@@ -262,10 +262,6 @@ const PreOrder = () => {
 				throw new Error(response.message);
 			}
 			const data = await response.json();
-			// if (!data.ok) {
-			// 	alert(data.error);
-      //   return
-			// }
 			const orderId = data.preOrder._id;
 			navigate(`/order-details/${orderId}`);
 		} catch (error) {
