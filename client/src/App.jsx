@@ -52,6 +52,7 @@ import Repair from "./pages/Repair";
 import RepairRequest from "./components/RepairRequest";
 import FurnitureOrderForm from "./components/FurnitureOrderForm";
 import ImageUpload from "./pages/ImageUpload";
+import ImageUploadViewer from "./pages/ImageUploadViewer";
 // import LoadingSpinner from "./components/LoadingSpinner";
 
 export default function App() {
@@ -142,6 +143,13 @@ export default function App() {
 					<Route path="/generate-report" element={<GenerateReport />} />
 					<Route path="/admin-signup" element={<AdminSignUp />} />
 					<Route path="/admin-profile-view" element={<AdminProfile />} />
+					<Route
+						path="/upload-images-design/view/:orderId"
+						element={
+							<ProtectedRoute element={ImageUploadViewer} adminOnly={true} />
+						}
+						adminOnly={true}
+					/>
 					<Route
 						path="/admin-signup/verify-account/:adminId"
 						element={<AdminVerify />}

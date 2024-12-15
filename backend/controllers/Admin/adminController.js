@@ -484,6 +484,15 @@ exports.AcceptOrder = async (req, res) => {
 		const orderToAccept = await Order.findById(orderId);
 		if (!orderToAccept) return res.status(404).json({ message: "Order not found!" });
 
+		if(orderToAccept.type === "ImageUpload"){
+			orderToAccept.orderStatus = "confirmed";
+			orderToAccept.isConfirmed = true;
+			const orderUpdate = await orderToAccept.save();
+	
+			console.log("Order accepted successfully:", orderUpdate);
+			return res.status(200).json({ message: "Order was accepted", order: orderUpdate });
+		}
+
 		// Validate furniture type
 		const furnitureType = orderToAccept.furniture?.furnitureType;
 		if (!furnitureType) return res.status(404).json({ message: "Furniture type not found!" });
@@ -510,9 +519,9 @@ exports.AcceptOrder = async (req, res) => {
 
 		// Check and update stocks
 		const updatedStocks = materials.stocks - orderToAccept.quantity;
-		console.log("materials stocks", materials.stocks)
-		console.log("order quantity", orderToAccept.quantity)
-		console.log("Updated Stocks: ", updatedStocks);
+		// console.log("materials stocks", materials.stocks)
+		// console.log("order quantity", orderToAccept.quantity)
+		// console.log("Updated Stocks: ", updatedStocks);
 
 		if (updatedStocks <= 0) {
 			return res.status(400).json({ message: "Stocks too low" });

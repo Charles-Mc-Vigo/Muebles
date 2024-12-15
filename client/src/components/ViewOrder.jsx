@@ -21,6 +21,8 @@ const ViewOrder = () => {
 	const [loading, setLoading] = useState(false);
 	const [cancelLoading, setCancelLoading] = useState(null);
 	const [filter, setFilter] = useState("All"); // State for filter
+	const [selectedImage, setSelectedImage] = useState(null);
+
 	const navigate = useNavigate();
 
 	const fetchOrder = async () => {
@@ -317,7 +319,7 @@ const ViewOrder = () => {
 												</p>
 											</div>
 										</div>
-									) : (
+									) : order.type === "Cart" ? (
 										<div>
 											<div className=" rounded-lg p-4 mb-4">
 												<h3 className="font-medium text-gray-700 mb-4">
@@ -424,6 +426,125 @@ const ViewOrder = () => {
 												</p>
 											</div>
 										</div>
+									) : (
+										<>
+											<div>
+												<div className=" rounded-lg p-4 mb-4">
+													<h3 className="font-medium text-gray-700 mb-4">
+														<h1>{order.type === "ImageUpload" && "Type: From Image Upload"}</h1>
+														{order.orderStatus === "pending" && (
+															<div className="p-5 text-right bg-yellow-200">
+																<h1>Your order is being processed</h1>
+															</div>
+														)}
+														{order.orderStatus === "confirmed" && (
+															<div className="p-5 text-right bg-blue-200">
+																<h1>Your order is being processed</h1>
+															</div>
+														)}
+														{order.orderStatus === "out for delivery" && (
+															<div className="p-5 text-right bg-orange-200">
+																<h1>Your order is out for delivery</h1>
+															</div>
+														)}
+														{order.orderStatus === "delivered" && (
+															<div className="p-5 text-right bg-green-200">
+																<h1>Your order has been delivered</h1>
+															</div>
+														)}
+														{order.orderStatus === "failed to deliver" && (
+															<div className="p-5 text-right bg-gray-200">
+																<h1>Delivery attempt failed</h1>
+															</div>
+														)}
+														{order.orderStatus === "repaired" && (
+															<div className="p-5 text-right bg-pink-200">
+																<h1>Your order has been repaired</h1>
+															</div>
+														)}
+														{order.orderStatus === "cancelled" && (
+															<div className="p-5 text-right bg-red-200">
+																<h1>Order cancelled</h1>
+															</div>
+														)}
+													</h3>
+													<p>Payment: {order.paymentOption || "Not set"}</p>
+													<div className="space-y-4">
+														<div className="flex items-center space-x-4">
+															{order.designImages?.map((image, imgIndex) => (
+																<img
+																	key={imgIndex}
+																	src={`data:image/jpeg;base64,${image}`}
+																	className="w-20 h-20 object-cover rounded-lg"
+																	alt={`Order Image ${imgIndex}`}
+																	onClick={() => setSelectedImage(image)}
+																/>
+															))}
+															{selectedImage && (
+																<div className="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-50">
+																	<div className="relative">
+																		<img
+																			src={`data:image/jpeg;base64,${selectedImage}`}
+																			className="w-[80vw] h-[80vh] object-contain rounded-lg border-4 border-white shadow-2xl"
+																			alt="Selected Design"
+																		/>
+																		<button
+																			className="absolute top-4 right-4 text-white text-3xl font-bold"
+																			onClick={() => setSelectedImage(null)}
+																		>
+																			&times;
+																		</button>
+																	</div>
+																</div>
+															)}
+
+															<div className="flex-grow">
+																<div className="mt-2 space-y-1">
+																	<p className="text-sm text-gray-600">
+																		Quantity: {order.quantity || "Not set"}
+																	</p>
+																	<p className="text-sm text-gray-600">
+																		Price: PHP {order.totalAmount || "Not set"}
+																	</p>
+																	<p className="text-sm text-gray-600">
+																		Expected Delivery:{" "}
+																		{order.expectedDelivery || "Not set"}
+																	</p>
+																	<p className="text-sm text-gray-600">
+																		Delivery Mode:{" "}
+																		{order.deliveryMode || "Not set"}
+																	</p>
+																</div>
+															</div>
+														</div>
+													</div>
+												</div>
+												<div className="space-y-3">
+													<p className="text-gray-600">
+														Order placed on:{" "}
+														{new Date(order.createdAt).toLocaleDateString(
+															"en-US",
+															{
+																year: "numeric",
+																month: "long",
+																day: "numeric",
+															}
+														)}
+													</p>
+													<p className="text-gray-600">
+														Shipping Fee: PHP {order.shippingFee || "Not set"}
+													</p>
+													{order.paymentOption === "Partial Payment" && (
+														<p className="text-gray-600">
+															Remaining Balance: PHP {order.remainingBalance || "Not set"}
+														</p>
+													)}
+													<p className="text-xl font-bold text-gray-800">
+														Total: PHP {order.totalAmountWithShipping || "Not set"}
+													</p>
+												</div>
+											</div>
+										</>
 									)}
 									{/* Cancel Order Button or Confirm Delivery Button */}
 									<div className="flex justify-end mt-6">

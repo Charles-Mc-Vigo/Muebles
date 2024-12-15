@@ -81,8 +81,7 @@ const ImageUpload = () => {
         }
       );
   
-      const data = await response.json();
-  
+      const data = await response.json();  
       if (!response.ok) {
         throw new Error(data.error || "Error creating order");
       }
@@ -118,6 +117,7 @@ const ImageUpload = () => {
 					<input
 						type="file"
 						accept="image/*"
+						disabled = {submitted}
 						multiple
 						onChange={handleImageChange}
 						required

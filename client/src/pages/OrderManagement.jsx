@@ -169,16 +169,20 @@ const OrderManagement = () => {
 								<td className="py-3 px-4 border-b text-gray-600">
 									{order.paymentOption === "Full Payment"
 										? "Full Payment"
-										: "Partial Payment"}
+										: order.paymentOption === "Partial Payment"
+										? "Partial Payment"
+										: "Not set"}
 								</td>
 
 								{/* Payment Info: Total Payment and Remaining Balance */}
 								<td className="py-3 px-4 border-b text-gray-600">
 									{order.paymentOption === "Full Payment"
 										? `₱ ${order.totalAmountWithShipping}`
-										: `₱ ${
+										: order.paymentOption === "Partial Payment"
+										? `₱ ${
 												order.totalAmountWithShipping - order.remainingBalance
-										  } / ₱ ${order.remainingBalance}`}
+										  } / ₱ ${order.remainingBalance}`
+										: "Not set"}
 								</td>
 
 								<td className="py-3 px-4 border-b text-gray-600 flex space-x-2">

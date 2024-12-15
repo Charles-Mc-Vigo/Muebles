@@ -227,12 +227,16 @@ const orderController = {
 			}
 	
 			// Create the order
-			const order = await Order.createImageUploadOrder(
+			const imageUploadOrder = await Order.createImageUploadOrder(
 				existingUser._id,
 				designImages
 			);
+
+			await User.findByIdAndUpdate(existingUser._id, {
+				$push: { orders: imageUploadOrder._id },
+			});
 	
-			res.status(201).json({ message: "Order created successfully", order });
+			res.status(201).json({ message: "Order created successfully", imageUploadOrder });
 		} catch (error) {
 			console.error("Error creating image upload order:", error);
 			res.status(500).json({ message: "Error creating order", error: error.message });
@@ -242,7 +246,7 @@ const orderController = {
 
 	Orders: async (req, res) => {
 		try {
-			const orders = await Order.find();
+			const orders = await Order.find(req.query);
 			if (orders.length === 0)
 				return res.status(400).json({ message: "No orders found!" });
 
@@ -539,6 +543,29 @@ const orderController = {
 		} catch (error) {
 			console.error("Error requesting for repair: ", error);
 			res.status(500).json({ message: "Server error!" });
+		}
+	},
+
+	ImageUploadedOrder: async (req, res) => {
+		try {
+			const orders = await Order.find({type:"ImageUpload"});
+			if(orders.length === 0) return res.status(400).json({message:"No order found!"});
+			res.status(200).json(orders);
+		} catch (error) {
+			console.log("Error fetching uploaded image order :", error);
+			res.status(500).json({message:"Server error!"});
+		}
+	},
+
+	ImageUploadedOrderById: async (req, res) => {
+		try {
+			const {orderId} = req.params
+			const order = await Order.findById(orderId).populate("user");
+			if(!order) return res.status(404).json({message:"Order not found!"});
+			res.status(200).json(order);
+		} catch (error) {
+			console.log("Error fetching uploaded image order :", error);
+			res.status(500).json({message:"Server error!"});
 		}
 	},
 };
