@@ -12,6 +12,7 @@ const ViewUserOrder = () => {
 	const [loading, setLoading] = useState(false);
 	const [newStatus, setNewStatus] = useState(""); // State for new status
 	const [selectedImage, setSelectedImage] = useState(null);
+	const [price, setPrice] = useState(null);
 
 	const navigate = useNavigate();
 
@@ -105,29 +106,44 @@ const ViewUserOrder = () => {
 	}, [orderId]);
 
 	const handleAccept = async () => {
+		if (!price || isNaN(price) || price <= 0) {
+			toast.error("Please enter a valid price.");
+			return;
+		}
+	
 		try {
 			const response = await fetch(
 				`http://localhost:3000/api/admin/accept-order/${orderId}`,
 				{
-					method: "PUT",
+					method: "POST",
 					credentials: "include",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({ price }),
 				}
 			);
+	
 			if (!response.ok) {
 				const errorData = await response.json();
 				toast.error(errorData.message || "Failed to accept the order.");
 				return;
 			}
+	
+			const responseData = await response.json();
+			console.log("Order Response:", responseData);
 			toast.success("Order accepted successfully!");
+			setPrice("");
 			setTimeout(() => {
 				navigate("/dashboard");
 			}, 2000);
 			fetchOrder();
 		} catch (error) {
 			toast.error("An error occurred while accepting the order.");
-			console.log(error.message);
+			console.error("Error:", error.message);
 		}
 	};
+	
 
 	const handleCancel = async () => {
 		try {
@@ -377,6 +393,23 @@ const ViewUserOrder = () => {
 											</tr>
 										</tbody>
 									</table>
+									<div>
+										{order.totalAmount ? (
+											<p>Price : Php {order.totalAmount}</p>
+										) : (
+											<>
+												<p>Price not set</p>
+												<label htmlFor="price">Set Price</label>
+												<input
+													type="number"
+													id="price"
+													className="ml-2 p-2 border border-gray-300 rounded"
+													placeholder="Enter price"
+													onChange={(e) => setPrice(e.target.value)}
+												/>
+											</>
+										)}
+									</div>
 
 									{selectedImage && (
 										<div className="fixed inset-0 bg-black bg-opacity-75 flex justify-center items-center z-50">
@@ -403,9 +436,15 @@ const ViewUserOrder = () => {
 											>
 												Cancel
 											</button>
+
 											<button
 												onClick={handleAccept}
-												className="px-6 py-2 bg-green-500 text-white rounded-md hover:bg-green-600"
+												disabled={!price}
+												className={`px-6 py-2 text-white rounded-md ${
+													!price
+														? "bg-gray-400 cursor-not-allowed"
+														: "bg-green-500 hover:bg-green-600"
+												}`}
 											>
 												Accept
 											</button>

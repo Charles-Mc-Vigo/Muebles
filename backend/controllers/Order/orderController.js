@@ -213,36 +213,61 @@ const orderController = {
 	// Inside your route handler or controller
 	createImageUploadOrder: async (req, res) => {
 		try {
-			const { userData, designImages } = req.body;
-	
-			if (!designImages || !Array.isArray(designImages) || designImages.length === 0) {
-				return res.status(400).json({ error: "Valid design image is required" });
+			const {
+				userData,
+				designImages,
+				material,
+				paymentMethod,
+				quantity,
+				deliveryMode,
+			} = req.body;
+
+			if (
+				!designImages ||
+				!Array.isArray(designImages) ||
+				designImages.length === 0
+			) {
+				return res
+					.status(400)
+					.json({ error: "Valid design image is required" });
 			}
-			
-	
+
+			if (!material || !quantity || !paymentMethod || !deliveryMode) {
+				return res.status(400).json({ message: "All fields are required!" });
+			}
+
 			// Find the user
 			const existingUser = await User.findById(userData._id);
 			if (!existingUser) {
 				return res.status(404).json({ message: "User not found!" });
 			}
-	
+
 			// Create the order
 			const imageUploadOrder = await Order.createImageUploadOrder(
 				existingUser._id,
-				designImages
+				designImages,
+				material,
+				paymentMethod,
+				quantity,
+				deliveryMode
 			);
 
-			await User.findByIdAndUpdate(existingUser._id, {
-				$push: { orders: imageUploadOrder._id },
-			});
-	
-			res.status(201).json({ message: "Order created successfully", imageUploadOrder });
+			console.log("Data to be save: ", imageUploadOrder);
+
+			existingUser.orders.push(imageUploadOrder._id);
+			await existingUser.save();
+			await imageUploadOrder.save();
+
+			res
+				.status(201)
+				.json({ message: "Order created successfully", imageUploadOrder });
 		} catch (error) {
 			console.error("Error creating image upload order:", error);
-			res.status(500).json({ message: "Error creating order", error: error.message });
+			res
+				.status(500)
+				.json({ message: "Error creating order", error: error.message });
 		}
 	},
-	
 
 	Orders: async (req, res) => {
 		try {
@@ -548,24 +573,25 @@ const orderController = {
 
 	ImageUploadedOrder: async (req, res) => {
 		try {
-			const orders = await Order.find({type:"ImageUpload"});
-			if(orders.length === 0) return res.status(400).json({message:"No order found!"});
+			const orders = await Order.find({ type: "ImageUpload" });
+			if (orders.length === 0)
+				return res.status(400).json({ message: "No order found!" });
 			res.status(200).json(orders);
 		} catch (error) {
 			console.log("Error fetching uploaded image order :", error);
-			res.status(500).json({message:"Server error!"});
+			res.status(500).json({ message: "Server error!" });
 		}
 	},
 
 	ImageUploadedOrderById: async (req, res) => {
 		try {
-			const {orderId} = req.params
+			const { orderId } = req.params;
 			const order = await Order.findById(orderId).populate("user");
-			if(!order) return res.status(404).json({message:"Order not found!"});
+			if (!order) return res.status(404).json({ message: "Order not found!" });
 			res.status(200).json(order);
 		} catch (error) {
 			console.log("Error fetching uploaded image order :", error);
-			res.status(500).json({message:"Server error!"});
+			res.status(500).json({ message: "Server error!" });
 		}
 	},
 };

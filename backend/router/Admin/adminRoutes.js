@@ -26,7 +26,7 @@ router.post("/notifications/requesting-for-repair/approved/:orderId", checkAdmin
 router.get("/notifications/pending-request/:adminId", checkAdminAuth, ViewRequest);
 router.post("/notifications/accept-request/:adminId", checkAdminAuth, AcceptAdminRequest);
 router.post("/notifications/reject-request/:adminId", checkAdminAuth, RejectAdminRequest);
-router.put('/accept-order/:orderId',checkAdminAuth,AcceptOrder);
+router.post('/accept-order/:orderId',checkAdminAuth,AcceptOrder);
 router.put('/cancel-order/:orderId',checkAdminAuth,cancelOrder);
 
 router.get('/verified/:adminId', checkAdminAuth, getAdminById);

@@ -86,12 +86,10 @@ exports.AdminSignup = async (req, res) => {
 			$or: [{ email }, { phoneNumber }],
 		});
 		if (exisitingAdmin) {
-			return res
-				.status(400)
-				.json({
-					message:
-						"Your email or number is already exisiting. Please login your account!",
-				});
+			return res.status(400).json({
+				message:
+					"Your email or number is already exisiting. Please login your account!",
+			});
 		}
 
 		if (!validator.isMobilePhone(phoneNumber, "en-PH")) {
@@ -147,13 +145,11 @@ exports.AdminSignup = async (req, res) => {
 		});
 
 		await newAdmin.save();
-		res
-			.status(201)
-			.json({
-				message:
-					"Your account has been created successfully. Please check your email to verify your account.",
-				newAdmin,
-			});
+		res.status(201).json({
+			message:
+				"Your account has been created successfully. Please check your email to verify your account.",
+			newAdmin,
+		});
 		// console.log("New admin created: ",newAdmin)
 	} catch (error) {
 		console.log(error);
@@ -210,12 +206,10 @@ exports.verifyEmail = async (req, res) => {
 
 		await admin.save();
 
-		res
-			.status(200)
-			.json({
-				message:
-					"Your account was successfully verified! However, the Admin Manager must first accept your request to proceed.",
-			});
+		res.status(200).json({
+			message:
+				"Your account was successfully verified! However, the Admin Manager must first accept your request to proceed.",
+		});
 	} catch (err) {
 		console.error("Email verification error:", err);
 		res.status(500).json({ message: "Server error!" });
@@ -244,7 +238,7 @@ exports.getAdminById = async (req, res) => {
 	}
 };
 
-exports.RejectAdminRequest = async (req,res) => {
+exports.RejectAdminRequest = async (req, res) => {
 	try {
 		const admin = await Admin.findById(req.admin._id);
 
@@ -256,21 +250,22 @@ exports.RejectAdminRequest = async (req,res) => {
 				.status(400)
 				.json({ message: "Action denied: Admin Manager only!" });
 		}
-		
-		const {adminId} = req.params;
+
+		const { adminId } = req.params;
 		const adminToReject = await Admin.findById(adminId);
 
-		if(!adminToReject) return res.status(404).json({message:"Admin not found!"});
+		if (!adminToReject)
+			return res.status(404).json({ message: "Admin not found!" });
 
 		adminToReject.adminApproval = "Rejected";
 
 		await adminToReject.save();
-		res.status(200).json({message:"Admin was rejected!"})
+		res.status(200).json({ message: "Admin was rejected!" });
 	} catch (error) {
 		console.error("Error rejecting request: ", error);
-		res.status(500).json({message:"Server error!"});
+		res.status(500).json({ message: "Server error!" });
 	}
-}
+};
 
 // Manager power
 exports.AcceptAdminRequest = async (req, res) => {
@@ -470,79 +465,89 @@ exports.myProfile = async (req, res) => {
 //accept order
 //accept order
 exports.AcceptOrder = async (req, res) => {
-	try {
-		// Validate Admin Role
-		const admin = await Admin.findById(req.admin._id);
-		if (!admin) return res.status(404).json({ message: "Admin not found!" });
+  try {
+    // Validate Admin Role
+    const admin = await Admin.findById(req.admin._id);
+    if (!admin) return res.status(404).json({ message: "Admin not found!" });
 
-		if (admin.role !== "Manager" && admin.role !== "Admin") {
-			return res.status(403).json({ message: "Action denied: Admin and Manager only!" });
-		}
+    if (!["Manager", "Admin"].includes(admin.role)) {
+      return res.status(403).json({ message: "Action denied: Admin and Manager only!" });
+    }
 
-		// Find the order
-		const { orderId } = req.params;
-		const orderToAccept = await Order.findById(orderId);
-		if (!orderToAccept) return res.status(404).json({ message: "Order not found!" });
+    // Find the order
+    const { orderId } = req.params;
+    const { price } = req.body;
+    const orderToAccept = await Order.findById(orderId);
 
-		if(orderToAccept.type === "ImageUpload"){
-			orderToAccept.orderStatus = "confirmed";
-			orderToAccept.isConfirmed = true;
-			const orderUpdate = await orderToAccept.save();
-	
-			console.log("Order accepted successfully:", orderUpdate);
-			return res.status(200).json({ message: "Order was accepted", order: orderUpdate });
-		}
+    if (!orderToAccept) {
+      return res.status(404).json({ message: "Order not found!" });
+    }
 
-		// Validate furniture type
-		const furnitureType = orderToAccept.furniture?.furnitureType;
-		if (!furnitureType) return res.status(404).json({ message: "Furniture type not found!" });
+    // Handle ImageUpload Order
+    if (orderToAccept.type === "ImageUpload") {
+      if (!price || isNaN(price) || price <= 0) {
+        return res.status(400).json({ message: "A valid price is required!" });
+      }
 
-		const selectedFurnitureType = await FurnitureType.findById(furnitureType);
-		if (!selectedFurnitureType) {
-			return res.status(404).json({ message: "Selected furniture type not found!" });
-		}
-		console.log("Selected furniture type: ", selectedFurnitureType.name);
+      orderToAccept.orderStatus = "confirmed";
+      orderToAccept.isConfirmed = true;
+      orderToAccept.totalAmount = price;
+      const orderUpdate = await orderToAccept.save();
 
+      console.log("Order accepted successfully:", orderUpdate);
+      return res.status(200).json({ message: "Order accepted successfully!", order: orderUpdate });
+    }
 
-		// Find selected material
-		const selectedMaterial = orderToAccept.material;
-		if (!selectedMaterial) {
-			return res.status(404).json({ message: "Selected material not found!" });
-		}
-		console.log("Selected Material: ", selectedMaterial);
+    // Validate Furniture and Material
+    await validateFurnitureAndMaterial(orderToAccept);
 
-		const materials = await Materials.findOne({ name: selectedMaterial, furnitureTypeId:furnitureType });
-		if (!materials) {
-			return res.status(404).json({ message: "Material not found!" });
-		}
-		console.log("Material ID: ", materials._id);
+    // Confirm the order
+    orderToAccept.orderStatus = "confirmed";
+    orderToAccept.isConfirmed = true;
+    const orderUpdate = await orderToAccept.save();
 
-		// Check and update stocks
-		const updatedStocks = materials.stocks - orderToAccept.quantity;
-		// console.log("materials stocks", materials.stocks)
-		// console.log("order quantity", orderToAccept.quantity)
-		// console.log("Updated Stocks: ", updatedStocks);
-
-		if (updatedStocks <= 0) {
-			return res.status(400).json({ message: "Stocks too low" });
-		}
-
-		await Materials.findByIdAndUpdate(materials._id, { stocks: updatedStocks });
-		console.log(`Materials updated: ${materials.name}, New Stocks: ${updatedStocks}`);
-
-		// Confirm the order
-		orderToAccept.orderStatus = "confirmed";
-		orderToAccept.isConfirmed = true;
-		const orderUpdate = await orderToAccept.save();
-
-		console.log("Order accepted successfully:", orderUpdate);
-		return res.status(200).json({ message: "Order was accepted", order: orderUpdate });
-
-	} catch (error) {
-		console.error("Error accepting the order: ", error);
-		res.status(500).json({ message: "Server error!" });
-	}
+    console.log("Order accepted successfully:", orderUpdate);
+    return res.status(200).json({ message: "Order accepted successfully!", order: orderUpdate });
+  } catch (error) {
+    console.error("Error accepting the order:", error);
+    res.status(500).json({ message: "Server error!" });
+  }
 };
+
+// Validate Furniture and Material
+async function validateFurnitureAndMaterial(order) {
+  const furnitureType = order.furniture?.furnitureType;
+  if (!furnitureType) {
+    throw new Error("Furniture type not found!");
+  }
+
+  const selectedFurnitureType = await FurnitureType.findById(furnitureType);
+  if (!selectedFurnitureType) {
+    throw new Error("Selected furniture type not found!");
+  }
+
+  const selectedMaterial = order.material;
+  if (!selectedMaterial) {
+    throw new Error("Selected material not found!");
+  }
+
+  const materials = await Materials.findOne({
+    name: selectedMaterial,
+    furnitureTypeId: furnitureType,
+  });
+
+  if (!materials) {
+    throw new Error("Material not found!");
+  }
+
+  const updatedStocks = materials.stocks - order.quantity;
+  if (updatedStocks < 0) {
+    throw new Error("Stocks too low!");
+  }
+
+  await Materials.findByIdAndUpdate(materials._id, { stocks: updatedStocks });
+  console.log(`Materials updated: ${materials.name}, New Stocks: ${updatedStocks}`);
+}
 
 
 exports.cancelOrder = async (req, res) => {
@@ -562,8 +567,9 @@ exports.cancelOrder = async (req, res) => {
 
 		const orderToAccept = await Order.findById(orderId);
 
-		if (!orderToAccept) return res.status(404).json({ message: "Order not found!" });
-		
+		if (!orderToAccept)
+			return res.status(404).json({ message: "Order not found!" });
+
 		orderToAccept.orderStatus = "cancelled";
 		const orderUpdate = await orderToAccept.save();
 		res.status(200).json({ message: "Order was cancelled", orderUpdate });
@@ -574,22 +580,22 @@ exports.cancelOrder = async (req, res) => {
 };
 
 //get order by id
-exports.getOrderId = async (req,res) => {
+exports.getOrderId = async (req, res) => {
 	try {
-		const {orderId} = req.params;
+		const { orderId } = req.params;
 		const exisitingOrder = await Order.findById(orderId)
-		.populate('user')
-		.populate('items.furniture',"name images price");
+			.populate("user")
+			.populate("items.furniture", "name images price");
 
-
-		if(!exisitingOrder) return res.status(404).json({error:"Order not found!"});
+		if (!exisitingOrder)
+			return res.status(404).json({ error: "Order not found!" });
 
 		res.status(200).json(exisitingOrder);
 	} catch (error) {
 		console.error("Error in getting order id :", error);
-		res.status(500).json({message:"Server error!"});
+		res.status(500).json({ message: "Server error!" });
 	}
-}
+};
 
 //view all pending order
 exports.viewPendingOrder = async (req, res) => {
@@ -605,110 +611,116 @@ exports.viewPendingOrder = async (req, res) => {
 	}
 };
 
-exports.ViewRequest = async (req,res) => {
+exports.ViewRequest = async (req, res) => {
 	try {
-		const {adminId} = req.params;
+		const { adminId } = req.params;
 		const requestingAdmin = await Admin.findById(adminId);
 
-		if(!requestingAdmin) return res.status(404).json({message: "Admin not found!"});
+		if (!requestingAdmin)
+			return res.status(404).json({ message: "Admin not found!" });
 
 		res.status(200).json(requestingAdmin);
 	} catch (error) {
-		console.error("Error viewing the request: ",error);
-		res.status(500).json({message:"Server error!"});
+		console.error("Error viewing the request: ", error);
+		res.status(500).json({ message: "Server error!" });
 	}
-}
+};
 
 // Fetch all orders with repair requests
 exports.requestingForRepair = async (req, res) => {
-  try {
-    const repairRequests = await Order.find({ "repairRequest.status": "pending" }).populate("user");
-    res.status(200).json(repairRequests);
-  } catch (error) {
-    console.log("Error fetching repair requests:", error);
-    res.status(500).json({ message: "Server error!" });
-  }
+	try {
+		const repairRequests = await Order.find({
+			"repairRequest.status": "pending",
+		}).populate("user");
+		res.status(200).json(repairRequests);
+	} catch (error) {
+		console.log("Error fetching repair requests:", error);
+		res.status(500).json({ message: "Server error!" });
+	}
 };
-
 
 // Approve a specific repair request
 exports.approvedRepairRequest = async (req, res) => {
-  try {
-    const { orderId } = req.params;
+	try {
+		const { orderId } = req.params;
 
-    // Find the order
-    const orderToApprove = await Order.findById(orderId);
-    if (!orderToApprove) {
-      return res.status(404).json({ message: "Order not found!" });
-    }
+		// Find the order
+		const orderToApprove = await Order.findById(orderId);
+		if (!orderToApprove) {
+			return res.status(404).json({ message: "Order not found!" });
+		}
 
-    // Check if repair was requested
-    if (!orderToApprove.repairRequest?.requested) {
-      return res.status(400).json({ message: "No repair request found for this order." });
-    }
+		// Check if repair was requested
+		if (!orderToApprove.repairRequest?.requested) {
+			return res
+				.status(400)
+				.json({ message: "No repair request found for this order." });
+		}
 
-    // Approve the repair request
-    orderToApprove.repairRequest.status = "approved";
-    orderToApprove.repairRequest.requested = false;
-    await orderToApprove.save();
+		// Approve the repair request
+		orderToApprove.repairRequest.status = "approved";
+		orderToApprove.repairRequest.requested = false;
+		await orderToApprove.save();
 
-    res.status(200).json({ message: "Repair request approved successfully." });
-  } catch (error) {
-    console.log("Error approving repair request:", error);
-    res.status(500).json({ message: "Server error!" });
-  }
+		res.status(200).json({ message: "Repair request approved successfully." });
+	} catch (error) {
+		console.log("Error approving repair request:", error);
+		res.status(500).json({ message: "Server error!" });
+	}
 };
 
 exports.updateRepairStatus = async (req, res) => {
-  try {
-    const { orderId } = req.params;
+	try {
+		const { orderId } = req.params;
 
-    // Find the order
-    const orderToUpdate = await Order.findById(orderId);
-    if (!orderToUpdate) {
-      return res.status(404).json({ message: "Order not found!" });
-    }
+		// Find the order
+		const orderToUpdate = await Order.findById(orderId);
+		if (!orderToUpdate) {
+			return res.status(404).json({ message: "Order not found!" });
+		}
 
-    // Check if repair was requested
-    if (!orderToUpdate.repairRequest?.requested) {
-      return res.status(400).json({ message: "No repair request found for this order." });
-    }
+		// Check if repair was requested
+		if (!orderToUpdate.repairRequest?.requested) {
+			return res
+				.status(400)
+				.json({ message: "No repair request found for this order." });
+		}
 
-    // Approve the repair request
-    orderToUpdate.repairRequest.status = "completed";
-    orderToUpdate.repairRequest.requested = false;
-    await orderToUpdate.save();
+		// Approve the repair request
+		orderToUpdate.repairRequest.status = "completed";
+		orderToUpdate.repairRequest.requested = false;
+		await orderToUpdate.save();
 
-    res.status(200).json({ message: "Repair status was updated successfully." });
-  } catch (error) {
-    console.log("Error approving repair request:", error);
-    res.status(500).json({ message: "Server error!" });
-  }
+		res
+			.status(200)
+			.json({ message: "Repair status was updated successfully." });
+	} catch (error) {
+		console.log("Error approving repair request:", error);
+		res.status(500).json({ message: "Server error!" });
+	}
 };
-
-
 
 // view a specific repair request
 exports.viewRepairRequest = async (req, res) => {
-  try {
-    const { orderId } = req.params;
+	try {
+		const { orderId } = req.params;
 
-    // Find the order
-    const order = await Order.findById(orderId).populate('user');
-    if (!order) {
-      return res.status(404).json({ message: "Order not found!" });
-    }
+		// Find the order
+		const order = await Order.findById(orderId).populate("user");
+		if (!order) {
+			return res.status(404).json({ message: "Order not found!" });
+		}
 
-    // Check if repair was requested
-    if (!order.repairRequest?.requested) {
-      return res.status(400).json({ message: "No repair request found for this order." });
-    }
+		// Check if repair was requested
+		if (!order.repairRequest?.requested) {
+			return res
+				.status(400)
+				.json({ message: "No repair request found for this order." });
+		}
 
-    res.status(200).json(order);
-  } catch (error) {
-    console.log("Error viewing repair request:", error);
-    res.status(500).json({ message: "Server error!" });
-  }
+		res.status(200).json(order);
+	} catch (error) {
+		console.log("Error viewing repair request:", error);
+		res.status(500).json({ message: "Server error!" });
+	}
 };
-
-

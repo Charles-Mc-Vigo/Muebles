@@ -539,8 +539,8 @@ const ViewOrder = () => {
 															Remaining Balance: PHP {order.remainingBalance || "Not set"}
 														</p>
 													)}
-													<p className="text-xl font-bold text-gray-800">
-														Total: PHP {order.totalAmountWithShipping || "Not set"}
+													<p className="text-xl font-bold text-gray-800 text-right">
+														Total: PHP {order.totalAmount || "Not set"}
 													</p>
 												</div>
 											</div>

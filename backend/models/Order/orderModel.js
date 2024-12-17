@@ -82,6 +82,7 @@ const orderSchema = new mongoose.Schema(
     },
     totalAmount: {
       type: Number,
+      default:0 
     },
     shippingFee: {
       type: Number,
@@ -198,14 +199,26 @@ orderSchema.methods.applyInterest = async function () {
   }
 };
 
-orderSchema.statics.createImageUploadOrder = async function (user, designImages) {
+orderSchema.statics.createImageUploadOrder = async function (user, designImages, material, paymentMethod, quantity, deliveryMode, additionalData = {}) {
+
   const orderData = {
     user,
     designImages,
+    material,
+    paymentMethod, // Correctly set the payment method
+    quantity,  // Ensure quantity is correctly set as a number
+    deliveryMode,
     type: "ImageUpload",
+    ...additionalData, 
   };
-  return this.create(orderData);
+
+  // Create and save the order
+  const newOrder = new this(orderData);
+  await newOrder.save();
+  return newOrder;
 };
+
+
 
 
 orderSchema.statics.preOrder = async function (
