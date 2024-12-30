@@ -431,7 +431,10 @@ const ViewOrder = () => {
 											<div>
 												<div className=" rounded-lg p-4 mb-4">
 													<h3 className="font-medium text-gray-700 mb-4">
-														<h1>{order.type === "ImageUpload" && "Type: From Image Upload"}</h1>
+														<h1>
+															{order.type === "ImageUpload" &&
+																"Type: From Image Upload"}
+														</h1>
 														{order.orderStatus === "pending" && (
 															<div className="p-5 text-right bg-yellow-200">
 																<h1>Your order is being processed</h1>
@@ -507,10 +510,6 @@ const ViewOrder = () => {
 																		Price: PHP {order.totalAmount || "Not set"}
 																	</p>
 																	<p className="text-sm text-gray-600">
-																		Expected Delivery:{" "}
-																		{order.expectedDelivery || "Not set"}
-																	</p>
-																	<p className="text-sm text-gray-600">
 																		Delivery Mode:{" "}
 																		{order.deliveryMode || "Not set"}
 																	</p>
@@ -536,12 +535,31 @@ const ViewOrder = () => {
 													</p>
 													{order.paymentOption === "Partial Payment" && (
 														<p className="text-gray-600">
-															Remaining Balance: PHP {order.remainingBalance || "Not set"}
+															Remaining Balance: PHP{" "}
+															{order.remainingBalance || "Not set"}
 														</p>
 													)}
 													<p className="text-xl font-bold text-gray-800 text-right">
 														Total: PHP {order.totalAmount || "Not set"}
 													</p>
+
+													{order.totalAmount !== 0 && (
+														<>
+															<button
+																className="px-6 py-2 rounded-lg bg-blue-200 text-blue-600 hover:bg-blue-600 hover:text-white disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed"
+																onClick={() =>
+																	navigate(
+																		`/upload-images-design/view/${order._id}`
+																	)
+																}
+																disabled={
+																	order.imageUploadOrderStatus === "settled"
+																}
+															>
+																{order.imageUploadOrderStatus === "settled" ? "Order was settled successfully" : "Review order"}
+															</button>
+														</>
+													)}
 												</div>
 											</div>
 										</>

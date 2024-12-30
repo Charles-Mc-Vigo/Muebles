@@ -61,6 +61,9 @@ const orderSchema = new mongoose.Schema(
       type: String,
       // required: true,
     },
+    referenceNumber:{
+      type:String
+    },
     orderStatus: {
       type: String,
       enum: ["pending", "confirmed", "delivered", "cancelled", "out for delivery", "repaired", "failed delivery"],
@@ -76,6 +79,10 @@ const orderSchema = new mongoose.Schema(
       endDate: {
         type: Date,
       },
+    },
+    imageUploadOrderStatus:{
+      type: String,
+      default:"not set"
     },
     subtotal: {
       type: Number,
@@ -199,13 +206,12 @@ orderSchema.methods.applyInterest = async function () {
   }
 };
 
-orderSchema.statics.createImageUploadOrder = async function (user, designImages, material, paymentMethod, quantity, deliveryMode, additionalData = {}) {
+orderSchema.statics.createImageUploadOrder = async function (user, designImages, material, quantity, deliveryMode, additionalData = {}) {
 
   const orderData = {
     user,
     designImages,
     material,
-    paymentMethod, // Correctly set the payment method
     quantity,  // Ensure quantity is correctly set as a number
     deliveryMode,
     type: "ImageUpload",

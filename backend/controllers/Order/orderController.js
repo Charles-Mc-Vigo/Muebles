@@ -217,7 +217,6 @@ const orderController = {
 				userData,
 				designImages,
 				material,
-				paymentMethod,
 				quantity,
 				deliveryMode,
 			} = req.body;
@@ -232,7 +231,7 @@ const orderController = {
 					.json({ error: "Valid design image is required" });
 			}
 
-			if (!material || !quantity || !paymentMethod || !deliveryMode) {
+			if (!material || !quantity || !deliveryMode) {
 				return res.status(400).json({ message: "All fields are required!" });
 			}
 
@@ -247,7 +246,6 @@ const orderController = {
 				existingUser._id,
 				designImages,
 				material,
-				paymentMethod,
 				quantity,
 				deliveryMode
 			);
@@ -588,6 +586,61 @@ const orderController = {
 			const { orderId } = req.params;
 			const order = await Order.findById(orderId).populate("user");
 			if (!order) return res.status(404).json({ message: "Order not found!" });
+			res.status(200).json(order);
+		} catch (error) {
+			console.log("Error fetching uploaded image order :", error);
+			res.status(500).json({ message: "Server error!" });
+		}
+	},
+
+	ContinueImageOrder: async (req, res) => {
+		try {
+			const { orderId } = req.params;
+			const order = await Order.findById(orderId).populate("user");
+
+			if (!order) return res.status(404).json({ message: "Order not found!" });
+
+			const proofOfPayment = req.file.buffer.toString("base64");
+
+
+			// Retrieve the payment details from the request body
+			const {
+				paymentOption,
+				paymentMethod,
+				referenceNumber,
+				payment,
+			} = req.body;
+
+			// Check if all necessary payment details are provided
+			if (
+				!paymentOption ||
+				!paymentMethod ||
+				!referenceNumber ||
+				!payment
+			) {
+				return res
+					.status(400)
+					.json({ message: "Please provide all payment details!" });
+			}
+
+			if (parseFloat(payment) !== parseFloat(order.totalAmount)) {
+				return res.status(400).json({ message: "Payment does not match!" });
+			}
+			
+
+			// Update the order with the payment details
+			order.paymentOption = paymentOption;
+			order.paymentMethod = paymentMethod;
+			order.referenceNumber = referenceNumber;
+			order.isPaid = true;
+			order.imageUploadOrderStatus = "settled"
+			// Assuming you save the proof of payment to a file path or as a URL, update accordingly
+			order.proofOfPayment = proofOfPayment; // You can save the file URL or path if needed
+
+			// Save the updated order
+			await order.save();
+
+			// Send the updated order back in the response
 			res.status(200).json(order);
 		} catch (error) {
 			console.log("Error fetching uploaded image order :", error);

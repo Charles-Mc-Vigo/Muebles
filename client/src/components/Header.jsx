@@ -98,7 +98,7 @@ const Header = ({ isLogin }) => {
           <div className="flex items-center justify-between gap-8">
             {/* Logo */}
             <Link
-              to="/"
+              to="/home"
               className="text-3xl font-bold text-teal-600 whitespace-nowrap"
             >
               MUEBLES

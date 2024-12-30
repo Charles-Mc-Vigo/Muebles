@@ -119,6 +119,11 @@ export default function App() {
 					/>
 
 					<Route
+						path="/upload-images-design/view/:orderId"
+						element={<ProtectedRoute element={ImageUploadViewer} />}
+					/>
+
+					<Route
 						path="/pre-order/:furnitureId"
 						element={<ProtectedRoute element={PreOrder} />}
 					/>
@@ -143,13 +148,7 @@ export default function App() {
 					<Route path="/generate-report" element={<GenerateReport />} />
 					<Route path="/admin-signup" element={<AdminSignUp />} />
 					<Route path="/admin-profile-view" element={<AdminProfile />} />
-					<Route
-						path="/upload-images-design/view/:orderId"
-						element={
-							<ProtectedRoute element={ImageUploadViewer} adminOnly={true} />
-						}
-						adminOnly={true}
-					/>
+
 					<Route
 						path="/admin-signup/verify-account/:adminId"
 						element={<AdminVerify />}

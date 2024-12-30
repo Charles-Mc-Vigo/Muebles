@@ -8,7 +8,6 @@ const ImageUpload = () => {
 	const [submitted, setSubmitted] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const [material, setMaterial] = useState(""); // Material state
-	const [paymentMethod, setPaymentMethod] = useState("");
 	const [quantity, setQuantity] = useState(1); // Default quantity is 1
 	const [deliveryMode, setDeliveryMode] = useState(""); // Changed from deliveryOption to deliveryMode
 
@@ -78,12 +77,6 @@ const ImageUpload = () => {
         return;
     }
 
-    if (!paymentMethod) {
-        setError("Please select a payment method");
-        setLoading(false);
-        return;
-    }
-
     if (!deliveryMode) {
         setError("Please select a delivery mode");
         setLoading(false);
@@ -95,7 +88,6 @@ const ImageUpload = () => {
     formData.append("designImages", JSON.stringify(images));
     formData.append("userData", JSON.stringify(userData));
     formData.append("material", material);
-    formData.append("paymentMethod", paymentMethod);
     formData.append("quantity", quantity); // Use the properly validated number
     formData.append("deliveryMode", deliveryMode);
 
@@ -112,7 +104,6 @@ const ImageUpload = () => {
                     designImages: images,
                     userData,
                     material,
-                    paymentMethod,
                     quantity,
                     deliveryMode,
                 }),
@@ -183,17 +174,6 @@ const decreaseQuantity = () => {
 						<option value="Narra">Narra</option>
 						<option value="Acacia">Acacia</option>
 						<option value="Mahogany">Mahogany</option>
-					</select>
-
-					<select
-						value={paymentMethod}
-						onChange={(e) => setPaymentMethod(e.target.value)}
-						required
-						className="block w-full text-lg py-3 px-4 border rounded-md"
-					>
-						<option value="">Select Payment Method</option>
-						<option value="GCash">Gcash</option>
-						<option value="Maya">Maya</option>
 					</select>
 
 					<div className="flex items-center justify-between">
