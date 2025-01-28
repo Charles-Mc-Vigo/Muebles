@@ -539,7 +539,6 @@ const PreOrder = () => {
 							</div>
 
 							{/* Sizes Section */}
-							{/* Sizes Section */}
 							<div className="flex flex-col">
 								<h2 className="flex justify-between font-semibold mb-2">
 									Sizes{" "}
@@ -628,68 +627,51 @@ const PreOrder = () => {
 											in payments.
 										</label>
 										<div className="p-5 bg-gray-100 rounded mb-5">
-											{/* payable amount dito */}
 											<div className="mt-5">
-												{paymentOption === "Partial Payment" ? (
-													<div>
-														<div className="flex justify-between">
-															<h3 className="font-semibold">
-																Partial Payment (50%):
-															</h3>
-															<p>₱ {partialPayment}</p>
-														</div>
-														<div className="flex justify-between">
-															<h3 className="font-semibold">
-																Remaining Balance:
-															</h3>
-															<p>₱ {remainingBalance || 0}</p>
-														</div>
-														<div className="flex justify-between">
-															<h3 className="font-semibold">
-																Monthly Installment for 3 months:
-															</h3>
-															<p>₱ {montlyInstallment || 0}</p>
-														</div>
-													</div>
-												) : (
-													<div className="flex justify-between">
-														<h3 className="text-lg font-semibold">
-															Total Payment:
-														</h3>
-														<p className="font-bold">
-															PHP {totalAmountWithShippingFee}
-														</p>
-													</div>
-												)}
-											</div>
-											{/* calculation payment */}
-											<div className="mt-5 border border-green-600 p-5">
-												<h1 className="font-semibold mb-2">Payment Details</h1>
-												<div className="font-normal">
-													<div className="flex justify-between">
-														<span>Material Price:</span>
-														<span>₱ {materialPrice || 0}</span>
-													</div>
-													<div className="flex justify-between">
-														<span>Size Price :</span>
-														<span>₱ {sizePrice || 0}</span>
-													</div>
-													<div className="flex justify-between">
-														<span>Subtotal :</span>
-														<span>₱ {subtotal || 0}</span>
-													</div>
-													<div className="flex justify-between mt-5">
-														<span>Shipping Fee:</span>
-														<span>₱ {shippingFee.toFixed(2)}</span>
-													</div>
-													<div className="flex justify-between">
-														<span>Total Amount :</span>
-														<span>₱ {totalAmountWithShippingFee || 0}</span>
-													</div>
+												<div className="flex justify-between">
+													<h3 className="font-semibold">
+														Partial Payment (50%):
+													</h3>
+													<p>₱ {partialPayment}</p>
+												</div>
+												<div className="flex justify-between">
+													<h3 className="font-semibold">Remaining Balance:</h3>
+													<p>₱ {remainingBalance || 0}</p>
+												</div>
+												<div className="flex justify-between">
+													<h3 className="font-semibold">
+														Monthly Installment for 3 months:
+													</h3>
+													<p>₱ {montlyInstallment || 0}</p>
 												</div>
 											</div>
 										</div>
 									</>
+								)}
+
+								{/* Full Payment Option */}
+								{paymentOption === "Full Payment" && (
+									<div className="p-5 bg-gray-100 rounded mb-5">
+										<h3 className="font-semibold mb-2">
+											Full Payment Details:
+										</h3>
+										<div className="flex justify-between">
+											<span>Material Price:</span>
+											<span>₱ {materialPrice || 0}</span>
+										</div>
+										<div className="flex justify-between">
+											<span>Size Price:</span>
+											<span>₱ {sizePrice || 0}</span>
+										</div>
+										<div className="flex justify-between">
+											<span>Subtotal:</span>
+											<span>₱ {subtotal || 0}</span>
+										</div>
+										<div className="flex justify-between">
+											<span>Total Amount:</span>
+											<span>₱ {totalAmount || 0}</span>
+										</div>
+									</div>
 								)}
 
 								{paymentOption === "Full Payment" && (
@@ -827,6 +809,24 @@ const PreOrder = () => {
 								)}
 							</div>
 						)}
+					</div>
+
+					{/* reference number and totalAmount */}
+					<div className="mt-5 mb-5">
+						<div>
+							<h1>Reference Number</h1>
+							<input
+								type="number"
+								className="py-2 px-4 bg-slate-100 rounded-md"
+							/>
+						</div>
+						<div>
+							<h1>Amount Paid</h1>
+							<input
+								type="number"
+								className="py-2 px-4 bg-slate-100 rounded-md"
+							/>
+						</div>
 					</div>
 
 					{/* Delivery Option */}

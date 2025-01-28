@@ -76,7 +76,7 @@ const Cart = () => {
 				setCount(data.cart.count);
 				setTotalAmount(data.cart.totalAmount);
 				setUser(data.cart.userId);
-				console.log(data.cart.userId)
+				console.log(data.cart.userId);
 				const defaultAddress = data.cart.userId.addresses?.find(
 					(address) => address.isDefault
 				);
@@ -103,29 +103,33 @@ const Cart = () => {
 	}, []);
 
 	useEffect(() => {
-    if (user?.addresses?.length > 0 && selectedAddress) {
-        const address = user.addresses.find(
-            (address) => address._id === selectedAddress
-        );
+		if (user?.addresses?.length > 0 && selectedAddress) {
+			const address = user.addresses.find(
+				(address) => address._id === selectedAddress
+			);
 
-        // Check if the delivery mode is 'pickup'
-        if (deliveryMode === "pickup") {
-            setShippingFee(0); // No shipping fee for pick up
-        } else {
-            const fee = shippingFees[address?.municipality] || 0;
-            setShippingFee(fee);
-        }
-    } else {
-        setShippingFee(0);
-    }
-}, [selectedAddress, user, deliveryMode]); // Added deliveryMode to dependencies
+			// Check if the delivery mode is 'pickup'
+			if (deliveryMode === "pickup") {
+				setShippingFee(0); // No shipping fee for pick up
+			} else {
+				const fee = shippingFees[address?.municipality] || 0;
+				setShippingFee(fee);
+			}
+		} else {
+			setShippingFee(0);
+		}
+	}, [selectedAddress, user, deliveryMode]); // Added deliveryMode to dependencies
 
 	const totalAmountWithShippingFee = (totalAmount + shippingFee).toFixed(2);
 
 	// kapag partial payment
 	const partialPaymentAmount = ((totalAmount + shippingFee) / 2).toFixed(2);
 
-	const remainingBalance = (totalAmount + shippingFee - partialPaymentAmount).toFixed(2);
+	const remainingBalance = (
+		totalAmount +
+		shippingFee -
+		partialPaymentAmount
+	).toFixed(2);
 
 	const montlyInstallment = (remainingBalance / 3).toFixed(2);
 
@@ -580,6 +584,23 @@ const Cart = () => {
 											className="mb-4 w-full border border-gray-300 rounded-md px-3 py-2 text-gray-600 focus:border-green-600 focus:ring-green-500"
 										/>
 										{uploadMessage && <p>{uploadMessage}</p>}
+									</div>
+									{/* reference number and totalAmount */}
+									<div className="mt-5 mb-5">
+										<div>
+											<h1>Reference Number</h1>
+											<input
+												type="number"
+												className="py-2 px-4 bg-slate-100 rounded-md"
+											/>
+										</div>
+										<div>
+											<h1>Amount Paid</h1>
+											<input
+												type="number"
+												className="py-2 px-4 bg-slate-100 rounded-md"
+											/>
+										</div>
 									</div>
 								</div>
 							</div>

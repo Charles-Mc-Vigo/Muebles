@@ -106,11 +106,13 @@ const ViewUserOrder = () => {
 	}, [orderId]);
 
 	const handleAccept = async () => {
-		if (!price || isNaN(price) || price <= 0) {
-			toast.error("Please enter a valid price.");
-			return;
+		if (order.type === "ImageUpload") {
+			if (!price || isNaN(price) || price <= 0) {
+				toast.error("Please enter a valid price.");
+				return;
+			}
 		}
-	
+
 		try {
 			const response = await fetch(
 				`http://localhost:3000/api/admin/accept-order/${orderId}`,
@@ -123,13 +125,13 @@ const ViewUserOrder = () => {
 					body: JSON.stringify({ price }),
 				}
 			);
-	
+
 			if (!response.ok) {
 				const errorData = await response.json();
 				toast.error(errorData.message || "Failed to accept the order.");
 				return;
 			}
-	
+
 			const responseData = await response.json();
 			console.log("Order Response:", responseData);
 			toast.success("Order accepted successfully!");
@@ -143,7 +145,6 @@ const ViewUserOrder = () => {
 			console.error("Error:", error.message);
 		}
 	};
-	
 
 	const handleCancel = async () => {
 		try {
