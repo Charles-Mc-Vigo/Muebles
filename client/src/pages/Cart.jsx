@@ -24,6 +24,9 @@ const Cart = () => {
 	const [error, setError] = useState(null);
 	const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
 	const [paymentOption, setSelectedPaymentOption] = useState("Partial Payment");
+	const [referenceNumber, setReferenceNumber] = useState(null);
+	const [amountPaid, setAmountPaid] = useState(null);
+
 	const navigate = useNavigate();
 	const shippingFees = {
 		Boac: 500,
@@ -585,26 +588,37 @@ const Cart = () => {
 										/>
 										{uploadMessage && <p>{uploadMessage}</p>}
 									</div>
-									{/* reference number and totalAmount */}
-									<div className="mt-5 mb-5">
-										<div>
-											<h1>Reference Number</h1>
-											<input
-												type="number"
-												className="py-2 px-4 bg-slate-100 rounded-md"
-											/>
+
+									{paymentOption === "Partial Payment" && (
+										<div className="mt-5 mb-5">
+											<div>
+												<h1>Reference Number</h1>
+												<input
+													type="number"
+													className="py-2 px-4 bg-slate-100 rounded-md"
+													value={referenceNumber}
+													onChange={(e) => setReferenceNumber(e.target.value)}
+												/>
+											</div>
+											<div>
+												<h1>Amount Paid</h1>
+												<input
+													type="number"
+													className="py-2 px-4 bg-slate-100 rounded-md"
+													value={amountPaid}
+													onChange={(e) => setAmountPaid(e.target.value)}
+												/>
+											</div>
+											{amountPaid && parseFloat(amountPaid) !== parseFloat(partialPaymentAmount) && (
+												<p className="text-red-600">Amount paid should match the partial payment amount of ₱{partialPaymentAmount}</p>
+											)}
 										</div>
-										<div>
-											<h1>Amount Paid</h1>
-											<input
-												type="number"
-												className="py-2 px-4 bg-slate-100 rounded-md"
-											/>
-										</div>
-									</div>
+									)}
 								</div>
 							</div>
 						)}
+
+
 						{selectedPaymentMethod === "GCash" && (
 							<div className="mt-5 p-5 bg-slate-200">
 								<h1 className="text-xl font-semibold mb-2">Scan the QR Code</h1>
