@@ -78,7 +78,7 @@ const OrderDetails = () => {
 				{/* Order Summary */}
 				<div className="pb-6 mb-2">
 					<h2 className="flex justify-between text-xl md:text-2xl ml-2 font-semibold text-black-700 mb-4">
-						Order Summary <span>{order.type}</span>
+						Order Summary <span>{order.partialPayment}</span>
 					</h2>
 					<div className="gap-2 text-gray-600 border-t border-black-500 p-5">
 						<div className="grid grid-cols-1 sm:grid-cols-2 gap-2 items-baseline rounded-md border-black-500 p-2 shadow-md">

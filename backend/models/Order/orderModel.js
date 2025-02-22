@@ -100,6 +100,10 @@ const orderSchema = new mongoose.Schema(
     partialPayment: {
       type: Number,
     },
+    partialPaymentAmountPaid:{
+      type:Number,
+      default:0
+    },
     remainingBalance: {
       type: Number,
     },
@@ -310,6 +314,7 @@ orderSchema.statics.createFromCart = async function (
   shippingFee,
   totalAmountWithShipping,
   partialPayment,
+  amountPaid,
   remainingBalance,
   monthlyInstallment,
 	dueDate,
@@ -337,6 +342,7 @@ orderSchema.statics.createFromCart = async function (
     phoneNumber: cart.userId.phoneNumber,
     paymentMethod,
     proofOfPayment,
+    partialPaymentAmountPaid: amountPaid,
     paymentOption,
     shippingFee,
     deliveryMode,

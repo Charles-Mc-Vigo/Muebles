@@ -173,6 +173,8 @@ const Cart = () => {
 		formData.append("shippingFee", shippingFee);
 		formData.append("totalAmountWithShippingFee", totalAmountWithShippingFee);
 		formData.append("partialPaymentAmount", partialPaymentAmount);
+		// formData.append("amountPaid", amountPaid);
+		// not yet done
 		formData.append("remainingBalance", remainingBalance);
 		formData.append("montlyInstallment", montlyInstallment);
 
@@ -609,15 +611,19 @@ const Cart = () => {
 													onChange={(e) => setAmountPaid(e.target.value)}
 												/>
 											</div>
-											{amountPaid && parseFloat(amountPaid) !== parseFloat(partialPaymentAmount) && (
-												<p className="text-red-600">Amount paid should match the partial payment amount of ₱{partialPaymentAmount}</p>
-											)}
+											{amountPaid &&
+												parseFloat(amountPaid) !==
+													parseFloat(partialPaymentAmount) && (
+													<p className="text-red-600">
+														Amount paid should match the partial payment amount
+														of ₱{partialPaymentAmount}
+													</p>
+												)}
 										</div>
 									)}
 								</div>
 							</div>
 						)}
-
 
 						{selectedPaymentMethod === "GCash" && (
 							<div className="mt-5 p-5 bg-slate-200">
@@ -642,6 +648,43 @@ const Cart = () => {
 											className="mb-4 w-full border border-gray-300 rounded-md px-3 py-2 text-gray-600 focus:border-green-600 focus:ring-green-500"
 										/>
 										{uploadMessage && <p>{uploadMessage}</p>}
+									</div>
+									{/* for reference number */}
+									<div>
+										<h1>Reference Number</h1>
+										<input
+											type="number"
+											className="py-2 px-4 bg-slate-100 rounded-md"
+											value={referenceNumber}
+											onChange={(e) => setReferenceNumber(e.target.value)}
+										/>
+									</div>
+									{/* for specific fee */}
+									<div>
+										<h1>Specific Fee</h1>
+										<input
+											type="number"
+											className="py-2 px-4 bg-slate-100 rounded-md"
+											value={amountPaid}
+											onChange={(e) => setAmountPaid(e.target.value)}
+										/>
+										{paymentOption === "Partial Payment" &&
+											amountPaid &&
+											parseFloat(amountPaid) !==
+												parseFloat(partialPaymentAmount) && (
+												<p className="text-red-600">
+													Amount paid should match the partial payment amount of
+													₱{partialPaymentAmount}
+												</p>
+											)}
+										{paymentOption === "Full Payment" &&
+											amountPaid &&
+											parseFloat(amountPaid) !== parseFloat(fullPayment) && (
+												<p className="text-red-600">
+													Amount paid should match the full payment amount of ₱
+													{fullPayment}
+												</p>
+											)}
 									</div>
 								</div>
 							</div>

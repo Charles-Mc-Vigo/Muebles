@@ -18,6 +18,7 @@ const orderController = {
 				shippingFee,
 				totalAmountWithShippingFee,
 				partialPayment,
+				amountPaid,
 				remainingBalance,
 				montlyInstallment,
 			} = req.body;
@@ -82,6 +83,7 @@ const orderController = {
 				expectedDelivery,
 				totalAmount,
 				shippingFee,
+				amountPaid,
 				totalAmountWithShippingFee,
 				adjustedPartialPayment,
 				adjustedRemainingBalance,
