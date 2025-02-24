@@ -342,7 +342,7 @@ orderSchema.statics.createFromCart = async function (
     phoneNumber: cart.userId.phoneNumber,
     paymentMethod,
     proofOfPayment,
-    partialPaymentAmountPaid: amountPaid,
+    partialPaymentAmountPaid: remainingBalance,
     paymentOption,
     shippingFee,
     deliveryMode,
