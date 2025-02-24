@@ -61,9 +61,6 @@ const orderSchema = new mongoose.Schema(
       type: String,
       // required: true,
     },
-    referenceNumber:{
-      type:String
-    },
     orderStatus: {
       type: String,
       enum: ["pending", "confirmed", "delivered", "cancelled", "out for delivery", "repaired", "failed delivery"],
@@ -157,6 +154,9 @@ const orderSchema = new mongoose.Schema(
     designImages: {
       type: [String],  // Support multiple image uploads
       required: true,
+    },
+    referenceNumber:{
+      type: Number,
     },
     
   },
@@ -314,11 +314,11 @@ orderSchema.statics.createFromCart = async function (
   shippingFee,
   totalAmountWithShipping,
   partialPayment,
-  amountPaid,
   remainingBalance,
   monthlyInstallment,
 	dueDate,
 	interest,
+  referenceNumber,
 ) {
   const cart = await mongoose
     .model("Cart")
@@ -350,6 +350,7 @@ orderSchema.statics.createFromCart = async function (
     totalAmount,
     totalAmountWithShipping,
     type: "Cart",
+    referenceNumber,
   };
 
   if (paymentOption === "Full Payment") {
@@ -373,6 +374,7 @@ orderSchema.statics.createFromCart = async function (
 			dueDate,
       interest,
       lastPaymentDate: new Date(), // Set current date as last payment date
+      referenceNumber,
     };
   }
 

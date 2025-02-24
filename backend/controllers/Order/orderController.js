@@ -21,6 +21,7 @@ const orderController = {
 				amountPaid,
 				remainingBalance,
 				montlyInstallment,
+				referenceNumber
 			} = req.body;
 
 			const userId = req.user._id;
@@ -90,7 +91,8 @@ const orderController = {
 				adjustedInstallment,
 				dueDate,
 				interest,
-				lastPaymentDate
+				lastPaymentDate,
+				referenceNumber
 			);
 
 			// Clear the user's cart after order creation

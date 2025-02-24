@@ -173,10 +173,12 @@ const Cart = () => {
 		formData.append("shippingFee", shippingFee);
 		formData.append("totalAmountWithShippingFee", totalAmountWithShippingFee);
 		formData.append("partialPaymentAmount", partialPaymentAmount);
+		
 		// formData.append("amountPaid", amountPaid);
 		// not yet done
 		formData.append("remainingBalance", remainingBalance);
 		formData.append("montlyInstallment", montlyInstallment);
+		formData.append("referenceNumber", referenceNumber);
 
 		// Log FormData contents
 		for (const [key, value] of formData.entries()) {
