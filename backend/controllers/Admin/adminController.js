@@ -511,7 +511,7 @@ exports.AcceptOrder = async (req, res) => {
     return res.status(200).json({ message: "Order accepted successfully!", order: orderUpdate });
   } catch (error) {
     console.error("Error accepting the order:", error);
-    res.status(500).json({ message: "Server error!" });
+    res.status(500).json({ message:error.message || "Server Error"});
   }
 };
 

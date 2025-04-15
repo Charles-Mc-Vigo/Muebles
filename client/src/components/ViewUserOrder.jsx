@@ -128,7 +128,7 @@ const ViewUserOrder = () => {
 
 			if (!response.ok) {
 				const errorData = await response.json();
-				toast.error(errorData.message || "Failed to accept the order.");
+				toast.error(errorData.message);
 				return;
 			}
 
