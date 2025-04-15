@@ -463,7 +463,6 @@ exports.myProfile = async (req, res) => {
 };
 
 //accept order
-//accept order
 exports.AcceptOrder = async (req, res) => {
   try {
     // Validate Admin Role
@@ -499,6 +498,8 @@ exports.AcceptOrder = async (req, res) => {
     }
 
     // Validate Furniture and Material
+		console.log("Order to Accept: ", orderToAccept);
+
     await validateFurnitureAndMaterial(orderToAccept);
 
     // Confirm the order

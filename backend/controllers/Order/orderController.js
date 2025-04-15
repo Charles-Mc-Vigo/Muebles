@@ -178,8 +178,8 @@ const orderController = {
 			const preOrder = await Order.preOrder(
 				user,
 				furniture,
-				color,
 				material,
+				color,
 				size,
 				quantity,
 				paymentMethod,
